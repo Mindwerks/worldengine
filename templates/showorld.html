@@ -6,10 +6,10 @@ Width: {{world.width()}} <br/>
 Height: {{world.height()}} <br/>
 </p>
 <img src="/map/{{world.name}}.png" />
-<h2>Cities</h2>
+<h2>Cities ({{cities|length}})</h2>
 <ul>
-{% for c in world.cities %}
-<li>{{c}}</li>
+{% for c in cities %}
+<li>{{c.name}} ({{c.x}},{{c.y}})</li>
 {% endfor %}
 </ul>
 {% endblock %}
