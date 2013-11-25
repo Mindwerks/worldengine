@@ -1,13 +1,12 @@
-from flask import Flask,request,get_flashed_messages,redirect,render_template,url_for,g
+from flask import Flask,request,get_flashed_messages,redirect,render_template,url_for,g,send_file
 from app import app
 from forms import *
 from flask.ext.admin import helpers
 
 from random import randint, choice
 
-world = None
-
 import atomic
+import math
 
 atomic.ATOMDIR = '.'
 
@@ -20,7 +19,6 @@ name_generator.atomize('atoms/hobbits')
 name_generator.atomize('atoms/human_m')
 name_generator.atomize('atoms/human_f')
 name_generator.atomize('atoms/old_phoenix')
-#name_generator.atomize('atoms/orcs_wh')
 
 @app.route('/')
 @app.route('/index')
@@ -93,7 +91,7 @@ def create_map(w,h,worldname):
 	while nlandstoplace>0:
 		if ncurrentcontinent==0:
 			pos = random_pos_centered_no_borders(w,h)
-			ncurrentcontinent= randint(2,10)*randint(1,20)
+			ncurrentcontinent= randint(2,10)*randint(1,nland/14)
 		x,y = pos
 		if tiles[y][x] == 'S':
 			nlandstoplace-=1
@@ -103,13 +101,13 @@ def create_map(w,h,worldname):
 
 	# Place mountains
 	vector = None
-	ntoplace = randint(0,nland/5)+randint(0,nland/7)+randint(0,nland/7)
+	ntoplace = randint(0,nland/7)+randint(0,nland/7)+randint(0,nland/7)
 	print("Mountains to be placed %i" % ntoplace)
 	ncurrent = 0
 	while ntoplace>0:
 		if ncurrent==0:
 			pos = random_land(w,h,tiles)
-			ncurrent = randint(1,15)
+			ncurrent = randint(1,math.trunc(math.sqrt(nland)/5))
 		x,y = pos
 		if tiles[y][x]!='M':
 			tiles[y][x] = 'M'
@@ -119,7 +117,7 @@ def create_map(w,h,worldname):
 		(pos,vector) = move_in_land_with_inertia(pos,w,h,tiles,vector)
 
 	# Place cities
-	ncities = randint(0,nland/150)+randint(0,nland/100)+randint(0,nland/150)
+	ncities = randint(0,nland/150)+randint(0,nland/150)+randint(0,nland/150)
 	print("N cities %i" % ncities)
 	cities = []
 	while ncities>0:
@@ -141,24 +139,68 @@ class World:
 		self.tiles = tiles
 		self.cities = cities
 
+	def width(self):
+		return len(self.tiles[0])
+
+	def height(self):
+		return len(self.tiles)
+
 	def save(self):
 		import pickle
 		with open("worlds/%s.world" % self.name,'w') as f:
 		    pickle.dump(self,f)
 
-@app.route('/showmap')
-def show_map_view():
-    global world
-    return render_template('showmap.html', title="Map",user=None, tiles=world.tiles)
+	@classmethod
+	def load(self,name):
+		import pickle
+		with open("worlds/%s.world" % name,'r') as f:
+		    return pickle.load(f)
+
+def serve_pil_image(pil_img):
+    import StringIO
+    img_io = StringIO.StringIO()
+    pil_img.save(img_io, 'PNG')
+    img_io.seek(0)
+    return send_file(img_io, mimetype='image/png')
+
+def generate_world_img(world):
+	import Image
+	img = Image.new('RGBA',(world.width(),world.height()))
+	pixels = img.load()
+	for y in range(0,world.height()):
+		for x in range(0,world.width()):
+			if world.tiles[y][x]=='S':
+				pixels[x,y] = (0,0,255,255)
+			elif world.tiles[y][x]=='M':
+				pixels[x,y] = (100,100,20,255)
+			else:
+				pixels[x,y] = (0,255,0,255)
+	return img
+
+@app.route('/map/<worldname>.png')
+def show_map_image(worldname):
+    world = World.load(worldname)
+    if world==None:
+    	return "Request world does not exist"
+    else:
+    	img = generate_world_img(world)
+    	return serve_pil_image(img)
+
+@app.route('/world/<worldname>')
+def show_world(worldname):
+    world = World.load(worldname)
+    if world==None:
+    	return "Request world does not exist"
+    else:
+    	return render_template('showorld.html', title="Map",user=None, world=world)
 
 @app.route('/createmap',methods=['GET','POST'])
 def create_map_view():
 	form = CreateMapForm(request.form)
 	if request.method == 'POST' and form.validate():
-		global world 
 		world = create_map(form.data['width'],form.data['height'],form.data['name'])	
 		world.save()
-		return redirect('/showmap')
+		return redirect('/world/%s' % world.name)
 	user = None
 	#user=login.current_user 
 	return render_template('createmap.html', 
