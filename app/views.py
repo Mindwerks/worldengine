@@ -62,7 +62,7 @@ def show_world(worldname):
     if world==None:
     	return "Request world does not exist"
     else:
-    	return render_template('showorld.html', title="Map",user=None, world=world, cities=sorted(world.cities, key=lambda city: city.name))
+    	return render_template('showorld.html', title="Map",user=None, world=world, cities=sorted(world.settlements, key=lambda city: city.name))
 
 @app.route('/createmap',methods=['GET','POST'])
 def create_world_view():

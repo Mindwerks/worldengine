@@ -20,10 +20,12 @@ class Positioned:
 		self.x = x
 		self.y = y
 
-class City(Positioned):
-	def __init__(self,x,y,name):
+class Settlement(Positioned):	
+	def __init__(self,x,y,name,type):
+		"""Type should be Village, Town or City"""
 		Positioned.__init__(self,x,y)
 		self.name = name
+		self.type = type
 
 # Tiles:
 # S Sea
@@ -36,10 +38,10 @@ class City(Positioned):
 # H Hills
 
 class World:
-	def __init__(self,name,tiles,cities):
+	def __init__(self,name,tiles,settlements):
 		self.name   = name
 		self.tiles  = tiles
-		self.cities = cities
+		self.settlements = settlements
 
 	def width(self):
 		return len(self.tiles[0])
@@ -195,7 +197,7 @@ def place_group(name,ntoplace,letter,ncurrent_lambda,tiles,w,h):
 def in_border(x,y,w,h):
 	return x>=0 and y>=0 and x<w and y<h
 
-def cities_around(tiles,x,y,w,h):
+def settlements_around(tiles,x,y,w,h):
 	for px in range(x-2,x+3):
 		for py in range(y-2,y+3):
 			if in_border(px,py,w,h) and tiles[py][px]=='C':
@@ -258,19 +260,20 @@ def create_map(w,h,worldname):
 	tiles = place_group('Forests',randint(0,nland/7)+randint(0,nland/5),
 		'F',(lambda: randint(1,sqnland/7)),tiles,w,h)
 
-	# Place cities
-	ncities = randint(0,sqnland)+randint(0,sqnland)+randint(0,sqnland)
-	cities = []
-	while ncities>0:
+	# Place settlements
+	nsettlements = randint(0,sqnland)+randint(0,sqnland)+randint(0,sqnland)
+	settlements = []
+	while nsettlements>0:
 		x,y = random_land(w,h,tiles)
-		if tiles[y][x]=='P' and not cities_around(tiles,x,y,w,h):
+		if tiles[y][x]=='P' and not settlements_around(tiles,x,y,w,h):
 			tiles[y][x] = 'C'
 			name = generate_name()			
-			if not [c for c in cities if c.name==name]:
-				city = City(x,y,name)
-				cities.append(city)
-				ncities-=1
+			if not [c for c in settlements if c.name==name]:
+				type = choice(['village','village','village','town','town','city'])
+				settlement = Settlement(x,y,name,type)
+				settlements.append(settlement)
+				nsettlements-=1
 
-	world = World(worldname,tiles,cities)
+	world = World(worldname,tiles,settlements)
 	return world
 
