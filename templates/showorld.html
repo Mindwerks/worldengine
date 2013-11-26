@@ -9,7 +9,7 @@ Height: {{world.height()}} <br/>
 <h2>Cities ({{cities|length}})</h2>
 <ul>
 {% for c in cities %}
-<li>{{c.name}} ({{c.x}},{{c.y}})</li>
+<li>{{c.name}} ({{c.type}}) at ({{c.x}},{{c.y}})</li>
 {% endfor %}
 </ul>
 {% endblock %}
