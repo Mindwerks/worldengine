@@ -21,7 +21,7 @@ def serve_pil_image(pil_img):
     return send_file(img_io, mimetype='image/png')
 
 def generate_world_img(world):
-	import Image
+	from PIL import Image
 	img = Image.new('RGBA',(world.width(),world.height()))
 	pixels = img.load()
 	for y in range(0,world.height()):
