@@ -60,6 +60,15 @@ class World:
 		with open("worlds/%s.world" % name,'r') as f:
 		    return pickle.load(f)
 
+class Game:
+	pass
+
+class Adventurer:
+	pass
+
+class Group:
+	pass
+
 def random_pos_centered_no_borders(w,h):
 	minx = w/10+1
 	maxx = (w*9)/10-1

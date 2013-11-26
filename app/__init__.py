@@ -13,6 +13,6 @@ app.secret_key = 'SecretLands'
 #login_manager.init_app(app)
 
 #from app import views, models
-from app import views
+from app.views import worlds
 
 

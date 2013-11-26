@@ -1,10 +1,10 @@
 from flask import Flask,request,get_flashed_messages,redirect,render_template,url_for,g,send_file
 from app import app
-from forms import *
+from app.forms import *
 from flask.ext.admin import helpers
 
 
-from models import *
+from app.models import *
 
 
 @app.route('/')
