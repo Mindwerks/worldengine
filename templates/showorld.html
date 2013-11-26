@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>World {{world.name}}</h1>
+<p>
+Width: {{world.width()}} <br/>
+Height: {{world.height()}} <br/>
+</p>
+<img src="/map/{{world.name}}.png" />
+<h2>Cities ({{cities|length}})</h2>
+<ul>
+{% for c in cities %}
+<li>{{c.name}} ({{c.x}},{{c.y}})</li>
+{% endfor %}
+</ul>
+{% endblock %}
