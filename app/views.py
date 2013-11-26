@@ -24,7 +24,7 @@ name_generator.atomize('atoms/old_phoenix')
 
 @app.route('/')
 @app.route('/index')
-def index():
+def homepage():
 	return render_template('index.html', 
         title="Homepage",user=None)
 
@@ -152,7 +152,7 @@ def show_map_view():
     return render_template('showmap.html', title="Map",user=None, tiles=world.tiles)
 
 @app.route('/createmap',methods=['GET','POST'])
-def create_map_view():
+def create_world_view():
 	form = CreateMapForm(request.form)
 	if request.method == 'POST' and form.validate():
 		global world 
