@@ -37,6 +37,10 @@ class Settlement(Positioned):
 # F Forest
 # H Hills
 
+#online_users = mongo.db.users.find({'online': True})
+#    return render_template('index.html',
+#        online_users=online_users)
+
 class World:
 	def __init__(self,name,tiles,settlements):
 		self.name   = name
@@ -59,6 +63,25 @@ class World:
 		import pickle
 		with open("worlds/%s.world" % name,'r') as f:
 		    return pickle.load(f)
+
+	@classmethod
+	def delete(self,name):
+		path = "worlds/%s.world" % name
+		import os
+		os.remove(path)
+
+	@classmethod
+	def all_names(self):
+		import os
+		worlds_dir = 'worlds'
+		names = []
+		for dir_entry in os.listdir(worlds_dir):
+			dir_entry_path = os.path.join(worlds_dir, dir_entry)
+			if os.path.isfile(dir_entry_path):
+				name = os.path.splitext(dir_entry)[0]
+				names.append(name)
+		return names
+
 
 class Game:
 	pass
