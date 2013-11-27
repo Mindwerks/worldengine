@@ -56,6 +56,11 @@ def show_map_image(worldname):
     	img = generate_world_img(world)
     	return serve_pil_image(img)
 
+@app.route('/world/<worldname>/delete')
+def delete_world(worldname):
+    World.delete(worldname)
+    return redirect(url_for('worlds'))
+
 @app.route('/world/<worldname>')
 def show_world(worldname):
     world = World.load(worldname)
@@ -76,3 +81,10 @@ def create_world_view():
 	return render_template('createmap.html', 
         title="Create map",user=None,
         form=form)
+
+@app.route('/worlds')
+def worlds():
+	world_names = World.all_names()
+	return render_template('worlds.html', 
+        title="Worlds",user=None,
+        world_names=world_names)	

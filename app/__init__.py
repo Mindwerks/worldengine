@@ -4,6 +4,10 @@ from flask.ext.sqlalchemy import SQLAlchemy
 app = Flask('Lands')
 app.debug = True
 app.secret_key = 'SecretLands'
+
+from flask.ext.pymongo import PyMongo
+mongo = PyMongo(app)
+
 #app.config.from_object('config')
 #db = SQLAlchemy(app)
 
