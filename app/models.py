@@ -1,4 +1,5 @@
 from random import randint, choice, random
+from app import db
 
 import atomic
 import math
@@ -83,8 +84,13 @@ class World:
 		return names
 
 
-class Game:
-	pass
+class Game(db.Document):
+	name = db.StringField(max_length=255, required=True)
+	world_name = db.StringField(max_length=255, required=True)
+
+#	def __init__(self,name,world_name):
+#		self.name = name
+#		self.world_name = world_name
 
 class Adventurer:
 	pass
