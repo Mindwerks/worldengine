@@ -27,8 +27,9 @@ def games_view():
 
 @app.route('/game/<game_name>/delete')
 def delete_game(game_name):
-    Game.delete(game_name)
-    return redirect(url_for('games_view'))	
+    game=Game.objects.get_or_404(name=game_name)
+    game.delete()
+    return redirect(url_for('games_view'))
 
 @app.route('/create_game',methods=['GET','POST'])
 def create_game_view():
