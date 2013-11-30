@@ -92,11 +92,21 @@ class Game(db.Document):
 #		self.name = name
 #		self.world_name = world_name
 
-class Adventurer:
-	pass
+class Adventurer(db.Document):
+	name = db.StringField(max_length=255, required=True)
+	race = db.StringField(max_length=255, required=True)
+	job  = db.StringField(max_length=255, required=True)
 
-class Group:
-	pass
+	def __init__(self,race,job):
+		self.race = race
+		self.job = job
+
+class Group(db.Document):
+	name = db.StringField(max_length=255, required=True)
+	
+
+	def add_member(self,race,type):
+		pass
 
 def random_pos_centered_no_borders(w,h):
 	minx = w/10+1
