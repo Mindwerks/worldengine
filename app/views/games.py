@@ -31,6 +31,57 @@ def delete_game(game_name):
     game.delete()
     return redirect(url_for('games_view'))
 
+class CreateGroup(Form):
+	types = [
+		('fighter', 'Fighter'),
+		('priest',  'Priest'),
+		('wizard',  'Wizard'),
+		('thief',   'Thief'),
+		('merchant','Merchant'),
+		('hunter',  'Hunter'),
+		('blacksmith','Blacksmith'),
+	]
+	races = [
+		('human', 'Human'),
+		('elf', 'Elf'),
+		('dwarf', 'Dwarf'),
+		('halforc', 'Half-orc'),		
+	]
+	name   = TextField(validators=[Required()])
+	race_member_1 = SelectField(validators=[Required()],
+		choices=races)
+	type_member_1 = SelectField(validators=[Required()],
+		choices=types)	
+	race_member_2 = SelectField(validators=[Required()],
+		choices=races)
+	type_member_2 = SelectField(validators=[Required()],
+		choices=types)
+	race_member_3 = SelectField(validators=[Required()],
+		choices=races)
+	type_member_3 = SelectField(validators=[Required()],
+		choices=types)	
+
+@app.route('/game/<game_name>/create_group',methods=['GET','POST'])
+def create_group_view(game_name):
+	game = Game.objects.get_or_404(name=game_name)
+	form = CreateGroup(request.form)
+	if request.method == 'POST' and form.validate():
+		group = Group(form.data['name'])
+		group.add_member(
+			form.data['type_member_1'],
+			form.data['race_member_1'])
+		group.add_member(
+			form.data['type_member_2'],
+			form.data['race_member_2'])
+		group.add_member(
+			form.data['type_member_3'],
+			form.data['race_member_3'])
+		group.save()
+		return redirect(url_for('game_view',game_name=game.name))
+	return render_template('creategroup.html', 
+        title="Create group",
+        form=form)    
+
 @app.route('/create_game',methods=['GET','POST'])
 def create_game_view():
 	form = CreateGame(request.form)

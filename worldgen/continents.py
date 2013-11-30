@@ -128,6 +128,7 @@ def generate_base_heightmap(seed,plates):
 
 	def consider_borders(elevation):
 		from noise import pnoise2, snoise2
+		base = random.randint(0,4096)
 		octaves = 3
 		freq = 16.0 * octaves
 
@@ -141,7 +142,7 @@ def generate_base_heightmap(seed,plates):
 						deltas[b] = random.randrange(-2,2)*random.randrange(0,2)*random.randrange(0,2)
 					deltatot += deltas[b]
 
-				elevation[y][x] += (deltatot/10)*((snoise2(x / freq*2, y / freq*2, octaves)+1.0))
+				elevation[y][x] += (deltatot/10)*((snoise2(x / freq*2, y / freq*2, octaves, base=base)+1.0))
 
 	def place_ocean(x,y,i):
 		elevation[y][x] = (elevation[y][x]*i)/OCEAN_BORDER
@@ -328,6 +329,7 @@ def draw_precipitation(temp,filename):
 
 def temperature(seed):
 	random.seed(seed*7)
+	base = random.randint(0,4096)
 	temp = [[0 for x in xrange(WIDTH)] for y in xrange(HEIGHT)] 
 	
 	from noise import pnoise2, snoise2
@@ -338,7 +340,7 @@ def temperature(seed):
 		yscaled = float(y)/HEIGHT
 		latitude_factor = 1.0-(abs(yscaled-0.5)*2)
 		for x in range(0,WIDTH):
-			n = snoise2(x / freq, y / freq, octaves)
+			n = snoise2(x / freq, y / freq, octaves,base=base)
 			t = (latitude_factor*4+n)/5.0
 			temp[y][x] = t
 
@@ -346,6 +348,7 @@ def temperature(seed):
 
 def precipitation(seed):
 	random.seed(seed*13)
+	base = random.randint(0,4096)
 	temp = [[0 for x in xrange(WIDTH)] for y in xrange(HEIGHT)] 
 	
 	from noise import pnoise2, snoise2
@@ -356,7 +359,7 @@ def precipitation(seed):
 		yscaled = float(y)/HEIGHT
 		latitude_factor = 1.0-(abs(yscaled-0.5)*2)
 		for x in range(0,WIDTH):
-			n = snoise2(x / freq, y / freq, octaves)
+			n = snoise2(x / freq, y / freq, octaves, base=base)
 			t = (latitude_factor*2+n)/3.0
 			temp[y][x] = t
 

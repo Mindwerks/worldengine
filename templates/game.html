@@ -3,5 +3,9 @@
 <h1>Game {{game.name}}</h1>
 <p>
 	Based on <a href="{{url_for('show_world',worldname=game.world_name)}}">{{game.world_name}}</a>
+	<br/>
+	<a href="{{url_for('create_group_view',game_name=game.name)}}">
+		Create a group
+	</a>
 </p>
 {% endblock %}
