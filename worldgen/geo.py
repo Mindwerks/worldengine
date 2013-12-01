@@ -374,7 +374,41 @@ class World(object):
 		self.temperature = {'data':data,'thresholds':thresholds}
 
 	def set_permeability(self,data,thresholds):
-		self.precipitation = {'data':data,'thresholds':thresholds}		
+		self.permeability = {'data':data,'thresholds':thresholds}
+
+	def random_land(self):
+		x,y = random_point()
+		if self.ocean[y][x]:
+			return self.random_land()
+		else:
+			return (x,y)
+
+	@classmethod
+	def from_dict(self,dict):
+
+		def map_from_dict(md):
+			m = []
+			for row_dict in md:
+				row = []
+				for col_dict in row_dict:
+					row.append(col_dict)
+				m.append(row)
+			return m
+
+		def thresholds_from_dict(td):
+			t = []
+			return t
+
+		def mapwt_from_dict(md):
+			return (map_from_dict(md['data'],thresholds_from_dict(md['thresholds'])))
+
+		instance = World(dict['name'])
+		instance.set_biome(map_from_dict(dict['biome']))
+		instance.set_ocean(map_from_dict(dict['ocean']))
+		instance.set_precipitation(map_from_dict(dict['precipitation']['data']),[])
+		instance.set_temperature(map_from_dict(dict['temperature']['data']),[])
+		#instance.set_permeability(map_from_dict(dict['permeability']['data']),[])
+		return instance
 
 
 def world_gen(name,seed,verbose=False):
