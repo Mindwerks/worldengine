@@ -201,13 +201,13 @@ def draw_elevation(elevation,filename):
 			pixels[x,y] = (e,e,e,255)
 	img.save(filename)
 
-def find_elevation(elevation,land_perc):
+def find_threshold(elevation,land_perc,ocean=None):
 	
 	def count(e):
 		tot = 0
 		for y in range(0,HEIGHT):
 			for x in range(0,WIDTH):
-				if elevation[y][x]>e:
+				if elevation[y][x]>e and (ocean==None or not ocean[y][x]):
 					tot+=1
 		return tot
 
@@ -225,15 +225,58 @@ def find_elevation(elevation,land_perc):
 				return b
 		m = (a+b)/2
 		cm = count(m)
-		print("For %i found %i (%f)" % (m,cm,float(cm)/(WIDTH*HEIGHT)))
 		if desired<cm:
 			return search(m,b,desired)
 		else:
 			return search(a,m,desired)
 
-	desired_land = WIDTH*HEIGHT*land_perc
-	print("Desired land: %i" % desired_land)
+	all_land = WIDTH*HEIGHT
+	if ocean:
+		for y in range(0,HEIGHT):
+			for x in range(0,WIDTH):
+				if ocean[y][x]:
+					all_land-=1
+	desired_land = all_land*land_perc
 	return search(0,255,desired_land)
+
+def find_threshold_f(elevation,land_perc,ocean=None):
+	
+	def count(e):
+		tot = 0
+		for y in range(0,HEIGHT):
+			for x in range(0,WIDTH):
+				if elevation[y][x]>e and (ocean==None or not ocean[y][x]):
+					tot+=1
+		return tot
+
+	def search(a,b,desired):
+		if a==b:
+			return a
+		if abs(b-a)<0.005:
+			ca = count(a)
+			cb = count(b)
+			dista = abs(desired-ca)
+			distb = abs(desired-cb)
+			if dista<distb:
+				return a
+			else:
+				return b
+		m = (a+b)/2.0
+		cm = count(m)
+		if desired<cm:
+			return search(m,b,desired)
+		else:
+			return search(a,m,desired)
+
+	all_land = WIDTH*HEIGHT
+	if ocean:
+		for y in range(0,HEIGHT):
+			for x in range(0,WIDTH):
+				if ocean[y][x]:
+					all_land-=1
+	desired_land = all_land*land_perc
+	return search(-1.0,2.0,desired_land)
+
 
 def draw_ocean_land(elevation,sea_level,filename):
 	from PIL import Image
@@ -326,8 +369,7 @@ def draw_precipitation(temp,filename):
 			pixels[x,y] = (0,0,c,255)
 	img.save(filename)	
 
-
-def temperature(seed):
+def temperature(seed,elevation,mountain_level):
 	random.seed(seed*7)
 	base = random.randint(0,4096)
 	temp = [[0 for x in xrange(WIDTH)] for y in xrange(HEIGHT)] 
@@ -340,8 +382,13 @@ def temperature(seed):
 		yscaled = float(y)/HEIGHT
 		latitude_factor = 1.0-(abs(yscaled-0.5)*2)
 		for x in range(0,WIDTH):
+			if elevation[y][x]<mountain_level:
+				altitude_factor = 0.5
+			else:
+				altitude_factor = 1.0-float(elevation[y][x]-mountain_level)/(255-mountain_level)
+
 			n = snoise2(x / freq, y / freq, octaves,base=base)
-			t = (latitude_factor*4+n)/5.0
+			t = (latitude_factor*2+n*2+altitude_factor*3)/7.0
 			temp[y][x] = t
 
 	return temp
@@ -360,7 +407,172 @@ def precipitation(seed):
 		latitude_factor = 1.0-(abs(yscaled-0.5)*2)
 		for x in range(0,WIDTH):
 			n = snoise2(x / freq, y / freq, octaves, base=base)
-			t = (latitude_factor*2+n)/3.0
+			t = (latitude_factor+n*2)/3.0
 			temp[y][x] = t
 
-	return temp	
+	return temp
+
+def permeability(seed):
+	random.seed(seed*37)
+	base = random.randint(0,4096)
+	temp = [[0 for x in xrange(WIDTH)] for y in xrange(HEIGHT)] 
+	
+	from noise import pnoise2, snoise2
+	octaves = 6
+	freq = 64.0 * octaves
+
+	for y in range(0,HEIGHT):
+		yscaled = float(y)/HEIGHT
+		for x in range(0,WIDTH):
+			n = snoise2(x / freq, y / freq, octaves, base=base)
+			t = n
+			temp[y][x] = t
+
+	return temp		
+
+def classify(data,thresholds,x,y):
+	value = data[y][x]
+	for name,level in thresholds:
+		if (level==None) or (value<level):
+			return name
+
+import operator
+
+class World:
+	def __init__(self):
+		pass
+
+	def set_biome(self,biome):
+		self.biome = biome
+
+	def set_ocean(self,ocean):
+		self.ocean = ocean
+
+	def set_elevation(self,data,thresholds):
+		self.elevation = {'data':data,'thresholds':thresholds}
+
+	def set_precipitation(self,data,thresholds):
+		self.precipitation = {'data':data,'thresholds':thresholds}
+
+	def set_temperature(self,data,thresholds):
+		self.temperature = {'data':data,'thresholds':thresholds}
+
+	def set_permeability(self,data,thresholds):
+		self.precipitation = {'data':data,'thresholds':thresholds}		
+
+def world_gen(elevation,seed):
+	i = seed
+	w = World()
+
+	# Elevation with thresholds
+	e = elevation
+	sl = find_threshold(e,0.3)
+	ocean = fill_ocean(e,sl+1.5)
+	hl = find_threshold(e,0.10)
+	ml = find_threshold(e,0.03)
+	e_th = [('plain',hl),('hill',ml),('mountain',None)]
+	w.set_ocean(ocean)
+	w.set_elevation(e,e_th)
+
+	# Precipitation with thresholds
+	p = precipitation(i)
+	p_th = [
+		('low',find_threshold_f(p,0.75,ocean)),
+		('med',find_threshold_f(p,0.3,ocean)),
+		('hig',None)
+	]
+	w.set_precipitation(p,p_th)
+
+	# Temperature with thresholds
+	t = temperature(i,e,ml)
+	t_th = [
+		('vlo',find_threshold_f(t,0.95,ocean)),
+		('low',find_threshold_f(t,0.75,ocean)),
+		('med',find_threshold_f(t,0.4,ocean)),
+		('hig',None)
+	]
+	w.set_temperature(t,t_th)
+	
+	# Permeability with thresholds
+	perm = permeability(i)
+	perm_th = [
+		('low',find_threshold_f(perm,0.75,ocean)),
+		('med',find_threshold_f(perm,0.25,ocean)),
+		('hig',None)
+	]
+	w.set_permeability(perm,perm_th)
+
+	cm = {}
+	biome_cm = {}
+	biome = [[0 for x in xrange(WIDTH)] for y in xrange(HEIGHT)]
+	for y in xrange(512):
+		for x in xrange(512):
+			if ocean[y][x]:
+				biome[y][x] = 'ocean'
+			else:
+				el = classify(e,e_th,x,y)
+				prl = classify(p,p_th,x,y)			
+				tl = classify(t,t_th,x,y)
+				pel = classify(perm,perm_th,x,y)
+				complex_l = (el,prl,tl,pel)
+				if not complex_l in cm:
+					cm[complex_l] = 0
+				cm[complex_l] += 1
+				if prl=='low' and tl=='low':
+					biome[y][x] = 'tundra'
+				elif prl=='low' and tl=='hig':
+					biome[y][x] = 'sand desert'
+				elif prl=='low' and tl=='med':
+					if pel=='low' or pel=='med':
+						biome[y][x] = 'steppe'
+					else:
+						biome[y][x] = 'rock desert'
+				elif prl=='hig' and tl=='hig':
+					biome[y][x] = 'jungle'
+				elif prl=='hig' and prl=='low':
+					biome[y][x] = 'swamp'
+				elif prl=='hig' and tl=='low':
+					biome[y][x] = 'forest'
+				elif prl=='hig' and tl=='med':
+					biome[y][x] = 'forest'					
+				elif tl=='vlo':
+					biome[y][x] = 'iceland'
+				elif prl=='med':
+					biome[y][x] = 'grassland'
+				else:
+					biome[y][x] = 'UNASSIGNED'
+			if not biome[y][x] in biome_cm:
+				biome_cm[biome[y][x]] = 0
+			biome_cm[biome[y][x]] += 1
+
+	for cl in cm.keys():
+		count = cm[cl]
+		print("%s = %i" %(str(cl),count))
+
+	for cl in biome_cm.keys():
+		count = biome_cm[cl]
+		print("%s = %i" %(str(cl),count))
+
+	w.set_biome(biome)
+	return w
+
+def draw_biome(temp,filename):
+	from PIL import Image
+	img = Image.new('RGBA',(WIDTH,HEIGHT))
+	pixels = img.load()
+	biome_colors = {
+		'iceland': (208,241,245),
+		'jungle' : (54,240,17),
+		'tundra' : (147,158,157),
+		'ocean'  : (23,94,145),
+		'forest' : (10,89,15),
+		'grassland' : (69,133,73),
+		'steppe'    : (90,117,92),
+		'sand desert' : (207,204,58),
+		'rock desert' : (94,93,25)
+	}
+	for y in range(0,HEIGHT):
+		for x in range(0,WIDTH):
+			v = temp[y][x]
+			pixels[x,y] = biome_colors[v]
+	img.save(filename)	
