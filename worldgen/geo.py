@@ -354,7 +354,7 @@ def classify(data,thresholds,x,y):
 
 import operator
 
-class World:
+class World(object):
 	def __init__(self,name):
 		self.name = name
 
