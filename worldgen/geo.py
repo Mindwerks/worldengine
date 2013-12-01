@@ -1,8 +1,9 @@
 import random
 import math
+from noise import snoise2
 
-WIDTH  = 512
-HEIGHT = 512
+WIDTH    = 512
+HEIGHT   = 512
 N_PLATES = 32
 MIN_ELEV = 0
 MAX_ELEV = 255
@@ -27,10 +28,12 @@ def nearest(p,hot_points):
 	return nearest_hp_i
 
 def generate_plates(seed):
+	N_HOT_POINTS = 512
+
 	random.seed(seed)
 
 	# generate hot points
-	hot_points = [random_point() for i in range(512)]
+	hot_points = [random_point() for i in range(N_HOT_POINTS)]
 
 	# generate plate-origins
 	plate_origins = [random_point() for i in range(N_PLATES)]
@@ -97,14 +100,13 @@ def antialias(elevation,steps):
 	for i in range(0,steps):
 		antialias()
 
-def elevnoise(elevation):
-	from noise import pnoise2, snoise2
+def elevnoise(elevation,seed):	
 	octaves = 6
 	freq = 16.0 * octaves
 	for y in range(0,HEIGHT):
 	    for x in range(0,WIDTH):
-	    	n = int(snoise2(x / freq*2, y / freq*2, octaves) * 127.0 + 128.0)
-	    	elevation[y][x]+=n/4
+	    	n = int(snoise2(x / freq*2, y / freq*2, octaves, base=seed) * 127.0 + 128.0)
+	    	elevation[y][x]+=n/2
 
 def generate_base_heightmap(seed,plates):
 
@@ -173,33 +175,9 @@ def generate_base_heightmap(seed,plates):
 	consider_borders(elevation)
 	place_oceans_around(elevation)	
 	antialias(elevation,5)
-	elevnoise(elevation)
+	elevnoise(elevation,random.randint(0,4096))
 
 	return elevation
-
-def draw_plates(plates,filename):
-	from PIL import Image
-	img = Image.new('RGBA',(WIDTH,HEIGHT))
-	pixels = img.load()
-	for y in range(0,HEIGHT):
-		for x in range(0,WIDTH):
-			n = plates[y][x]*255/N_PLATES
-			pixels[x,y] = (n,n,n,255)
-	img.save(filename)
-
-def draw_elevation(elevation,filename):
-	from PIL import Image
-	img = Image.new('RGBA',(WIDTH,HEIGHT))
-	pixels = img.load()
-	for y in range(0,HEIGHT):
-		for x in range(0,WIDTH):
-			e = int(elevation[y][x]*255/MAX_ELEV)
-			if e<0:
-				e=0
-			if e>255:
-				e=255
-			pixels[x,y] = (e,e,e,255)
-	img.save(filename)
 
 def find_threshold(elevation,land_perc,ocean=None):
 	
@@ -277,19 +255,6 @@ def find_threshold_f(elevation,land_perc,ocean=None):
 	desired_land = all_land*land_perc
 	return search(-1.0,2.0,desired_land)
 
-
-def draw_ocean_land(elevation,sea_level,filename):
-	from PIL import Image
-	img = Image.new('RGBA',(WIDTH,HEIGHT))
-	pixels = img.load()
-	for y in range(0,HEIGHT):
-		for x in range(0,WIDTH):
-			if elevation[y][x]>sea_level:
-				pixels[x,y] = (0,255,0,255)
-			else:
-				pixels[x,y] = (0,0,255,255)
-	img.save(filename)
-
 def around(x,y):
 	ps = []
 	for dx in range(-1,2):
@@ -319,55 +284,6 @@ def fill_ocean(elevation,sea_level):
 					to_expand.append((px,py))
 
 	return ocean
-
-def draw_land(elevation,ocean_map,hill_level,mountain_level,filename):
-	from PIL import Image
-	img = Image.new('RGBA',(WIDTH,HEIGHT))
-	pixels = img.load()
-	for y in range(0,HEIGHT):
-		for x in range(0,WIDTH):
-			if ocean_map[y][x]:
-				pixels[x,y] = (0,0,255,255)
-			elif elevation[y][x]>mountain_level:
-				pixels[x,y] = (255,255,255,255)
-			elif elevation[y][x]>hill_level:
-				pixels[x,y] = (30,140,30,255)
-			else:
-				pixels[x,y] = (0,230,0,255)
-				
-	img.save(filename)	
-
-def draw_ocean(ocean,filename):
-	from PIL import Image
-	img = Image.new('RGBA',(WIDTH,HEIGHT))
-	pixels = img.load()
-	for y in range(0,HEIGHT):
-		for x in range(0,WIDTH):
-			if ocean[y][x]:
-				pixels[x,y] = (0,0,255,255)
-			else:
-				pixels[x,y] = (0,255,255,255)
-	img.save(filename)	
-
-def draw_temp(temp,filename):
-	from PIL import Image
-	img = Image.new('RGBA',(WIDTH,HEIGHT))
-	pixels = img.load()
-	for y in range(0,HEIGHT):
-		for x in range(0,WIDTH):
-			c  = int(temp[y][x]*255)
-			pixels[x,y] = (c,0,0,255)
-	img.save(filename)	
-
-def draw_precipitation(temp,filename):
-	from PIL import Image
-	img = Image.new('RGBA',(WIDTH,HEIGHT))
-	pixels = img.load()
-	for y in range(0,HEIGHT):
-		for x in range(0,WIDTH):
-			c  = int(temp[y][x]*255)
-			pixels[x,y] = (0,0,c,255)
-	img.save(filename)	
 
 def temperature(seed,elevation,mountain_level):
 	random.seed(seed*7)
@@ -439,8 +355,8 @@ def classify(data,thresholds,x,y):
 import operator
 
 class World:
-	def __init__(self):
-		pass
+	def __init__(self,name):
+		self.name = name
 
 	def set_biome(self,biome):
 		self.biome = biome
@@ -460,9 +376,16 @@ class World:
 	def set_permeability(self,data,thresholds):
 		self.precipitation = {'data':data,'thresholds':thresholds}		
 
-def world_gen(elevation,seed):
+
+def world_gen(name,seed,verbose=False):
+	plates = generate_plates(seed)
+	e = generate_base_heightmap(seed,plates)
+	w = world_gen_from_elevation(name,e,seed,verbose=verbose)
+	return w
+
+def world_gen_from_elevation(name,elevation,seed,verbose=False):
 	i = seed
-	w = World()
+	w = World(name)
 
 	# Elevation with thresholds
 	e = elevation
@@ -547,32 +470,14 @@ def world_gen(elevation,seed):
 
 	for cl in cm.keys():
 		count = cm[cl]
-		print("%s = %i" %(str(cl),count))
+		if verbose:
+			print("%s = %i" %(str(cl),count))
 
 	for cl in biome_cm.keys():
 		count = biome_cm[cl]
-		print("%s = %i" %(str(cl),count))
+		if verbose:
+			print("%s = %i" %(str(cl),count))
 
 	w.set_biome(biome)
 	return w
 
-def draw_biome(temp,filename):
-	from PIL import Image
-	img = Image.new('RGBA',(WIDTH,HEIGHT))
-	pixels = img.load()
-	biome_colors = {
-		'iceland': (208,241,245),
-		'jungle' : (54,240,17),
-		'tundra' : (147,158,157),
-		'ocean'  : (23,94,145),
-		'forest' : (10,89,15),
-		'grassland' : (69,133,73),
-		'steppe'    : (90,117,92),
-		'sand desert' : (207,204,58),
-		'rock desert' : (94,93,25)
-	}
-	for y in range(0,HEIGHT):
-		for x in range(0,WIDTH):
-			v = temp[y][x]
-			pixels[x,y] = biome_colors[v]
-	img.save(filename)	
