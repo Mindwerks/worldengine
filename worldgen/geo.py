@@ -354,9 +354,77 @@ def classify(data,thresholds,x,y):
 
 import operator
 
+class Biome:
+
+	@classmethod
+	def by_name(self,name):
+		return BIOMES[name]
+
+class Ocean(Biome):
+
+	def __init__(self):
+		self.sustainable_population = 0
+
+class Iceland(Biome):
+
+	def __init__(self):
+		self.sustainable_population = 50
+
+class Steppe(Biome):
+
+	def __init__(self):
+		self.sustainable_population = 100
+
+class Grassland(Biome):
+
+	def __init__(self):
+		self.sustainable_population = 1000
+
+class Jungle(Biome):
+
+	def __init__(self):
+		self.sustainable_population = 500
+
+class Forest(Biome):
+
+	def __init__(self):
+		self.sustainable_population = 350
+
+class SandDesert(Biome):
+
+	def __init__(self):
+		self.sustainable_population = 50
+
+class RockDesert(Biome):
+
+	def __init__(self):
+		self.sustainable_population = 75
+
+
+class Tundra(Biome):
+
+	def __init__(self):
+		self.sustainable_population = 60
+
+
+BIOMES = {
+	'ocean':Ocean(),
+	'iceland':Iceland(),
+	'jungle':Jungle(),
+	'rock desert':RockDesert(),
+	'sand desert':SandDesert(),
+	'steppe':Steppe(),
+	'grassland':Grassland(),
+	'forest':Forest(),
+	'tundra':Tundra()
+}
+
+
 class World(object):
 	def __init__(self,name):
 		self.name = name
+		self.width = 512
+		self.height = 512
 
 	def set_biome(self,biome):
 		self.biome = biome
@@ -382,6 +450,41 @@ class World(object):
 			return self.random_land()
 		else:
 			return (x,y)
+
+	def is_land(self,pos):
+		x,y = pos
+		return not self.ocean[y][x]
+
+	def tiles_around(self,pos,radius=1,predicate=None):
+		ps = []
+		x,y = pos
+		for dx in range(-radius,radius+1):
+			nx = x+dx
+			if nx>=0 and nx<self.width:
+				for dy in range(-radius,radius+1):
+					ny = y+dy
+					if ny>=0 and ny<self.height and (dx!=0 or dy!=0):
+						if predicate==None or predicate((nx,ny)):
+							ps.append((nx,ny))
+		return ps		
+
+	def tiles_around_many(self,pos_list,radius=1,predicate=None):
+		tiles = []
+		for pos in pos_list:
+			tiles += self.tiles_around(pos,radius,predicate)
+		# remove duplicates
+		# remove elements in pos
+		return list(set(tiles)-set(pos_list))
+
+	def biome_at(self,pos):
+		x,y = pos
+		b = Biome.by_name(self.biome[y][x])
+		if b==None:
+			raise Exception('Not found')
+		return b
+
+	def sustainable_population(self,pos):
+		return self.biome_at(pos).sustainable_population
 
 	@classmethod
 	def from_dict(self,dict):
