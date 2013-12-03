@@ -32,24 +32,36 @@ def draw_elevation(world,filename):
 	ocean = world.ocean
 	img = Image.new('RGBA',(WIDTH,HEIGHT))
 	pixels = img.load()
-	#print(world.elevation['thresholds'].keys())
-	sl = world.elevation['thresholds'][0][1]
-	print("SL %i" % sl)
+
+	min_elev = None
+	max_elev = None
+	for y in xrange(HEIGHT):
+		for x in xrange(WIDTH):
+			if not ocean[y][x]:
+				e = data[y][x]
+				if min_elev==None or e<min_elev:
+					min_elev=e
+				if max_elev==None or e>max_elev:
+					max_elev=e				
+	elev_delta = max_elev-min_elev	
+
 	for y in range(0,HEIGHT):
 		for x in range(0,WIDTH):
 			if ocean[y][x]:
 				pixels[x,y] = (0,0,255,255)
 			else:
 				e = data[y][x]
-				e_above_sl = int(e-sl+50)*2
-				#print e
-				if e_above_sl<0:
-					pixels[x,y] = (255,255,255,255)
-				elif e_above_sl>255:
-					pixels[x,y] = (0,0,0,255)
-				else:
-					c = int(255-e_above_sl)
-					pixels[x,y] = (c,c,c,255)
+				c = int(((e-min_elev)*255)/elev_delta)
+				if y>2 and x>2:
+					if data[y-1][x-1]>e:
+						c-=15
+					if data[y-2][x-2]>e and data[y-2][x-2]>data[y-1][x-1]:
+						c-=10		
+					if data[y-3][x-3]>e and data[y-3][x-3]>data[y-1][x-1] and data[y-3][x-3]>data[y-2][x-2]:
+						c-=5								
+					if c<0:
+						c=0				
+				pixels[x,y] = (c,c,c,255)
 	img.save(filename)	
 
 def draw_basic_elevation(elevation,filename):

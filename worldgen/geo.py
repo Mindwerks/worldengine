@@ -78,6 +78,47 @@ def plate_borders(plates):
 		borders.append(row)
 	return borders
 
+def erode(world,n):
+
+    def droplet(world,pos):
+        x,y = pos
+        min_elev = world.elevation['data'][y][x]
+        min2_elev = min_elev
+        max_elev = None
+        dest = None
+        dest2 = None
+        for p in world.tiles_around((x,y)):
+            px,py = p
+            e = world.elevation['data'][py][px]
+            if e<min_elev:
+                dest2 = dest
+                dest  = p
+                min2_elev = min_elev
+                min_elev  = e
+            elif e<min2_elev:
+                dest2 = p
+                min2_elev = e
+            if max_elev==None or e>max_elev:
+                max_elev = e            
+        if dest:
+            if dest2 and (min2_elev-min_elev)<3.5:
+                dest = random.choice([dest,dest2])
+            if world.is_land(dest):
+                destx,desty = dest
+                world.elevation['data'][desty][destx]-=0.05+(world.elevation['data'][desty][destx]-2)/30
+                if world.elevation['data'][desty][destx]<min2_elev:
+                    world.elevation['data'][desty][destx] = min2_elev
+                droplet(world,dest)
+        else:
+            world.elevation['data'][py][px]+=0.35
+            if world.elevation['data'][py][px]>max_elev:
+                world.elevation['data'][py][px] = max_elev
+
+    for i in xrange(n):
+        x,y = world.random_land()
+        if random.random()<world.precipitation['data'][y][x]:
+            droplet(world,(x,y))	
+
 def antialias(elevation,steps):
 
 	def antialias():
@@ -555,6 +596,8 @@ def world_gen_from_elevation(name,elevation,seed,verbose=False):
 		('hig',None)
 	]
 	w.set_precipitation(p,p_th)
+
+	erode(w,1500000)
 
 	# Temperature with thresholds
 	t = temperature(i,e,ml)
