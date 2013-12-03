@@ -12,7 +12,7 @@ def main():
     random.seed()
     seed = random.randint(0,65536)
     print('Using seed %i to generate world "%s"' % (seed,world_name)) 
-    w = world_gen(world_name,seed)
+    w = world_gen(world_name,seed,verbose=True)
 
     # Save data
     filename = "world_%s.json" % world_name

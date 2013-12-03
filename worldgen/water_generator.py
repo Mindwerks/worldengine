@@ -2,33 +2,8 @@ import sys
 import random
 import jsonpickle
 
-from geo import world_gen, World
-from draw import draw_elevation
-
-def droplet(world,pos):
-    x,y = pos
-    min_elev = world.elevation['data'][y][x]
-    dest = None
-    for p in world.tiles_around((x,y)):
-        px,py = p
-        e = world.elevation['data'][py][px]
-        if e<min_elev:
-            dest = p
-    if dest:
-        if world.is_land(dest):
-            destx,desty = dest
-            world.elevation['data'][desty][destx]-=0.5
-            droplet(world,dest)
-    else:
-        world.elevation['data'][py][px]+=0.5
-
-def erode(world,n):
-    for i in xrange(n):
-        if (i%50000==0):
-            save(world,i)
-        x,y = world.random_land()
-        if random.random()<world.precipitation['data'][y][x]:
-            droplet(world,(x,y))            
+from geo import world_gen, World, antialias
+from draw import draw_elevation            
 
 def save(world,i):
     filename = 'world_%s_elevation_at_%i.png' % (world.name,i)
@@ -51,6 +26,8 @@ def main():
     print("+ data loaded from '%s'" % filename)
 
     erode(world,drops)
+    antialias(world.elevation['data'],10)
+    save(world,-1)
 
     # Generate images
     #filename = 'world_%s_elevation.png' % world_name
