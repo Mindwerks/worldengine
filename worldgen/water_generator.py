@@ -2,7 +2,7 @@ import sys
 import random
 import jsonpickle
 
-from geo import world_gen, World, antialias
+from geo import world_gen, World, antialias, erode
 from draw import draw_elevation            
 
 def save(world,i):
@@ -25,9 +25,14 @@ def main():
     world = World.from_json_file(filename)
     print("+ data loaded from '%s'" % filename)
 
-    erode(world,drops)
-    antialias(world.elevation['data'],10)
-    save(world,-1)
+    n = 0
+    while n<drops:
+        next = 100000
+        if (n+next)>drops:
+            next = drops-n
+        erode(world,next)
+        n+=next
+        save(world,n)
 
     # Generate images
     #filename = 'world_%s_elevation.png' % world_name

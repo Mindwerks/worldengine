@@ -80,7 +80,44 @@ def plate_borders(plates):
 
 def erode(world,n):
 
-    def droplet(world,pos):
+    def droplet(world,pos,q,v):
+        x,y = pos
+        pos_elev = world.elevation['data'][y][x]
+        lowers  = []
+        min_higher = None
+        min_lower  = None
+        tot_lowers = 0
+        for p in world.tiles_around((x,y)):
+            px,py = p
+            e = world.elevation['data'][py][px]
+            if e<pos_elev:
+            	lowers.append((e-pos_elev,p))
+            	tot_lowers += e-pos_elev
+            	if min_lower==None or e>min_lower:
+            		min_lower=e
+            else:
+            	if min_higher==None or e>min_higher:
+            		min_higher=e
+        if lowers:
+        	f = q/tot_lowers
+        	for l in lowers:
+        		s,p = l
+        		if world.is_land(p):
+	        		px,py = p
+	        		ql = f*s
+	        		going = world.elevation['data'][py][px]==min_higher
+	        		world.elevation['data'][py][px] -= ql
+	        		if going:
+	        			droplet(world,p,ql,0) 
+	        		elif random.random()<s:
+	        			droplet(world,p,ql,0) 
+        else:
+            world.elevation['data'][y][x]+=0.35
+            if world.elevation['data'][y][x]>min_higher:
+                world.elevation['data'][y][x] = min_higher
+
+
+    def droplet_old(world,pos):
         x,y = pos
         min_elev = world.elevation['data'][y][x]
         min2_elev = min_elev
@@ -101,7 +138,7 @@ def erode(world,n):
             if max_elev==None or e>max_elev:
                 max_elev = e            
         if dest:
-            if dest2 and (min2_elev-min_elev)<3.5:
+            if dest2 and (min2_elev-min_elev)<2.0:
                 dest = random.choice([dest,dest2])
             if world.is_land(dest):
                 destx,desty = dest
@@ -110,14 +147,14 @@ def erode(world,n):
                     world.elevation['data'][desty][destx] = min2_elev
                 droplet(world,dest)
         else:
-            world.elevation['data'][py][px]+=0.35
-            if world.elevation['data'][py][px]>max_elev:
-                world.elevation['data'][py][px] = max_elev
+            world.elevation['data'][y][x]+=0.25
+            if world.elevation['data'][y][x]>max_elev:
+                world.elevation['data'][y][x] = max_elev
 
     for i in xrange(n):
         x,y = world.random_land()
-        if random.random()<world.precipitation['data'][y][x]:
-            droplet(world,(x,y))	
+        if True:
+            droplet(world,(x,y),world.precipitation['data'][y][x],0)	
 
 def antialias(elevation,steps):
 
@@ -597,7 +634,7 @@ def world_gen_from_elevation(name,elevation,seed,verbose=False):
 	]
 	w.set_precipitation(p,p_th)
 
-	erode(w,1500000)
+	erode(w,2000000)
 
 	# Temperature with thresholds
 	t = temperature(i,e,ml)
