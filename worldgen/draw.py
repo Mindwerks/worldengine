@@ -51,7 +51,7 @@ def draw_elevation(world,filename):
 				pixels[x,y] = (0,0,255,255)
 			else:
 				e = data[y][x]
-				c = int(((e-min_elev)*255)/elev_delta)
+				c = 255-int(((e-min_elev)*255)/elev_delta)
 				if y>2 and x>2:
 					if data[y-1][x-1]>e:
 						c-=15
