@@ -145,6 +145,13 @@ class Settlement(InGameMixin,PositionedMixin):
 			tot += self.world().sustainable_population(p)
 		return tot
 
+	def position(self):
+		return self.controlled_tiles[0]
+
+	def distance_from_settlement(self,other):
+		dist = geo.distance(self.position(),other.position())
+		return dist
+
 	def positions(self):
 		return self.controlled_tiles
 
@@ -244,6 +251,15 @@ class Civilization(PositionedMixin,InGameMixin):
 		for s in self.alive_settlements():
 			ps = ps + s.positions()
 		return ps
+
+	def distance_from_civ(self,other):
+		min_dist = None
+		for s1 in self.alive_settlements():
+			for s2 in other.alive_settlements():
+				dist = s1.distance_from_settlement(s2)
+				if min_dist==None or min_dist>dist:
+					min_dist=dist
+		return min_dist
 
 	def add_settlement(self,settlement):
 		self.settlements.append(settlement)

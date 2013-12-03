@@ -1,6 +1,7 @@
 import random
 import math
 from noise import snoise2
+import jsonpickle
 
 WIDTH    = 512
 HEIGHT   = 512
@@ -421,6 +422,7 @@ BIOMES = {
 
 
 class World(object):
+
 	def __init__(self,name):
 		self.name = name
 		self.width = 512
@@ -485,6 +487,17 @@ class World(object):
 
 	def sustainable_population(self,pos):
 		return self.biome_at(pos).sustainable_population
+
+	@classmethod
+	def from_json_file(self,filename):
+		with open(filename, "r") as f:
+			content = f.read()
+		world = jsonpickle.decode(content)
+		world.width = world.height = 512
+		if type(world) is World:
+			return world
+		else:
+			return self.from_dict(world)
 
 	@classmethod
 	def from_dict(self,dict):

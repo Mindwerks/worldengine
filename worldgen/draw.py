@@ -27,8 +27,32 @@ def draw_land_profile(elevation,sea_level,filename):
 				pixels[x,y] = (0,0,255,255)
 	img.save(filename)	
 
-def draw_elevation(elevation,filename):
-	
+def draw_elevation(world,filename):
+	data = world.elevation['data']
+	ocean = world.ocean
+	img = Image.new('RGBA',(WIDTH,HEIGHT))
+	pixels = img.load()
+	#print(world.elevation['thresholds'].keys())
+	sl = world.elevation['thresholds'][0][1]
+	print("SL %i" % sl)
+	for y in range(0,HEIGHT):
+		for x in range(0,WIDTH):
+			if ocean[y][x]:
+				pixels[x,y] = (0,0,255,255)
+			else:
+				e = data[y][x]
+				e_above_sl = int(e-sl+50)*2
+				#print e
+				if e_above_sl<0:
+					pixels[x,y] = (255,255,255,255)
+				elif e_above_sl>255:
+					pixels[x,y] = (0,0,0,255)
+				else:
+					c = int(255-e_above_sl)
+					pixels[x,y] = (c,c,c,255)
+	img.save(filename)	
+
+def draw_basic_elevation(elevation,filename):
 	img = Image.new('RGBA',(WIDTH,HEIGHT))
 	pixels = img.load()
 	for y in range(0,HEIGHT):

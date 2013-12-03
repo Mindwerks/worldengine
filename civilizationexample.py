@@ -72,7 +72,7 @@ def turn(verbose=False):
 					if verbose:
 						print('From settlment %s a new settlment is created' % stlm.name)
 		for other in game.alive_civilizations():
-			if other!=civ and (not civ.dead) and (not other.dead) and civ.distance(other)<15:
+			if other!=civ and (not civ.dead) and (not other.dead) and civ.distance_from_civ(other)<15:
 				if (not civ.at_war_with(other)) and random.random()<0.05:
 					game.start_war(civ,other)
 					if verbose or True:
@@ -85,7 +85,7 @@ from game.draw import draw_civs
 for i in xrange(501):
 	turn()
 	print('[%i] Civs: %i, Population: %i, Settlements: %i, Land: %i, Wars: %i' % (game.time,len(game.alive_civilizations()),game.population(),len(game.alive_settlements()),game.land_size(),len(game.ongoing_wars())))
-	if i%25==0:	
+	if i%100==0 and i>0:	
 		draw_civs(game,'%s_civs_%i.png' % ('game',game.time))
 #print_game_state()
 
