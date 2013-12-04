@@ -498,7 +498,7 @@ class Biome:
 class Ocean(Biome):
 
     def __init__(self):
-        self.sustainable_population = 0
+        self.sustainable_population = 750
 
 class Iceland(Biome):
 
@@ -541,6 +541,10 @@ class Tundra(Biome):
     def __init__(self):
         self.sustainable_population = 60
 
+class Swamp(Biome):
+
+    def __init__(self):
+        self.sustainable_population = 90
 
 BIOMES = {
     'ocean':Ocean(),
@@ -551,7 +555,8 @@ BIOMES = {
     'steppe':Steppe(),
     'grassland':Grassland(),
     'forest':Forest(),
-    'tundra':Tundra()
+    'tundra':Tundra(),
+    'swamp' : Swamp()
 }
 
 class World(object):
