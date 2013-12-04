@@ -419,13 +419,11 @@ def temperature(seed,elevation,mountain_level):
         yscaled = float(y)/HEIGHT
         latitude_factor = 1.0-(abs(yscaled-0.5)*2)
         for x in range(0,WIDTH):
-            if elevation[y][x]<mountain_level:
-                altitude_factor = 0.5
-            else:
-                altitude_factor = 1.0-float(elevation[y][x]-mountain_level)/(255-mountain_level)
-
             n = snoise2(x / freq, y / freq, octaves,base=base)
-            t = (latitude_factor*2+n*2+altitude_factor*3)/7.0
+            t = (latitude_factor*2+n*2)/4.0
+            if elevation[y][x]>mountain_level:                
+                altitude_factor = 1.0-float(elevation[y][x]-mountain_level)/(255-mountain_level)
+                t*=altitude_factor**1.5
             temp[y][x] = t
 
     return temp
@@ -444,10 +442,26 @@ def precipitation(seed):
         latitude_factor = 1.0-(abs(yscaled-0.5)*2)
         for x in range(0,WIDTH):
             n = snoise2(x / freq, y / freq, octaves, base=base)
-            t = (latitude_factor+n*2)/3.0
+            t = (latitude_factor+n*4)/5.0
             temp[y][x] = t
 
     return temp
+
+def irrigation(world):
+    values = [[0 for x in xrange(WIDTH)] for y in xrange(HEIGHT)] 
+    radius = 10
+    
+    for y in xrange(HEIGHT):
+        for x in xrange(WIDTH):
+            if world.is_land((x,y)):
+                for dy in range(-radius,radius+1):
+                    if (y+dy)>=0 and (y+dy)<world.height:
+                        for dx in range(-radius,radius+1):
+                            if (x+dx)>=0 and (x+dx)<world.width:
+                                dist = math.sqrt(dx**2+dy**2)
+                                values[y+dy][x+dx] += world.watermap[y][x]/(math.log(dist+1)+1)
+
+    return values
 
 def permeability(seed):
     random.seed(seed*37)
@@ -539,7 +553,6 @@ BIOMES = {
     'forest':Forest(),
     'tundra':Tundra()
 }
-
 
 class World(object):
 
@@ -653,6 +666,20 @@ def world_gen(name,seed,verbose=False):
     w = world_gen_from_elevation(name,e,seed,verbose=verbose)
     return w
 
+def humidity(world):
+    humidity = {}
+    humidity['data'] = [[0 for x in xrange(world.width)] for y in xrange(world.height)] 
+    
+    for y in xrange(world.height):
+        for x in xrange(world.width):
+            humidity['data'][y][x] = world.precipitation['data'][y][x]+world.irrigation[y][x]
+
+    humidity['quantiles'] = {}
+    humidity['quantiles'][33] = find_threshold_f(humidity['data'],0.33,world.ocean)
+    humidity['quantiles'][50] = find_threshold_f(humidity['data'],0.50,world.ocean) 
+    humidity['quantiles'][66] = find_threshold_f(humidity['data'],0.66,world.ocean) 
+    return humidity
+
 def world_gen_from_elevation(name,elevation,seed,verbose=False):
     i = seed
     w = World(name)
@@ -678,11 +705,20 @@ def world_gen_from_elevation(name,elevation,seed,verbose=False):
 
     erode(w,3000000)
 
+    w.watermap = watermap(w,20000)
+    w.irrigation = irrigation(w)
+    w.humidity = humidity(w)
+    hu_th = [
+        ('low',find_threshold_f(w.humidity['data'],0.75,ocean)),
+        ('med',find_threshold_f(w.humidity['data'],0.3,ocean)),
+        ('hig',None)
+    ]
+
     # Temperature with thresholds
     t = temperature(i,e,ml)
     t_th = [
-        ('vlo',find_threshold_f(t,0.95,ocean)),
-        ('low',find_threshold_f(t,0.75,ocean)),
+        ('vlo',find_threshold_f(t,0.92,ocean)),
+        ('low',find_threshold_f(t,0.65,ocean)),
         ('med',find_threshold_f(t,0.4,ocean)),
         ('hig',None)
     ]
@@ -705,34 +741,34 @@ def world_gen_from_elevation(name,elevation,seed,verbose=False):
             if ocean[y][x]:
                 biome[y][x] = 'ocean'
             else:
-                el = classify(e,e_th,x,y)
-                prl = classify(p,p_th,x,y)          
-                tl = classify(t,t_th,x,y)
+                el  = classify(e,e_th,x,y)
+                hul = classify(w.humidity['data'],hu_th,x,y)          
+                tl  = classify(t,t_th,x,y)
                 pel = classify(perm,perm_th,x,y)
-                complex_l = (el,prl,tl,pel)
+                complex_l = (el,hul,tl,pel)
                 if not complex_l in cm:
                     cm[complex_l] = 0
                 cm[complex_l] += 1
-                if prl=='low' and tl=='low':
+                if hul=='low' and tl=='low':
                     biome[y][x] = 'tundra'
-                elif prl=='low' and tl=='hig':
+                elif hul=='low' and tl=='hig':
                     biome[y][x] = 'sand desert'
-                elif prl=='low' and tl=='med':
-                    if pel=='low' or pel=='med':
+                elif hul=='low' and tl=='med':
+                    if pel=='low':
                         biome[y][x] = 'steppe'
                     else:
                         biome[y][x] = 'rock desert'
-                elif prl=='hig' and tl=='hig':
+                elif hul=='hig' and tl=='hig':
                     biome[y][x] = 'jungle'
-                elif prl=='hig' and prl=='low':
+                elif hul=='hig' and pel=='low':
                     biome[y][x] = 'swamp'
-                elif prl=='hig' and tl=='low':
+                elif hul=='hig' and tl=='low':
                     biome[y][x] = 'forest'
-                elif prl=='hig' and tl=='med':
+                elif hul=='hig' and tl=='med':
                     biome[y][x] = 'forest'                  
                 elif tl=='vlo':
                     biome[y][x] = 'iceland'
-                elif prl=='med':
+                elif hul=='med':
                     biome[y][x] = 'grassland'
                 else:
                     biome[y][x] = 'UNASSIGNED'
