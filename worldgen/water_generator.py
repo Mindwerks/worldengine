@@ -2,8 +2,8 @@ import sys
 import random
 import jsonpickle
 
-from geo import world_gen, World, antialias, erode
-from draw import draw_elevation            
+from geo import world_gen, World, antialias, erode, watermap, find_threshold
+from draw import draw_watermap            
 
 def save(world,i):
     filename = 'world_%s_elevation_at_%i.png' % (world.name,i)
@@ -25,14 +25,12 @@ def main():
     world = World.from_json_file(filename)
     print("+ data loaded from '%s'" % filename)
 
-    n = 0
-    while n<drops:
-        next = 100000
-        if (n+next)>drops:
-            next = drops-n
-        erode(world,next)
-        n+=next
-        save(world,n)
+    _watermap = None
+    for i in xrange(30):
+        _watermap = watermap(world,50000,_watermap)
+        filename = 'world_%s_%i_watermap.png' % (world_name,i)
+        th = find_threshold(_watermap,0.03,ocean=world.ocean)
+        draw_watermap(world, _watermap, filename, th)
 
     # Generate images
     #filename = 'world_%s_elevation.png' % world_name
