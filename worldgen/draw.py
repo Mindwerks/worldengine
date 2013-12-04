@@ -64,6 +64,69 @@ def draw_elevation(world,filename,shadow=True):
 				pixels[x,y] = (c,c,c,255)
 	img.save(filename)	
 
+def draw_irrigation(world,filename):
+	data  = world.irrigation
+	ocean = world.ocean
+	img   = Image.new('RGBA',(WIDTH,HEIGHT))
+	pixels = img.load()
+
+	min_elev = None
+	max_elev = None
+	for y in xrange(HEIGHT):
+		for x in xrange(WIDTH):
+			if not ocean[y][x]:
+				e = data[y][x]
+				if min_elev==None or e<min_elev:
+					min_elev=e
+				if max_elev==None or e>max_elev:
+					max_elev=e				
+	elev_delta = max_elev-min_elev	
+
+	for y in range(0,HEIGHT):
+		for x in range(0,WIDTH):
+			if ocean[y][x]:
+				pixels[x,y] = (0,0,255,255)
+			else:
+				e = data[y][x]
+				c = int(((e-min_elev)*255)/elev_delta)		
+				pixels[x,y] = (0,0,c,255)
+	img.save(filename)
+
+def draw_humidity(world,filename):
+	ocean = world.ocean
+	img   = Image.new('RGBA',(WIDTH,HEIGHT))
+	pixels = img.load()
+
+	min_elev = None
+	max_elev = None
+	for y in xrange(HEIGHT):
+		for x in xrange(WIDTH):
+			if not ocean[y][x]:
+				e = world.humidity['data'][y][x]
+				if min_elev==None or e<min_elev:
+					min_elev=e
+				if max_elev==None or e>max_elev:
+					max_elev=e				
+	elev_middle = world.humidity['quantiles']['50']
+	elev_delta_plus = max_elev-elev_middle
+	elev_delta_minus = elev_middle-min_elev	
+
+	for y in range(0,HEIGHT):
+		for x in range(0,WIDTH):
+			if ocean[y][x]:
+				pixels[x,y] = (0,0,255,255)
+			else:
+				e = world.humidity['data'][y][x]
+				if e<elev_middle:
+					c = int(((elev_middle-e)*255)/elev_delta_minus)		
+					pixels[x,y] = (c,0,0,255)
+				else:
+					c = int(((e-elev_middle)*255)/elev_delta_plus)		
+					pixels[x,y] = (0,c,0,255)
+
+	img.save(filename)		
+
+
 def draw_watermap(world, _watermap, filename, th):
 	ocean = world.ocean
 	img = Image.new('RGBA',(WIDTH,HEIGHT))
@@ -172,7 +235,8 @@ def draw_biome(temp,filename):
 		'grassland' : (69,133,73),
 		'steppe'    : (90,117,92),
 		'sand desert' : (207,204,58),
-		'rock desert' : (94,93,25)
+		'rock desert' : (94,93,25),
+		'swamp'       : (255,0,0)
 	}
 	for y in range(0,HEIGHT):
 		for x in range(0,WIDTH):
