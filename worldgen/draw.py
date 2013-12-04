@@ -27,7 +27,7 @@ def draw_land_profile(elevation,sea_level,filename):
 				pixels[x,y] = (0,0,255,255)
 	img.save(filename)	
 
-def draw_elevation(world,filename):
+def draw_elevation(world,filename,shadow=True):
 	data = world.elevation['data']
 	ocean = world.ocean
 	img = Image.new('RGBA',(WIDTH,HEIGHT))
@@ -52,7 +52,7 @@ def draw_elevation(world,filename):
 			else:
 				e = data[y][x]
 				c = 255-int(((e-min_elev)*255)/elev_delta)
-				if y>2 and x>2:
+				if shadow and y>2 and x>2:
 					if data[y-1][x-1]>e:
 						c-=15
 					if data[y-2][x-2]>e and data[y-2][x-2]>data[y-1][x-1]:
@@ -63,6 +63,40 @@ def draw_elevation(world,filename):
 						c=0				
 				pixels[x,y] = (c,c,c,255)
 	img.save(filename)	
+
+def draw_watermap(world, _watermap, filename, th):
+	ocean = world.ocean
+	img = Image.new('RGBA',(WIDTH,HEIGHT))
+	pixels = img.load()
+
+	# min_elev = None
+	# max_elev = None
+	# for y in xrange(HEIGHT):
+	# 	for x in xrange(WIDTH):
+	# 		if not ocean[y][x]:
+	# 			e = _watermap[y][x]**1.5
+	# 			if min_elev==None or e<min_elev:
+	# 				min_elev=e
+	# 			if max_elev==None or e>max_elev:
+	# 				max_elev=e				
+	# elev_delta = max_elev-min_elev	
+	# if elev_delta<1:
+	# 	elev_delta=1
+
+	for y in range(0,HEIGHT):
+		for x in range(0,WIDTH):
+			if ocean[y][x]:
+				pixels[x,y] = (0,0,255,255)
+			else:
+				e = _watermap[y][x]
+				if e>th:
+					c = 255
+				else:
+					c = 0
+					#c = int(((e-min_elev)*255)/elev_delta)
+				pixels[x,y] = (c,0,0,255)
+	img.save(filename)	
+
 
 def draw_basic_elevation(elevation,filename):
 	img = Image.new('RGBA',(WIDTH,HEIGHT))
