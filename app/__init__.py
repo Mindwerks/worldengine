@@ -1,9 +1,18 @@
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.mongoengine import MongoEngine
+
 
 app = Flask('Lands')
 app.debug = True
 app.secret_key = 'SecretLands'
+app.config["MONGODB_SETTINGS"] = {'DB': "lands_a"}
+
+#from flask.ext.pymongo import PyMongo
+#mongo = PyMongo(app)
+
+db = MongoEngine(app)
+
 #app.config.from_object('config')
 #db = SQLAlchemy(app)
 
@@ -13,6 +22,6 @@ app.secret_key = 'SecretLands'
 #login_manager.init_app(app)
 
 #from app import views, models
-from app import views
+from app.views import worlds, games
 
 
