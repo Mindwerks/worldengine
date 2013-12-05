@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Games</h1>
+<p><em><a href="{{url_for('create_game_view')}}">Want to create a game?</a></em></p>
+{% if games %}
+<ul>
+{% for game in games %}
+<li><a href="{{url_for('game_view',game_name=game.name)}}">{{game.name}}</a> (<a href="{{url_for('delete_game',game_name=game.name)}}">delete</a>)</li>
+{% endfor %}
+</ul>
+{% else %}
+<p><em>No games available</em></p>
+{% endif %}
+{% endblock %}
