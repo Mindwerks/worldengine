@@ -1,11 +1,13 @@
 from worldgen.namegen import *
 import jsonpickle
+import pickle
 from worldgen.geo import World
 from worldgen import geo
 import random
 import math
+from events import *
 
-class Game:
+class Game(object):
 
     def __init__(self,world):
         self.world = world
@@ -14,6 +16,26 @@ class Game:
         self.wars = []
         self._occupied = {}     
 
+    def rebuild_caches(self):
+        self._occupied = {}
+        for c in self.alive_civilizations():
+            for s in c.alive_settlements():
+                for p in s.positions():
+                    self._occupied[p] = s
+
+    @classmethod
+    def load(self,name):
+        filename = 'games/%s.game' % name
+        with open(filename, "r") as f:
+            obj = pickle.load(f)
+        return obj
+    
+
+    def save(self,name):
+        filename = '%s.game' % name
+        with open(filename, "w") as f:
+            pickle.dump(self,f,pickle.HIGHEST_PROTOCOL)
+    
     def add_ruin(self,settlement):
         pass
 
@@ -25,6 +47,19 @@ class Game:
             if c.occupy(pos):
                 return c
         return None
+
+    def host_settlement(self,pos):
+        city = self.city_owning(self,pos)
+        if city and city.position()==pos:
+            return city
+        else:
+            return False
+
+    def city_owning(self,pos):
+        if pos in self._occupied:
+            return self._occupied[pos]
+        else:
+            return None
 
     def is_free(self,pos):
         return not (pos in self._occupied)
@@ -152,7 +187,7 @@ class Settlement(InGameMixin,PositionedMixin):
         self.dead = False
         self._occupy_cache = {}
         self._occupy_cache[pos]=True
-        self.game()._occupied[pos] = True
+        self.game()._occupied[pos] = self
 
     def sustainable_population(self):
         tot = 0
@@ -188,7 +223,7 @@ class Settlement(InGameMixin,PositionedMixin):
             new_pos,s = random.choice(around_with_sustainable[0:3])
             self.controlled_tiles.append(new_pos)
             self._occupy_cache[new_pos]=True
-            self.game()._occupied[new_pos]=True
+            self.game()._occupied[new_pos]=self
             return True
 
     def occupy(self,pos):
@@ -380,3 +415,41 @@ class Civilization(PositionedMixin,InGameMixin):
 
     def __repr__(self):
         return "Civ %s" % self.name
+
+def turn(game,verbose=False):
+    game.time += 1
+
+    # check expansion
+    events = []
+    for i in xrange(50):
+        events.append(Grow())
+    for i in xrange(3):
+        events.append(Famine())
+    for i in xrange(1):
+        events.append(Plague())             
+    for civ in game.alive_civilizations():
+        for stlm in civ.alive_settlements():            
+            event = random.choice(events)
+            rate = float(event.rate(crowded=stlm.crowded()))/100
+            stlm.size = int(stlm.size*rate)
+            if stlm.consider_disperding():
+                if verbose:
+                    print('Settlment %s is dispersed' % stlm.name)
+                if civ.disperse(stlm):
+                    if verbose:
+                        print('The civilization diseappears')
+            if stlm.consider_expanding() and stlm.try_to_expand():
+                if verbose:
+                    print('%s grew' % stlm.name)
+            if stlm.consider_send_settlers():
+                if stlm.try_to_send_settlers():
+                    if verbose:
+                        print('From settlment %s a new settlment is created' % stlm.name)
+        for other in game.alive_civilizations():
+            if other!=civ and (not civ.dead) and (not other.dead) and civ.distance_from_civ(other)<15:
+                if (not civ.at_war_with(other)) and random.random()<0.05:
+                    game.start_war(civ,other)
+                    if verbose or True:
+                        print('[%i] Started war between %s and %s' % (game.time,civ.name,other.name))
+    for w in game.ongoing_wars():
+        w.proceed()
