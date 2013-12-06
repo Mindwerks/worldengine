@@ -11,7 +11,42 @@ from app.models import *
 
 class CreateGame(Form):
 	name   = TextField(validators=[Required()])
-	world  = SelectField(validators=[Required()])	
+	world  = SelectField(validators=[Required()])
+
+@app.route('/game/<game_name>/explore/<x>/<y>')	
+def game_explore(game_name,x,y):
+	from game.game import Game
+	game=Game.load(name=game_name)
+	game.rebuild_caches()
+
+	xi = int(x)
+	yi = int(y)
+
+	tiles = [[None for x in xrange(7)] for y in xrange(7)]
+	for py in xrange(7):
+		for px in xrange(7):
+			pos = (px+xi-3,py+yi-3)
+			tiles[py][px] = {
+				'biome':game.world.biome_at(pos).name(),
+				'x':px+xi-3,
+				'y':py+yi-3,
+				'owned':game.city_owning((px+xi-3,py+yi-3))!=None
+			}
+
+	owner = game.city_owning((xi,yi))
+	if owner:
+		owner_name = owner.name
+		civ_name   = owner.civ.name
+	else:
+		owner_name = '<no one>'
+		civ_name   = '<no one>' 
+	return render_template('explore.html',
+		tiles=tiles, 
+        title="Games",
+        biome=game.world.biome_at((xi,yi)).name(),
+        owner_name=owner_name,
+        civ_name=civ_name,
+        game_name=game_name)
 
 @app.route('/game/<game_name>')
 def game_view(game_name):

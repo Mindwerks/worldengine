@@ -1,5 +1,4 @@
 from random import randint, choice, random
-=======
 from app import db
 
 import atomic
