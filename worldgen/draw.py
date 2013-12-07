@@ -1,9 +1,9 @@
 from PIL import Image
 
 try:
-	from worldgen.geo import WIDTH,HEIGHT,N_PLATES,MAX_ELEV
+	from worldgen.geo import WIDTH,HEIGHT,N_PLATES,MAX_ELEV, antialias
 except:
-	from geo import WIDTH,HEIGHT,N_PLATES,MAX_ELEV
+	from geo import WIDTH,HEIGHT,N_PLATES,MAX_ELEV, antialias
 
 def draw_plates(plates,filename):
 	
@@ -213,13 +213,70 @@ def draw_temp(temp,filename):
 	img.save(filename)	
 
 def draw_precipitation(temp,filename):
-	
 	img = Image.new('RGBA',(WIDTH,HEIGHT))
 	pixels = img.load()
 	for y in range(0,HEIGHT):
 		for x in range(0,WIDTH):
 			c  = int(temp[y][x]*255)
 			pixels[x,y] = (0,0,c,255)
+	img.save(filename)	
+
+def draw_sea(world,filename):
+	img = Image.new('RGBA',(WIDTH,HEIGHT))
+
+	pixels = img.load()
+	for y in range(0,HEIGHT):
+		for x in range(0,WIDTH):
+			if world.is_land((x,y)):
+				pixels[x,y] = (255,255,255,255)
+			else:
+				c = int(world.sea_depth[y][x]*200+50)
+				pixels[x,y] = (0,0,255-c,255)
+	img.save(filename)
+
+def draw_world(world,filename):
+	img = Image.new('RGBA',(WIDTH,HEIGHT))
+
+	pixels = img.load()
+	for y in range(0,HEIGHT):
+		for x in range(0,WIDTH):
+			if world.is_land((x,y)):
+				e = world.elevation['data'][y][x]
+				if world.is_mountain((x,y)):
+					if world.is_temperature_very_low((x,y)):
+						pixels[x,y] = (255,0,0,255)
+					else:
+						pixels[x,y] = (0,0,0,255)
+				elif world.is_hill((x,y)):
+					pixels[x,y] = (128,128,128,255)
+				else:
+					if world.is_temperature_very_low((x,y)):
+						pixels[x,y] = (255,0,255,255)
+					else:
+						pixels[x,y] = (255,255,255,255)
+			else:
+				c = int(world.sea_depth[y][x]*200+50)
+				pixels[x,y] = (0,0,255-c,255)
+	img.save(filename)	
+
+def draw_temperature_levels(world,filename):
+	img = Image.new('RGBA',(WIDTH,HEIGHT))
+
+	pixels = img.load()
+	for y in range(0,HEIGHT):
+		for x in range(0,WIDTH):
+			if world.is_land((x,y)):
+				e = world.elevation['data'][y][x]
+				if world.is_temperature_very_low((x,y)):
+					pixels[x,y] = (0,0,255,255)
+				elif world.is_temperature_low((x,y)):
+					pixels[x,y] = (80,120,255,255)
+				elif world.is_temperature_medium((x,y)):
+					pixels[x,y] = (180,255,180,255)
+				elif world.is_temperature_high((x,y)):
+					pixels[x,y] = (255,0,0,255)
+			else:
+				pixels[x,y] = (0,0,0,255)
 	img.save(filename)	
 
 
