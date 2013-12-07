@@ -118,21 +118,8 @@ def watermap(world,n,_watermap=None):
                     _watermap[py][px] += ql
                     if going:
                         droplet(world,p,ql,_watermap) 
-                    #elif random.random()<s:
-                    #   droplet(world,p,ql,0) 
         else:
             _watermap[y][x] += q
-        # else:
-        #     if (min_higher-pos_elev)<5:
-        #         if world.is_land(pos_min_higher):
-        #             px,py = pos_min_higher
-        #             world.elevation['data'][py][px]=pos_elev
-        #             _watermap[py][px] += q
-        #             droplet(world,p,q,_watermap) 
-        #     else:
-        #         _watermap[y][x]+=q
-        #     #if world.elevation['data'][y][x]>min_higher:
-        #     #    world.elevation['data'][y][x] = min_higher
 
     if _watermap==None:
         _watermap = [[0 for x in xrange(world.width)] for y in xrange(world.height)] 
@@ -196,7 +183,42 @@ def erode(world,n):
     for i in xrange(n):
         x,y = world.random_land()
         if True and world.precipitation['data'][y][x]>0:
-            droplet(world,(x,y),world.precipitation['data'][y][x]*1,0)    
+            droplet(world,(x,y),world.precipitation['data'][y][x]*1,0)  
+
+def matrix_extremes(matrix):
+    min = None
+    max = None
+    for row in matrix:
+        for el in row:
+            val = el
+            if min==None or val<min:
+                min=val
+            if max==None or val>max:
+                max=val
+    return (min,max)
+
+def rescale_value(original,prev_min,prev_max,min,max):
+    f = float(original-prev_min)/(prev_max-prev_min)
+    return min+((max-min)*f)
+
+def sea_depth(world,sea_level):
+    sea_depth = [[sea_level-world.elevation['data'][y][x] for x in xrange(world.width)] for y in xrange(world.height)]
+    for y in xrange(world.height):
+        for x in xrange(world.width):
+            if world.tiles_around((x,y),radius=1,predicate=world.is_land):
+                sea_depth[y][x] = 0
+            elif world.tiles_around((x,y),radius=2,predicate=world.is_land):
+                sea_depth[y][x] *= 0.3
+            elif world.tiles_around((x,y),radius=3,predicate=world.is_land):
+                sea_depth[y][x] *= 0.5
+            elif world.tiles_around((x,y),radius=4,predicate=world.is_land):
+                sea_depth[y][x] *= 0.7
+            elif world.tiles_around((x,y),radius=5,predicate=world.is_land):
+                sea_depth[y][x] *= 0.9                            
+    antialias(sea_depth,10)  
+    min_depth,max_depth = matrix_extremes(sea_depth)
+    sea_depth = [[rescale_value(sea_depth[y][x],min_depth,max_depth,0.0,1.0) for x in xrange(world.width)] for y in xrange(world.height)]
+    return sea_depth
 
 def antialias(elevation,steps):
 
@@ -420,10 +442,13 @@ def temperature(seed,elevation,mountain_level):
         latitude_factor = 1.0-(abs(yscaled-0.5)*2)
         for x in range(0,WIDTH):
             n = snoise2(x / freq, y / freq, octaves,base=base)
-            t = (latitude_factor*2+n*2)/4.0
-            if elevation[y][x]>mountain_level:                
-                altitude_factor = 1.0-float(elevation[y][x]-mountain_level)/(255-mountain_level)
-                t*=altitude_factor**1.5
+            t = (latitude_factor*3+n*2)/5.0
+            if elevation[y][x]>mountain_level:
+                if elevation[y][x]>(mountain_level+29):
+                    altitude_factor=0.033
+                else:
+                    altitude_factor = 1.00-(float(elevation[y][x]-mountain_level)/30)
+                t*=altitude_factor
             temp[y][x] = t
 
     return temp
@@ -489,114 +514,62 @@ def classify(data,thresholds,x,y):
 
 import operator
 
-class Biome:
-
-    @classmethod
-    def by_name(self,name):
-        return BIOMES[name]
-
-    def name(self):
-        return str(type(self))
-
-class Ocean(Biome):
-
-    def __init__(self):
-        self.sustainable_population = 750
-
-    def name(self):
-        return 'ocean'
-
-class Iceland(Biome):
-
-    def __init__(self):
-        self.sustainable_population = 50
-
-    def name(self):
-        return 'iceland'
-
-class Steppe(Biome):
-
-    def __init__(self):
-        self.sustainable_population = 100
-
-    def name(self):
-        return 'steppe'
-
-class Grassland(Biome):
-
-    def __init__(self):
-        self.sustainable_population = 1000
-
-    def name(self):
-        return 'grassland'
-
-class Jungle(Biome):
-
-    def __init__(self):
-        self.sustainable_population = 500
-
-    def name(self):
-        return 'jungle'
-
-class Forest(Biome):
-
-    def __init__(self):
-        self.sustainable_population = 350
-
-    def name(self):
-        return 'forest'        
-
-class SandDesert(Biome):
-
-    def __init__(self):
-        self.sustainable_population = 50
-
-    def name(self):
-        return 'sand_desert'        
-
-class RockDesert(Biome):
-
-    def __init__(self):
-        self.sustainable_population = 75
-
-    def name(self):
-        return 'rock_desert'
-
-class Tundra(Biome):
-
-    def __init__(self):
-        self.sustainable_population = 60
-
-    def name(self):
-        return 'tundra'
-
-class Swamp(Biome):
-
-    def __init__(self):
-        self.sustainable_population = 90
-
-    def name(self):
-        return 'swamp'
-
-BIOMES = {
-    'ocean':Ocean(),
-    'iceland':Iceland(),
-    'jungle':Jungle(),
-    'rock desert':RockDesert(),
-    'sand desert':SandDesert(),
-    'steppe':Steppe(),
-    'grassland':Grassland(),
-    'forest':Forest(),
-    'tundra':Tundra(),
-    'swamp' : Swamp()
-}
-
 class World(object):
 
     def __init__(self,name):
         self.name = name
         self.width = 512
         self.height = 512
+
+    def is_mountain(self,pos):
+        if not self.is_land(pos):
+            return False
+        if len(self.elevation['thresholds'])==4:
+            mi = 2
+        else:
+            mi = 1
+        mountain_level = self.elevation['thresholds'][mi][1]
+        x,y = pos
+        return self.elevation['data'][y][x]>mountain_level
+
+    def is_hill(self,pos):
+        if not self.is_land(pos):
+            return False
+        if len(self.elevation['thresholds'])==4:
+            hi = 1
+        else:
+            hi = 0
+        hill_level = self.elevation['thresholds'][hi][1]
+        mountain_level = self.elevation['thresholds'][hi+1][1]
+        x,y = pos
+        return self.elevation['data'][y][x]>hill_level and self.elevation['data'][y][x]<mountain_level
+
+    def is_temperature_very_low(self,pos):
+        th_max = self.temperature['thresholds'][0][1]
+        x,y = pos
+        t = self.temperature['data'][y][x]
+        return t<th_max
+
+    def is_temperature_low(self,pos):
+        th_min = self.temperature['thresholds'][0][1]
+        th_max = self.temperature['thresholds'][1][1]
+        x,y = pos
+        t = self.temperature['data'][y][x]
+        return t<th_max and t>=th_min
+
+    def is_temperature_medium(self,pos):
+        th_min = self.temperature['thresholds'][1][1]
+        th_max = self.temperature['thresholds'][2][1]
+        x,y = pos
+        t = self.temperature['data'][y][x]
+        return t<th_max and t>=th_min
+
+    def is_temperature_high(self,pos):
+        th_min = self.temperature['thresholds'][2][1]
+        x,y = pos
+        t = self.temperature['data'][y][x]
+        return t>=th_min
+
 
     def set_biome(self,biome):
         self.biome = biome
@@ -693,7 +666,6 @@ class World(object):
         instance.set_ocean(map_from_dict(dict['ocean']))
         instance.set_precipitation(map_from_dict(dict['precipitation']['data']),[])
         instance.set_temperature(map_from_dict(dict['temperature']['data']),[])
-        #instance.set_permeability(map_from_dict(dict['permeability']['data']),[])
         return instance
 
 
@@ -727,9 +699,12 @@ def world_gen_from_elevation(name,elevation,seed,verbose=False):
     ocean = fill_ocean(e,sl+1.5)
     hl = find_threshold(e,0.10)
     ml = find_threshold(e,0.03)
-    e_th = [('plain',hl),('hill',ml),('mountain',None)]
+    e_th = [('sea',sl),('plain',hl),('hill',ml),('mountain',None)]
     w.set_ocean(ocean)
     w.set_elevation(e,e_th)
+    w.sea_depth = sea_depth(w,sl)
+    if verbose:
+        print("...elevation level calculated")
 
     # Precipitation with thresholds
     p = precipitation(i)
@@ -741,6 +716,9 @@ def world_gen_from_elevation(name,elevation,seed,verbose=False):
     w.set_precipitation(p,p_th)
 
     erode(w,3000000)
+    if verbose:
+        print("...erosion calculated")
+
 
     w.watermap = watermap(w,20000)
     w.irrigation = irrigation(w)
@@ -750,13 +728,15 @@ def world_gen_from_elevation(name,elevation,seed,verbose=False):
         ('med',find_threshold_f(w.humidity['data'],0.3,ocean)),
         ('hig',None)
     ]
+    if verbose:
+        print("...humidity calculated")
 
     # Temperature with thresholds
     t = temperature(i,e,ml)
     t_th = [
-        ('vlo',find_threshold_f(t,0.92,ocean)),
-        ('low',find_threshold_f(t,0.65,ocean)),
-        ('med',find_threshold_f(t,0.4,ocean)),
+        ('vlo',find_threshold_f(t,0.87,ocean)),
+        ('low',find_threshold_f(t,0.70,ocean)),
+        ('med',find_threshold_f(t,0.30,ocean)),
         ('hig',None)
     ]
     w.set_temperature(t,t_th)
@@ -769,6 +749,9 @@ def world_gen_from_elevation(name,elevation,seed,verbose=False):
         ('hig',None)
     ]
     w.set_permeability(perm,perm_th)
+
+    if verbose:
+        print("...permeability level calculated")    
 
     cm = {}
     biome_cm = {}
