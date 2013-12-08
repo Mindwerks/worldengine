@@ -23,6 +23,10 @@ class Game(object):
                 for p in s.positions():
                     self._occupied[p] = s
 
+    def free_pos(self,pos):
+        if pos in self._occupied:
+            self._occupied.pop(pos)
+
     @classmethod
     def load(self,name):
         filename = 'games/%s.game' % name
@@ -147,17 +151,17 @@ class War(InGameMixin):
         if self.try_peace():
             #self.game().log_event('..war between %s and %s ended with a truce' % (self.civs[0],self.civs[1]))
             self.finish()
-        elif self.scores[0]>self.scores[1] and self.scores[0]>10*self.civs[1].strength() and random.random()<0.3:
+        elif self.scores[0]>self.scores[1] and self.scores[0]>10*self.civs[1].war_power() and random.random()<0.3:
             #print('CONQUER %i vs %i' % (self.civs[0].population(),self.civs[1].population()))
             self.civs[0].conquer(self.civs[1])
             self.finish()
-        elif self.scores[1]>self.scores[0] and self.scores[1]>10*self.civs[0].strength() and random.random()<0.3:
+        elif self.scores[1]>self.scores[0] and self.scores[1]>10*self.civs[0].war_power() and random.random()<0.3:
             #print('CONQUER')           
             self.civs[1].conquer(self.civs[0])
             self.finish()
         else:           
-            s1 = self.civs[0].strength()*((random.random()+random.random()*2+2)/5)
-            s2 = self.civs[1].strength()*((random.random()+random.random()*2+2)/5)
+            s1 = self.civs[0].war_power()*((random.random()+random.random()*2+2)/5)
+            s2 = self.civs[1].war_power()*((random.random()+random.random()*2+2)/5)
             self.scores[0]+=s1
             self.scores[1]+=s2
             k1 = int(s2*0.3)
@@ -226,6 +230,18 @@ class Settlement(InGameMixin,PositionedMixin):
             self.game()._occupied[new_pos]=self
             return True
 
+    def try_to_shrink(self):
+        w = self.world()
+        g = self.game()
+        tiles = self.controlled_tiles[1:]
+        tiles_with_sustainable = [(p,w.sustainable_population(p)/geo.distance(p,self.position())) for p in tiles]
+        tiles_with_sustainable.sort(key=lambda x: -1*x[1])
+        new_pos,s = random.choice(tiles_with_sustainable[0:3])
+        self.controlled_tiles.remove(new_pos)
+        self._occupy_cache[new_pos]=False
+        self.game().free_pos(new_pos)
+        return True
+
     def occupy(self,pos):
         #for t in self.controlled_tiles:
         #   if t==pos:
@@ -236,12 +252,15 @@ class Settlement(InGameMixin,PositionedMixin):
     def crowded(self):
         return self.size>self.sustainable_population()
 
+    def under_populated(self):
+        return self.size<(self.sustainable_population()/10)
+
     def try_to_send_settlers(self):
         w = self.world()
         g = self.game()
         around = []
         for s in self.civ.alive_settlements():
-            around += w.tiles_around(s.position(),radius=15,predicate=g.is_free_land)
+            around += w.tiles_around(s.position(),radius=self.civ.expansion_distance(),predicate=g.is_free_land)
         if around:
             around_with_sustainable = [(p,w.sustainable_population(p)) for p in around]
             around_with_sustainable.sort(key=lambda x: -1*x[1])
@@ -263,11 +282,17 @@ class Settlement(InGameMixin,PositionedMixin):
         else:
             return False
 
+    def consider_shrinking(self):
+        if self.under_populated() and self.land_size()>1:
+            return random.random()<0.25
+        else:
+            return False
+
     def consider_disperding(self):
         return self.size<20 and random.random()<0.5
 
     def consider_send_settlers(self):
-        return self.size>1000 and (self.size/self.land_size())>700 and random.random()<0.05
+        return self.size>1000 and self.crowded() and random.random()<0.1*self.civ.expansion_eagerness()
 
     def consider_declaring_wars(self):
         wars = []       
@@ -293,131 +318,11 @@ class Settlement(InGameMixin,PositionedMixin):
         if self.size==0:
             self.disperse()
 
-class Civilization(PositionedMixin,InGameMixin):
-
-    def __init__(self,game,name):
-        self._game = game
-        self.name = name
-        self.settlements = []
-        self.dead = False
-
-    def game(self):
-        return self._game
-
-    def strength(self):
-        if self.population()<2:
-            return 0.0
-        pop = self.population()
-        return (math.log(pop,1.05)*pop)/1000
-
-    def conquer(self,other):
-        other.dead = True
-        self.game().log_event('%s conquered %s: getting %i settlements (he had %i)' % (self,other,len(other.alive_settlements()),len(self.alive_settlements())))
-        for s in other.settlements:
-            if not s.dead:
-                s.civ = self
-                self.settlements.append(s)
-
-    def positions(self):
-        ps = []
-        for s in self.alive_settlements():
-            ps = ps + s.positions()
-        return ps
-
-    def distance_from_civ(self,other):
-        min_dist = None
-        for s1 in self.alive_settlements():
-            for s2 in other.alive_settlements():
-                dist = s1.distance_from_settlement(s2)
-                if min_dist==None or min_dist>dist:
-                    min_dist=dist
-        return min_dist
-
-    def add_settlement(self,settlement):
-        self.settlements.append(settlement)
-
-    def alive_settlements(self):
-        #return [s for s in self.settlements if not s.dead]
-        return self.settlements
-
-    def disperse(self,settlement):
-        settlement.dead = True
-        settlement.size = 0
-        self.settlements.remove(settlement)
-        self.game().add_ruin(settlement)
-        if len(self.alive_settlements())==0:
-            self.dead = True
-        return self.dead
-
-    def occupy(self,pos):
-        for s in self.alive_settlements():
-            if s.occupy(pos):
-                return True
-        return False
-
-    def population(self):
-        t = 0
-        for s in self.alive_settlements():
-            t+=s.size
-        return t
-
-    def land_size(self):
-        t = 0
-        for s in self.alive_settlements():
-            t+=s.land_size()
-        return t
-
-    def at_war_with(self,other):
-        return self.game().war_between(self,other)
-
-    def kill(self,n,pool=None):
-        start_n = n
-        if not self.alive_settlements():
-            return
-        if self.population()<0:
-            raise Exception('Error!')
-        if n>=self.population():
-            for s in self.alive_settlements():
-                s.disperse()
-            return
-        cap = 1000
-        if n>1000000:
-            cap = 35000
-        elif n>100000:
-            cap = 15000
-        elif n>20000:
-            cap = 5000
-
-        if pool==None:
-            pool = []
-            for s in self.alive_settlements():
-                for i in xrange((s.population()/cap) +1):
-                    pool.append(s)
-        r = random.randint(cap/3,cap)
-        if r>n:
-            r = n
-        s = random.choice(pool)
-        if r>s.population():
-            n += (r-s.population())
-            if not s.dead:
-                pool=None
-                s.disperse()
-        else:
-            s.kill(r)
-        n -= r
-        if n>0:
-            if n>start_n:
-                raise Exception('...it should not happen')
-            elif n==start_n:
-                # avoid deadlocks...
-                n -= random.randint(0,10)
-            self.kill(n,pool)
-
-    def __repr__(self):
-        return "Civ %s" % self.name
-
 def turn(game,verbose=False):
     game.time += 1
+
+    if verbose:
+        print("--- Turn %i ---" % game.time)
 
     # check expansion
     events = []
@@ -431,7 +336,11 @@ def turn(game,verbose=False):
         for stlm in civ.alive_settlements():            
             event = random.choice(events)
             rate = float(event.rate(crowded=stlm.crowded()))/100
+            old_size = stlm.size
             stlm.size = int(stlm.size*rate)
+            if verbose:
+                pass
+                #print('Settlement %s went from %i to %i inhabitants' % (stlm.name,old_size,stlm.size))
             if stlm.consider_disperding():
                 if verbose:
                     print('Settlment %s is dispersed' % stlm.name)
@@ -440,16 +349,21 @@ def turn(game,verbose=False):
                         print('The civilization diseappears')
             if stlm.consider_expanding() and stlm.try_to_expand():
                 if verbose:
-                    print('%s grew' % stlm.name)
+                    print('%s grew to %i tiles' % (stlm.name,len(stlm.positions())))
+            if stlm.consider_shrinking() and stlm.try_to_shrink():
+                if verbose:
+                    print('%s shrink to %i tiles' % (stlm.name,len(stlm.positions())))
             if stlm.consider_send_settlers():
                 if stlm.try_to_send_settlers():
                     if verbose:
                         print('From settlment %s a new settlment is created' % stlm.name)
         for other in game.alive_civilizations():
             if other!=civ and (not civ.dead) and (not other.dead) and civ.distance_from_civ(other)<15:
-                if (not civ.at_war_with(other)) and random.random()<0.05:
+                if (not civ.at_war_with(other)) and random.random()<(civ.aggressiveness()/10.0):
                     game.start_war(civ,other)
                     if verbose or True:
                         print('[%i] Started war between %s and %s' % (game.time,civ.name,other.name))
+        if not civ.dead and civ.consider_secession():
+            civ.secession()
     for w in game.ongoing_wars():
         w.proceed()

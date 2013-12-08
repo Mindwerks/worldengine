@@ -2,6 +2,7 @@ import random
 import math
 from noise import snoise2
 import jsonpickle
+from biome import *
 
 WIDTH    = 512
 HEIGHT   = 512
@@ -78,7 +79,7 @@ def plate_borders(plates):
         borders.append(row)
     return borders
 
-def watermap(world,n,_watermap=None):
+def watermap(world,n):
 
     def droplet(world,pos,q,_watermap):
         if q<0:
@@ -121,12 +122,16 @@ def watermap(world,n,_watermap=None):
         else:
             _watermap[y][x] += q
 
-    if _watermap==None:
-        _watermap = [[0 for x in xrange(world.width)] for y in xrange(world.height)] 
+    _watermap_data = [[0 for x in xrange(world.width)] for y in xrange(world.height)] 
     for i in xrange(n):
         x,y = world.random_land()
         if True and world.precipitation['data'][y][x]>0:
-            droplet(world,(x,y),world.precipitation['data'][y][x],_watermap)    
+            droplet(world,(x,y),world.precipitation['data'][y][x],_watermap_data)    
+    _watermap = {'data':_watermap_data}
+    _watermap['thresholds'] = {}
+    _watermap['thresholds']['creek'] = find_threshold_f(_watermap_data,0.05,ocean=world.ocean)
+    _watermap['thresholds']['river'] = find_threshold_f(_watermap_data,0.02,ocean=world.ocean)
+    _watermap['thresholds']['main river'] = find_threshold_f(_watermap_data,0.007,ocean=world.ocean)
     return _watermap
 
 
@@ -484,7 +489,7 @@ def irrigation(world):
                         for dx in range(-radius,radius+1):
                             if (x+dx)>=0 and (x+dx)<world.width:
                                 dist = math.sqrt(dx**2+dy**2)
-                                values[y+dy][x+dx] += world.watermap[y][x]/(math.log(dist+1)+1)
+                                values[y+dy][x+dx] += world.watermap['data'][y][x]/(math.log(dist+1)+1)
 
     return values
 
@@ -634,6 +639,24 @@ class World(object):
 
     def set_permeability(self,data,thresholds):
         self.permeability = {'data':data,'thresholds':thresholds}
+
+    def contains_stream(self,pos):
+        return self.contains_creek(pos) or self.contains_river(pos) or self.contains_main_river(pos)
+
+    def contains_creek(self,pos):
+        x,y = pos
+        v = self.watermap['data'][y][x]
+        return v>=self.watermap['thresholds']['creek'] and v<self.watermap['thresholds']['river']
+
+    def contains_river(self,pos):
+        x,y = pos
+        v = self.watermap['data'][y][x]
+        return v>=self.watermap['thresholds']['river'] and v<self.watermap['thresholds']['main river']
+
+    def contains_main_river(self,pos):
+        x,y = pos
+        v = self.watermap['data'][y][x]
+        return v>=self.watermap['thresholds']['main river']
 
     def random_land(self):
         x,y = random_point()
@@ -802,7 +825,7 @@ def world_gen_from_elevation(name,elevation,seed,verbose=False):
 
     cm = {}
     biome_cm = {}
-    biome = [[0 for x in xrange(WIDTH)] for y in xrange(HEIGHT)]
+    biome = [[None for x in xrange(WIDTH)] for y in xrange(HEIGHT)]
     for y in xrange(512):
         for x in xrange(512):
             if ocean[y][x]:
@@ -832,6 +855,8 @@ def world_gen_from_elevation(name,elevation,seed,verbose=False):
                         biome[y][x] = 'savanna'
                     else:# world.is_humidity_low((x,y)) or world.is_humidity_very_low((x,y)):
                         biome[y][x] = 'sand desert'
+                else:
+                    raise Exception('No cases like that!')
             if not biome[y][x] in biome_cm:
                 biome_cm[biome[y][x]] = 0
             biome_cm[biome[y][x]] += 1

@@ -4,7 +4,7 @@ class Event:
 	
 	def rate(self,crowded):
 		if crowded and self.max>100:
-			return random.randint(self.min,(self.max+200)/3)
+			return random.randint(self.min-4,(self.max+200)/3)
 		else:
 			return random.randint(self.min,self.max)
 
