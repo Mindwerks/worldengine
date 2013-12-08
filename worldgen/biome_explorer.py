@@ -22,6 +22,10 @@ def main():
 
     #world.temperature['data'] = temperature(seed,world.elevation,mountain_level)
 
+    world.humidity['quantiles']['75'] = find_threshold_f(world.humidity['data'],0.75,world.ocean)
+    world.humidity['quantiles']['50'] = find_threshold_f(world.humidity['data'],0.50,world.ocean)
+    world.humidity['quantiles']['10'] = find_threshold_f(world.humidity['data'],0.10,world.ocean)
+
     # Generate images
     filename = 'world_%s_world.png' % world_name
     draw_world(world,filename)
@@ -31,6 +35,9 @@ def main():
     draw_temperature_levels(world,filename)
     print("+ temperature levels image generated in '%s'" % filename)
 
+    filename = 'world_%s_humidity.png' % world_name
+    draw_humidity(world,filename)
+    print("+ humidity image generated in '%s'" % filename)
 
 if __name__ == "__main__":
     main()

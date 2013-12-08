@@ -396,7 +396,7 @@ def find_threshold_f(elevation,land_perc,ocean=None):
                 if ocean[y][x]:
                     all_land-=1
     desired_land = all_land*land_perc
-    return search(-1.0,2.0,desired_land)
+    return search(-1000.0,1000.0,desired_land)
 
 def around(x,y):
     ps = []
@@ -570,6 +570,52 @@ class World(object):
         t = self.temperature['data'][y][x]
         return t>=th_min
 
+    def is_humidity_very_low(self,pos):
+        th_max = self.humidity['quantiles']['75']
+        #print('Humidity Q10 %f' % th_max)
+        x,y = pos
+        t = self.temperature['data'][y][x]
+        return t<th_max
+
+    def is_humidity_low(self,pos):
+        th_min = self.humidity['quantiles']['75']
+        th_max = self.humidity['quantiles']['66']
+        #print('Humidity Q10 %f' % th_min)
+        #print('Humidity Q33 %f' % th_max)
+        x,y = pos
+        t = self.humidity['data'][y][x]
+        return t<th_max and t>=th_min
+
+    def is_humidity_medium(self,pos):
+        th_min = self.humidity['quantiles']['66']
+        th_max = self.humidity['quantiles']['33']
+        #print('Humidity Q33 %f' % th_min)
+        #print('Humidity Q66 %f' % th_max)
+        x,y = pos
+        t = self.humidity['data'][y][x]
+        return t<th_max and t>=th_min
+
+    def is_humidity_above_quantile(self,pos,q):
+        th = self.humidity['quantiles'][str(q)]
+        x,y = pos
+        v = self.humidity['data'][y][x]
+        return v>=th
+
+    def is_humidity_high(self,pos):
+        th_min = self.humidity['quantiles']['33']
+        th_max = self.humidity['quantiles']['10']
+        #print('Humidity Q66 %f' % th_min)
+        #print('Humidity Q75 %f' % th_max)
+        x,y = pos
+        t = self.humidity['data'][y][x]
+        return t>=th_min and t<th_max
+
+    def is_humidity_very_high(self,pos):
+        th_min = self.humidity['quantiles']['10']
+        #print('Humidity Q75 %f' % th_min)
+        x,y = pos
+        t = self.humidity['data'][y][x]
+        return t>=th_min
 
     def set_biome(self,biome):
         self.biome = biome
@@ -684,9 +730,11 @@ def humidity(world):
             humidity['data'][y][x] = world.precipitation['data'][y][x]+world.irrigation[y][x]
 
     humidity['quantiles'] = {}
-    humidity['quantiles'][33] = find_threshold_f(humidity['data'],0.33,world.ocean)
-    humidity['quantiles'][50] = find_threshold_f(humidity['data'],0.50,world.ocean) 
-    humidity['quantiles'][66] = find_threshold_f(humidity['data'],0.66,world.ocean) 
+    humidity['quantiles']['10'] = find_threshold_f(humidity['data'],0.10,world.ocean)
+    humidity['quantiles']['33'] = find_threshold_f(humidity['data'],0.33,world.ocean)
+    humidity['quantiles']['50'] = find_threshold_f(humidity['data'],0.50,world.ocean) 
+    humidity['quantiles']['66'] = find_threshold_f(humidity['data'],0.66,world.ocean)
+    humidity['quantiles']['75'] = find_threshold_f(humidity['data'],0.75,world.ocean)
     return humidity
 
 def world_gen_from_elevation(name,elevation,seed,verbose=False):
@@ -719,7 +767,6 @@ def world_gen_from_elevation(name,elevation,seed,verbose=False):
     if verbose:
         print("...erosion calculated")
 
-
     w.watermap = watermap(w,20000)
     w.irrigation = irrigation(w)
     w.humidity = humidity(w)
@@ -735,7 +782,7 @@ def world_gen_from_elevation(name,elevation,seed,verbose=False):
     t = temperature(i,e,ml)
     t_th = [
         ('vlo',find_threshold_f(t,0.87,ocean)),
-        ('low',find_threshold_f(t,0.70,ocean)),
+        ('low',find_threshold_f(t,0.75,ocean)),
         ('med',find_threshold_f(t,0.30,ocean)),
         ('hig',None)
     ]
@@ -761,37 +808,30 @@ def world_gen_from_elevation(name,elevation,seed,verbose=False):
             if ocean[y][x]:
                 biome[y][x] = 'ocean'
             else:
-                el  = classify(e,e_th,x,y)
-                hul = classify(w.humidity['data'],hu_th,x,y)          
-                tl  = classify(t,t_th,x,y)
-                pel = classify(perm,perm_th,x,y)
-                complex_l = (el,hul,tl,pel)
-                if not complex_l in cm:
-                    cm[complex_l] = 0
-                cm[complex_l] += 1
-                if hul=='low' and tl=='low':
-                    biome[y][x] = 'tundra'
-                elif hul=='low' and tl=='hig':
-                    biome[y][x] = 'sand desert'
-                elif hul=='low' and tl=='med':
-                    if pel=='low':
-                        biome[y][x] = 'steppe'
+                e = w.elevation['data'][y][x]
+                if w.is_mountain((x,y)):
+                    if w.is_temperature_very_low((x,y)):
+                        biome[y][x] = 'glacier'                        
                     else:
-                        biome[y][x] = 'rock desert'
-                elif hul=='hig' and tl=='hig':
-                    biome[y][x] = 'jungle'
-                elif hul=='hig' and pel=='low':
-                    biome[y][x] = 'swamp'
-                elif hul=='hig' and tl=='low':
-                    biome[y][x] = 'forest'
-                elif hul=='hig' and tl=='med':
-                    biome[y][x] = 'forest'                  
-                elif tl=='vlo':
+                        biome[y][x] = 'alpine'
+                elif w.is_temperature_very_low((x,y)):
                     biome[y][x] = 'iceland'
-                elif hul=='med':
-                    biome[y][x] = 'grassland'
-                else:
-                    biome[y][x] = 'UNASSIGNED'
+                elif w.is_temperature_low((x,y)):
+                    biome[y][x] = 'tundra'
+                elif w.is_temperature_medium((x,y)):
+                    if w.is_humidity_very_high((x,y)) or w.is_humidity_high((x,y)):
+                        biome[y][x] = 'forest'
+                    elif w.is_humidity_medium((x,y)):
+                        biome[y][x] = 'grassland'
+                    elif w.is_humidity_low((x,y)) or w.is_humidity_very_low((x,y)):
+                        biome[y][x] = 'rock desert'
+                elif w.is_temperature_high((x,y)):
+                    if w.is_humidity_very_high((x,y)) or w.is_humidity_high((x,y)):
+                        biome[y][x] = 'jungle'
+                    elif w.is_humidity_above_quantile((x,y),50):
+                        biome[y][x] = 'savanna'
+                    else:# world.is_humidity_low((x,y)) or world.is_humidity_very_low((x,y)):
+                        biome[y][x] = 'sand desert'
             if not biome[y][x] in biome_cm:
                 biome_cm[biome[y][x]] = 0
             biome_cm[biome[y][x]] += 1
