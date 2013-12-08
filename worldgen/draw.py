@@ -127,7 +127,7 @@ def draw_humidity(world,filename):
 	img.save(filename)      
 
 
-def draw_watermap(world, _watermap, filename, th):
+def draw_watermap(world, filename, th):
 	ocean = world.ocean
 	img = Image.new('RGBA',(WIDTH,HEIGHT))
 	pixels = img.load()
@@ -151,7 +151,7 @@ def draw_watermap(world, _watermap, filename, th):
 			if ocean[y][x]:
 				pixels[x,y] = (0,0,255,255)
 			else:
-				e = _watermap[y][x]
+				e = world.watermap[y][x]
 				if e>th:
 					c = 255
 				else:

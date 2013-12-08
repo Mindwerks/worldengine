@@ -12,25 +12,30 @@ def save(world,i):
 
 
 def main():
-    if len(sys.argv)!=3:
+    if len(sys.argv)!=2:
         usage()
     world_name = sys.argv[1]    
-    drops      = int(sys.argv[2])
-    random.seed()
-    seed = random.randint(0,65536)
-    print('Using seed %i to add rivers & erosion to world "%s". Drops=%i' % (seed,world_name,drops)) 
+    print('Add rivers & erosion to world "%s"' % (world_name)) 
 
     # Load data
     filename = "worlds/world_%s.json" % world_name
     world = World.from_json_file(filename)
     print("+ data loaded from '%s'" % filename)
 
-    _watermap = None
-    for i in xrange(30):
-        _watermap = watermap(world,50000,_watermap)
-        filename = 'world_%s_%i_watermap.png' % (world_name,i)
-        th = find_threshold(_watermap,0.03,ocean=world.ocean)
-        draw_watermap(world, _watermap, filename, th)
+    # torrent
+    th = find_thresholdd_f(world.watermap,0.05,ocean=world.ocean)
+    filename = 'world_%s_watermap5.png' % world_name
+    draw_watermap(world, filename, th)
+
+    # rivers
+    th = find_threshold(world.watermap,0.02,ocean=world.ocean)
+    filename = 'world_%s_watermap2.png' % world_name
+    draw_watermap(world, filename, th)
+
+    # main rivers
+    th = find_threshold(world.watermap,0.007,ocean=world.ocean)
+    filename = 'world_%s_watermap07.png' % world_name
+    draw_watermap(world, filename, th)
 
     # Generate images
     #filename = 'world_%s_elevation.png' % world_name
