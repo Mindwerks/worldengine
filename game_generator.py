@@ -24,6 +24,8 @@ def print_race_state(game,race):
     print('## %s civs %i ##' % (race.name(),len(civs)))
     print('\tland size: %i' % land)
     print('\tpeople: %i' % pop)
+    for c in civs:
+        print('\t%s of %s, settlements: %i' % (c.rank(),c.name,len(c.alive_settlements())))
 
 def print_game_state(game):
     print('Turn %i, alive civilizations: %i' % (game.time,len(game.alive_civilizations())))

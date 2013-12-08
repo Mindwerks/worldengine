@@ -18,6 +18,18 @@ class Civilization(PositionedMixin,InGameMixin):
                     characteristics[ch] = 0.99
         self.characteristics = characteristics
 
+    def rank(self):
+        if self.population()<10000:
+            return 'tribe'
+        elif self.population()<50000:
+            return 'county'            
+        elif self.population()<100000:
+            return 'duchy'            
+        elif self.population()<300000:
+            return 'kingdom'
+        else:
+            return 'empire'                
+
     def aggressiveness(self):
         return self.characteristics['aggressiveness']
 
