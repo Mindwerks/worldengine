@@ -11,8 +11,8 @@ MIN_ELEV = 0
 MAX_ELEV = 255
 MAX_DIST = 6
 
-def random_point():
-    return (random.randrange(0,WIDTH),random.randrange(0,HEIGHT))
+def random_point(width=WIDTH,height=HEIGHT):
+    return (random.randrange(0,width),random.randrange(0,height))
 
 def distance(pa,pb):
     ax,ay = pa
@@ -29,25 +29,24 @@ def nearest(p,hot_points):
             nearest_hp_i = i
     return nearest_hp_i
 
-def generate_plates(seed):
-    N_HOT_POINTS = 512
+def generate_plates(seed,width=WIDTH,height=HEIGHT,n_plates=N_PLATES,n_hot_points=512):
 
     random.seed(seed)
 
     # generate hot points
-    hot_points = [random_point() for i in range(N_HOT_POINTS)]
+    hot_points = [random_point(width,height) for i in range(n_hot_points)]
 
     # generate plate-origins
-    plate_origins = [random_point() for i in range(N_PLATES)]
+    plate_origins = [random_point(width,height) for i in range(n_plates)]
 
     # assign hot points to plate plate-origins
     hot_points_to_plates = [nearest(hp,plate_origins) for hp in hot_points]
 
     # assign each tile to hot points
     tiles_to_plates = []
-    for y in range(0,HEIGHT):
+    for y in range(0,height):
         row = []
-        for x in range(0,WIDTH):
+        for x in range(0,width):
             hp_i = nearest((x,y),hot_points)
             hp = hot_points[hp_i]
             plate_i = nearest(hp,plate_origins)
