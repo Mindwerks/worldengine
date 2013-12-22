@@ -21,8 +21,9 @@ def generate_world(seed,world_name):
     draw_biome(w.biome,filename)
     print("+ biome image generated in '%s'" % filename)
 
+
 def generate_plates(seed,world_name):
-    plates = geo.generate_plates(seed)
+    plates = geo.generate_plates(seed,n_hot_points=2048,distance_f=geo.distance3)
 
     # Generate images
     filename = 'plates_%s.png' % world_name
@@ -47,7 +48,7 @@ def main():
         generate_world(seed,world_name)
     elif operation=='plates':
         generate_plates(seed,world_name)
-    elif:
+    else:
         raise Exception('Unknown operation')
 
 def usage():
