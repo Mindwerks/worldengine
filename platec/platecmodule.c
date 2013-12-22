@@ -20,6 +20,15 @@ static PyObject * platec_step(PyObject *self, PyObject *args)
     return Py_BuildValue("i", 0);
 }
 
+static void platec_seed(PyObject *self, PyObject *args)
+{
+    long seed;
+    if (!PyArg_ParseTuple(args, "l", &seed))
+        return NULL; 
+    srand(seed);
+    return Py_BuildValue("i", 0);    
+}
+
 static PyObject * platec_destroy(PyObject *self, PyObject *args)
 {
 
@@ -54,7 +63,8 @@ static PyMethodDef PlatecMethods[] = {
      "Get heightmap."},
     {"step",  platec_step, METH_VARARGS,
      "Step."},     
-
+    {"seed",  platec_seed, METH_VARARGS,
+     "Seed."},  
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
