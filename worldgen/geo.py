@@ -68,8 +68,11 @@ def center_elevation_map(elevation,width,height):
 
     return elevation
 
-def generate_plates_simulation(seed):
-    p = platec.create(seed)
+def generate_plates_simulation(seed,map_side=512, sea_level=0.65, erosion_period=60,
+            folding_ratio=0.02, aggr_overlap_abs=1000000, aggr_overlap_rel=0.33,
+            cycle_count=2, num_plates=10):
+    p = platec.create(seed,map_side,sea_level,erosion_period,folding_ratio,
+        aggr_overlap_abs,aggr_overlap_rel,cycle_count,num_plates)
 
     while platec.is_finished(p)==0:
         platec.step(p)
@@ -183,6 +186,8 @@ def watermap(world,n):
 
 def erode(world,n):
 
+    EROSION_FACTOR = 250.0
+
     def droplet(world,pos,q,v):
         if q<0:
             raise Exception('why?')
@@ -220,13 +225,13 @@ def erode(world,n):
                     #ql = q
                     #going = world.elevation['data'][py][px]==min_higher
                     going = ql>0.05
-                    world.elevation['data'][py][px] -= ql/80.0
+                    world.elevation['data'][py][px] -= ql/EROSION_FACTOR
                     if going:
                         droplet(world,p,ql,0) 
                     #elif random.random()<s:
                     #    droplet(world,p,ql,0) 
         else:
-            world.elevation['data'][y][x]+=0.3/80.0
+            world.elevation['data'][y][x]+=0.3/EROSION_FACTOR
             if world.elevation['data'][y][x]>min_higher:
                 world.elevation['data'][y][x] = min_higher
             #world.elevation['data'][y][x] = min_higher

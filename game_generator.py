@@ -63,14 +63,17 @@ def usage():
     print('Missing params')
 
 def main():
-    if len(sys.argv)!=5:
+    if len(sys.argv)<5:
         usage()
     world_name = sys.argv[1]    
     game_name  = sys.argv[2]
     ncivs      = int(sys.argv[3])
     turns      = int(sys.argv[4])
-    random.seed()
-    seed = random.randint(0,65536)
+    if len(sys.argv)==6:
+        seed = int(sys.argv[5])
+    else:
+        random.seed()
+        seed = random.randint(0,65536)
     print('Using seed %i to generate game %s in world "%s"' % (seed,game_name,world_name)) 
 
     with open('worlds/world_%s.json' % world_name, "r") as f:
