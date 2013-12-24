@@ -47,11 +47,6 @@ void* platec_api_create(size_t map_side, float sea_level,
 	/* Miten nykyisen opengl-mainin koodit refaktoroidaan tänne?
 	 *    parametrien tarkistus, kommentit eli dokumentointi, muuta? */
 
-	printf("Map side %i\n",map_side);
-	printf("Sea level %f\n",sea_level);
-	printf("Erosion period %i\n",erosion_period);
-	printf("Folding ratio %f\n",folding_ratio);
-
 	lithosphere* litho = new lithosphere(map_side, sea_level,
 		erosion_period, folding_ratio, aggr_overlap_abs,
 		aggr_overlap_rel, cycle_count);
@@ -59,7 +54,6 @@ void* platec_api_create(size_t map_side, float sea_level,
 
 	platec_api_list_elem elem(++last_id, litho);
 	lithospheres.push_back(elem);
-	printf("IMMEDIATELY AFTER %i\n",platec_api_get_lithosphere(last_id));
 
 	litho->seed = rand();
 	
@@ -88,16 +82,8 @@ const size_t* platec_api_get_agemap(size_t id)
 
 const float* platec_api_get_heightmap(void *pointer)
 {
-	//lithosphere* litho = platec_api_get_lithosphere(id);
-	/*if (!litho){
-		printf("No litho found for id %i\n",id);
-		return NULL;
-	}else{
-		printf("Litho found for id %i\n",id);
-	}*/
 	lithosphere* litho = (lithosphere*)pointer;
 	const float *res = litho->getTopography();
-	printf("Returning topografy %i\n",res); 
 	return res;
 }
 

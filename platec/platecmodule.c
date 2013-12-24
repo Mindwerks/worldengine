@@ -4,13 +4,24 @@
 
 static PyObject * platec_create(PyObject *self, PyObject *args)
 {
-    long seed;
-    if (!PyArg_ParseTuple(args, "l", &seed))
+    unsigned int seed;
+    unsigned int map_side;
+    float sea_level;
+    unsigned int erosion_period;
+    float folding_ratio;
+    unsigned int aggr_overlap_abs;
+    float aggr_overlap_rel;
+    unsigned int cycle_count;
+    unsigned int num_plates;
+    if (!PyArg_ParseTuple(args, "IIfIfIfII", &seed, &map_side, &sea_level, &erosion_period,
+            &folding_ratio, &aggr_overlap_abs, &aggr_overlap_rel,
+            &cycle_count, &num_plates))
         return NULL; 
     srand(seed);
-    /*size_t id = platec_api_create(10, 512, 0.65f, 2, 60, 0.02f,
-                                  1000000, 0.33f);*/
-    void *litho = platec_api_create(512,0.65f,60,0.02f,1000000, 0.33f, 2, 10);
+
+    void *litho = platec_api_create(map_side, sea_level, erosion_period,
+            folding_ratio, aggr_overlap_abs, aggr_overlap_rel,
+            cycle_count, num_plates);
 
     long pointer = (long)litho;
     return Py_BuildValue("l", pointer);
@@ -27,7 +38,11 @@ static PyObject * platec_step(PyObject *self, PyObject *args)
 
 static PyObject * platec_destroy(PyObject *self, PyObject *args)
 {
-
+    void *litho;
+    if (!PyArg_ParseTuple(args, "l", &litho))
+        return NULL; 
+    platec_api_destroy(litho);
+    return Py_BuildValue("i", 0);
 }
 
 PyObject *makelist(float array[], size_t size) {
@@ -62,22 +77,22 @@ static PyObject * platec_is_finished(PyObject *self, PyObject *args)
     return res;
 }
 
-
 static PyMethodDef PlatecMethods[] = {
     {"create",  platec_create, METH_VARARGS,
-     "Create."},
+     "Create initial plates configuration."},
+    {"destroy",  platec_destroy, METH_VARARGS,
+     "Release the data for the simulation."},
     {"get_heightmap",  platec_get_heightmap, METH_VARARGS,
-     "Get heightmap."},
-    {"step",  platec_step, METH_VARARGS,
-     "Step."},     
+     "Get current heightmap."},
+    {"step", platec_step, METH_VARARGS,
+     "Perform next step of the simulation."},     
     {"is_finished",  platec_is_finished, METH_VARARGS,
-     "Finished?."},       
-    {NULL, NULL, 0, NULL}        /* Sentinel */
+     "Is the simulation finished?"},       
+    {NULL, NULL, 0, NULL} /* Sentinel */
 };
 
 PyMODINIT_FUNC
 initplatec(void)
 {
     (void) Py_InitModule("platec", PlatecMethods);
-//    import_array();
 }
