@@ -220,13 +220,13 @@ def erode(world,n):
                     #ql = q
                     #going = world.elevation['data'][py][px]==min_higher
                     going = ql>0.05
-                    world.elevation['data'][py][px] -= ql/40.0
+                    world.elevation['data'][py][px] -= ql/80.0
                     if going:
                         droplet(world,p,ql,0) 
                     #elif random.random()<s:
                     #    droplet(world,p,ql,0) 
         else:
-            world.elevation['data'][y][x]+=0.3/40.0
+            world.elevation['data'][y][x]+=0.3/80.0
             if world.elevation['data'][y][x]>min_higher:
                 world.elevation['data'][y][x] = min_higher
             #world.elevation['data'][y][x] = min_higher
@@ -819,8 +819,8 @@ def world_gen_from_elevation(name,elevation,seed,ocean_level=None,verbose=False)
     if ocean_level:
         sl = ocean_level
     else:
-        sl = find_threshold(e,0.3)
-    ocean = fill_ocean(e,sl+1.5)
+        sl = find_threshold(e,0.3)+1.5
+    ocean = fill_ocean(e,sl)
     hl = find_threshold(e,0.10)
     ml = find_threshold(e,0.03)
     e_th = [('sea',sl),('plain',hl),('hill',ml),('mountain',None)]
