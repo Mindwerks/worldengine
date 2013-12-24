@@ -3,6 +3,7 @@ import math
 from noise import snoise2
 import jsonpickle
 from biome import *
+import platec
 
 WIDTH    = 512
 HEIGHT   = 512
@@ -33,6 +34,47 @@ def nearest(p,hot_points,distance_f=distance):
             min_dist = dist
             nearest_hp_i = i
     return nearest_hp_i
+
+def center_elevation_map(elevation,width,height):
+    """Translate the map horizontally and vertically to put as much ocean as possible at the borders."""
+    miny = None
+    ymin = None
+    minx = None
+    xmin = None
+
+    for y in xrange(height):
+        sumy = 0
+        for x in xrange(width):
+            sumy+=elevation[y*width+x]
+        if miny==None or sumy<miny:
+            miny=sumy
+            ymin=y
+
+    for x in xrange(width):
+        sumx = 0
+        for y in xrange(height):
+            sumx+=elevation[y*width+x]
+        if minx==None or sumx<minx:
+            minx=sumx
+            xmin=x
+
+    new_elevation = [0]*(width*height)
+    for y in xrange(height):
+        srcy = (ymin+y)%height
+        for x in xrange(width):
+            srcx = (xmin+x)%width
+            new_elevation[y*width+x]=elevation[srcy*width+srcx]
+    elevation = new_elevation
+
+    return elevation
+
+def generate_plates_simulation(seed):
+    p = platec.create(seed)
+
+    while platec.is_finished(p)==0:
+        platec.step(p)
+    hm = platec.get_heightmap(p)
+    return hm
 
 def generate_plates(seed,width=WIDTH,height=HEIGHT,n_plates=N_PLATES,n_hot_points=1024,distance_f=distance):
 
@@ -178,13 +220,13 @@ def erode(world,n):
                     #ql = q
                     #going = world.elevation['data'][py][px]==min_higher
                     going = ql>0.05
-                    world.elevation['data'][py][px] -= ql
+                    world.elevation['data'][py][px] -= ql/40.0
                     if going:
                         droplet(world,p,ql,0) 
                     #elif random.random()<s:
                     #    droplet(world,p,ql,0) 
         else:
-            world.elevation['data'][y][x]+=0.3
+            world.elevation['data'][y][x]+=0.3/40.0
             if world.elevation['data'][y][x]>min_higher:
                 world.elevation['data'][y][x] = min_higher
             #world.elevation['data'][y][x] = min_higher
@@ -583,7 +625,7 @@ class World(object):
         th_max = self.humidity['quantiles']['75']
         #print('Humidity Q10 %f' % th_max)
         x,y = pos
-        t = self.temperature['data'][y][x]
+        t = self.humidity['data'][y][x]
         return t<th_max
 
     def is_humidity_low(self,pos):
@@ -743,9 +785,13 @@ class World(object):
 
 
 def world_gen(name,seed,verbose=False):
-    plates = generate_plates(seed)
-    e = generate_base_heightmap(seed,plates)
-    w = world_gen_from_elevation(name,e,seed,verbose=verbose)
+    width = 512
+    height = 512
+    e_as_array = generate_plates_simulation(seed)
+    e_as_array = center_elevation_map(e_as_array,width,height)
+    e = [[e_as_array[y*width+x] for x in xrange(width)] for y in xrange(height)] 
+
+    w = world_gen_from_elevation(name,e,seed,ocean_level=1.0,verbose=verbose)
     return w
 
 def humidity(world):
@@ -764,13 +810,16 @@ def humidity(world):
     humidity['quantiles']['75'] = find_threshold_f(humidity['data'],0.75,world.ocean)
     return humidity
 
-def world_gen_from_elevation(name,elevation,seed,verbose=False):
+def world_gen_from_elevation(name,elevation,seed,ocean_level=None,verbose=False):
     i = seed
     w = World(name)
 
     # Elevation with thresholds
     e = elevation
-    sl = find_threshold(e,0.3)
+    if ocean_level:
+        sl = ocean_level
+    else:
+        sl = find_threshold(e,0.3)
     ocean = fill_ocean(e,sl+1.5)
     hl = find_threshold(e,0.10)
     ml = find_threshold(e,0.03)
@@ -852,6 +901,8 @@ def world_gen_from_elevation(name,elevation,seed,verbose=False):
                         biome[y][x] = 'grassland'
                     elif w.is_humidity_low((x,y)) or w.is_humidity_very_low((x,y)):
                         biome[y][x] = 'rock desert'
+                    else:
+                        raise Exception('No cases like that! (2)')    
                 elif w.is_temperature_high((x,y)):
                     if w.is_humidity_very_high((x,y)) or w.is_humidity_high((x,y)):
                         biome[y][x] = 'jungle'

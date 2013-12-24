@@ -4,9 +4,14 @@
 
 static PyObject * platec_create(PyObject *self, PyObject *args)
 {
+    long seed;
+    if (!PyArg_ParseTuple(args, "l", &seed))
+        return NULL; 
+    srand(seed);
     /*size_t id = platec_api_create(10, 512, 0.65f, 2, 60, 0.02f,
                                   1000000, 0.33f);*/
     void *litho = platec_api_create(512,0.65f,60,0.02f,1000000, 0.33f, 2, 10);
+
     long pointer = (long)litho;
     return Py_BuildValue("l", pointer);
 }
@@ -18,15 +23,6 @@ static PyObject * platec_step(PyObject *self, PyObject *args)
         return NULL; 
     platec_api_step(litho);
     return Py_BuildValue("i", 0);
-}
-
-static void platec_seed(PyObject *self, PyObject *args)
-{
-    long seed;
-    if (!PyArg_ParseTuple(args, "l", &seed))
-        return NULL; 
-    srand(seed);
-    return Py_BuildValue("i", 0);    
 }
 
 static PyObject * platec_destroy(PyObject *self, PyObject *args)
@@ -56,6 +52,17 @@ static PyObject * platec_get_heightmap(PyObject *self, PyObject *args)
     return res;
 }
 
+static PyObject * platec_is_finished(PyObject *self, PyObject *args)
+{
+    size_t id;
+    void *litho;
+    if (!PyArg_ParseTuple(args, "l", &litho))
+        return NULL; 
+    PyObject* res = Py_BuildValue("b",platec_api_is_finished(litho));
+    return res;
+}
+
+
 static PyMethodDef PlatecMethods[] = {
     {"create",  platec_create, METH_VARARGS,
      "Create."},
@@ -63,8 +70,8 @@ static PyMethodDef PlatecMethods[] = {
      "Get heightmap."},
     {"step",  platec_step, METH_VARARGS,
      "Step."},     
-    {"seed",  platec_seed, METH_VARARGS,
-     "Seed."},  
+    {"is_finished",  platec_is_finished, METH_VARARGS,
+     "Finished?."},       
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 

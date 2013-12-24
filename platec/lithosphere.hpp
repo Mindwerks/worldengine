@@ -79,6 +79,8 @@ class lithosphere
 	const float* getTopography() const throw(); ///< Return height map.
 	void update() throw(); ///< Simulate one step of plate tectonics.
 
+	long seed;
+
   protected:
   private:
 
@@ -132,6 +134,7 @@ class lithosphere
 
 	float peak_Ek; ///< Max total kinetic energy in the system so far.
 	size_t last_coll_count; ///< Iterations since last cont. collision.
+
 };
 
 #endif
