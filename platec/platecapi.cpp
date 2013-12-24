@@ -18,6 +18,7 @@
 
 #include "lithosphere.hpp"
 #include "platecapi.hpp"
+#include <stdlib.h>
 
 #include <vector>
 
@@ -59,6 +60,8 @@ void* platec_api_create(size_t map_side, float sea_level,
 	platec_api_list_elem elem(++last_id, litho);
 	lithospheres.push_back(elem);
 	printf("IMMEDIATELY AFTER %i\n",platec_api_get_lithosphere(last_id));
+
+	litho->seed = rand();
 	
 	return litho;
 }
@@ -124,9 +127,13 @@ size_t platec_api_is_finished(void *pointer)
 }
 
 void platec_api_step(void *pointer)
-{
+{	
+   
 	lithosphere* litho = (lithosphere*)pointer;
+	srand(litho->seed);
 
 	litho->update();
+	
+	litho->seed = rand();
 }
 

@@ -1,5 +1,4 @@
 from distutils.core import setup, Extension
-import numpy as np 
 
 extra_compile_args = "-std=c99"
 

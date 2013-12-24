@@ -17,10 +17,18 @@ def generate_world(seed,world_name):
     print("+ data saved in '%s'" % filename)
 
     # Generate images
+    filename = 'world_%s_ocean.png' % world_name
+    draw.draw_ocean(w.ocean,filename)
+    
     filename = 'world_%s_biome.png' % world_name
     draw_biome(w.biome,filename)
     print("+ biome image generated in '%s'" % filename)
-
+    filename = 'world_elevation_%s.png' % world_name
+    e_as_array = []
+    for y in xrange(512):
+        for x in xrange(512):
+            e_as_array.append(w.elevation['data'][y][x])
+    draw.draw_simple_elevation(e_as_array,filename)  
 
 def generate_plates(seed,world_name):
     plates = geo.generate_plates(seed,n_hot_points=2048,distance_f=geo.distance3)
@@ -29,6 +37,19 @@ def generate_plates(seed,world_name):
     filename = 'plates_%s.png' % world_name
     draw.draw_plates(plates,filename)
     print("+ plates image generated in '%s'" % filename)
+
+def generate_plates_simulation(seed, world_name):
+    plates = geo.generate_plates_simulation(seed)
+
+    # Generate images
+    filename = 'plates_%s.png' % world_name
+    draw.draw_simple_elevation(plates,filename)
+    print("+ plates image generated in '%s'" % filename)
+    plates = geo.center_elevation_map(plates,512,512)
+    filename = 'centered_plates_%s.png' % world_name
+    draw.draw_simple_elevation(plates,filename)    
+    print("+ centered plates image generated in '%s'" % filename)
+
 
 def main():
     if len(sys.argv)<2:
@@ -47,7 +68,7 @@ def main():
     if operation=='world':
         generate_world(seed,world_name)
     elif operation=='plates':
-        generate_plates(seed,world_name)
+        generate_plates_simulation(seed,world_name)
     else:
         raise Exception('Unknown operation')
 
@@ -56,7 +77,7 @@ def usage():
     print ' Federico Tomassetti, 2013'
     print ' World generator'
     print ' '
-    print ' generator <world_name>'
+    print ' generator <world_name> <operation> [seed]'
     print ' -------------------------------------------------------------------------'
     sys.exit(' ')
 
