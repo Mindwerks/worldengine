@@ -299,85 +299,6 @@ def antialias(elevation,steps):
     for i in range(0,steps):
         antialias()
 
-def elevnoise(elevation,seed):  
-    octaves = 6
-    freq = 16.0 * octaves
-    for y in range(0,HEIGHT):
-        for x in range(0,WIDTH):
-            n = int(snoise2(x / freq*2, y / freq*2, octaves, base=seed) * 127.0 + 128.0)
-            elevation[y][x]+=n/2
-
-def generate_base_heightmap(seed,plates):
-
-    OCEAN_BORDER = 20
-
-    def at_border(i):
-        for y in range(0,HEIGHT):
-            if plates[y][0]==i or plates[y][WIDTH-1]==i:
-                return True
-        for x in range(0,WIDTH):
-            if plates[0][x]==i or plates[HEIGHT-1][x]==i:
-                return True
-        return False
-
-    def random_plate_elev(i):
-        if at_border(i):
-            base = 0
-        else:
-            base = random.choice([20,25,80,90,100])
-        return base+random.randrange(0,25)
-
-    def consider_borders(elevation):
-        from noise import pnoise2, snoise2
-        base = random.randint(0,4096)
-        octaves = 3
-        freq = 16.0 * octaves
-
-        pbs = plate_borders(plates)
-        deltas = {}
-        for y in range(0,HEIGHT):
-            for x in range(0,WIDTH):
-                deltatot = 0
-                for b in pbs[y][x]:
-                    if not (b in deltas):
-                        deltas[b] = random.randrange(-2,2)*random.randrange(0,2)*random.randrange(0,2)
-                    deltatot += deltas[b]
-
-                elevation[y][x] += (deltatot/10)*((snoise2(x / freq*2, y / freq*2, octaves, base=base)+1.0))
-
-    def place_ocean(x,y,i):
-        elevation[y][x] = (elevation[y][x]*i)/OCEAN_BORDER
-
-    def place_oceans_around(elevation):
-        for y in range(0,HEIGHT):
-            for i in range(0,OCEAN_BORDER):
-                place_ocean(i,y,i)
-                place_ocean(WIDTH-i-1,y,i)
-        for x in range(0,WIDTH):
-            for i in range(0,OCEAN_BORDER):
-                place_ocean(x,i,i)
-                place_ocean(x,HEIGHT-i-1,i)             
-            
-    random.seed(seed)
-
-    # base elevation for each plate
-    plate_elev = [random_plate_elev(i) for i in range(0,N_PLATES)]
-    elevation = []
-    for y in range(0,HEIGHT):
-        row = []
-        for x in range(0,WIDTH):
-            elev = plate_elev[plates[y][x]]
-            row.append(elev)
-        elevation.append(row)
-
-    # consider borders
-    consider_borders(elevation)
-    place_oceans_around(elevation)  
-    antialias(elevation,5)
-    elevnoise(elevation,random.randint(0,4096))
-
-    return elevation
-
 def find_threshold(elevation,land_perc,ocean=None):
     
     def count(e):
@@ -788,6 +709,29 @@ class World(object):
         instance.set_temperature(map_from_dict(dict['temperature']['data']),[])
         return instance
 
+def elevnoise(elevation,seed):  
+    octaves = 6
+    freq = 16.0 * octaves
+    for y in range(0,HEIGHT):
+        for x in range(0,WIDTH):
+            n = int(snoise2(x / freq*2, y / freq*2, octaves, base=seed))
+            elevation[y][x]+=n
+
+def place_oceans_at_map_borders(elevation,width=512,height=512):
+
+    OCEAN_BORDER = 20
+
+    def place_ocean(x,y,i):
+        elevation[y][x] = (elevation[y][x]*i)/OCEAN_BORDER
+
+    for y in xrange(height):
+        for i in range(0,OCEAN_BORDER):
+            place_ocean(i,y,i)
+            place_ocean(width-i-1,y,i)
+    for x in xrange(width):
+        for i in range(0,OCEAN_BORDER):
+            place_ocean(x,i,i)
+            place_ocean(x,height-i-1,i)             
 
 def world_gen(name,seed,verbose=False):
     width = 512
@@ -795,6 +739,8 @@ def world_gen(name,seed,verbose=False):
     e_as_array = generate_plates_simulation(seed)
     e_as_array = center_elevation_map(e_as_array,width,height)
     e = [[e_as_array[y*width+x] for x in xrange(width)] for y in xrange(height)] 
+    elevnoise(e,random.randint(0,4096))
+    place_oceans_at_map_borders(e)
 
     w = world_gen_from_elevation(name,e,seed,ocean_level=1.0,verbose=verbose)
     return w
