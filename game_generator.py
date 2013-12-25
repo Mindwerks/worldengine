@@ -74,6 +74,7 @@ def main():
     else:
         random.seed()
         seed = random.randint(0,65536)
+    random.seed(seed)
     print('Using seed %i to generate game %s in world "%s"' % (seed,game_name,world_name)) 
 
     with open('worlds/world_%s.json' % world_name, "r") as f:

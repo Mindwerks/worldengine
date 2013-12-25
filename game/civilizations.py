@@ -1,5 +1,15 @@
 from game import *
 
+class CulturalAdvancement():
+
+    def __init__(self):
+        self.merchant    = 0
+        self.agriculture = 0
+        self.naval       = 0
+        self.weaponry    = 0
+        self.government  = 0
+        self.cultural    = 0
+
 class Civilization(PositionedMixin,InGameMixin):
 
     def __init__(self,game,name,race,characteristics=None):
