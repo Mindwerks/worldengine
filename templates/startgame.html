@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% from "form.html" import form_fields %}
+{% block content %}
+<h1>Create game</h1>
+<form method="post" action="" >
+	{{form.hidden_tag()}}
+    {{ form_fields([form.name,form.race]) }}
+	<p><input type=submit value="Start game"></p>
+</form>
+{% endblock %}
