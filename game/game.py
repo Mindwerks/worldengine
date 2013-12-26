@@ -6,6 +6,23 @@ from worldgen import geo
 import random
 import math
 from events import *
+from game.civilizations import *
+
+def generate_civ(game,race):
+    language = generate_language()
+    civilization = Civilization(game,language.name(),race)        
+    civilization.language = language
+    first_settlement = Settlement(civilization,find_start_location(civilization,game),100)
+    civilization.add_settlement(first_settlement)
+    x,y = first_settlement.pos
+    return civilization
+
+def start_game(world,name,race):
+    game = Game(world)
+    game.name = name
+    civ = generate_civ(race=race,game=game)
+    game.add_played_civ(civ)
+    return game
 
 class Game(object):
 
@@ -15,6 +32,10 @@ class Game(object):
         self.time = 0
         self.wars = []
         self._occupied = {}     
+
+    def set_played_civ(self,civ):
+        self.civilizations.append(civ)
+        self.played_civ = civ
 
     def rebuild_caches(self):
         self._occupied = {}

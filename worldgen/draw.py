@@ -367,26 +367,26 @@ def draw_temperature_levels(world,filename):
 				pixels[x,y] = (0,0,0,255)
 	img.save(filename)  
 
+biome_colors = {
+	'iceland': (208,241,245),
+	'jungle' : (54,240,17),
+	'tundra' : (180,120,130),
+	'ocean'  : (23,94,145),
+	'forest' : (10,89,15),
+	'grassland' : (69,133,73),
+	'steppe'    : (90,117,92),
+	'sand desert' : (207,204,58),
+	'rock desert' : (94,93,25),
+	'swamp'       : (255,0,0),
+	'glacier'	  : (255,255,255),
+	'alpine'      : (100,70,5),
+	'savanna'     : (200,140,20)
+}
 
 def draw_biome(temp,filename):  
 	img = Image.new('RGBA',(WIDTH,HEIGHT))
 	pixels = img.load()
-	biome_colors = {
-		'iceland': (208,241,245),
-		'jungle' : (54,240,17),
-		'tundra' : (180,120,130),
-		'ocean'  : (23,94,145),
-		'forest' : (10,89,15),
-		'grassland' : (69,133,73),
-		'steppe'    : (90,117,92),
-		'sand desert' : (207,204,58),
-		'rock desert' : (94,93,25),
-		'swamp'       : (255,0,0),
-		'glacier'	  : (255,255,255),
-		'alpine'      : (100,70,5),
-		'savanna'     : (200,140,20)
-	}
-
+	
 	for y in range(0,HEIGHT):
 		for x in range(0,WIDTH):
 			v = temp[y][x]
