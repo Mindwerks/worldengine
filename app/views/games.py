@@ -8,10 +8,24 @@ from wtforms import TextField, IntegerField, PasswordField, SelectField
 from wtforms.validators import Required, EqualTo
 
 from app.models import *
+from game.game import *
 
 class CreateGame(Form):
     name   = TextField(validators=[Required()])
     world  = SelectField(validators=[Required()])
+
+@app.route('/startgame/<world_name>',methods=['GET','POST']) 
+def start_game_view(world_name):
+    world = WorldModel.load(world_name)
+    form = StartGameForm(request.form)
+    if request.method == 'POST' and form.validate():
+        name = form.data['name']
+        race = form.data['race']
+        game = start_game(name=name,race=race,world=world)
+        return redirect(url_for('game_view',game_name=game.name))
+    return render_template('startgame.html', 
+        title="Start game",
+        form=form)    
 
 @app.route('/game/<game_name>/explore/<x>/<y>') 
 def game_explore(game_name,x,y):

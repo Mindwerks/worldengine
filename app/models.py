@@ -3,6 +3,10 @@ from app import db
 
 import atomic
 import math
+from worldgen import geo
+
+import sys
+sys.modules['geo'] = geo
 
 atomic.ATOMDIR = '.'
 
@@ -42,7 +46,7 @@ class Settlement(Positioned):
 #    return render_template('index.html',
 #        online_users=online_users)
 
-class World:
+class WorldModel:
 	def __init__(self,name,tiles,settlements):
 		self.name   = name
 		self.tiles  = tiles
@@ -62,7 +66,7 @@ class World:
 	@classmethod
 	def load(self,name):
 		import pickle
-		with open("worlds/%s.world" % name,'r') as f:
+		with open("worlds/world_%s.world" % name,'r') as f:
 		    return pickle.load(f)
 
 	@classmethod
@@ -78,9 +82,11 @@ class World:
 		names = []
 		for dir_entry in os.listdir(worlds_dir):
 			dir_entry_path = os.path.join(worlds_dir, dir_entry)
-			if os.path.isfile(dir_entry_path):
+			if os.path.isfile(dir_entry_path) and dir_entry_path.endswith('.world'):
 				name = os.path.splitext(dir_entry)[0]
-				names.append(name)
+				if name.startswith('world_'):
+					name = name[len('world_'):]
+					names.append(name)
 		return names
 
 
