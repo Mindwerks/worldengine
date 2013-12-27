@@ -60,7 +60,7 @@ class WorldModel:
 
 	def save(self):
 		import pickle
-		with open("worlds/%s.world" % self.name,'w') as f:
+		with open("worlds/world_%s.world" % self.name,'w') as f:
 		    pickle.dump(self,f)
 
 	@classmethod
@@ -71,7 +71,7 @@ class WorldModel:
 
 	@classmethod
 	def delete(self,name):
-		path = "worlds/%s.world" % name
+		path = "worlds/world_%s.world" % name
 		import os
 		os.remove(path)
 
@@ -90,9 +90,48 @@ class WorldModel:
 		return names
 
 
-class Game(db.Document):
-	name = db.StringField(max_length=255, required=True)
-	world_name = db.StringField(max_length=255, required=True)
+class GameModel:
+	def __init__(self,name,world):
+		self.name   = name
+		self.world  = world
+
+	def save(self):
+		import pickle
+		with open("games/%s.game" % self.name,'w') as f:
+		    pickle.dump(self,f)
+
+	@classmethod
+	def load(self,name):
+		import pickle
+		with open("games/%s.game" % name,'r') as f:
+		    return pickle.load(f)
+
+	@classmethod
+	def get_or_404(self,name):
+		return GameModel.load(name)
+
+	@classmethod
+	def delete(self,name):
+		path = "worlds/%s.game" % name
+		import os
+		os.remove(path)
+
+	@classmethod
+	def all_names(self):
+		import os
+		worlds_dir = 'games'
+		names = []
+		for dir_entry in os.listdir(worlds_dir):
+			dir_entry_path = os.path.join(worlds_dir, dir_entry)
+			if os.path.isfile(dir_entry_path) and dir_entry_path.endswith('.game'):
+				name = os.path.splitext(dir_entry)[0]
+				names.append(name)
+		return names
+
+
+#class GameModel(db.Document):
+#	name = db.StringField(max_length=255, required=True)
+#	world_name = db.StringField(max_length=255, required=True)
 
 #	def __init__(self,name,world_name):
 #		self.name = name

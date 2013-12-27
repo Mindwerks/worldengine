@@ -1,5 +1,17 @@
 class Race(object):
-    pass
+    
+    @staticmethod
+    def by_name(name):
+        if name=='human':
+            return Human()
+        elif name=='orc':
+            return Orc()
+        elif name=='elf':
+            return Elf()
+        elif name=='Dwarf':
+            return Dwarf()
+        else:
+            raise Exception('No race named %s' % name)
     
 class Human(Race):
 

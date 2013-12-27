@@ -1,4 +1,5 @@
-from game import *
+from basic import PositionedMixin, InGameMixin
+import random
 
 class CulturalAdvancement():
 
