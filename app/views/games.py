@@ -8,7 +8,9 @@ from wtforms import TextField, IntegerField, PasswordField, SelectField
 from wtforms.validators import Required, EqualTo
 
 from app.models import *
-from game.game import *
+from game.mechanic import *
+from game.basic import *
+from game.races import Race
 
 class CreateGame(Form):
     name   = TextField(validators=[Required()])
@@ -21,7 +23,8 @@ def start_game_view(world_name):
     if request.method == 'POST' and form.validate():
         name = form.data['name']
         race = form.data['race']
-        game = start_game(name=name,race=race,world=world)
+        game = start_game(name=name,race=Race.by_name(race),world=world)
+        game.save(name)
         return redirect(url_for('game_view',game_name=game.name))
     return render_template('startgame.html', 
         title="Start game",
@@ -67,19 +70,20 @@ def game_explore(game_name,x,y):
 
 @app.route('/game/<game_name>')
 def game_view(game_name):
+
     return render_template('game.html',
-        game=Game.objects.get_or_404(name=game_name), 
+        game=GameModel.get_or_404(name=game_name), 
         title="Games")
 
 @app.route('/games')
 def games_view():
     return render_template('games.html',
-        games=Game.objects.all(), 
+        games=GameModel.objects.all(), 
         title="Games")
 
 @app.route('/game/<game_name>/delete')
 def delete_game(game_name):
-    game=Game.objects.get_or_404(name=game_name)
+    game=GameModel.objects.get_or_404(name=game_name)
     game.delete()
     return redirect(url_for('games_view'))
 
@@ -115,7 +119,7 @@ class CreateGroup(Form):
 
 @app.route('/game/<game_name>/create_group',methods=['GET','POST'])
 def create_group_view(game_name):
-    game = Game.objects.get_or_404(name=game_name)
+    game = GameModel.objects.get_or_404(name=game_name)
     form = CreateGroup(request.form)
     if request.method == 'POST' and form.validate():
         group = Group(form.data['name'])

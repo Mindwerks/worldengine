@@ -9,4 +9,4 @@ class CreateMapForm(Form):
 
 class StartGameForm(Form):
     name  = TextField(validators=[Required()])
-    race  = SelectField(choices=[('dwarf', 'Dwarf'), ('human', 'Human'), ('orc', 'Orc'), ('elf', 'Elf')])
+    race  = SelectField(choices=[('Dwarf', 'Dwarf'), ('Human', 'Human'), ('Orc', 'Orc'), ('Elf', 'Elf')])

@@ -37,14 +37,6 @@ def print_game_state(game):
     for r in [Human(),Orc(),Dwarf(),Elf()]:
         print_race_state(game,r)
 
-def find_start_location(civ,game):
-    pos=None
-    while pos==None or not game.is_free(pos):
-        pos = game.world.random_land()
-        if random.random()>=float(civ.sustainable_population(pos)/1000.0):
-            pos=None
-    return pos
-
 def generate_civ(game,race):
     language = generate_language()
     civilization = Civilization(game,language.name(),race)        
