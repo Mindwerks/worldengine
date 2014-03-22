@@ -8,6 +8,8 @@ import geo
 import draw
 from optparse import OptionParser
 
+OPERATIONS = 'world|plates'
+
 def generate_world(seed,world_name,output_dir):
     w = world_gen(world_name,seed,verbose=True)
 
@@ -72,15 +74,16 @@ def main():
     elif operation=='plates':
         generate_plates(seed,world_name,options.output_dir)
     else:
-        raise Exception('Unknown operation')
+        raise Exception('Unknown operation: valid operations are %s' % OPERATIONS)
 
 def usage():
     print ' -------------------------------------------------------------------------'
     print ' Federico Tomassetti, 2013'
     print ' World generator'
     print ' '
-    print ' generator <world_name> <operation>'
-    print ' use -h to see option'
+    print ' generator <world_name> [operation] [options]'
+    print ' possible operations: %s' % OPERATIONS
+    print ' use -h to see options'
     print ' -------------------------------------------------------------------------'
     sys.exit(' ')
 
