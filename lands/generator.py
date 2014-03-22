@@ -26,7 +26,7 @@ def generate_world(seed,world_name,output_dir):
     filename = '%s/world_%s_biome.png' % (output_dir,world_name)
     draw_biome(w.biome,filename)
     print("+ biome image generated in '%s'" % filename)
-    filename = '%s/world_elevation_%s.png' % (output_dir,world_name)
+    filename = '%s/world_%s_elevation.png' % (output_dir,world_name)
     e_as_array = []
     for y in xrange(512):
         for x in xrange(512):
