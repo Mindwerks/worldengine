@@ -509,6 +509,42 @@ class World(object):
         x,y = pos
         return self.elevation['data'][y][x]>mountain_level
 
+    def is_low_mountain(self,pos):
+        if not self.is_mountain(pos):
+            return False
+        if len(self.elevation['thresholds'])==4:
+            mi = 2
+        else:
+            mi = 1            
+        mountain_level = self.elevation['thresholds'][mi][1]
+        x,y = pos
+        return self.elevation['data'][y][x]<mountain_level+2.0
+
+    def level_of_mountain(self,pos):
+        if not self.is_land(pos):
+            return False
+        if len(self.elevation['thresholds'])==4:
+            mi = 2
+        else:
+            mi = 1
+        mountain_level = self.elevation['thresholds'][mi][1]
+        x,y = pos
+        if self.elevation['data'][y][x]<=mountain_level:
+            return 0
+        else:
+            return self.elevation['data'][y][x]-mountain_level
+
+    def is_high_mountain(self,pos):
+        if not self.is_mountain(pos):
+            return False
+        if len(self.elevation['thresholds'])==4:
+            mi = 2
+        else:
+            mi = 1            
+        mountain_level = self.elevation['thresholds'][mi][1]
+        x,y = pos
+        return self.elevation['data'][y][x]>mountain_level+4.0
+
     def is_hill(self,pos):
         if not self.is_land(pos):
             return False
@@ -640,6 +676,20 @@ class World(object):
     def is_land(self,pos):
         x,y = pos
         return not self.ocean[y][x]
+
+    def is_ocean(self,pos):
+        x,y = pos
+        return self.ocean[y][x]
+
+    def on_tiles_around(self,pos,radius=1,action=None):
+        x,y = pos
+        for dx in range(-radius,radius+1):
+            nx = x+dx
+            if nx>=0 and nx<self.width:
+                for dy in range(-radius,radius+1):
+                    ny = y+dy
+                    if ny>=0 and ny<self.height and (dx!=0 or dy!=0):
+                        action((nx,ny))
 
     def tiles_around(self,pos,radius=1,predicate=None):
         ps = []
