@@ -89,6 +89,111 @@ def draw_simple_elevation(data,filename,shadow=True,width=512,height=512):
             #pixels[x,y] = (c,c,c,255)
             r,g,b = my_color(e)
             pixels[x,y]=(int(r*255),int(g*255),int(b*255),255)
+    img.save(filename)     
+
+def find_land_borders(world):
+    _borders = [[False for x in xrange(world.width)] for y in xrange(world.height)] 
+    for y in xrange(world.height):
+        for x in xrange(world.width):
+            if not world.ocean[y][x] and world.tiles_around((x,y),radius=1,predicate=world.is_ocean):
+                _borders[y][x] = True
+    return _borders
+
+def find_mountains_mask(world):
+    _mask = [[False for x in xrange(world.width)] for y in xrange(world.height)] 
+    for y in xrange(world.height):
+        for x in xrange(world.width):            
+            if world.is_mountain((x,y)):
+                v = len(world.tiles_around((x,y),radius=3,predicate=world.is_mountain))
+                if v>32:
+                    _mask[y][x] = v/4                
+    return _mask
+
+def gradient(value,low,high,low_color,high_color):
+    if high==low:
+        return low_color
+    _range = float(high-low)
+    _x     = float(value-low)/_range
+    _ix    = 1.0-_x
+    lr,lg,lb = low_color
+    hr,hg,hb = high_color
+    r = int(lr*_ix+hr*_x)
+    g = int(lg*_ix+hg*_x)
+    b = int(lb*_ix+hb*_x)
+    return (r,g,b,255)
+
+def draw_a_mountain(pixels,x,y,w=3,h=3):
+    mcl = (0,0,0,255)
+    mcll = (128,128,128,255)
+    mcr = (75,75,75,255)
+    # left edge
+    for mody in range(-h,h+1):
+        bottomness = (float(mody+h)/2.0)/w
+        leftborder = int(bottomness*w)
+        darkarea   = int(bottomness*w)/2
+        lightarea  = int(bottomness*w)/2
+        for itx in range(darkarea,leftborder+1):            
+            pixels[x-itx,y+mody] = gradient(itx,darkarea,leftborder,(0,0,0),(64,64,64))
+        for itx in range(-darkarea,lightarea+1):
+            pixels[x+itx,y+mody] = gradient(itx,-darkarea,lightarea,(64,64,64),(128,128,128))
+        for itx in range(lightarea,leftborder):
+            pixels[x+itx,y+mody] = (181, 166, 127, 255) # land_color
+    # right edge
+    for mody in range(-h,h+1):
+        bottomness = (float(mody+h)/2.0)/w
+        modx = int(bottomness*w)
+        pixels[x+modx,y+mody] = mcr    
+
+def draw_oldmap(world,filename):
+    img = Image.new('RGBA',(world.width,world.height))
+    pixels = img.load()
+
+    sea_color  = (212, 198, 169, 255)
+    land_color = (181, 166, 127, 255)
+    borders    = find_land_borders(world)
+    mountains_mask = find_mountains_mask(world)
+
+    def unset_mask(pos):
+        x,y = pos
+        mountains_mask[y][x] = False
+
+    def on_border(pos):
+        x,y = pos
+        return borders[y][x]
+
+    min_elev = None
+    max_elev = None
+    for y in xrange(world.height):
+        for x in xrange(world.width):
+            e = world.elevation['data'][y][x]
+            if min_elev==None or e<min_elev:
+                min_elev=e
+            if max_elev==None or e>max_elev:
+                max_elev=e              
+    elev_delta = max_elev-min_elev  
+
+    for y in xrange(world.height):
+        for x in xrange(world.width):
+            e = world.elevation['data'][y][x]
+            c = int(((e-min_elev)*255)/elev_delta)
+            if borders[y][x]:
+                pixels[x,y] = (0,0,0,255)
+            elif world.ocean[y][x]:
+                pixels[x,y] = sea_color
+            else:
+                pixels[x,y] = land_color
+
+    # Draw mountains
+    for y in xrange(world.height):
+        for x in xrange(world.width):
+            if mountains_mask[y][x]:
+                w = mountains_mask[y][x]
+                h = 3+int(world.level_of_mountain((x,y)))
+                r = max(w/3*2,h)
+                if len(world.tiles_around((x,y),radius=r,predicate=on_border))<=2:                
+                    draw_a_mountain(pixels,x,y,w=w,h=h)
+                    world.on_tiles_around((x,y),radius=r,action=unset_mask)                
+
     img.save(filename)      
 
 def draw_bw_heightmap(world,filename):
