@@ -111,15 +111,18 @@ def find_mountains_mask(world):
                     _mask[y][x] = v/4                
     return _mask
 
-def find_forest_mask(world):
+def mask(world,predicate):
     _mask = [[False for x in xrange(world.width)] for y in xrange(world.height)] 
     for y in xrange(world.height):
         for x in xrange(world.width):            
-            if world.is_forest((x,y)):
-                v = len(world.tiles_around((x,y),radius=1,predicate=world.is_forest))
+            if predicate((x,y)):
+                v = len(world.tiles_around((x,y),radius=1,predicate=predicate))
                 if v>5:
                     _mask[y][x] = v                
     return _mask
+
+def find_forest_mask(world):
+    return mask(world,predicate=world.is_forest)
 
 def gradient(value,low,high,low_color,high_color):
     if high==low:
@@ -159,6 +162,51 @@ def draw_forest(pixels,x,y,w,h):
     pixels[x+0,y-0] = c2
     pixels[x+1,y-0] = c2    
 
+def draw_jungle(pixels,x,y,w,h):
+    #pixels[x,y] = 
+    c = (0,164,0,255)
+    c2 = (0,200,0,255)
+    pixels[x+0,y-3] = c
+    pixels[x-1,y-2] = c
+    pixels[x+1,y-2] = c
+    pixels[x-2,y-1] = c
+    pixels[x+2,y-1] = c
+    pixels[x-2,y+0] = c
+    pixels[x+2,y+0] = c
+    pixels[x-1,y+1] = c    
+    pixels[x+0,y+1] = c
+    pixels[x+1,y+1] = c
+    pixels[x+0,y+2] = c
+    pixels[x+0,y+2] = c
+
+    pixels[x+0,y-2] = c2
+    pixels[x-1,y-1] = c2
+    pixels[x+0,y-1] = c2
+    pixels[x+1,y-1] = c2
+    pixels[x-1,y-0] = c2
+    pixels[x+0,y-0] = c2
+    pixels[x+1,y-0] = c2    
+
+def draw_desert(pixels,x,y,w,h):
+    c = (245,245,140,255)
+    l = (181, 166, 127, 255) # land_color
+    pixels[x-1,y-1] = c
+    pixels[x-0,y-1] = c
+    pixels[x+1,y-1] = c
+    pixels[x-2,y-0] = c
+    pixels[x+2,y-0] = c    
+    pixels[x-3,y+1] = c
+    pixels[x+3,y+1] = c
+
+    pixels[x-1,y+0] = l
+    pixels[x-0,y+0] = l
+    pixels[x+1,y+0] = l
+    pixels[x-2,y+1] = l
+    pixels[x-1,y+1] = l
+    pixels[x+0,y+1] = l
+    pixels[x+1,y+1] = l
+    pixels[x+2,y+1] = l
+
 def draw_a_mountain(pixels,x,y,w=3,h=3):
     mcl = (0,0,0,255)
     mcll = (128,128,128,255)
@@ -190,6 +238,8 @@ def draw_oldmap(world,filename):
     borders    = find_land_borders(world)
     mountains_mask = find_mountains_mask(world)
     forest_mask = find_forest_mask(world)
+    jungle_mask = mask(world,world.is_jungle)
+    desert_mask = mask(world,world.is_sand_desert)
 
     def unset_mask(pos):
         x,y = pos
@@ -198,6 +248,14 @@ def draw_oldmap(world,filename):
     def unset_forest_mask(pos):
         x,y = pos
         forest_mask[y][x] = False
+
+    def unset_jungle_mask(pos):
+        x,y = pos
+        jungle_mask[y][x] = False
+
+    def unset_desert_mask(pos):
+        x,y = pos
+        desert_mask[y][x] = False
 
     def on_border(pos):
         x,y = pos
@@ -235,6 +293,28 @@ def draw_oldmap(world,filename):
                 if len(world.tiles_around((x,y),radius=r,predicate=on_border))<=2:                
                     draw_forest(pixels,x,y,w=w,h=h)
                     world.on_tiles_around((x,y),radius=r,action=unset_forest_mask) 
+
+    # Draw jungle
+    for y in xrange(world.height):
+        for x in xrange(world.width):
+            if jungle_mask[y][x]:
+                w = 2
+                h = 3
+                r = 3
+                if len(world.tiles_around((x,y),radius=r,predicate=on_border))<=2:                
+                    draw_jungle(pixels,x,y,w=w,h=h)
+                    world.on_tiles_around((x,y),radius=r,action=unset_jungle_mask) 
+
+    # Draw sand desert
+    for y in xrange(world.height):
+        for x in xrange(world.width):
+            if desert_mask[y][x]:
+                w = 2
+                h = 3
+                r = 4
+                if len(world.tiles_around((x,y),radius=r,predicate=on_border))<=2:                
+                    draw_desert(pixels,x,y,w=w,h=h)
+                    world.on_tiles_around((x,y),radius=r,action=unset_desert_mask) 
 
     # Draw mountains
     for y in xrange(world.height):
