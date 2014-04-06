@@ -5,6 +5,8 @@ try:
 except:
     from geo import WIDTH,HEIGHT,N_PLATES,MAX_ELEV, antialias
 
+from biome import *
+
 def draw_plates(plates,filename):
     
     img = Image.new('RGBA',(WIDTH,HEIGHT))
@@ -109,6 +111,16 @@ def find_mountains_mask(world):
                     _mask[y][x] = v/4                
     return _mask
 
+def find_forest_mask(world):
+    _mask = [[False for x in xrange(world.width)] for y in xrange(world.height)] 
+    for y in xrange(world.height):
+        for x in xrange(world.width):            
+            if world.is_forest((x,y)):
+                v = len(world.tiles_around((x,y),radius=1,predicate=world.is_forest))
+                if v>5:
+                    _mask[y][x] = v                
+    return _mask
+
 def gradient(value,low,high,low_color,high_color):
     if high==low:
         return low_color
@@ -121,6 +133,31 @@ def gradient(value,low,high,low_color,high_color):
     g = int(lg*_ix+hg*_x)
     b = int(lb*_ix+hb*_x)
     return (r,g,b,255)
+
+def draw_forest(pixels,x,y,w,h):
+    #pixels[x,y] = 
+    c = (0,64,0,255)
+    c2 = (0,100,0,255)
+    pixels[x+0,y-3] = c
+    pixels[x-1,y-2] = c
+    pixels[x+1,y-2] = c
+    pixels[x-2,y-1] = c
+    pixels[x+2,y-1] = c
+    pixels[x-2,y+0] = c
+    pixels[x+2,y+0] = c
+    pixels[x-1,y+1] = c    
+    pixels[x+0,y+1] = c
+    pixels[x+1,y+1] = c
+    pixels[x+0,y+2] = c
+    pixels[x+0,y+2] = c
+
+    pixels[x+0,y-2] = c2
+    pixels[x-1,y-1] = c2
+    pixels[x+0,y-1] = c2
+    pixels[x+1,y-1] = c2
+    pixels[x-1,y-0] = c2
+    pixels[x+0,y-0] = c2
+    pixels[x+1,y-0] = c2    
 
 def draw_a_mountain(pixels,x,y,w=3,h=3):
     mcl = (0,0,0,255)
@@ -152,10 +189,15 @@ def draw_oldmap(world,filename):
     land_color = (181, 166, 127, 255)
     borders    = find_land_borders(world)
     mountains_mask = find_mountains_mask(world)
+    forest_mask = find_forest_mask(world)
 
     def unset_mask(pos):
         x,y = pos
         mountains_mask[y][x] = False
+
+    def unset_forest_mask(pos):
+        x,y = pos
+        forest_mask[y][x] = False
 
     def on_border(pos):
         x,y = pos
@@ -182,6 +224,17 @@ def draw_oldmap(world,filename):
                 pixels[x,y] = sea_color
             else:
                 pixels[x,y] = land_color
+
+    # Draw forest
+    for y in xrange(world.height):
+        for x in xrange(world.width):
+            if forest_mask[y][x]:
+                w = 2
+                h = 3
+                r = 3
+                if len(world.tiles_around((x,y),radius=r,predicate=on_border))<=2:                
+                    draw_forest(pixels,x,y,w=w,h=h)
+                    world.on_tiles_around((x,y),radius=r,action=unset_forest_mask) 
 
     # Draw mountains
     for y in xrange(world.height):

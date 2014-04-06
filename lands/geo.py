@@ -719,6 +719,9 @@ class World(object):
             raise Exception('Not found')
         return b
 
+    def is_forest(self,pos):
+        return isinstance(self.biome_at(pos),Forest)
+
     def sustainable_population(self,pos):
         return self.biome_at(pos).sustainable_population
 
