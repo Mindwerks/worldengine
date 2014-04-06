@@ -722,6 +722,12 @@ class World(object):
     def is_forest(self,pos):
         return isinstance(self.biome_at(pos),Forest)
 
+    def is_jungle(self,pos):
+        return isinstance(self.biome_at(pos),Jungle)
+
+    def is_sand_desert(self,pos):
+        return isinstance(self.biome_at(pos),SandDesert)        
+
     def sustainable_population(self,pos):
         return self.biome_at(pos).sustainable_population
 
