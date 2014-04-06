@@ -7,6 +7,7 @@ from draw import draw_biome
 import geo
 import draw
 from optparse import OptionParser
+import os
 
 OPERATIONS = 'world|plates'
 
@@ -49,9 +50,12 @@ def generate_plates(seed, world_name,output_dir):
 def main():
 
     parser = OptionParser()
-    parser.add_option('-o', '--output', dest='output_dir',help="generate files in OUTPUT",metavar="FILE",default='.')
-    parser.add_option('-s', '--seed', dest='seed',help="use SEED to initialize the pseudo-random generation",metavar="SEED",)
+    parser.add_option('-o', '--output', dest='output_dir', help="generate files in OUTPUT", metavar="FILE", default='.')
+    parser.add_option('-s', '--seed', dest='seed', help="use SEED to initialize the pseudo-random generation", metavar="SEED")
     (options,args) = parser.parse_args()
+
+    if not os.path.isdir(options.output_dir):
+        raise Exception("Output dir does not exist or it is not a dir")
 
     if len(args)<1 or len(args)>2:
         usage()
