@@ -15,19 +15,19 @@ def generate_world(seed,world_name,output_dir):
     w = world_gen(world_name,seed,verbose=True)
 
     # Save data
-    filename = "%s/world_%s.world" % (output_dir,world_name)
+    filename = "%s/%s.world" % (output_dir,world_name)
     with open(filename, "w") as f:
         pickle.dump(w, f, pickle.HIGHEST_PROTOCOL)
     print("+ data saved in '%s'" % filename)
 
     # Generate images
-    filename = '%s/world_%s_ocean.png' % (output_dir,world_name)
+    filename = '%s/%s_ocean.png' % (output_dir,world_name)
     draw.draw_ocean(w.ocean,filename)
     
-    filename = '%s/world_%s_biome.png' % (output_dir,world_name)
+    filename = '%s/%s_biome.png' % (output_dir,world_name)
     draw_biome(w.biome,filename)
     print("+ biome image generated in '%s'" % filename)
-    filename = '%s/world_%s_elevation.png' % (output_dir,world_name)
+    filename = '%s/%s_elevation.png' % (output_dir,world_name)
     e_as_array = []
     for y in xrange(512):
         for x in xrange(512):
@@ -51,15 +51,15 @@ def main():
 
     parser = OptionParser()
     parser.add_option('-o', '--output', dest='output_dir', help="generate files in OUTPUT", metavar="FILE", default='.')
+    parser.add_option('-n', '--worldname', dest='worldname', help="set WORLDNAME", metavar="WORLDNAME")
     parser.add_option('-s', '--seed', dest='seed', help="use SEED to initialize the pseudo-random generation", metavar="SEED")
     (options,args) = parser.parse_args()
 
     if not os.path.isdir(options.output_dir):
         raise Exception("Output dir does not exist or it is not a dir")
 
-    if len(args)<1 or len(args)>2:
-        usage()
-    world_name = args[0]        
+    if len(args)>2:
+        usage()    
     if len(args)>=2:
         operation = args[1]
     else:
@@ -69,6 +69,10 @@ def main():
         seed = int(options.seed)
     else:
         seed = random.randint(0,65536)
+    if len(args)>=1:
+        world_name = args[0]
+    else:
+        world_name = "seed_%i" % seed
     print('World generator')
     print(' seed      : %i' % seed)
     print(' name      : %s' % world_name)

@@ -187,6 +187,31 @@ def draw_jungle(pixels,x,y,w,h):
     pixels[x+0,y-0] = c2
     pixels[x+1,y-0] = c2    
 
+def draw_tundra(pixels,x,y,w,h):
+    #pixels[x,y] = 
+    c = (30,82,80,255)
+    c2 = (30,110,80,255)
+    pixels[x+0,y-3] = c
+    pixels[x-1,y-2] = c
+    pixels[x+1,y-2] = c
+    pixels[x-2,y-1] = c
+    pixels[x+2,y-1] = c
+    pixels[x-2,y+0] = c
+    pixels[x+2,y+0] = c
+    pixels[x-1,y+1] = c    
+    pixels[x+0,y+1] = c
+    pixels[x+1,y+1] = c
+    pixels[x+0,y+2] = c
+    pixels[x+0,y+2] = c
+
+    pixels[x+0,y-2] = c2
+    pixels[x-1,y-1] = c2
+    pixels[x+0,y-1] = c2
+    pixels[x+1,y-1] = c2
+    pixels[x-1,y-0] = c2
+    pixels[x+0,y-0] = c2
+    pixels[x+1,y-0] = c2        
+
 def draw_desert(pixels,x,y,w,h):
     c = (245,245,140,255)
     l = (181, 166, 127, 255) # land_color
@@ -229,6 +254,10 @@ def draw_a_mountain(pixels,x,y,w=3,h=3):
         modx = int(bottomness*w)
         pixels[x+modx,y+mody] = mcr    
 
+def draw_glacier(pixels,x,y):
+    rg = 255-(x**(y/5)+x*23+y*37+(x*y)*13)%75
+    pixels[x,y] = (rg,rg,255,255)
+
 def draw_oldmap(world,filename):
     img = Image.new('RGBA',(world.width,world.height))
     pixels = img.load()
@@ -240,6 +269,7 @@ def draw_oldmap(world,filename):
     forest_mask = find_forest_mask(world)
     jungle_mask = mask(world,world.is_jungle)
     desert_mask = mask(world,world.is_sand_desert)
+    tundra_mask = mask(world,world.is_tundra) 
 
     def unset_mask(pos):
         x,y = pos
@@ -252,6 +282,10 @@ def draw_oldmap(world,filename):
     def unset_jungle_mask(pos):
         x,y = pos
         jungle_mask[y][x] = False
+
+    def unset_tundra_mask(pos):
+        x,y = pos
+        tundra_mask[y][x] = False        
 
     def unset_desert_mask(pos):
         x,y = pos
@@ -283,6 +317,12 @@ def draw_oldmap(world,filename):
             else:
                 pixels[x,y] = land_color
 
+    # Draw glacier
+    for y in xrange(world.height):
+        for x in xrange(world.width):
+            if not borders[y][x] and world.is_iceland((x,y)):
+                draw_glacier(pixels,x,y)
+
     # Draw forest
     for y in xrange(world.height):
         for x in xrange(world.width):
@@ -305,6 +345,17 @@ def draw_oldmap(world,filename):
                     draw_jungle(pixels,x,y,w=w,h=h)
                     world.on_tiles_around((x,y),radius=r,action=unset_jungle_mask) 
 
+    # Draw tundra
+    for y in xrange(world.height):
+        for x in xrange(world.width):
+            if tundra_mask[y][x]:
+                w = 2
+                h = 3
+                r = 3
+                if len(world.tiles_around((x,y),radius=r,predicate=on_border))<=2:                
+                    draw_tundra(pixels,x,y,w=w,h=h)
+                    world.on_tiles_around((x,y),radius=r,action=unset_tundra_mask)                     
+
     # Draw sand desert
     for y in xrange(world.height):
         for x in xrange(world.width):
@@ -314,8 +365,17 @@ def draw_oldmap(world,filename):
                 r = 4
                 if len(world.tiles_around((x,y),radius=r,predicate=on_border))<=2:                
                     draw_desert(pixels,x,y,w=w,h=h)
-                    world.on_tiles_around((x,y),radius=r,action=unset_desert_mask) 
+                    world.on_tiles_around((x,y),radius=r,action=unset_desert_mask)       
 
+    # Draw rivers
+    # for y in xrange(world.height):
+    #     for x in xrange(world.width):
+    #         if world.contains_main_river((x,y)):
+    #             pixels[x,y] = (0,0,128,128)    
+    #         elif world.contains_river((x,y)):
+    #             pixels[x,y] = (0,0,164,128)  
+
+                            
     # Draw mountains
     for y in xrange(world.height):
         for x in xrange(world.width):
@@ -325,7 +385,8 @@ def draw_oldmap(world,filename):
                 r = max(w/3*2,h)
                 if len(world.tiles_around((x,y),radius=r,predicate=on_border))<=2:                
                     draw_a_mountain(pixels,x,y,w=w,h=h)
-                    world.on_tiles_around((x,y),radius=r,action=unset_mask)                
+                    world.on_tiles_around((x,y),radius=r,action=unset_mask)  
+
 
     img.save(filename)      
 

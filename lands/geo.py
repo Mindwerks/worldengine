@@ -104,25 +104,25 @@ def generate_plates(seed,width=WIDTH,height=HEIGHT,n_plates=N_PLATES,n_hot_point
         tiles_to_plates.append(row)
     return tiles_to_plates
 
-def plate_borders(plates):  
+def plate_borders(plates,width=WIDTH,height=HEIGHT):  
 
     def calc_borders(x,y,p):
         borders = []
         for dy in range(-MAX_DIST,+MAX_DIST+1):
             py = y+dy
-            if py>0 and py<HEIGHT:
+            if py>0 and py<height:
                 for dx in range(-MAX_DIST,+MAX_DIST+1):
                     px = x+dx
-                    if px>0 and px<WIDTH:
+                    if px>0 and px<width:
                         pp = plates[py][px]
                         if pp!=p:
                             borders.append((p,pp))
         return borders  
 
     borders = []
-    for y in range(0,HEIGHT):
+    for y in range(0,height):
         row = []
-        for x in range(0,WIDTH):
+        for x in range(0,width):
             p = plates[y][x]
             row.append(calc_borders(x,y,p))
         borders.append(row)
@@ -276,11 +276,11 @@ def sea_depth(world,sea_level):
     sea_depth = [[rescale_value(sea_depth[y][x],min_depth,max_depth,0.0,1.0) for x in xrange(world.width)] for y in xrange(world.height)]
     return sea_depth
 
-def antialias(elevation,steps):
+def antialias(elevation,steps,width=WIDTH,height=HEIGHT):
 
     def antialias():
-        for y in range(0,HEIGHT):
-            for x in range(0,WIDTH):
+        for y in range(0,height):
+            for x in range(0,width):
                 antialias_point(x,y)        
 
     def antialias_point(x,y):   
@@ -288,10 +288,10 @@ def antialias(elevation,steps):
         tot = elevation[y][x]*2
         for dy in range(-1,+2):
             py = y+dy
-            if py>0 and py<HEIGHT:
+            if py>0 and py<height:
                 for dx in range(-1,+2):
                     px = x+dx
-                    if px>0 and px<WIDTH:
+                    if px>0 and px<width:
                         n += 1
                         tot += elevation[py][px]
         return tot/n
@@ -493,10 +493,10 @@ import operator
 
 class World(object):
 
-    def __init__(self,name):
+    def __init__(self,name,width=512,height=512):
         self.name = name
-        self.width = 512
-        self.height = 512
+        self.width = width
+        self.height = height
 
     def is_mountain(self,pos):
         if not self.is_land(pos):
@@ -722,6 +722,15 @@ class World(object):
     def is_forest(self,pos):
         return isinstance(self.biome_at(pos),Forest)
 
+    def is_tundra(self,pos):
+        return isinstance(self.biome_at(pos),Tundra)
+
+    def is_glacier(self,pos):
+        return isinstance(self.biome_at(pos),Glacier)
+
+    def is_iceland(self,pos):
+        return isinstance(self.biome_at(pos),Iceland)
+
     def is_jungle(self,pos):
         return isinstance(self.biome_at(pos),Jungle)
 
@@ -732,11 +741,12 @@ class World(object):
         return self.biome_at(pos).sustainable_population
 
     @classmethod
-    def from_json_file(self,filename):
+    def from_json_file(self,filename,width=512,height=512):
         with open(filename, "r") as f:
             content = f.read()
         world = jsonpickle.decode(content)
-        world.width = world.height = 512
+        world.width  = width
+        world.height = height
         if type(world) is World:
             return world
         else:
@@ -792,9 +802,7 @@ def place_oceans_at_map_borders(elevation,width=512,height=512):
             place_ocean(x,i,i)
             place_ocean(x,height-i-1,i)             
 
-def world_gen(name,seed,verbose=False):
-    width = 512
-    height = 512
+def world_gen(name,seed,verbose=False,width=512,height=512):    
     e_as_array = generate_plates_simulation(seed)
     e_as_array = center_elevation_map(e_as_array,width,height)
     e = [[e_as_array[y*width+x] for x in xrange(width)] for y in xrange(height)] 
@@ -820,7 +828,7 @@ def humidity(world):
     humidity['quantiles']['75'] = find_threshold_f(humidity['data'],0.75,world.ocean)
     return humidity
 
-def world_gen_from_elevation(name,elevation,seed,ocean_level=None,verbose=False):
+def world_gen_from_elevation(name,elevation,seed,ocean_level=None,verbose=False,width=512,height=512):
     i = seed
     w = World(name)
 
@@ -888,9 +896,9 @@ def world_gen_from_elevation(name,elevation,seed,ocean_level=None,verbose=False)
 
     cm = {}
     biome_cm = {}
-    biome = [[None for x in xrange(WIDTH)] for y in xrange(HEIGHT)]
-    for y in xrange(512):
-        for x in xrange(512):
+    biome = [[None for x in xrange(width)] for y in xrange(height)]
+    for y in xrange(height):
+        for x in xrange(width):
             if ocean[y][x]:
                 biome[y][x] = 'ocean'
             else:
