@@ -744,6 +744,9 @@ class World(object):
     def is_sand_desert(self,pos):
         return isinstance(self.biome_at(pos),SandDesert)        
 
+    def is_rock_desert(self,pos):
+        return isinstance(self.biome_at(pos),RockDesert)        
+
     def sustainable_population(self,pos):
         return self.biome_at(pos).sustainable_population
 
