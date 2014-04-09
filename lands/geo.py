@@ -738,6 +738,9 @@ class World(object):
     def is_jungle(self,pos):
         return isinstance(self.biome_at(pos),Jungle)
 
+    def is_savanna(self,pos):
+        return isinstance(self.biome_at(pos),Savanna)
+
     def is_sand_desert(self,pos):
         return isinstance(self.biome_at(pos),SandDesert)        
 
