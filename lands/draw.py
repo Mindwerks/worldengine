@@ -187,6 +187,18 @@ def draw_jungle(pixels,x,y,w,h):
     pixels[x+0,y-0] = c2
     pixels[x+1,y-0] = c2    
 
+def draw_savanna(pixels,x,y,w,h):
+    c = (181,149,20,255)
+    c2 = (105,95,58,255)
+    for dx in xrange(-1,1):
+        pixels[x+dx,y-2] = c
+    for dx in xrange(-2,2):
+        pixels[x+dx,y-1] = c
+    for dx in xrange(-1,1):
+        pixels[x+dx,y-0] = c                        
+    pixels[x,y+1] = c2
+    pixels[x,y+2] = c2
+
 def draw_tundra(pixels,x,y,w,h):
     #pixels[x,y] = 
     c = (30,82,80,255)
@@ -343,6 +355,7 @@ def draw_oldmap(world,filename):
     jungle_mask = mask(world,world.is_jungle)
     desert_mask = mask(world,world.is_sand_desert)
     tundra_mask = mask(world,world.is_tundra) 
+    savanna_mask = mask(world,world.is_savanna)     
 
     def unset_mask(pos):
         x,y = pos
@@ -359,6 +372,10 @@ def draw_oldmap(world,filename):
     def unset_tundra_mask(pos):
         x,y = pos
         tundra_mask[y][x] = False        
+
+    def unset_savanna_mask(pos):
+        x,y = pos
+        savanna_mask[y][x] = False        
 
     def unset_desert_mask(pos):
         x,y = pos
@@ -406,6 +423,17 @@ def draw_oldmap(world,filename):
                 if len(world.tiles_around((x,y),radius=r,predicate=on_border))<=2:                
                     draw_forest(pixels,x,y,w=w,h=h)
                     world.on_tiles_around((x,y),radius=r,action=unset_forest_mask) 
+
+    # Draw savanna
+    for y in xrange(world.height):
+        for x in xrange(world.width):
+            if savanna_mask[y][x]:
+                w = 2
+                h = 2
+                r = 3
+                if len(world.tiles_around((x,y),radius=r,predicate=on_border))<=2:                
+                    draw_savanna(pixels,x,y,w=w,h=h)
+                    world.on_tiles_around((x,y),radius=r,action=unset_savanna_mask)
 
     # Draw jungle
     for y in xrange(world.height):
