@@ -244,6 +244,27 @@ def draw_desert(pixels,x,y,w,h):
     pixels[x+1,y+1] = l
     pixels[x+2,y+1] = l
 
+def draw_rock_desert(pixels,x,y,w,h):
+    c = (71,74,65,255)
+    l = (181, 166, 127, 255) # land_color
+    pixels[x-1,y-1] = c
+    pixels[x-0,y-1] = c
+    pixels[x+1,y-1] = c
+    pixels[x-2,y-0] = c
+    pixels[x+2,y-0] = c    
+    pixels[x-3,y+1] = c
+    pixels[x+3,y+1] = c
+
+    pixels[x-1,y+0] = l
+    pixels[x-0,y+0] = l
+    pixels[x+1,y+0] = l
+    pixels[x-2,y+1] = l
+    pixels[x-1,y+1] = l
+    pixels[x+0,y+1] = l
+    pixels[x+1,y+1] = l
+    pixels[x+2,y+1] = l
+
+
 def draw_a_mountain(pixels,x,y,w=3,h=3):
     mcl = (0,0,0,255)
     mcll = (128,128,128,255)
@@ -354,6 +375,7 @@ def draw_oldmap(world,filename):
     forest_mask = find_forest_mask(world)
     jungle_mask = mask(world,world.is_jungle)
     desert_mask = mask(world,world.is_sand_desert)
+    rock_desert_mask = mask(world,world.is_rock_desert)
     tundra_mask = mask(world,world.is_tundra) 
     savanna_mask = mask(world,world.is_savanna)     
 
@@ -380,6 +402,10 @@ def draw_oldmap(world,filename):
     def unset_desert_mask(pos):
         x,y = pos
         desert_mask[y][x] = False
+
+    def unset_rock_desert_mask(pos):
+        x,y = pos
+        rock_desert_mask[y][x] = False
 
     def on_border(pos):
         x,y = pos
@@ -467,6 +493,17 @@ def draw_oldmap(world,filename):
                 if len(world.tiles_around((x,y),radius=r,predicate=on_border))<=2:                
                     draw_desert(pixels,x,y,w=w,h=h)
                     world.on_tiles_around((x,y),radius=r,action=unset_desert_mask)       
+
+    # Draw rock desert
+    for y in xrange(world.height):
+        for x in xrange(world.width):
+            if rock_desert_mask[y][x]:
+                w = 2
+                h = 3
+                r = 4
+                if len(world.tiles_around((x,y),radius=r,predicate=on_border))<=2:                
+                    draw_rock_desert(pixels,x,y,w=w,h=h)
+                    world.on_tiles_around((x,y),radius=r,action=unset_rock_desert_mask)       
 
     draw_riversmap_on_image(world,pixels)
 
