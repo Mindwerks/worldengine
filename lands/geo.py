@@ -712,6 +712,10 @@ class World(object):
         # remove elements in pos
         return list(set(tiles)-set(pos_list))
 
+    def watermap_at(self,pos):
+        x,y = pos
+        return self.watermap['data'][y][x]
+
     def biome_at(self,pos):
         x,y = pos
         b = Biome.by_name(self.biome[y][x])

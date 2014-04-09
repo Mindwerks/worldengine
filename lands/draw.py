@@ -258,6 +258,79 @@ def draw_glacier(pixels,x,y):
     rg = 255-(x**(y/5)+x*23+y*37+(x*y)*13)%75
     pixels[x,y] = (rg,rg,255,255)
 
+def pseudo_random_land_pos(world,i):
+    y = (i**7+i*23)%world.height
+    x = (i**13+i*37)%world.width
+    if world.is_land((x,y)):
+        return (int(x),int(y))
+    else:
+        return pseudo_random_land_pos(world,i*17+3)
+
+def generate_riversmap(world_path,map_path):
+    import pickle
+    with open(world_path,'r') as f:
+        w=pickle.load(f)
+
+    # Generate images
+    draw_riversmap(w,map_path)
+
+def draw_river(world,pixels,pos):
+    if world.is_ocean(pos):
+        return
+    x,y = pos    
+    pixels[x,y] = (0,0,128,255)
+    draw_river(world,pixels,lowest_neighbour(world,pos))
+
+def lowest_neighbour(world,pos):
+    x,y = pos
+    lowest = None
+    lowest_lvl = None
+    for dx in xrange(-1,1):
+        for dy in xrange(-1,1):
+            if dx!=0 or dy!=0:
+                e = world.elevation['data'][y+dy][x+dx] #+world.humidity['data'][y+dy][x+dx]/3.0
+                if (not lowest_lvl) or (e<lowest_lvl):
+                    lowest_lvl = e
+                    lowest = (x+dx,y+dy)
+                elif (e==lowest_lvl) and ((x+y+dx+dy)%2==0):
+                    lowest_lvl = e
+                    lowest = (x+dx,y+dy)
+
+    return lowest
+
+def draw_riversmap_on_image(world,pixels):
+    sea_color  = (0,0,128,255)
+    land_color = (255,255,255,255)
+
+    for i in range(1,45):
+        candidates = []
+        for j in range(1,10):
+            candidates.append(pseudo_random_land_pos(world,i*j+j))
+        max = None
+        cc = None
+        for c in candidates:
+            cx,cy = c
+            wl = world.humidity['data'][cy][cx]*world.precipitation['data'][cy][cx]*world.elevation['data'][cy][cx]
+            if max==None or wl>max:
+                max = wl
+                cc = c
+        draw_river(world,pixels,cc)        
+
+def draw_riversmap(world,filename):
+    img = Image.new('RGBA',(world.width,world.height))
+    pixels = img.load()
+
+    for y in xrange(world.height):
+        for x in xrange(world.width):
+            if world.ocean[y][x]:
+                pixels[x,y] = sea_color
+            else:
+                pixels[x,y] = land_color
+
+    draw_riversmap_on_image(world,pixels)
+        
+    img.save(filename)
+
 def draw_oldmap(world,filename):
     img = Image.new('RGBA',(world.width,world.height))
     pixels = img.load()
@@ -367,15 +440,8 @@ def draw_oldmap(world,filename):
                     draw_desert(pixels,x,y,w=w,h=h)
                     world.on_tiles_around((x,y),radius=r,action=unset_desert_mask)       
 
-    # Draw rivers
-    # for y in xrange(world.height):
-    #     for x in xrange(world.width):
-    #         if world.contains_main_river((x,y)):
-    #             pixels[x,y] = (0,0,128,128)    
-    #         elif world.contains_river((x,y)):
-    #             pixels[x,y] = (0,0,164,128)  
+    draw_riversmap_on_image(world,pixels)
 
-                            
     # Draw mountains
     for y in xrange(world.height):
         for x in xrange(world.width):
