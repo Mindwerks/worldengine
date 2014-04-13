@@ -1,11 +1,16 @@
-from worldgen.namegen import *
+from langgen import langgen
 import jsonpickle
 import pickle
-from worldgen.geo import World
-from worldgen import geo
+from geo import World
+import geo
 import random
 import math
 from events import *
+
+def generate_language():
+    samples = langgen.load_all_lang_samples()
+    mixed_sample = langgen.extract_and_mix_samples(samples)
+    return langgen.Language.language_from_samples(mixed_sample)
 
 class Game(object):
 
@@ -32,15 +37,13 @@ class Game(object):
             self._occupied.pop(pos)
 
     @classmethod
-    def load(self,name):
-        filename = 'games/%s.game' % name
+    def load(self,filename):
         with open(filename, "r") as f:
             obj = pickle.load(f)
         return obj
     
 
-    def save(self,name):
-        filename = 'games/%s.game' % name
+    def save(self,filename):
         with open(filename, "w") as f:
             pickle.dump(self,f,pickle.HIGHEST_PROTOCOL)
     

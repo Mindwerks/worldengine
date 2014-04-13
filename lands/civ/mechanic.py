@@ -1,5 +1,5 @@
-from game.civilizations import Civilization
-from game.basic import Game, generate_language, Settlement
+from civilizations import Civilization
+from basic import Game, generate_language, Settlement
 import random
 
 def find_start_location(civ,game):

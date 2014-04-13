@@ -1,5 +1,7 @@
 from basic import PositionedMixin, InGameMixin
 import random
+import math
+import geo
 
 class CulturalAdvancement():
 
