@@ -1,13 +1,17 @@
-from worldgen.namegen import *
-import jsonpickle
-from worldgen.geo import World
-from worldgen import geo
-from game.game import *
-from game.events import *
-from game.draw import draw_civs
-from game.races import *
-from game.civilizations import *
 import sys
+sys.path.append("lands")
+
+from langgen import *
+import pickle
+from geo import World
+import geo
+from civ import *
+from civ.basic import *
+from civ.events import *
+from civ.draw import draw_civs
+from civ.races import *
+from civ.mechanic import *
+from civ.civilizations import *
     
 #import cProfile
 #import re
@@ -52,13 +56,14 @@ def generate_civ(game,race):
     game.civilizations.append(civilization)
 
 def usage():
-    print('Missing params')
+    print('Usage:\n\tciv_simulator <world_path> <game_path> <ncvis> <turns> [seed]')
+    sys.exit()
 
 def main():
-    if len(sys.argv)<5:
+    if len(sys.argv)<5 or len(sys.argv)>6:
         usage()
-    world_name = sys.argv[1]    
-    game_name  = sys.argv[2]
+    world_path = sys.argv[1]    
+    game_path  = sys.argv[2]
     ncivs      = int(sys.argv[3])
     turns      = int(sys.argv[4])
     if len(sys.argv)==6:
@@ -67,11 +72,9 @@ def main():
         random.seed()
         seed = random.randint(0,65536)
     random.seed(seed)
-    print('Using seed %i to generate game %s in world "%s"' % (seed,game_name,world_name)) 
+    print('Using seed %i to generate game %s in world "%s"' % (seed,game_path,world_path)) 
 
-    with open('worlds/world_%s.json' % world_name, "r") as f:
-        content = f.read()
-    world = World.from_dict(jsonpickle.decode(content))
+    world = pickle.load(open(world_path))
 
     game = Game(world)
 
@@ -99,9 +102,9 @@ def main():
         if (i+1)%50==0 and i>1:
             print_game_state(game)
 
-    game.save(game_name)
+    game.save(game_path)
 
-    draw_civs(game,'%s_civs_%i.png' % (game_name,game.time))
+    draw_civs(game,'civs_%i.png' % (game.time))
 
 #cProfile.run('main()')
 main()
