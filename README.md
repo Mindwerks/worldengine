@@ -26,3 +26,8 @@ The program produces a binary format with all the data of the generated world an
 ## Biome Map
 
 ![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_biome.png)
+
+Requirements
+============
+
+Libjpeg is required by PIL
