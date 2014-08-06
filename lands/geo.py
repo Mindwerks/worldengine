@@ -812,12 +812,16 @@ def place_oceans_at_map_borders(elevation,width=512,height=512):
             place_ocean(x,i,i)
             place_ocean(x,height-i-1,i)             
 
-def world_gen(name,seed,verbose=False,width=512,height=512):    
+def world_gen(name,seed,verbose=False,width=512,height=512):
     e_as_array = generate_plates_simulation(seed)
     e_as_array = center_elevation_map(e_as_array,width,height)
+    if verbose:
+        print("...plates simulated")
     e = [[e_as_array[y*width+x] for x in xrange(width)] for y in xrange(height)] 
     elevnoise(e,random.randint(0,4096))
     place_oceans_at_map_borders(e)
+    if verbose:
+        print("...elevation noise added")
 
     w = world_gen_from_elevation(name,e,seed,ocean_level=1.0,verbose=verbose)
     return w
@@ -866,6 +870,8 @@ def world_gen_from_elevation(name,elevation,seed,ocean_level=None,verbose=False,
         ('hig',None)
     ]
     w.set_precipitation(p,p_th)
+    if verbose:
+        print("...precipations calculated")
 
     erode(w,3000000)
     if verbose:
@@ -936,7 +942,7 @@ def world_gen_from_elevation(name,elevation,seed,ocean_level=None,verbose=False,
                         biome[y][x] = 'jungle'
                     elif w.is_humidity_above_quantile((x,y),50):
                         biome[y][x] = 'savanna'
-                    else:# world.is_humidity_low((x,y)) or world.is_humidity_very_low((x,y)):
+                    else:
                         biome[y][x] = 'sand desert'
                 else:
                     raise Exception('No cases like that!')
@@ -949,10 +955,14 @@ def world_gen_from_elevation(name,elevation,seed,ocean_level=None,verbose=False,
         if verbose:
             print("%s = %i" %(str(cl),count))
 
+    if verbose:
+        print('') # empty line
+        print('Biome obtained:')
+
     for cl in biome_cm.keys():
         count = biome_cm[cl]
         if verbose:
-            print("%s = %i" %(str(cl),count))
+            print(" %20s = %7i" %(str(cl),count))
 
     w.set_biome(biome)
     return w

@@ -11,28 +11,35 @@ import os
 
 OPERATIONS = 'world|plates'
 
-def generate_world(seed,world_name,output_dir):
-    w = world_gen(world_name,seed,verbose=True)
+def generate_world(seed, world_name, output_dir):
+    w = world_gen(world_name, seed, verbose=True)
+
+    print('') # empty line
+    print('Producing ouput:')
 
     # Save data
     filename = "%s/%s.world" % (output_dir,world_name)
     with open(filename, "w") as f:
         pickle.dump(w, f, pickle.HIGHEST_PROTOCOL)
-    print("+ data saved in '%s'" % filename)
+    print("* world data saved in '%s'" % filename)
 
     # Generate images
     filename = '%s/%s_ocean.png' % (output_dir,world_name)
     draw.draw_ocean(w.ocean,filename)
+    print("* ocean image generated in '%s'" % filename)
     
     filename = '%s/%s_biome.png' % (output_dir,world_name)
     draw_biome(w.biome,filename)
-    print("+ biome image generated in '%s'" % filename)
+    print("* biome image generated in '%s'" % filename)
+    
     filename = '%s/%s_elevation.png' % (output_dir,world_name)
     e_as_array = []
     for y in xrange(512):
         for x in xrange(512):
             e_as_array.append(w.elevation['data'][y][x])
     draw.draw_simple_elevation(e_as_array,filename)  
+    print("* elevation image generated in '%s'" % filename)
+    
 
 def generate_plates(seed, world_name,output_dir):
     plates = geo.generate_plates_simulation(seed)
@@ -48,7 +55,6 @@ def generate_plates(seed, world_name,output_dir):
 
 
 def main():
-
     parser = OptionParser()
     parser.add_option('-o', '--output', dest='output_dir', help="generate files in OUTPUT", metavar="FILE", default='.')
     parser.add_option('-n', '--worldname', dest='worldname', help="set WORLDNAME", metavar="WORLDNAME")
@@ -73,16 +79,20 @@ def main():
         world_name = args[0]
     else:
         world_name = "seed_%i" % seed
-    print('World generator')
+    print('Lands world generator')
+    print('---------------------')
     print(' seed      : %i' % seed)
     print(' name      : %s' % world_name)
     print(' operation : %s generation' % operation)
+    print('') # empty line
+    print('starting...')
     if operation=='world':
-        generate_world(seed,world_name,options.output_dir)
+        generate_world(seed, world_name, options.output_dir)
     elif operation=='plates':
-        generate_plates(seed,world_name,options.output_dir)
+        generate_plates(seed, world_name, options.output_dir)
     else:
         raise Exception('Unknown operation: valid operations are %s' % OPERATIONS)
+    print('...done')
 
 def usage():
     print ' -------------------------------------------------------------------------'
