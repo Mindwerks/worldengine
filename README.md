@@ -5,7 +5,9 @@ You can generate worlds data (heighmap, biome, etc.) and images for your own wor
 
 For example:
 
-    python worldgen/generator.py seed1 world -s 1
+```python
+python lands/generator.pyy seed1 world -s 1
+```
 
 Worlds are generated using plate simulations, erosion, rain shadows and plenty of other phenomenons.
 
@@ -26,3 +28,20 @@ The program produces a binary format with all the data of the generated world an
 ## Biome Map
 
 ![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_biome.png)
+
+Algorithm
+=========
+
+The world generation algorithm goes through different phases:
+* plates simulation: it is the best way to get proper mountain chains. For this [pyplatec](https://github.com/ftomassetti/pyplatec) is used
+* noise techniques are used at different steps
+* precipitations are calculated considering latitude and rain shadow effects
+* erosion is calculated
+* humidity in each zone is calculated
+* terrain permeability is calculated
+* biome is calculated considering humidity, precipitations, rivers, etc.
+
+Requirements
+============
+
+Libjpeg is required by PIL
