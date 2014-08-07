@@ -812,7 +812,7 @@ def place_oceans_at_map_borders(elevation,width=512,height=512):
             place_ocean(x,i,i)
             place_ocean(x,height-i-1,i)             
 
-def world_gen(name,seed,verbose=False,width=512,height=512):
+def world_gen(name,seed,verbose=False,width=512,height=512,step="full"):
     e_as_array = generate_plates_simulation(seed)
     e_as_array = center_elevation_map(e_as_array,width,height)
     if verbose:
@@ -823,9 +823,11 @@ def world_gen(name,seed,verbose=False,width=512,height=512):
     if verbose:
         print("...elevation noise added")
 
-    w = world_gen_from_elevation(name,e,seed,ocean_level=1.0,verbose=verbose)
-    return w
-
+    if step.include_biome:
+        return world_gen_from_elevation(name, e, seed, ocean_level=1.0, verbose=verbose)
+    else:
+        return init_world_from_elevation(name, e, ocean_level=1.0, verbose=verbose)[0]
+        
 def humidity(world):
     humidity = {}
     humidity['data'] = [[0 for x in xrange(world.width)] for y in xrange(world.height)] 
@@ -842,8 +844,7 @@ def humidity(world):
     humidity['quantiles']['75'] = find_threshold_f(humidity['data'],0.75,world.ocean)
     return humidity
 
-def world_gen_from_elevation(name,elevation,seed,ocean_level=None,verbose=False,width=512,height=512):
-    i = seed
+def init_world_from_elevation(name, elevation, ocean_level, verbose):
     w = World(name)
 
     # Elevation with thresholds
@@ -861,6 +862,14 @@ def world_gen_from_elevation(name,elevation,seed,ocean_level=None,verbose=False,
     w.sea_depth = sea_depth(w,sl)
     if verbose:
         print("...elevation level calculated")
+
+    return [w, ocean, sl, hl, ml, e_th]
+
+
+def world_gen_from_elevation(name,elevation,seed,ocean_level=None,verbose=False,width=512,height=512):
+    i = seed
+    e = elevation
+    w, ocean, sl, hl, ml, e_th = init_world_from_elevation(name, elevation, ocean_level, verbose)
 
     # Precipitation with thresholds
     p = precipitation(i)

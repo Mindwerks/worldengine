@@ -11,8 +11,8 @@ import os
 
 OPERATIONS = 'world|plates'
 
-def generate_world(seed, world_name, output_dir):
-    w = world_gen(world_name, seed, verbose=True)
+def generate_world(seed, world_name, output_dir, width, height, step):
+    w = world_gen(world_name, seed, True, width, height, step)
 
     print('') # empty line
     print('Producing ouput:')
@@ -28,9 +28,10 @@ def generate_world(seed, world_name, output_dir):
     draw.draw_ocean(w.ocean,filename)
     print("* ocean image generated in '%s'" % filename)
     
-    filename = '%s/%s_biome.png' % (output_dir,world_name)
-    draw_biome(w.biome,filename)
-    print("* biome image generated in '%s'" % filename)
+    if step.include_biome:
+        filename = '%s/%s_biome.png' % (output_dir,world_name)
+        draw_biome(w.biome,filename)
+        print("* biome image generated in '%s'" % filename)
     
     filename = '%s/%s_elevation.png' % (output_dir,world_name)
     e_as_array = []
@@ -53,12 +54,44 @@ def generate_plates(seed, world_name,output_dir):
     draw.draw_simple_elevation(plates,filename)    
     print("+ centered plates image generated in '%s'" % filename)
 
+class Step:
+
+    def __init__(self, name):
+        self.name = name
+        self.include_plates = True
+        self.include_precipitations = False
+        self.include_biome = False
+
+    @staticmethod
+    def get_by_name(name):
+        step = None
+        if name=="plates":
+            step = Step(name)
+        elif name=="precipitations":
+            step = Step(name)
+            step.include_precipitations = True
+        elif name=="full":
+            step = Step(name)
+            step.include_precipitations = True
+            step.include_biome = True
+
+        return step
+
+
+def check_step(step_name):
+    step = Step.get_by_name(step_name)
+    if step==None:
+        print("ERROR: unknown step name, using default 'full'")
+        return Step.get_by_name("full")
+    else:
+        return step
 
 def main():
     parser = OptionParser()
     parser.add_option('-o', '--output', dest='output_dir', help="generate files in OUTPUT", metavar="FILE", default='.')
     parser.add_option('-n', '--worldname', dest='worldname', help="set WORLDNAME", metavar="WORLDNAME")
     parser.add_option('-s', '--seed', dest='seed', help="use SEED to initialize the pseudo-random generation", metavar="SEED")
+    parser.add_option('-t', '--step', dest='step', help="use STEP to specify how far to proceed in the world generation process", metavar="STEP")    
     (options,args) = parser.parse_args()
 
     if not os.path.isdir(options.output_dir):
@@ -79,15 +112,26 @@ def main():
         world_name = args[0]
     else:
         world_name = "seed_%i" % seed
+    if options.step:
+        step = check_step(options.step)
+    else:
+        step = Step.get_by_name("full")
+    width = 512
+    height = 512
+
     print('Lands world generator')
     print('---------------------')
     print(' seed      : %i' % seed)
     print(' name      : %s' % world_name)
+    print(' width     : %i' % width)
+    print(' height    : %i' % height)
     print(' operation : %s generation' % operation)
+    print(' step      : %s' % step.name)
+
     print('') # empty line
     print('starting...')
     if operation=='world':
-        generate_world(seed, world_name, options.output_dir)
+        generate_world(seed, world_name, options.output_dir, width, height, step)
     elif operation=='plates':
         generate_plates(seed, world_name, options.output_dir)
     else:
