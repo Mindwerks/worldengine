@@ -757,13 +757,18 @@ def draw_temp(temp,filename):
             pixels[x,y] = (c,0,0,255)
     img.save(filename)  
 
-def draw_precipitation(temp,filename):
+def draw_precipitation(world, filename):
+    data = world.precipitation['data']
+    ocean = world.ocean
     img = Image.new('RGBA',(WIDTH,HEIGHT))
     pixels = img.load()
     for y in range(0,HEIGHT):
         for x in range(0,WIDTH):
-            c  = int(temp[y][x]*255)
-            pixels[x,y] = (0,0,c,255)
+            if ocean[y][x]:
+                pixels[x,y] = (0,0,0,255)
+            else:
+                c  = int((data[y][x]+1.0)*127.5)
+                pixels[x,y] = (0,0,c,255)
     img.save(filename)  
 
 def draw_sea(world,filename):

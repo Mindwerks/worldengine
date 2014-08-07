@@ -30,7 +30,7 @@ def generate_world(seed, world_name, output_dir, width, height, step):
 
     if step.include_precipitations:
         filename = '%s/%s_precipitations.png' % (output_dir,world_name)
-        draw_precipitation(w.precipitation['data'],filename)
+        draw_precipitation(w, filename)
         print("* precipitations image generated in '%s'" % filename)
     
     if step.include_biome:
