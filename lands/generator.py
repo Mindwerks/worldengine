@@ -95,10 +95,10 @@ def check_step(step_name):
 
 def main():
     parser = OptionParser()
-    parser.add_option('-o', '--output', dest='output_dir', help="generate files in OUTPUT", metavar="FILE", default='.')
-    parser.add_option('-n', '--worldname', dest='worldname', help="set WORLDNAME", metavar="WORLDNAME")
-    parser.add_option('-s', '--seed', dest='seed', help="use SEED to initialize the pseudo-random generation", metavar="SEED")
-    parser.add_option('-t', '--step', dest='step', help="use STEP to specify how far to proceed in the world generation process", metavar="STEP")    
+    parser.add_option('-o', '--output',    dest='output_dir', help="generate files in OUTPUT",                                               metavar="FILE", default='.')
+    parser.add_option('-n', '--worldname', dest='worldname',  help="set WORLDNAME",                                                          metavar="WORLDNAME")
+    parser.add_option('-s', '--seed',      dest='seed',       help="use SEED to initialize the pseudo-random generation",                    metavar="SEED")
+    parser.add_option('-t', '--step',      dest='step',       help="use STEP to specify how far to proceed in the world generation process", metavar="STEP")    
     (options,args) = parser.parse_args()
 
     if not os.path.isdir(options.output_dir):
