@@ -823,10 +823,7 @@ def world_gen(name,seed,verbose=False,width=512,height=512,step="full"):
     if verbose:
         print("...elevation noise added")
 
-    if step.include_biome:
-        return world_gen_from_elevation(name, e, seed, ocean_level=1.0, verbose=verbose)
-    else:
-        return init_world_from_elevation(name, e, ocean_level=1.0, verbose=verbose)[0]
+    return world_gen_from_elevation(name, e, seed, ocean_level=1.0, verbose=verbose, width=512, height=512, step=step)
         
 def humidity(world):
     humidity = {}
@@ -865,13 +862,7 @@ def init_world_from_elevation(name, elevation, ocean_level, verbose):
 
     return [w, ocean, sl, hl, ml, e_th]
 
-
-def world_gen_from_elevation(name,elevation,seed,ocean_level=None,verbose=False,width=512,height=512):
-    i = seed
-    e = elevation
-    w, ocean, sl, hl, ml, e_th = init_world_from_elevation(name, elevation, ocean_level, verbose)
-
-    # Precipitation with thresholds
+def world_gen_precipitation(w, i, ocean, verbose):
     p = precipitation(i)
     p_th = [
         ('low',find_threshold_f(p,0.75,ocean)),
@@ -881,6 +872,21 @@ def world_gen_from_elevation(name,elevation,seed,ocean_level=None,verbose=False,
     w.set_precipitation(p,p_th)
     if verbose:
         print("...precipations calculated")
+    return [p, p_th]
+
+def world_gen_from_elevation(name, elevation, seed, ocean_level, verbose, width, height, step):
+    i = seed
+    e = elevation
+    w, ocean, sl, hl, ml, e_th = init_world_from_elevation(name, elevation, ocean_level, verbose)
+
+    if not step.include_precipitations:
+        return w
+
+    # Precipitation with thresholds
+    p, p_th = world_gen_precipitation(w, i, ocean, verbose)
+
+    if not step.include_erosion:
+        return w
 
     erode(w,3000000)
     if verbose:

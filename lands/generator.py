@@ -3,7 +3,7 @@ import random
 import pickle
 
 from geo import world_gen
-from draw import draw_biome
+from draw import draw_biome, draw_precipitation
 import geo
 import draw
 from optparse import OptionParser
@@ -27,6 +27,11 @@ def generate_world(seed, world_name, output_dir, width, height, step):
     filename = '%s/%s_ocean.png' % (output_dir,world_name)
     draw.draw_ocean(w.ocean,filename)
     print("* ocean image generated in '%s'" % filename)
+
+    if step.include_precipitations:
+        filename = '%s/%s_precipitations.png' % (output_dir,world_name)
+        draw_precipitation(w.precipitation['data'],filename)
+        print("* precipitations image generated in '%s'" % filename)
     
     if step.include_biome:
         filename = '%s/%s_biome.png' % (output_dir,world_name)
@@ -60,6 +65,7 @@ class Step:
         self.name = name
         self.include_plates = True
         self.include_precipitations = False
+        self.include_erosion = False
         self.include_biome = False
 
     @staticmethod
@@ -73,6 +79,7 @@ class Step:
         elif name=="full":
             step = Step(name)
             step.include_precipitations = True
+            step.include_erosion = True
             step.include_biome = True
 
         return step
