@@ -431,6 +431,7 @@ def temperature(seed,elevation,mountain_level):
     return temp
 
 def precipitation(seed):
+    """"Precipitation is a value in [-1,1]"""
     random.seed(seed*13)
     base = random.randint(0,4096)
     temp = [[0 for x in xrange(WIDTH)] for y in xrange(HEIGHT)] 
@@ -640,6 +641,7 @@ class World(object):
         self.elevation = {'data':data,'thresholds':thresholds}
 
     def set_precipitation(self,data,thresholds):
+        """"Precipitation is a value in [-1,1]"""
         self.precipitation = {'data':data,'thresholds':thresholds}
 
     def set_temperature(self,data,thresholds):
