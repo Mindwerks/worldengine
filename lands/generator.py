@@ -98,7 +98,7 @@ def check_step(step_name):
         return step
 
 def operation_ancient_map(world, map_filename):
-    img = draw.draw_oldmap(world, map_filename)
+    img = draw.draw_oldmap(world)
     img.save(map_filename)
     print("+ ancient map generated in '%s'" % map_filename)
 
