@@ -4,15 +4,14 @@ from noise import snoise2
 import jsonpickle
 from biome import *
 import platec
+import math
 
-WIDTH    = 512
-HEIGHT   = 512
 N_PLATES = 32
 MIN_ELEV = 0
 MAX_ELEV = 255
 MAX_DIST = 6
 
-def random_point(width=WIDTH,height=HEIGHT):
+def random_point(width,height):
     return (random.randrange(0,width),random.randrange(0,height))
 
 def distance(pa,pb):
@@ -68,18 +67,118 @@ def center_elevation_map(elevation,width,height):
 
     return elevation
 
-def generate_plates_simulation(seed,map_side=512, sea_level=0.65, erosion_period=60,
+def get_interleave_value(original_map, x, y):
+    """x and y can be float value"""
+    weight_next_x, base_x = math.modf(x)
+    weight_preceding_x    = 1.0 - weight_next_x
+    weight_next_y, base_y = math.modf(y)
+    weight_preceding_y    = 1.0 - weight_next_y
+
+    base_x = int(base_x)
+    base_y = int(base_y)
+
+    sum = 0.0
+
+    # In case the point is right on the border, the weight
+    # of the next point will be zero and we will not access
+    # it
+    combined_weight = weight_preceding_x * weight_preceding_y
+    if combined_weight > 0.0:
+        sum += combined_weight * original_map[base_y][base_x]
+
+    combined_weight = weight_preceding_x * weight_next_y
+    if combined_weight > 0.0:
+        sum += combined_weight * original_map[base_y + 1][base_x]
+
+    combined_weight = weight_next_x * weight_preceding_y
+    if combined_weight > 0.0:
+        sum += combined_weight * original_map[base_y][base_x + 1]
+
+    combined_weight = weight_next_x * weight_next_y
+    if combined_weight > 0.0:
+        sum += combined_weight * original_map[base_y + 1][base_x + 1]
+
+    return sum
+
+def scale(original_map, target_width, target_height):
+    original_width  = len(original_map[0])
+    original_height = len(original_map)
+
+    y_factor =  float(original_height-1) / (target_height-1)
+    x_factor =  float(original_width-1)  / (target_width-1)
+
+    scaled_map = [[0 for x in xrange(target_width)] for y in xrange(target_height)]
+    for scaled_y in xrange(target_height):
+        original_y = y_factor * scaled_y
+        for scaled_x in xrange(target_width):
+            original_x = x_factor * scaled_x
+            scaled_map[scaled_y][scaled_x] = get_interleave_value(original_map, original_x, original_y)
+
+    return scaled_map
+
+def get_interleave_value_in_array(original_map, width, height, x, y):
+    """x and y can be float value"""
+    weight_next_x, base_x = math.modf(x)
+    weight_preceding_x    = 1.0 - weight_next_x
+    weight_next_y, base_y = math.modf(y)
+    weight_preceding_y    = 1.0 - weight_next_y
+
+    base_x = int(base_x)
+    base_y = int(base_y)
+
+    sum = 0.0
+
+    # In case the point is right on the border, the weight
+    # of the next point will be zero and we will not access
+    # it
+    combined_weight = weight_preceding_x * weight_preceding_y
+    if combined_weight > 0.0:
+        sum += combined_weight * original_map[base_y*width + base_x]
+
+    combined_weight = weight_preceding_x * weight_next_y
+    if combined_weight > 0.0:
+        sum += combined_weight * original_map[(base_y + 1)*width +base_x]
+
+    combined_weight = weight_next_x * weight_preceding_y
+    if combined_weight > 0.0:
+        sum += combined_weight * original_map[(base_y)*width +base_x + 1]
+
+    combined_weight = weight_next_x * weight_next_y
+    if combined_weight > 0.0:
+        sum += combined_weight * original_map[(base_y + 1)*width +base_x + 1]
+
+    return sum
+
+def scale_map_in_array(original_map, original_width, original_height, target_width, target_height):
+    y_factor =  float(original_height-1) / (target_height-1)
+    x_factor =  float(original_width-1)  / (target_width-1)
+
+    scaled_map = [0 for el in xrange(target_width*target_height)]
+    for scaled_y in xrange(target_height):
+        original_y = y_factor * scaled_y
+        for scaled_x in xrange(target_width):
+            original_x = x_factor * scaled_x
+            scaled_map[scaled_y*target_width +scaled_x] = get_interleave_value_in_array(original_map, original_width, original_height, original_x, original_y)
+
+    return scaled_map
+
+def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_period=60,
             folding_ratio=0.02, aggr_overlap_abs=1000000, aggr_overlap_rel=0.33,
             cycle_count=2, num_plates=10):
+    # we use always the same values for plates simulation and we scale later
+    map_side = 512
     p = platec.create(seed,map_side,sea_level,erosion_period,folding_ratio,
         aggr_overlap_abs,aggr_overlap_rel,cycle_count,num_plates)
 
     while platec.is_finished(p)==0:
         platec.step(p)
     hm = platec.get_heightmap(p)
+
+    scale_map_in_array(hm, map_side, map_side, width, height)
+
     return hm
 
-def generate_plates(seed,width=WIDTH,height=HEIGHT,n_plates=N_PLATES,n_hot_points=1024,distance_f=distance):
+def generate_plates(seed,width,height,n_plates=N_PLATES,n_hot_points=1024,distance_f=distance):
 
     random.seed(seed)
 
@@ -104,7 +203,7 @@ def generate_plates(seed,width=WIDTH,height=HEIGHT,n_plates=N_PLATES,n_hot_point
         tiles_to_plates.append(row)
     return tiles_to_plates
 
-def plate_borders(plates,width=WIDTH,height=HEIGHT):  
+def plate_borders(plates,width,height):
 
     def calc_borders(x,y,p):
         borders = []
@@ -257,7 +356,7 @@ def rescale_value(original,prev_min,prev_max,min,max):
     f = float(original-prev_min)/(prev_max-prev_min)
     return min+((max-min)*f)
 
-def sea_depth(world,sea_level):
+def sea_depth(world, sea_level):
     sea_depth = [[sea_level-world.elevation['data'][y][x] for x in xrange(world.width)] for y in xrange(world.height)]
     for y in xrange(world.height):
         for x in xrange(world.width):
@@ -276,7 +375,7 @@ def sea_depth(world,sea_level):
     sea_depth = [[rescale_value(sea_depth[y][x],min_depth,max_depth,0.0,1.0) for x in xrange(world.width)] for y in xrange(world.height)]
     return sea_depth
 
-def antialias(elevation,steps,width=WIDTH,height=HEIGHT):
+def antialias(elevation,steps,width,height):
 
     def antialias():
         for y in range(0,height):
@@ -299,12 +398,14 @@ def antialias(elevation,steps,width=WIDTH,height=HEIGHT):
     for i in range(0,steps):
         antialias()
 
-def find_threshold(elevation,land_perc,ocean=None):
-    
+def find_threshold(elevation, land_perc, ocean=None):
+    width  = len(elevation[0])
+    height = len(elevation)
+
     def count(e):
         tot = 0
-        for y in range(0,HEIGHT):
-            for x in range(0,WIDTH):
+        for y in range(0,height):
+            for x in range(0,width):
                 if elevation[y][x]>e and (ocean==None or not ocean[y][x]):
                     tot+=1
         return tot
@@ -328,21 +429,23 @@ def find_threshold(elevation,land_perc,ocean=None):
         else:
             return search(a,m,desired)
 
-    all_land = WIDTH*HEIGHT
+    all_land = width*height
     if ocean:
-        for y in range(0,HEIGHT):
-            for x in range(0,WIDTH):
+        for y in range(0, height):
+            for x in range(0, width):
                 if ocean[y][x]:
                     all_land-=1
     desired_land = all_land*land_perc
     return search(0,255,desired_land)
 
-def find_threshold_f(elevation,land_perc,ocean=None):
-    
+def find_threshold_f(elevation, land_perc, ocean=None):
+    width  = len(elevation[0])
+    height = len(elevation)
+
     def count(e):
         tot = 0
-        for y in range(0,HEIGHT):
-            for x in range(0,WIDTH):
+        for y in range(0, height):
+            for x in range(0, width):
                 if elevation[y][x]>e and (ocean==None or not ocean[y][x]):
                     tot+=1
         return tot
@@ -366,58 +469,64 @@ def find_threshold_f(elevation,land_perc,ocean=None):
         else:
             return search(a,m,desired)
 
-    all_land = WIDTH*HEIGHT
+    all_land = width*height
     if ocean:
-        for y in range(0,HEIGHT):
-            for x in range(0,WIDTH):
+        for y in range(0,height):
+            for x in range(0,width):
                 if ocean[y][x]:
                     all_land-=1
     desired_land = all_land*land_perc
     return search(-1000.0,1000.0,desired_land)
 
-def around(x,y):
+def around(x,y,width, height):
     ps = []
     for dx in range(-1,2):
         nx = x+dx
-        if nx>=0 and nx<WIDTH:
+        if nx>=0 and nx<width:
             for dy in range(-1,2):
                 ny = y+dy
-                if ny>=0 and ny<HEIGHT and (dx!=0 or dy!=0):
+                if ny>=0 and ny<height and (dx!=0 or dy!=0):
                     ps.append((nx,ny))
     return ps
 
-def fill_ocean(elevation,sea_level):
-    ocean = [[False for x in xrange(WIDTH)] for y in xrange(HEIGHT)] 
+def fill_ocean(elevation, sea_level):
+    width  = len(elevation[0])
+    height = len(elevation)
+
+    ocean = [[False for x in xrange(width)] for y in xrange(height)]
     to_expand = []
-    for x in range(0,WIDTH):
+    for x in range(0, width):
         to_expand.append((x,0))
-        to_expand.append((x,HEIGHT-1))
-    for y in range(0,HEIGHT):
+        to_expand.append((x,height-1))
+    for y in range(0,height):
         to_expand.append((0,y))
-        to_expand.append((WIDTH-1,y))
+        to_expand.append((width-1,y))
     for t in to_expand:
         tx,ty = t
         if not ocean[ty][tx]:
             ocean[ty][tx] = True
-            for px,py in around(tx,ty):
+            for px,py in around(tx,ty, width, height):
                 if not ocean[py][px] and elevation[py][px]<=sea_level:
                     to_expand.append((px,py))
 
     return ocean
 
-def temperature(seed,elevation,mountain_level):
+def temperature(seed, elevation,mountain_level):
+    width  = len(elevation[0])
+    height = len(elevation)
+
     random.seed(seed*7)
     base = random.randint(0,4096)
-    temp = [[0 for x in xrange(WIDTH)] for y in xrange(HEIGHT)] 
+    temp = [[0 for x in xrange(width)] for y in xrange(height)]
     
     from noise import pnoise2, snoise2
     octaves = 6
     freq = 16.0 * octaves
 
-    for y in range(0,HEIGHT):
-        yscaled = float(y)/HEIGHT
+    for y in range(0, height):
+        yscaled = float(y)/ height
         latitude_factor = 1.0-(abs(yscaled-0.5)*2)
-        for x in range(0,WIDTH):
+        for x in range(0,width):
             n = snoise2(x / freq, y / freq, octaves,base=base)
             t = (latitude_factor*3+n*2)/5.0
             if elevation[y][x]>mountain_level:
@@ -430,20 +539,20 @@ def temperature(seed,elevation,mountain_level):
 
     return temp
 
-def precipitation(seed):
+def precipitation(seed, width, height):
     """"Precipitation is a value in [-1,1]"""
     random.seed(seed*13)
     base = random.randint(0,4096)
-    temp = [[0 for x in xrange(WIDTH)] for y in xrange(HEIGHT)] 
+    temp = [[0 for x in xrange(width)] for y in xrange(height)]
     
     from noise import pnoise2, snoise2
     octaves = 6
     freq = 64.0 * octaves
 
-    for y in range(0,HEIGHT):
-        yscaled = float(y)/HEIGHT
+    for y in range(0,height):
+        yscaled = float(y)/height
         latitude_factor = 1.0-(abs(yscaled-0.5)*2)
-        for x in range(0,WIDTH):
+        for x in range(0,width):
             n = snoise2(x / freq, y / freq, octaves, base=base)
             t = (latitude_factor+n*4)/5.0
             temp[y][x] = t
@@ -451,11 +560,14 @@ def precipitation(seed):
     return temp
 
 def irrigation(world):
-    values = [[0 for x in xrange(WIDTH)] for y in xrange(HEIGHT)] 
+    width  = world.width
+    height = world.height
+
+    values = [[0 for x in xrange(width)] for y in xrange(height)]
     radius = 10
     
-    for y in xrange(HEIGHT):
-        for x in xrange(WIDTH):
+    for y in xrange(height):
+        for x in xrange(width):
             if world.is_land((x,y)):
                 for dy in range(-radius,radius+1):
                     if (y+dy)>=0 and (y+dy)<world.height:
@@ -466,18 +578,18 @@ def irrigation(world):
 
     return values
 
-def permeability(seed):
+def permeability(seed, width, height):
     random.seed(seed*37)
     base = random.randint(0,4096)
-    temp = [[0 for x in xrange(WIDTH)] for y in xrange(HEIGHT)] 
+    temp = [[0 for x in xrange(width)] for y in xrange(height)]
     
     from noise import pnoise2, snoise2
     octaves = 6
     freq = 64.0 * octaves
 
-    for y in range(0,HEIGHT):
-        yscaled = float(y)/HEIGHT
-        for x in range(0,WIDTH):
+    for y in range(0,height):
+        yscaled = float(y)/height
+        for x in range(0,width):
             n = snoise2(x / freq, y / freq, octaves, base=base)
             t = n
             temp[y][x] = t
@@ -790,17 +902,22 @@ class World(object):
         instance.set_temperature(map_from_dict(dict['temperature']['data']),[])
         return instance
 
-def elevnoise(elevation,seed):  
+def elevnoise(elevation,seed):
+    width  = len(elevation[0])
+    height = len(elevation)
+
     octaves = 6
     freq = 16.0 * octaves
-    for y in range(0,HEIGHT):
-        for x in range(0,WIDTH):
+    for y in range(0, height):
+        for x in range(0, width):
             n = int(snoise2(x / freq*2, y / freq*2, octaves, base=seed))
             elevation[y][x]+=n
 
-def place_oceans_at_map_borders(elevation,width=512,height=512):
+def place_oceans_at_map_borders(elevation):
+    width  = len(elevation[0])
+    height = len(elevation)
 
-    OCEAN_BORDER = 20
+    OCEAN_BORDER = min(30, max(width/5, height/5))
 
     def place_ocean(x,y,i):
         elevation[y][x] = (elevation[y][x]*i)/OCEAN_BORDER
@@ -814,8 +931,8 @@ def place_oceans_at_map_borders(elevation,width=512,height=512):
             place_ocean(x,i,i)
             place_ocean(x,height-i-1,i)             
 
-def world_gen(name,seed,verbose=False,width=512,height=512,step="full"):
-    e_as_array = generate_plates_simulation(seed)
+def world_gen(name, seed, verbose, width, height,step="full"):
+    e_as_array = generate_plates_simulation(seed, width, height)
     e_as_array = center_elevation_map(e_as_array,width,height)
     if verbose:
         print("...plates simulated")
