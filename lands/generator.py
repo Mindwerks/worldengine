@@ -1,11 +1,9 @@
 __author__ = 'Federico Tomassetti'
 
 import sys
-import random
-import pickle
 from optparse import OptionParser
 
-from geo import world_gen
+from plates import world_gen
 from draw import draw_biome, draw_precipitation
 import geo
 import draw
