@@ -33,7 +33,7 @@ def draw_land_profile(elevation, sea_level, filename):
                 pixels[x,y] = (0,0,255,255)
     img.save(filename)  
 
-def draw_simple_elevation(data,filename,shadow=True,width=512,height=512):
+def draw_simple_elevation(data,filename,shadow,width,height):
     COLOR_STEP = 1.5
     def my_color(c):
         if c < 0.5:
@@ -784,6 +784,9 @@ def draw_temp(temp,filename):
     img.save(filename)  
 
 def draw_precipitation(world, filename):
+    WIDTH = world.width
+    HEIGHT = world.height
+
     data = world.precipitation['data']
     ocean = world.ocean
     img = Image.new('RGBA',(WIDTH,HEIGHT))
@@ -798,6 +801,9 @@ def draw_precipitation(world, filename):
     img.save(filename)  
 
 def draw_sea(world,filename):
+    WIDTH = world.width
+    HEIGHT = world.height
+
     img = Image.new('RGBA',(WIDTH,HEIGHT))
 
     pixels = img.load()
@@ -863,6 +869,9 @@ def draw_world(world,filename):
     img.save(filename)  
 
 def draw_temperature_levels(world,filename):
+    WIDTH = world.width
+    HEIGHT = world.height
+
     img = Image.new('RGBA',(WIDTH,HEIGHT))
 
     pixels = img.load()

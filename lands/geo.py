@@ -370,12 +370,14 @@ def sea_depth(world, sea_level):
                 sea_depth[y][x] *= 0.7
             elif world.tiles_around((x,y),radius=5,predicate=world.is_land):
                 sea_depth[y][x] *= 0.9                            
-    antialias(sea_depth,10)  
+    antialias(sea_depth, 10)
     min_depth,max_depth = matrix_extremes(sea_depth)
     sea_depth = [[rescale_value(sea_depth[y][x],min_depth,max_depth,0.0,1.0) for x in xrange(world.width)] for y in xrange(world.height)]
     return sea_depth
 
-def antialias(elevation,steps,width,height):
+def antialias(elevation,steps):
+    width  = len(elevation[0])
+    height = len(elevation)
 
     def antialias():
         for y in range(0,height):
@@ -441,6 +443,9 @@ def find_threshold(elevation, land_perc, ocean=None):
 def find_threshold_f(elevation, land_perc, ocean=None):
     width  = len(elevation[0])
     height = len(elevation)
+    if ocean:
+        if (width <> len(ocean[0])) or (height <> len(ocean)):
+            raise Exception("Dimension of elevation and ocean do not match. Elevation is %d x %d, while ocean is %d x%d" % (width, height, len(ocean[0]), len(ocean)))
 
     def count(e):
         tot = 0
@@ -606,7 +611,7 @@ import operator
 
 class World(object):
 
-    def __init__(self,name,width=512,height=512):
+    def __init__(self, name, width, height):
         self.name = name
         self.width = width
         self.height = height
@@ -744,22 +749,48 @@ class World(object):
         return t>=th_min
 
     def set_biome(self,biome):
+        if len(biome) != self.height:
+            raise Exception("Setting data with wrong height")
+        if len(biome[0]) != self.width:
+            raise Exception("Setting data with wrong width")
+
         self.biome = biome
 
     def set_ocean(self,ocean):
+        if (len(ocean) != self.height) or (len(ocean[0]) != self.width):
+            raise Exception("Setting ocean map with wrong dimension. Expected %d x %d, found %d x %d" % (self.width, self.height, len(ocean[0]), len(ocean)))
+
         self.ocean = ocean
 
-    def set_elevation(self,data,thresholds):
+    def set_elevation(self, data, thresholds):
+        if (len(data) != self.height) or (len(data[0]) != self.width):
+            raise Exception("Setting elevation map with wrong dimension. Expected %d x %d, found %d x %d" % (self.width, self.height, (len[data[0]], len(data))))
         self.elevation = {'data':data,'thresholds':thresholds}
 
     def set_precipitation(self,data,thresholds):
         """"Precipitation is a value in [-1,1]"""
+
+        if len(data) != self.height:
+            raise Exception("Setting data with wrong height")
+        if len(data[0]) != self.width:
+            raise Exception("Setting data with wrong width")
+
         self.precipitation = {'data':data,'thresholds':thresholds}
 
     def set_temperature(self,data,thresholds):
+        if len(data) != self.height:
+            raise Exception("Setting data with wrong height")
+        if len(data[0]) != self.width:
+            raise Exception("Setting data with wrong width")
+
         self.temperature = {'data':data,'thresholds':thresholds}
 
     def set_permeability(self,data,thresholds):
+        if len(data) != self.height:
+            raise Exception("Setting data with wrong height")
+        if len(data[0]) != self.width:
+            raise Exception("Setting data with wrong width")
+
         self.permeability = {'data':data,'thresholds':thresholds}
 
     def contains_stream(self,pos):
@@ -781,7 +812,7 @@ class World(object):
         return v>=self.watermap['thresholds']['main river']
 
     def random_land(self):
-        x,y = random_point()
+        x,y = random_point(self.width, self.height)
         if self.ocean[y][x]:
             return self.random_land()
         else:
@@ -865,7 +896,7 @@ class World(object):
         return self.biome_at(pos).sustainable_population
 
     @classmethod
-    def from_json_file(self,filename,width=512,height=512):
+    def from_json_file(self,filename,width,height):
         with open(filename, "r") as f:
             content = f.read()
         world = jsonpickle.decode(content)
@@ -931,7 +962,7 @@ def place_oceans_at_map_borders(elevation):
             place_ocean(x,i,i)
             place_ocean(x,height-i-1,i)             
 
-def world_gen(name, seed, verbose, width, height,step="full"):
+def world_gen(name, seed, verbose, width, height, step="full"):
     e_as_array = generate_plates_simulation(seed, width, height)
     e_as_array = center_elevation_map(e_as_array,width,height)
     if verbose:
@@ -942,7 +973,7 @@ def world_gen(name, seed, verbose, width, height,step="full"):
     if verbose:
         print("...elevation noise added")
 
-    return world_gen_from_elevation(name, e, seed, ocean_level=1.0, verbose=verbose, width=512, height=512, step=step)
+    return world_gen_from_elevation(name, e, seed, ocean_level=1.0, verbose=verbose, width=width, height=height, step=step)
         
 def humidity(world):
     humidity = {}
@@ -961,7 +992,10 @@ def humidity(world):
     return humidity
 
 def init_world_from_elevation(name, elevation, ocean_level, verbose):
-    w = World(name)
+    width  = len(elevation[0])
+    height = len(elevation)
+
+    w = World(name, width, height)
 
     # Elevation with thresholds
     e = elevation
@@ -982,7 +1016,10 @@ def init_world_from_elevation(name, elevation, ocean_level, verbose):
     return [w, ocean, sl, hl, ml, e_th]
 
 def world_gen_precipitation(w, i, ocean, verbose):
-    p = precipitation(i)
+    width  = len(ocean[0])
+    height = len(ocean)
+
+    p = precipitation(i, width, height)
     p_th = [
         ('low',find_threshold_f(p,0.75,ocean)),
         ('med',find_threshold_f(p,0.3,ocean)),
@@ -1033,7 +1070,7 @@ def world_gen_from_elevation(name, elevation, seed, ocean_level, verbose, width,
     w.set_temperature(t,t_th)
     
     # Permeability with thresholds
-    perm = permeability(i)
+    perm = permeability(i, width, height)
     perm_th = [
         ('low',find_threshold_f(perm,0.75,ocean)),
         ('med',find_threshold_f(perm,0.25,ocean)),

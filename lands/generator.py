@@ -40,10 +40,10 @@ def generate_world(seed, world_name, output_dir, width, height, step):
     
     filename = '%s/%s_elevation.png' % (output_dir,world_name)
     e_as_array = []
-    for y in xrange(512):
-        for x in xrange(512):
+    for y in xrange(height):
+        for x in xrange(width):
             e_as_array.append(w.elevation['data'][y][x])
-    draw.draw_simple_elevation(e_as_array,filename)  
+    draw.draw_simple_elevation(e_as_array,filename,shadow=True, width=width, height=height)
     print("* elevation image generated in '%s'" % filename)
     
 
@@ -54,7 +54,7 @@ def generate_plates(seed, world_name, output_dir, width, height):
     filename = '%s/plates_%s.png' % (output_dir,world_name)
     draw.draw_simple_elevation(plates,filename)
     print("+ plates image generated in '%s'" % filename)
-    plates = geo.center_elevation_map(plates,512,512)
+    plates = geo.center_elevation_map(plates,width,height)
     filename = '%s/centered_plates_%s.png' % (output_dir,world_name)
     draw.draw_simple_elevation(plates,filename)    
     print("+ centered plates image generated in '%s'" % filename)
