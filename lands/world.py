@@ -293,6 +293,9 @@ class World(object):
     def sustainable_population(self, pos):
         return self.biome_at(pos).sustainable_population
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
     @classmethod
     def from_pickle_file(cls, filename):
         with open(filename, "r") as f:
