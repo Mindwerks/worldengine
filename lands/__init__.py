@@ -1,4 +1,3 @@
 __author__ = 'Federico Tomassetti'
 
-import geo
-import draw
+# Removing references to modules includinc C extensions
