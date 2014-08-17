@@ -2,10 +2,12 @@ __author__ = 'Federico Tomassetti'
 
 from biome import *
 import jsonpickle
+import pickle
 from basic_map_operations import *
 
 
 class World(object):
+
     def __init__(self, name, width, height):
         self.name = name
         self.width = width
@@ -292,6 +294,7 @@ class World(object):
     def sustainable_population(self, pos):
         return self.biome_at(pos).sustainable_population
 
+    # TODO Remove it
     @classmethod
     def from_json_file(cls, filename, width, height):
         with open(filename, "r") as f:
@@ -304,6 +307,12 @@ class World(object):
         else:
             return cls.from_dict(world)
 
+    @classmethod
+    def from_pickle_file(cls, filename):
+        with open(filename, "r") as f:
+            return pickle.load(f)
+
+    # TODO Remove it (do I use it?)
     @classmethod
     def from_dict(cls, dict):
 

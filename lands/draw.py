@@ -320,7 +320,7 @@ def pseudo_random_land_pos(world, i):
     if world.is_land((x, y)):
         return (int(x), int(y))
     else:
-        return pseudo_random_land_pos(world, i * 17 + 3)
+        return pseudo_random_land_pos(world, (i % 123456789) * 17 + 11)
 
 
 def generate_riversmap(world_path, map_path):
