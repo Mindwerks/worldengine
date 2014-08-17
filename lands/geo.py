@@ -1,7 +1,5 @@
 __author__ = 'Federico Tomassetti'
 
-import platec
-
 from noise import snoise2
 from world import *
 
@@ -144,23 +142,6 @@ def scale_map_in_array(original_map, original_width, original_height, target_wid
                                                                                            original_y)
 
     return scaled_map
-
-
-def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_period=60,
-                               folding_ratio=0.02, aggr_overlap_abs=1000000, aggr_overlap_rel=0.33,
-                               cycle_count=2, num_plates=10):
-    # we use always the same values for plates simulation and we scale later
-    map_side = 512
-    p = platec.create(seed, map_side, sea_level, erosion_period, folding_ratio,
-                      aggr_overlap_abs, aggr_overlap_rel, cycle_count, num_plates)
-
-    while platec.is_finished(p) == 0:
-        platec.step(p)
-    hm = platec.get_heightmap(p)
-
-    hm = scale_map_in_array(hm, map_side, map_side, width, height)
-
-    return hm
 
 
 def generate_plates(seed, width, height, n_plates=N_PLATES, n_hot_points=1024, distance_f=distance):
@@ -639,21 +620,6 @@ def place_oceans_at_map_borders(elevation):
         for i in range(0, OCEAN_BORDER):
             place_ocean(x, i, i)
             place_ocean(x, height - i - 1, i)
-
-
-def world_gen(name, seed, verbose, width, height, step="full"):
-    e_as_array = generate_plates_simulation(seed, width, height)
-    e_as_array = center_elevation_map(e_as_array, width, height)
-    if verbose:
-        print("...plates simulated")
-    e = [[e_as_array[y * width + x] for x in xrange(width)] for y in xrange(height)]
-    elevnoise(e, random.randint(0, 4096))
-    place_oceans_at_map_borders(e)
-    if verbose:
-        print("...elevation noise added")
-
-    return world_gen_from_elevation(name, e, seed, ocean_level=1.0, verbose=verbose, width=width, height=height,
-                                    step=step)
 
 
 def humidity(world):
