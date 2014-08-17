@@ -47,8 +47,8 @@ def generate_world(seed, world_name, output_dir, width, height, step):
     print("* elevation image generated in '%s'" % filename)
     
 
-def generate_plates(seed, world_name,output_dir):
-    plates = geo.generate_plates_simulation(seed)
+def generate_plates(seed, world_name, output_dir, width, height):
+    plates = geo.generate_plates_simulation(seed, width, height)
 
     # Generate images
     filename = '%s/plates_%s.png' % (output_dir,world_name)
@@ -95,14 +95,27 @@ def check_step(step_name):
 
 def main():
     parser = OptionParser()
-    parser.add_option('-o', '--output',    dest='output_dir', help="generate files in OUTPUT",                                               metavar="FILE", default='.')
+    parser.add_option('-o', '--output',    dest='output_dir', help="generate files in OUTPUT",                                               metavar="FILE",      default='.')
     parser.add_option('-n', '--worldname', dest='worldname',  help="set WORLDNAME",                                                          metavar="WORLDNAME")
     parser.add_option('-s', '--seed',      dest='seed',       help="use SEED to initialize the pseudo-random generation",                    metavar="SEED")
-    parser.add_option('-t', '--step',      dest='step',       help="use STEP to specify how far to proceed in the world generation process", metavar="STEP")    
+    parser.add_option('-t', '--step',      dest='step',       help="use STEP to specify how far to proceed in the world generation process", metavar="STEP")
+    parser.add_option('-x', '--width',     dest='width',      help="WIDTH of the world to be generated",                                     metavar="WIDTH",     default='512')
+    parser.add_option('-y', '--height',    dest='height',     help="HEIGHT of the world to be generated",                                    metavar="HEIGHT",    default='512')
+
     (options,args) = parser.parse_args()
 
     if not os.path.isdir(options.output_dir):
         raise Exception("Output dir does not exist or it is not a dir")
+
+    try:
+        width = int(options.width)
+    except:
+        usage(error="Width should be a number")
+
+    try:
+        height = int(options.height)
+    except:
+        usage(error="Height should be a number")
 
     if len(args)>2:
         usage()    
@@ -123,8 +136,6 @@ def main():
         step = check_step(options.step)
     else:
         step = Step.get_by_name("full")
-    width = 512
-    height = 512
 
     print('Lands world generator')
     print('---------------------')
@@ -140,12 +151,12 @@ def main():
     if operation=='world':
         generate_world(seed, world_name, options.output_dir, width, height, step)
     elif operation=='plates':
-        generate_plates(seed, world_name, options.output_dir)
+        generate_plates(seed, world_name, options.output_dir, width, height)
     else:
         raise Exception('Unknown operation: valid operations are %s' % OPERATIONS)
     print('...done')
 
-def usage():
+def usage(error=None):
     print ' -------------------------------------------------------------------------'
     print ' Federico Tomassetti, 2013'
     print ' World generator'
@@ -154,6 +165,8 @@ def usage():
     print ' possible operations: %s' % OPERATIONS
     print ' use -h to see options'
     print ' -------------------------------------------------------------------------'
+    if error:
+        print("ERROR: %s" % error)
     sys.exit(' ')
 
 #-------------------------------

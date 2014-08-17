@@ -1,14 +1,16 @@
 from PIL import Image
 
 try:
-    from worldgen.geo import WIDTH,HEIGHT,N_PLATES,MAX_ELEV, antialias
+    from worldgen.geo import N_PLATES,MAX_ELEV, antialias
 except:
-    from geo import WIDTH,HEIGHT,N_PLATES,MAX_ELEV, antialias
+    from geo import N_PLATES,MAX_ELEV, antialias
 
 from biome import *
 
-def draw_plates(plates,filename):
-    
+def draw_plates(plates, filename):
+    WIDTH  = len(plates[0])
+    HEIGHT = len(plates)
+
     img = Image.new('RGBA',(WIDTH,HEIGHT))
     pixels = img.load()
     for y in range(0,HEIGHT):
@@ -17,8 +19,10 @@ def draw_plates(plates,filename):
             pixels[x,y] = (n,n,n,255)
     img.save(filename)
 
-def draw_land_profile(elevation,sea_level,filename):
-    
+def draw_land_profile(elevation, sea_level, filename):
+    WIDTH  = len(elevation[0])
+    HEIGHT = len(elevation)
+
     img = Image.new('RGBA',(WIDTH,HEIGHT))
     pixels = img.load()
     for y in range(0,HEIGHT):
@@ -573,6 +577,9 @@ def draw_bw_heightmap_for_a_biome(world,filename,biome):
 
 
 def draw_elevation(world,filename,shadow=True):
+    WIDTH  = world.width
+    HEIGHT = world.height
+
     data = world.elevation['data']
     ocean = world.ocean
     img = Image.new('RGBA',(WIDTH,HEIGHT))
@@ -610,6 +617,9 @@ def draw_elevation(world,filename,shadow=True):
     img.save(filename)  
 
 def draw_irrigation(world,filename):
+    WIDTH  = world.width
+    HEIGHT = world.height
+
     data  = world.irrigation
     ocean = world.ocean
     img   = Image.new('RGBA',(WIDTH,HEIGHT))
@@ -638,6 +648,9 @@ def draw_irrigation(world,filename):
     img.save(filename)
 
 def draw_humidity(world,filename):
+    WIDTH  = world.width
+    HEIGHT = world.height
+
     ocean = world.ocean
     img   = Image.new('RGBA',(WIDTH,HEIGHT))
     pixels = img.load()
@@ -673,6 +686,9 @@ def draw_humidity(world,filename):
 
 
 def draw_watermap(world, filename, th):
+    WIDTH  = world.width
+    HEIGHT = world.height
+
     ocean = world.ocean
     img = Image.new('RGBA',(WIDTH,HEIGHT))
     pixels = img.load()
@@ -707,6 +723,9 @@ def draw_watermap(world, filename, th):
 
 
 def draw_basic_elevation(elevation,filename):
+    WIDTH  = len(elevation[0])
+    HEIGHT = len(elevation)
+
     img = Image.new('RGBA',(WIDTH,HEIGHT))
     pixels = img.load()
     for y in range(0,HEIGHT):
@@ -720,7 +739,9 @@ def draw_basic_elevation(elevation,filename):
     img.save(filename)
 
 def draw_land(elevation,ocean_map,hill_level,mountain_level,filename):
-    
+    WIDTH  = len(elevation[0])
+    HEIGHT = len(elevation)
+
     img = Image.new('RGBA',(WIDTH,HEIGHT))
     pixels = img.load()
     for y in range(0,HEIGHT):
@@ -736,7 +757,10 @@ def draw_land(elevation,ocean_map,hill_level,mountain_level,filename):
                 
     img.save(filename)  
 
-def draw_ocean(ocean,filename): 
+def draw_ocean(ocean,filename):
+    WIDTH  = len(ocean[0])
+    HEIGHT = len(ocean)
+
     img = Image.new('RGBA',(WIDTH,HEIGHT))
     pixels = img.load()
     for y in range(0,HEIGHT):
@@ -748,7 +772,9 @@ def draw_ocean(ocean,filename):
     img.save(filename)  
 
 def draw_temp(temp,filename):
-    
+    WIDTH  = len(temp[0])
+    HEIGHT = len(temp)
+
     img = Image.new('RGBA',(WIDTH,HEIGHT))
     pixels = img.load()
     for y in range(0,HEIGHT):
@@ -816,6 +842,9 @@ biome_colors = {
 
 
 def draw_world(world,filename):
+    WIDTH  = world.width
+    HEIGHT = world.height
+
     img = Image.new('RGBA',(WIDTH,HEIGHT))
 
     counter = Counter()
@@ -869,7 +898,10 @@ biome_colors = {
     'savanna'     : (200,140,20)
 }
 
-def draw_biome(temp,filename):  
+def draw_biome(temp,filename):
+    WIDTH  = len(temp[0])
+    HEIGHT = len(temp)
+
     img = Image.new('RGBA',(WIDTH,HEIGHT))
     pixels = img.load()
     
