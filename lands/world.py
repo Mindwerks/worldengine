@@ -321,7 +321,8 @@ class World(object):
         #    return map_from_dict(md['data'], thresholds_from_dict(md['thresholds']))
 
         instance = World(dict['name'], dict['width'], dict['height'])
-        instance.__dict__ = dict
+        for k in dict:
+            instance.__dict__[k] = dict[k]
         #instance.set_biome(map_from_dict(dict['biome']))
         #instance.set_elevation(map_from_dict(dict['elevation']['data']), [])
         #instance.set_ocean(map_from_dict(dict['ocean']))
