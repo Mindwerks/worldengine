@@ -101,6 +101,7 @@ def operation_ancient_map(world, map_filename):
     draw.draw_oldmap(world, map_filename)
     print("+ ancient map generated in '%s'" % map_filename)
 
+
 def main():
     parser = OptionParser()
     parser.add_option('-o', '--output', dest='output_dir', help="generate files in OUTPUT", metavar="FILE", default='.')
@@ -154,14 +155,18 @@ def main():
     else:
         step = Step.get_by_name("full")
 
+    generation_operation = (operation == 'world') or (operation == 'plates')
+
     print('Lands world generator')
     print('---------------------')
-    print(' seed      : %i' % seed)
-    print(' name      : %s' % world_name)
-    print(' width     : %i' % width)
-    print(' height    : %i' % height)
+    if generation_operation:
+        print(' seed      : %i' % seed)
+        print(' name      : %s' % world_name)
+        print(' width     : %i' % width)
+        print(' height    : %i' % height)
     print(' operation : %s generation' % operation)
-    print(' step      : %s' % step.name)
+    if generation_operation:
+        print(' step      : %s' % step.name)
 
     print('')  # empty line
     print('starting...')
