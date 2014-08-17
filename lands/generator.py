@@ -7,10 +7,21 @@ from plates import world_gen
 from draw import draw_biome, draw_precipitation
 import geo
 import draw
+import drawing_functions
 import os
 from world import *
 
+from PIL import Image
+
+
 OPERATIONS = 'world|plates|ancient_map'
+
+
+def draw_oldmap(world, filename):
+    img = Image.new('RGBA', (world.width, world.height))
+    pixels = img.load()
+    drawing_functions.draw_oldmap_on_pixels(world, pixels)
+    img.save(filename)
 
 
 def generate_world(seed, world_name, output_dir, width, height, step):
@@ -96,8 +107,7 @@ def check_step(step_name):
         return step
 
 def operation_ancient_map(world, map_filename):
-    img = draw.draw_oldmap(world)
-    img.save(map_filename)
+    draw_oldmap(world, map_filename)
     print("+ ancient map generated in '%s'" % map_filename)
 
 
