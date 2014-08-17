@@ -6,7 +6,7 @@ You can generate worlds data (heighmap, biome, etc.) and images for your own wor
 For example:
 
 ```python
-python lands/generator.py seed1 world -s 1
+python lands/generator.py world -s 1 -n seed1
 ```
 
 Worlds are generated using plate simulations, erosion, rain shadows and plenty of other phenomenons.
