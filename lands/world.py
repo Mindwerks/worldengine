@@ -327,6 +327,7 @@ class World(object):
 
         instance = World(dict['name'], width, height)
         instance.set_biome(biome)
+        instance.set_elevation(map_from_dict(dict['elevation']['data']), [])
         instance.set_ocean(map_from_dict(dict['ocean']))
         instance.set_precipitation(map_from_dict(dict['precipitation']['data']), [])
         instance.set_temperature(map_from_dict(dict['temperature']['data']), [])
