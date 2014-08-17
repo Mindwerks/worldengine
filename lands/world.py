@@ -303,29 +303,7 @@ class World(object):
 
     @classmethod
     def from_dict(cls, dict):
-
-        #def map_from_dict(md):
-        #    m = []
-        #    for row_dict in md:
-        #        row = []
-        #        for col_dict in row_dict:
-        #            row.append(col_dict)
-        #        m.append(row)
-        #    return m
-
-        #def thresholds_from_dict(td):
-        #    t = []
-        #    return t
-
-        #def mapwt_from_dict(md):
-        #    return map_from_dict(md['data'], thresholds_from_dict(md['thresholds']))
-
         instance = World(dict['name'], dict['width'], dict['height'])
         for k in dict:
             instance.__dict__[k] = dict[k]
-        #instance.set_biome(map_from_dict(dict['biome']))
-        #instance.set_elevation(map_from_dict(dict['elevation']['data']), [])
-        #instance.set_ocean(map_from_dict(dict['ocean']))
-        #instance.set_precipitation(map_from_dict(dict['precipitation']['data']), [])
-        #instance.set_temperature(map_from_dict(dict['temperature']['data']), [])
         return instance
