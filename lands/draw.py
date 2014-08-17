@@ -548,7 +548,7 @@ def draw_oldmap(world, filename):
                     draw_a_mountain(pixels, x, y, w=w, h=h)
                     world.on_tiles_around((x, y), radius=r, action=unset_mask)
 
-    img.save(filename)
+    return img
 
 
 def draw_bw_heightmap(world, filename):
