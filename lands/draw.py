@@ -394,7 +394,7 @@ def draw_riversmap(world, filename):
     img.save(filename)
 
 
-def draw_oldmap(world, filename):
+def draw_oldmap(world):
     img = Image.new('RGBA', (world.width, world.height))
     pixels = img.load()
 
