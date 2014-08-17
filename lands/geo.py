@@ -34,7 +34,7 @@ def nearest(p,hot_points,distance_f=distance):
             nearest_hp_i = i
     return nearest_hp_i
 
-def center_elevation_map(elevation,width,height):
+def center_elevation_map(elevation, width, height):
     """Translate the map horizontally and vertically to put as much ocean as possible at the borders."""
     miny = None
     ymin = None
@@ -174,7 +174,7 @@ def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_peri
         platec.step(p)
     hm = platec.get_heightmap(p)
 
-    scale_map_in_array(hm, map_side, map_side, width, height)
+    hm = scale_map_in_array(hm, map_side, map_side, width, height)
 
     return hm
 
@@ -964,7 +964,7 @@ def place_oceans_at_map_borders(elevation):
 
 def world_gen(name, seed, verbose, width, height, step="full"):
     e_as_array = generate_plates_simulation(seed, width, height)
-    e_as_array = center_elevation_map(e_as_array,width,height)
+    e_as_array = center_elevation_map(e_as_array, width, height)
     if verbose:
         print("...plates simulated")
     e = [[e_as_array[y*width+x] for x in xrange(width)] for y in xrange(height)] 
