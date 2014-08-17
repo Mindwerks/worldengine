@@ -10,9 +10,9 @@ from draw import draw_biome, draw_precipitation
 import geo
 import draw
 import os
+from world import *
 
-
-OPERATIONS = 'world|plates'
+OPERATIONS = 'world|plates|ancient_map'
 
 
 def generate_world(seed, world_name, output_dir, width, height, step):
@@ -97,11 +97,14 @@ def check_step(step_name):
     else:
         return step
 
+def operation_ancient_map(world, map_filename):
+    draw.draw_oldmap(world, map_filename)
+    print("+ ancient map generated in '%s'" % map_filename)
 
 def main():
     parser = OptionParser()
     parser.add_option('-o', '--output', dest='output_dir', help="generate files in OUTPUT", metavar="FILE", default='.')
-    parser.add_option('-n', '--worldname', dest='worldname', help="set WORLDNAME", metavar="WORLDNAME")
+    parser.add_option('-n', '--worldname', dest='world_name', help="set WORLDNAME", metavar="WORLDNAME")
     parser.add_option('-s', '--seed', dest='seed', help="use SEED to initialize the pseudo-random generation",
                       metavar="SEED")
     parser.add_option('-t', '--step', dest='step',
@@ -110,6 +113,8 @@ def main():
                       default='512')
     parser.add_option('-y', '--height', dest='height', help="HEIGHT of the world to be generated", metavar="HEIGHT",
                       default='512')
+    parser.add_option('-w', '--worldfile', dest='world_file', help="WORLD_FILE to be loaded (for ancient_map operation)", metavar="WORLD_FILE")
+    parser.add_option('-g', '--generatedfile', dest='generated_file', help="name of the GENERATED_FILE (for ancient_map operation)", metavar="GENERATED_FILE")
 
     (options, args) = parser.parse_args()
 
@@ -126,10 +131,13 @@ def main():
     except:
         usage(error="Height should be a number")
 
-    if len(args) > 2:
+    if len(args) > 1:
         usage()
-    if len(args) >= 2:
-        operation = args[1]
+    if len(args) == 1:
+        if args[0] in OPERATIONS:
+            operation = args[0]
+        else:
+            usage("Unknown operation")
     else:
         operation = 'world'
     random.seed()
@@ -137,8 +145,8 @@ def main():
         seed = int(options.seed)
     else:
         seed = random.randint(0, 65536)
-    if len(args) >= 1:
-        world_name = args[0]
+    if options.world_name:
+        world_name = options.world_name
     else:
         world_name = "seed_%i" % seed
     if options.step:
@@ -161,6 +169,15 @@ def main():
         generate_world(seed, world_name, options.output_dir, width, height, step)
     elif operation == 'plates':
         generate_plates(seed, world_name, options.output_dir, width, height)
+    elif operation == 'ancient_map':
+        if not options.world_file:
+            usage("For generating an ancient map is necessary to specify the world to be used (-w option)")
+        world = World.from_pickle_file(options.world_file)
+        if options.generated_file:
+            map_filename = options.generated_file
+        else:
+            map_filename = "ancient_map_%s.png" % world.name
+        operation_ancient_map(world, map_filename)
     else:
         raise Exception('Unknown operation: valid operations are %s' % OPERATIONS)
     print('...done')
@@ -168,7 +185,7 @@ def main():
 
 def usage(error=None):
     print ' -------------------------------------------------------------------------'
-    print ' Federico Tomassetti, 2013'
+    print ' Federico Tomassetti, 2013-2014'
     print ' World generator'
     print ' '
     print ' generator <world_name> [operation] [options]'
