@@ -318,8 +318,12 @@ class World(object):
         def mapwt_from_dict(md):
             return map_from_dict(md['data'], thresholds_from_dict(md['thresholds']))
 
-        instance = World(dict['name'])
-        instance.set_biome(map_from_dict(dict['biome']))
+        biome = map_from_dict(dict['biome'])
+        width = len(biome[0])
+        height = len(biome)
+
+        instance = World(dict['name'], width, height)
+        instance.set_biome(biome)
         instance.set_ocean(map_from_dict(dict['ocean']))
         instance.set_precipitation(map_from_dict(dict['precipitation']['data']), [])
         instance.set_temperature(map_from_dict(dict['temperature']['data']), [])
