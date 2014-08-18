@@ -17,10 +17,10 @@ from PIL import Image
 OPERATIONS = 'world|plates|ancient_map'
 
 
-def draw_oldmap(world, filename):
-    img = Image.new('RGBA', (world.width, world.height))
+def draw_oldmap(world, filename, resize_factor):
+    img = Image.new('RGBA', (world.width*resize_factor, world.height*resize_factor))
     pixels = img.load()
-    drawing_functions.draw_oldmap_on_pixels(world, pixels)
+    drawing_functions.draw_oldmap_on_pixels(world, pixels, resize_factor)
     img.save(filename)
 
 
@@ -106,8 +106,8 @@ def check_step(step_name):
     else:
         return step
 
-def operation_ancient_map(world, map_filename):
-    draw_oldmap(world, map_filename)
+def operation_ancient_map(world, map_filename, resize_factor):
+    draw_oldmap(world, map_filename, resize_factor)
     print("+ ancient map generated in '%s'" % map_filename)
 
 
@@ -125,6 +125,7 @@ def main():
                       default='512')
     parser.add_option('-w', '--worldfile', dest='world_file', help="WORLD_FILE to be loaded (for ancient_map operation)", metavar="WORLD_FILE")
     parser.add_option('-g', '--generatedfile', dest='generated_file', help="name of the GENERATED_FILE (for ancient_map operation)", metavar="GENERATED_FILE")
+    parser.add_option('-f', '--resize_factor', dest='resize_factor', help="resize factor", metavar="RESIZE_FACTOR", default='1')
 
     (options, args) = parser.parse_args()
 
@@ -166,6 +167,8 @@ def main():
 
     generation_operation = (operation == 'world') or (operation == 'plates')
 
+    resize_factor = int(options.resize_factor)
+
     print('Lands world generator')
     print('---------------------')
     if generation_operation:
@@ -176,6 +179,8 @@ def main():
     print(' operation : %s generation' % operation)
     if generation_operation:
         print(' step      : %s' % step.name)
+    if operation=='ancient_map':
+        print(' resize factor : %i' % resize_factor)
 
     print('')  # empty line
     print('starting...')
@@ -191,7 +196,7 @@ def main():
             map_filename = options.generated_file
         else:
             map_filename = "ancient_map_%s.png" % world.name
-        operation_ancient_map(world, map_filename)
+        operation_ancient_map(world, map_filename, resize_factor)
     else:
         raise Exception('Unknown operation: valid operations are %s' % OPERATIONS)
     print('...done')
