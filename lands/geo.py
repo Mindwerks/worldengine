@@ -3,11 +3,6 @@ __author__ = 'Federico Tomassetti'
 from noise import snoise2
 from world import *
 
-N_PLATES = 32
-MIN_ELEV = 0
-MAX_ELEV = 255
-MAX_DIST = 6
-
 
 def center_elevation_map(elevation, width, height):
     """Translate the map horizontally and vertically to put as much ocean as possible at the borders."""
@@ -144,55 +139,6 @@ def scale_map_in_array(original_map, original_width, original_height, target_wid
     return scaled_map
 
 
-def generate_plates(seed, width, height, n_plates=N_PLATES, n_hot_points=1024, distance_f=distance):
-    random.seed(seed)
-
-    # generate hot points
-    hot_points = [random_point(width, height) for i in range(n_hot_points)]
-
-    # generate plate-origins
-    plate_origins = [random_point(width, height) for i in range(n_plates)]
-
-    # assign hot points to plate plate-origins
-    hot_points_to_plates = [nearest(hp, plate_origins, distance_f) for hp in hot_points]
-
-    # assign each tile to hot points
-    tiles_to_plates = []
-    for y in range(0, height):
-        row = []
-        for x in range(0, width):
-            hp_i = nearest((x, y), hot_points)
-            hp = hot_points[hp_i]
-            plate_i = nearest(hp, plate_origins)
-            row.append(plate_i)
-        tiles_to_plates.append(row)
-    return tiles_to_plates
-
-
-def plate_borders(plates, width, height):
-    def calc_borders(x, y, p):
-        borders = []
-        for dy in range(-MAX_DIST, +MAX_DIST + 1):
-            py = y + dy
-            if py > 0 and py < height:
-                for dx in range(-MAX_DIST, +MAX_DIST + 1):
-                    px = x + dx
-                    if px > 0 and px < width:
-                        pp = plates[py][px]
-                        if pp != p:
-                            borders.append((p, pp))
-        return borders
-
-    borders = []
-    for y in range(0, height):
-        row = []
-        for x in range(0, width):
-            p = plates[y][x]
-            row.append(calc_borders(x, y, p))
-        borders.append(row)
-    return borders
-
-
 def watermap(world, n):
     def droplet(world, pos, q, _watermap):
         if q < 0:
@@ -284,7 +230,7 @@ def erode(world, n):
                     if ql < 0:
                         raise Exception('Why ql<0? f=%f s=%f' % (f, s))
                     # if ql<0.8*q:
-                    #    ql = q # rafforzativo
+                    # ql = q # rafforzativo
                     #ql = q
                     #going = world.elevation['data'][py][px]==min_higher
                     going = ql > 0.05
@@ -418,7 +364,7 @@ def find_threshold_f(elevation, land_perc, ocean=None):
         if (width <> len(ocean[0])) or (height <> len(ocean)):
             raise Exception(
                 "Dimension of elevation and ocean do not match. Elevation is %d x %d, while ocean is %d x%d" % (
-                width, height, len(ocean[0]), len(ocean)))
+                    width, height, len(ocean[0]), len(ocean)))
 
     def count(e):
         tot = 0
@@ -500,7 +446,7 @@ def temperature(seed, elevation, mountain_level):
     base = random.randint(0, 4096)
     temp = [[0 for x in xrange(width)] for y in xrange(height)]
 
-    from noise import pnoise2, snoise2
+    from noise import snoise2
 
     octaves = 6
     freq = 16.0 * octaves
@@ -528,7 +474,7 @@ def precipitation(seed, width, height):
     base = random.randint(0, 4096)
     temp = [[0 for x in xrange(width)] for y in xrange(height)]
 
-    from noise import pnoise2, snoise2
+    from noise import snoise2
 
     octaves = 6
     freq = 64.0 * octaves
@@ -569,7 +515,7 @@ def permeability(seed, width, height):
     base = random.randint(0, 4096)
     temp = [[0 for x in xrange(width)] for y in xrange(height)]
 
-    from noise import pnoise2, snoise2
+    from noise import snoise2
 
     octaves = 6
     freq = 64.0 * octaves
