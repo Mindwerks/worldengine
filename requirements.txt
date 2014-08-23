@@ -1,3 +1,5 @@
+--allow-external PIL==1.1.7
+--allow-unverified PIL==1.1.7
 PIL==1.1.7
 PyPlatec==1.0
 langgen==0.1.2
