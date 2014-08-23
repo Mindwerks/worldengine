@@ -4,9 +4,9 @@ from PIL import Image
 from drawing_functions import *
 
 try:
-    from worldgen.geo import N_PLATES, MAX_ELEV, antialias
+    from worldgen.geo import antialias
 except:
-    from geo import N_PLATES, MAX_ELEV, antialias
+    from geo import antialias
 
 from biome import *
 
