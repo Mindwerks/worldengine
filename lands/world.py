@@ -314,9 +314,6 @@ class World(object):
     def is_rock_desert(self, pos):
         return isinstance(self.biome_at(pos), RockDesert)
 
-    def sustainable_population(self, pos):
-        return self.biome_at(pos).sustainable_population
-
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
