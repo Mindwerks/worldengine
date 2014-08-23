@@ -24,7 +24,7 @@ def main():
     print("+ data loaded from '%s'" % filename)
 
     # torrent
-    th = find_thresholdd_f(world.watermap, 0.05, ocean=world.ocean)
+    th = find_threshold_f(world.watermap, 0.05, ocean=world.ocean)
     filename = 'world_%s_watermap5.png' % world_name
     draw_watermap(world, filename, th)
 
