@@ -5,6 +5,6 @@ python:
   - "3.2"
   - "3.3"
 # command to install dependencies
-install: "pip install --allow-external -r requirements.txt"
+install: "pip install --allow-all-external -r requirements.txt"
 # # command to run tests
 script: nosetests
