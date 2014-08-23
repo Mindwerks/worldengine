@@ -1,6 +1,8 @@
 lands
 =====
 
+[![Build Status](https://travis-ci.org/ftomassetti/lands.svg?branch=master)](https://travis-ci.org/ftomassetti/lands)
+
 You can generate worlds data (heighmap, biome, etc.) and images for your own worlds.
 
 For example:
