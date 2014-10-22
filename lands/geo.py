@@ -448,6 +448,7 @@ def temperature(seed, elevation, mountain_level):
 
     from noise import snoise2
 
+    border = width / 4
     octaves = 6
     freq = 16.0 * octaves
 
@@ -456,6 +457,11 @@ def temperature(seed, elevation, mountain_level):
         latitude_factor = 1.0 - (abs(yscaled - 0.5) * 2)
         for x in range(0, width):
             n = snoise2(x / freq, y / freq, octaves, base=base)
+
+            #Added to allow noise pattern to wrap around right and left.
+            if x <= border:
+                n = (snoise2(x / freq, y / freq, octaves, base=base) * x / border) + (snoise2((x+width) / freq, y / freq, octaves, base=base) * (border-x)/border)
+
             t = (latitude_factor * 3 + n * 2) / 5.0
             if elevation[y][x] > mountain_level:
                 if elevation[y][x] > (mountain_level + 29):
@@ -470,6 +476,7 @@ def temperature(seed, elevation, mountain_level):
 
 def precipitation(seed, width, height):
     """"Precipitation is a value in [-1,1]"""
+    border = width / 4 
     random.seed(seed * 13)
     base = random.randint(0, 4096)
     temp = [[0 for x in xrange(width)] for y in xrange(height)]
@@ -484,6 +491,11 @@ def precipitation(seed, width, height):
         latitude_factor = 1.0 - (abs(yscaled - 0.5) * 2)
         for x in range(0, width):
             n = snoise2(x / freq, y / freq, octaves, base=base)
+
+            #Added to allow noise pattern to wrap around right and left.
+            if x < border: 
+		n = (snoise2(x / freq, y / freq, octaves, base=base) * x / border) + (snoise2((x+width) / freq, y / freq, octaves, base=base) * (border-x)/border)
+
             t = (latitude_factor + n * 4) / 5.0
             temp[y][x] = t
 
@@ -557,11 +569,12 @@ def place_oceans_at_map_borders(elevation):
 
     def place_ocean(x, y, i):
         elevation[y][x] = (elevation[y][x] * i) / OCEAN_BORDER
-
-    for y in xrange(height):
-        for i in range(0, OCEAN_BORDER):
-            place_ocean(i, y, i)
-            place_ocean(width - i - 1, y, i)
+    
+    #Removed so map could wrap around along the equator.
+    #for y in xrange(height):
+    #    for i in range(0, OCEAN_BORDER):
+    #        place_ocean(i, y, i)
+    #        place_ocean(width - i - 1, y, i)
     for x in xrange(width):
         for i in range(0, OCEAN_BORDER):
             place_ocean(x, i, i)
@@ -576,12 +589,16 @@ def humidity(world):
         for x in xrange(world.width):
             humidity['data'][y][x] = world.precipitation['data'][y][x] + world.irrigation[y][x]
 
+    #These were originally evenly spaced at 12.5% each but changing them to a bell curve produced
+    #better results
     humidity['quantiles'] = {}
-    humidity['quantiles']['10'] = find_threshold_f(humidity['data'], 0.10, world.ocean)
-    humidity['quantiles']['33'] = find_threshold_f(humidity['data'], 0.33, world.ocean)
+    humidity['quantiles']['12'] = find_threshold_f(humidity['data'], 0.02, world.ocean)
+    humidity['quantiles']['25'] = find_threshold_f(humidity['data'], 0.09, world.ocean)
+    humidity['quantiles']['37'] = find_threshold_f(humidity['data'], 0.26, world.ocean)
     humidity['quantiles']['50'] = find_threshold_f(humidity['data'], 0.50, world.ocean)
-    humidity['quantiles']['66'] = find_threshold_f(humidity['data'], 0.66, world.ocean)
-    humidity['quantiles']['75'] = find_threshold_f(humidity['data'], 0.75, world.ocean)
+    humidity['quantiles']['62'] = find_threshold_f(humidity['data'], 0.74, world.ocean)
+    humidity['quantiles']['75'] = find_threshold_f(humidity['data'], 0.91, world.ocean)
+    humidity['quantiles']['87'] = find_threshold_f(humidity['data'], 0.98, world.ocean)
     return humidity
 
 
@@ -658,10 +675,13 @@ def world_gen_from_elevation(name, elevation, seed, ocean_level, verbose, width,
     # Temperature with thresholds
     t = temperature(i, e, ml)
     t_th = [
-        ('vlo', find_threshold_f(t, 0.87, ocean)),
-        ('low', find_threshold_f(t, 0.75, ocean)),
-        ('med', find_threshold_f(t, 0.30, ocean)),
-        ('hig', None)
+	('polar', find_threshold_f(t, 0.90, ocean)),
+        ('alpine', find_threshold_f(t, 0.76, ocean)),
+        ('boreal', find_threshold_f(t, 0.59, ocean)),
+        ('cool', find_threshold_f(t, 0.38, ocean)),
+        ('warm', find_threshold_f(t, 0.26, ocean)),
+        ('subtropical', find_threshold_f(t, 0.14, ocean)),
+        ('tropical', None)
     ]
     w.set_temperature(t, t_th)
 
@@ -685,34 +705,124 @@ def world_gen_from_elevation(name, elevation, seed, ocean_level, verbose, width,
             if ocean[y][x]:
                 biome[y][x] = 'ocean'
             else:
-                e = w.elevation['data'][y][x]
-                if w.is_mountain((x, y)):
-                    if w.is_temperature_very_low((x, y)):
-                        biome[y][x] = 'glacier'
+                if w.is_temperature_polar((x, y)):
+                    if w.is_humidity_superarid((x, y)):
+                        biome[y][x] = 'polar desert'
                     else:
-                        biome[y][x] = 'alpine'
-                elif w.is_temperature_very_low((x, y)):
-                    biome[y][x] = 'iceland'
-                elif w.is_temperature_low((x, y)):
-                    biome[y][x] = 'tundra'
-                elif w.is_temperature_medium((x, y)):
-                    if w.is_humidity_very_high((x, y)) or w.is_humidity_high((x, y)):
-                        biome[y][x] = 'forest'
-                    elif w.is_humidity_medium((x, y)):
-                        biome[y][x] = 'grassland'
-                    elif w.is_humidity_low((x, y)) or w.is_humidity_very_low((x, y)):
-                        biome[y][x] = 'rock desert'
+                        biome[y][x] = 'ice'
+                elif w.is_temperature_alpine((x, y)):
+                    if w.is_humidity_superarid((x, y)):
+                        biome[y][x] = 'subpolar dry tundra'
+                    elif w.is_humidity_perarid((x, y)):
+                        biome[y][x] = 'subpolar moist tundra'
+                    elif w.is_humidity_arid((x, y)):
+                        biome[y][x] = 'subpolar wet tundra'
                     else:
-                        raise Exception('No cases like that! (2)')
-                elif w.is_temperature_high((x, y)):
-                    if w.is_humidity_very_high((x, y)) or w.is_humidity_high((x, y)):
-                        biome[y][x] = 'jungle'
-                    elif w.is_humidity_above_quantile((x, y), 50):
-                        biome[y][x] = 'savanna'
+                        biome[y][x] = 'subpolar rain tundra'
+                elif w.is_temperature_boreal((x, y)):
+                    if w.is_humidity_superarid((x, y)):
+                        biome[y][x] = 'boreal desert'
+                    elif w.is_humidity_perarid((x, y)):
+                        biome[y][x] = 'boreal dry scrub'
+                    elif w.is_humidity_arid((x, y)):
+                        biome[y][x] = 'boreal moist forest'
+                    elif w.is_humidity_semiarid((x, y)):
+                        biome[y][x] = 'boreal wet forest'
                     else:
-                        biome[y][x] = 'sand desert'
+                        biome[y][x] = 'boreal rain forest'
+                elif w.is_temperature_cool((x, y)):
+                    if w.is_humidity_superarid((x, y)):
+                        biome[y][x] = 'cool temperate desert'
+                    elif w.is_humidity_perarid((x, y)):
+                        biome[y][x] = 'cool temperate desert scrub'
+                    elif w.is_humidity_arid((x, y)):
+                        biome[y][x] = 'cool temperate steppe'
+                    elif w.is_humidity_semiarid((x, y)):
+                        biome[y][x] = 'cool temperate moist forest'
+                    elif w.is_humidity_subhumid((x, y)):
+                        biome[y][x] = 'cool temperate wet forest'
+                    else:
+                        biome[y][x] = 'cool temperate rain forest'
+                elif w.is_temperature_warm((x, y)):
+                    if w.is_humidity_superarid((x, y)):
+                        biome[y][x] = 'warm temperate desert'
+                    elif w.is_humidity_perarid((x, y)):
+                        biome[y][x] = 'warm temperate desert scrub'
+                    elif w.is_humidity_arid((x, y)):
+                        biome[y][x] = 'warm temperate thorn scrub'
+                    elif w.is_humidity_semiarid((x, y)):
+                        biome[y][x] = 'warm temperate dry forest'
+                    elif w.is_humidity_subhumid((x, y)):
+                        biome[y][x] = 'warm temperate moist forest'
+                    elif w.is_humidity_humid((x, y)):
+                        biome[y][x] = 'warm temperate wet forest'
+                    else:
+                        biome[y][x] = 'warm temperate rain forest'
+                elif w.is_temperature_subtropical((x, y)):
+                    if w.is_humidity_superarid((x, y)):
+                        biome[y][x] = 'subtropical desert'
+                    elif w.is_humidity_perarid((x, y)):
+                        biome[y][x] = 'subtropical desert scrub'
+                    elif w.is_humidity_arid((x, y)):
+                        biome[y][x] = 'subtropical thorn woodland'
+                    elif w.is_humidity_semiarid((x, y)):
+                        biome[y][x] = 'subtropical dry forest'
+                    elif w.is_humidity_subhumid((x, y)):
+                        biome[y][x] = 'subtropical moist forest'
+                    elif w.is_humidity_humid((x, y)):
+                        biome[y][x] = 'subtropical wet forest'
+                    else:
+                        biome[y][x] = 'subtropical rain forest'
+                elif w.is_temperature_tropical((x, y)):
+                    if w.is_humidity_superarid((x, y)):
+                        biome[y][x] = 'tropical desert'
+                    elif w.is_humidity_perarid((x, y)):
+                        biome[y][x] = 'tropical desert scrub'
+                    elif w.is_humidity_arid((x, y)):
+                        biome[y][x] = 'tropical thorn woodland'
+                    elif w.is_humidity_semiarid((x, y)):
+                        biome[y][x] = 'tropical very dry forest'
+                    elif w.is_humidity_subhumid((x, y)):
+                        biome[y][x] = 'tropical dry forest'
+                    elif w.is_humidity_humid((x, y)):
+                        biome[y][x] = 'tropical moist forest'
+                    elif w.is_humidity_perhumid((x, y)):
+                        biome[y][x] = 'tropical wet forest'
+                    else:
+                        biome[y][x] = 'tropical rain forest'
                 else:
-                    raise Exception('No cases like that!')
+                    biome[y][x] = 'bare rock'
+
+                #Old biome code
+
+                #e = w.elevation['data'][y][x]
+                # if w.is_mountain((x, y)):
+                #    if w.is_temperature_very_low((x, y)):
+                #        biome[y][x] = 'glacier'
+                #    else:
+                #        biome[y][x] = 'alpine'
+                #elif w.is_temperature_very_low((x, y)):
+                #    biome[y][x] = 'iceland'
+                #elif w.is_temperature_low((x, y)):
+                #    biome[y][x] = 'tundra'
+                #elif w.is_temperature_medium((x, y)):
+                #    if w.is_humidity_very_high((x, y)) or w.is_humidity_high((x, y)):
+                #        biome[y][x] = 'forest'
+                #    elif w.is_humidity_medium((x, y)):
+                #        biome[y][x] = 'grassland'
+                #    elif w.is_humidity_low((x, y)) or w.is_humidity_very_low((x, y)):
+                #        biome[y][x] = 'bare rock'
+                #    else:
+                #        raise Exception('No cases like that! (2)')
+                #elif w.is_temperature_high((x, y)):
+                #    if w.is_humidity_very_high((x, y)) or w.is_humidity_high((x, y)):
+                #        biome[y][x] = 'jungle'
+                #    elif w.is_humidity_above_quantile((x, y), 50):
+                #        biome[y][x] = 'savanna'
+                #    else:
+                #        biome[y][x] = 'sand desert'
+                #else:
+                #    raise Exception('No cases like that!')
             if not biome[y][x] in biome_cm:
                 biome_cm[biome[y][x]] = 0
             biome_cm[biome[y][x]] += 1
@@ -729,7 +839,7 @@ def world_gen_from_elevation(name, elevation, seed, ocean_level, verbose, width,
     for cl in biome_cm.keys():
         count = biome_cm[cl]
         if verbose:
-            print(" %20s = %7i" % (str(cl), count))
+            print(" %30s = %7i" % (str(cl), count))
 
     w.set_biome(biome)
     return w
