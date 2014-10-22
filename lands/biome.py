@@ -21,67 +21,67 @@ class Sea(Biome):
 
 
 #class Alpine(Biome):
-    def name(self):
-        return 'alpine'
+#    def name(self):
+#        return 'alpine'
 
 
 #class Glacier(Biome):
-    def name(self):
-        return 'glacier'
+#    def name(self):
+#        return 'glacier'
 
 
 #class Iceland(Biome):
-    def name(self):
-        return 'iceland'
+#    def name(self):
+#        return 'iceland'
 
 
 #class Steppe(Biome):
-    def name(self):
-        return 'steppe'
+#    def name(self):
+#        return 'steppe'
 
 
 #class Grassland(Biome):
-    def name(self):
-        return 'grassland'
+#    def name(self):
+#        return 'grassland'
 
 
 #class Jungle(Biome):
-    def name(self):
-        return 'jungle'
+#    def name(self):
+#        return 'jungle'
 
 
 #class Forest(Biome):
-    def name(self):
-        return 'forest'
+#    def name(self):
+#        return 'forest'
 
 
 #class SandDesert(Biome):
-    def name(self):
-        return 'sand_desert'
+#    def name(self):
+#        return 'sand_desert'
 
 
 #class RockDesert(Biome):
-    def name(self):
-        return 'rock_desert'
+#    def name(self):
+#        return 'rock_desert'
 
 #class BareRock(Biome):
-    def name(self):
-        return 'bare_rock'
+#    def name(self):
+#        return 'bare_rock'
 
 
 #class Savanna(Biome):
-    def name(self):
-        return 'savanna'
+#    def name(self):
+#        return 'savanna'
 
 
 #class Tundra(Biome):
-    def name(self):
-        return 'tundra'
+#    def name(self):
+#        return 'tundra'
 
 
 #class Swamp(Biome):
-    def name(self):
-        return 'swamp'
+#    def name(self):
+#        return 'swamp'
 
 class PolarDesert(Biome):
     def name(self):
