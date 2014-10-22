@@ -437,25 +437,6 @@ class Counter:
         for w in self.c.keys():
             print("%s : %i" % (w, self.c[w]))
 
-
-#biome_colors = {
-#    'iceland': (208, 241, 245),
-#    'jungle': (54, 240, 17),
-#    'tundra': (180, 120, 130),
-#    'ocean': (23, 94, 145),
-#    'forest': (10, 89, 15),
-#    'grassland': (69, 133, 73),
-#    'steppe': (90, 117, 92),
-#    'sand desert': (207, 204, 58),
-#    'rock desert': (94, 93, 25),
-#    'swamp': (255, 0, 0),
-#    'glacier': (255, 255, 255),
-#    'alpine': (100, 70, 5),
-#    'savanna': (200, 140, 20),
-#    'bare rock': (128, 0, 128)
-#}
-
-
 def draw_world(world, filename):
     WIDTH = world.width
     HEIGHT = world.height
@@ -506,20 +487,7 @@ def draw_temperature_levels(world, filename):
 
 
 biome_colors = {
-#    'iceland': (208, 241, 245),
-#    'jungle': (54, 240, 17),
-#    'tundra': (180, 120, 130),
-#    'ocean': (23, 94, 145),
-#    'forest': (10, 89, 15),
-#    'grassland': (69, 133, 73),
-#    'steppe': (90, 117, 92),
-#    'sand desert': (207, 204, 58),
-#    'rock desert': (94, 93, 25),
-#    'swamp': (255, 0, 0),
-#    'glacier': (255, 255, 255),
-#    'alpine': (100, 70, 5),
-#    'savanna': (200, 140, 20),
-#    'bare rock': (128, 0, 128),
+    'ocean': (23, 94, 145),
     'ice' : (255, 255, 255),
     'subpolar dry tundra': (128, 128, 128),
     'subpolar moist tundra': (96, 128, 128),

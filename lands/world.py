@@ -71,32 +71,6 @@ class World(object):
         x, y = pos
         return self.elevation['data'][y][x] > hill_level and self.elevation['data'][y][x] < mountain_level
 
-    #def is_temperature_very_low(self, pos):
-    #    th_max = self.temperature['thresholds'][0][1]
-    #    x, y = pos
-    #    t = self.temperature['data'][y][x]
-    #    return t < th_max
-
-    #def is_temperature_low(self, pos):
-    #    th_min = self.temperature['thresholds'][0][1]
-    #    th_max = self.temperature['thresholds'][1][1]
-    #    x, y = pos
-    #    t = self.temperature['data'][y][x]
-    #    return t < th_max and t >= th_min
-
-    #def is_temperature_medium(self, pos):
-    #    th_min = self.temperature['thresholds'][1][1]
-    #    th_max = self.temperature['thresholds'][2][1]
-    #    x, y = pos
-    #    t = self.temperature['data'][y][x]
-    #    return t < th_max and t >= th_min
-
-    #def is_temperature_high(self, pos):
-    #    th_min = self.temperature['thresholds'][2][1]
-    #    x, y = pos
-    #    t = self.temperature['data'][y][x]
-    #    return t >= th_min
-
     def is_temperature_polar(self, pos):
         th_max = self.temperature['thresholds'][0][1]
         x, y = pos
@@ -144,56 +118,14 @@ class World(object):
         t = self.temperature['data'][y][x]
         return t >= th_min
 
-    #def is_humidity_very_low(self, pos):
-    #    th_max = self.humidity['quantiles']['75']
-    #    # print('Humidity Q10 %f' % th_max)
-    #    x, y = pos
-    #    t = self.humidity['data'][y][x]
-    #    return t < th_max
-
-    #def is_humidity_low(self, pos):
-    #    th_min = self.humidity['quantiles']['75']
-    #    th_max = self.humidity['quantiles']['66']
-    #    # print('Humidity Q10 %f' % th_min)
-    #    #print('Humidity Q33 %f' % th_max)
-    #    x, y = pos
-    #    t = self.humidity['data'][y][x]
-    #    return t < th_max and t >= th_min
-
-    #def is_humidity_medium(self, pos):
-    #    th_min = self.humidity['quantiles']['66']
-    #    th_max = self.humidity['quantiles']['33']
-    #    # print('Humidity Q33 %f' % th_min)
-    #    #print('Humidity Q66 %f' % th_max)
-    #    x, y = pos
-    #    t = self.humidity['data'][y][x]
-    #    return t < th_max and t >= th_min
-
     def is_humidity_above_quantile(self, pos, q):
         th = self.humidity['quantiles'][str(q)]
         x, y = pos
         v = self.humidity['data'][y][x]
         return v >= th
 
-    #def is_humidity_high(self, pos):
-    #    th_min = self.humidity['quantiles']['33']
-    #    th_max = self.humidity['quantiles']['10']
-    #    # print('Humidity Q66 %f' % th_min)
-    #    #print('Humidity Q75 %f' % th_max)
-    #    x, y = pos
-    #    t = self.humidity['data'][y][x]
-    #    return t >= th_min and t < th_max
-
-    #def is_humidity_very_high(self, pos):
-    #    th_min = self.humidity['quantiles']['10']
-    #    # print('Humidity Q75 %f' % th_min)
-    #    x, y = pos
-    #    t = self.humidity['data'][y][x]
-    #    return t >= th_min
-
     def is_humidity_superarid(self, pos):
         th_max = self.humidity['quantiles']['87']
-        # print('Humidity Q10 %f' % th_max)
         x, y = pos
         t = self.humidity['data'][y][x]
         return t < th_max
@@ -201,8 +133,6 @@ class World(object):
     def is_humidity_perarid(self, pos):
         th_min = self.humidity['quantiles']['87']
         th_max = self.humidity['quantiles']['75']
-        # print('Humidity Q66 %f' % th_min)
-        #print('Humidity Q75 %f' % th_max)
         x, y = pos
         t = self.humidity['data'][y][x]
         return t >= th_min and t < th_max
@@ -210,8 +140,6 @@ class World(object):
     def is_humidity_arid(self, pos):
         th_min = self.humidity['quantiles']['75']
         th_max = self.humidity['quantiles']['62']
-        # print('Humidity Q66 %f' % th_min)
-        #print('Humidity Q75 %f' % th_max)
         x, y = pos
         t = self.humidity['data'][y][x]
         return t >= th_min and t < th_max
@@ -219,8 +147,6 @@ class World(object):
     def is_humidity_semiarid(self, pos):
         th_min = self.humidity['quantiles']['62']
         th_max = self.humidity['quantiles']['50']
-        # print('Humidity Q66 %f' % th_min)
-        #print('Humidity Q75 %f' % th_max)
         x, y = pos
         t = self.humidity['data'][y][x]
         return t >= th_min and t < th_max
@@ -228,8 +154,6 @@ class World(object):
     def is_humidity_subhumid(self, pos):
         th_min = self.humidity['quantiles']['50']
         th_max = self.humidity['quantiles']['37']
-        # print('Humidity Q66 %f' % th_min)
-        #print('Humidity Q75 %f' % th_max)
         x, y = pos
         t = self.humidity['data'][y][x]
         return t >= th_min and t < th_max
@@ -237,8 +161,6 @@ class World(object):
     def is_humidity_humid(self, pos):
         th_min = self.humidity['quantiles']['37']
         th_max = self.humidity['quantiles']['25']
-        # print('Humidity Q66 %f' % th_min)
-        #print('Humidity Q75 %f' % th_max)
         x, y = pos
         t = self.humidity['data'][y][x]
         return t >= th_min and t < th_max
@@ -246,16 +168,12 @@ class World(object):
     def is_humidity_perhumid(self, pos):
         th_min = self.humidity['quantiles']['25']
         th_max = self.humidity['quantiles']['12']
-        # print('Humidity Q66 %f' % th_min)
-        #print('Humidity Q75 %f' % th_max)
         x, y = pos
         t = self.humidity['data'][y][x]
         return t >= th_min and t < th_max
 
     def is_humidity_superhumid(self, pos):
         th_min = self.humidity['quantiles']['12']
-        # print('Humidity Q66 %f' % th_min)
-        #print('Humidity Q75 %f' % th_max)
         x, y = pos
         t = self.humidity['data'][y][x]
         return t >= th_min
