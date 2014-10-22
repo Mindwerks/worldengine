@@ -71,103 +71,103 @@ class World(object):
         x, y = pos
         return self.elevation['data'][y][x] > hill_level and self.elevation['data'][y][x] < mountain_level
 
-    def is_temperature_very_low(self, pos):
+    #def is_temperature_very_low(self, pos):
+    #    th_max = self.temperature['thresholds'][0][1]
+    #    x, y = pos
+    #    t = self.temperature['data'][y][x]
+    #    return t < th_max
+
+    #def is_temperature_low(self, pos):
+    #    th_min = self.temperature['thresholds'][0][1]
+    #    th_max = self.temperature['thresholds'][1][1]
+    #    x, y = pos
+    #    t = self.temperature['data'][y][x]
+    #    return t < th_max and t >= th_min
+
+    #def is_temperature_medium(self, pos):
+    #    th_min = self.temperature['thresholds'][1][1]
+    #    th_max = self.temperature['thresholds'][2][1]
+    #    x, y = pos
+    #    t = self.temperature['data'][y][x]
+    #    return t < th_max and t >= th_min
+
+    #def is_temperature_high(self, pos):
+    #    th_min = self.temperature['thresholds'][2][1]
+    #    x, y = pos
+    #    t = self.temperature['data'][y][x]
+    #    return t >= th_min
+
+    def is_temperature_polar(self, pos):
         th_max = self.temperature['thresholds'][0][1]
         x, y = pos
         t = self.temperature['data'][y][x]
         return t < th_max
 
-    def is_temperature_low(self, pos):
+    def is_temperature_alpine(self, pos):
         th_min = self.temperature['thresholds'][0][1]
         th_max = self.temperature['thresholds'][1][1]
         x, y = pos
         t = self.temperature['data'][y][x]
         return t < th_max and t >= th_min
 
-    def is_temperature_medium(self, pos):
+    def is_temperature_boreal(self, pos):
         th_min = self.temperature['thresholds'][1][1]
         th_max = self.temperature['thresholds'][2][1]
         x, y = pos
         t = self.temperature['data'][y][x]
         return t < th_max and t >= th_min
 
-    def is_temperature_high(self, pos):
+    def is_temperature_cool(self, pos):
         th_min = self.temperature['thresholds'][2][1]
+        th_max = self.temperature['thresholds'][3][1]
         x, y = pos
         t = self.temperature['data'][y][x]
-        return t >= th_min
+        return t < th_max and t >= th_min
 
-    def is_temperature_polar(self, pos):
+    def is_temperature_warm(self, pos):
+        th_min = self.temperature['thresholds'][3][1]
         th_max = self.temperature['thresholds'][4][1]
         x, y = pos
         t = self.temperature['data'][y][x]
-        return t < th_max
+        return t < th_max and t >= th_min
 
-    def is_temperature_alpine(self, pos):
+    def is_temperature_subtropical(self, pos):
         th_min = self.temperature['thresholds'][4][1]
         th_max = self.temperature['thresholds'][5][1]
         x, y = pos
         t = self.temperature['data'][y][x]
         return t < th_max and t >= th_min
 
-    def is_temperature_boreal(self, pos):
-        th_min = self.temperature['thresholds'][5][1]
-        th_max = self.temperature['thresholds'][6][1]
-        x, y = pos
-        t = self.temperature['data'][y][x]
-        return t < th_max and t >= th_min
-
-    def is_temperature_cool(self, pos):
-        th_min = self.temperature['thresholds'][6][1]
-        th_max = self.temperature['thresholds'][7][1]
-        x, y = pos
-        t = self.temperature['data'][y][x]
-        return t < th_max and t >= th_min
-
-    def is_temperature_warm(self, pos):
-        th_min = self.temperature['thresholds'][7][1]
-        th_max = self.temperature['thresholds'][8][1]
-        x, y = pos
-        t = self.temperature['data'][y][x]
-        return t < th_max and t >= th_min
-
-    def is_temperature_subtropical(self, pos):
-        th_min = self.temperature['thresholds'][8][1]
-        th_max = self.temperature['thresholds'][9][1]
-        x, y = pos
-        t = self.temperature['data'][y][x]
-        return t < th_max and t >= th_min
-
     def is_temperature_tropical(self, pos):
-        th_min = self.temperature['thresholds'][9][1]
+        th_min = self.temperature['thresholds'][5][1]
         x, y = pos
         t = self.temperature['data'][y][x]
         return t >= th_min
 
-    def is_humidity_very_low(self, pos):
-        th_max = self.humidity['quantiles']['75']
-        # print('Humidity Q10 %f' % th_max)
-        x, y = pos
-        t = self.humidity['data'][y][x]
-        return t < th_max
+    #def is_humidity_very_low(self, pos):
+    #    th_max = self.humidity['quantiles']['75']
+    #    # print('Humidity Q10 %f' % th_max)
+    #    x, y = pos
+    #    t = self.humidity['data'][y][x]
+    #    return t < th_max
 
-    def is_humidity_low(self, pos):
-        th_min = self.humidity['quantiles']['75']
-        th_max = self.humidity['quantiles']['66']
-        # print('Humidity Q10 %f' % th_min)
-        #print('Humidity Q33 %f' % th_max)
-        x, y = pos
-        t = self.humidity['data'][y][x]
-        return t < th_max and t >= th_min
+    #def is_humidity_low(self, pos):
+    #    th_min = self.humidity['quantiles']['75']
+    #    th_max = self.humidity['quantiles']['66']
+    #    # print('Humidity Q10 %f' % th_min)
+    #    #print('Humidity Q33 %f' % th_max)
+    #    x, y = pos
+    #    t = self.humidity['data'][y][x]
+    #    return t < th_max and t >= th_min
 
-    def is_humidity_medium(self, pos):
-        th_min = self.humidity['quantiles']['66']
-        th_max = self.humidity['quantiles']['33']
-        # print('Humidity Q33 %f' % th_min)
-        #print('Humidity Q66 %f' % th_max)
-        x, y = pos
-        t = self.humidity['data'][y][x]
-        return t < th_max and t >= th_min
+    #def is_humidity_medium(self, pos):
+    #    th_min = self.humidity['quantiles']['66']
+    #    th_max = self.humidity['quantiles']['33']
+    #    # print('Humidity Q33 %f' % th_min)
+    #    #print('Humidity Q66 %f' % th_max)
+    #    x, y = pos
+    #    t = self.humidity['data'][y][x]
+    #    return t < th_max and t >= th_min
 
     def is_humidity_above_quantile(self, pos, q):
         th = self.humidity['quantiles'][str(q)]
@@ -175,21 +175,21 @@ class World(object):
         v = self.humidity['data'][y][x]
         return v >= th
 
-    def is_humidity_high(self, pos):
-        th_min = self.humidity['quantiles']['33']
-        th_max = self.humidity['quantiles']['10']
-        # print('Humidity Q66 %f' % th_min)
-        #print('Humidity Q75 %f' % th_max)
-        x, y = pos
-        t = self.humidity['data'][y][x]
-        return t >= th_min and t < th_max
+    #def is_humidity_high(self, pos):
+    #    th_min = self.humidity['quantiles']['33']
+    #    th_max = self.humidity['quantiles']['10']
+    #    # print('Humidity Q66 %f' % th_min)
+    #    #print('Humidity Q75 %f' % th_max)
+    #    x, y = pos
+    #    t = self.humidity['data'][y][x]
+    #    return t >= th_min and t < th_max
 
-    def is_humidity_very_high(self, pos):
-        th_min = self.humidity['quantiles']['10']
-        # print('Humidity Q75 %f' % th_min)
-        x, y = pos
-        t = self.humidity['data'][y][x]
-        return t >= th_min
+    #def is_humidity_very_high(self, pos):
+    #    th_min = self.humidity['quantiles']['10']
+    #    # print('Humidity Q75 %f' % th_min)
+    #    x, y = pos
+    #    t = self.humidity['data'][y][x]
+    #    return t >= th_min
 
     def is_humidity_superarid(self, pos):
         th_max = self.humidity['quantiles']['87']
