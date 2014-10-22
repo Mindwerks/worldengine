@@ -98,8 +98,6 @@ def draw_simple_elevation(data, filename, shadow, width, height):
     for y in range(0, height):
         for x in range(0, width):
             e = data[y * width + x]
-            # c = 255-int(((e-min_elev)*255)/elev_delta)
-            #pixels[x,y] = (c,c,c,255)
             r, g, b = my_color(e)
             pixels[x, y] = (int(r * 255), int(g * 255), int(b * 255), 255)
     img.save(filename)
@@ -301,20 +299,6 @@ def draw_watermap(world, filename, th):
     img = Image.new('RGBA', (WIDTH, HEIGHT))
     pixels = img.load()
 
-    # min_elev = None
-    # max_elev = None
-    # for y in xrange(HEIGHT):
-    # for x in xrange(WIDTH):
-    #       if not ocean[y][x]:
-    #           e = _watermap[y][x]**1.5
-    #           if min_elev==None or e<min_elev:
-    #               min_elev=e
-    #           if max_elev==None or e>max_elev:
-    #               max_elev=e              
-    # elev_delta = max_elev-min_elev    
-    # if elev_delta<1:
-    #   elev_delta=1
-
     for y in range(0, HEIGHT):
         for x in range(0, WIDTH):
             if ocean[y][x]:
@@ -325,10 +309,9 @@ def draw_watermap(world, filename, th):
                     c = 255
                 else:
                     c = 0
-                    #c = int(((e-min_elev)*255)/elev_delta)
+
                 pixels[x, y] = (c, 0, 0, 255)
     img.save(filename)
-
 
 def draw_basic_elevation(elevation, filename):
     WIDTH = len(elevation[0])
@@ -405,11 +388,22 @@ def draw_precipitation(world, filename):
     pixels = img.load()
     for y in range(0, HEIGHT):
         for x in range(0, WIDTH):
-            if ocean[y][x]:
-                pixels[x, y] = (0, 0, 0, 255)
-            else:
-                c = int((data[y][x] + 1.0) * 127.5)
-                pixels[x, y] = (0, 0, c, 255)
+            if world.is_humidity_superarid((x, y)):
+                pixels[x, y] = (0, 32, 32, 255)
+            elif world.is_humidity_perarid((x, y)):
+                pixels[x, y] = (0, 64, 64, 255)
+            elif world.is_humidity_arid((x, y)):
+                pixels[x, y] = (0, 96, 96, 255)
+            elif world.is_humidity_semiarid((x, y)):
+                pixels[x, y] = (0, 128, 128, 255)
+            elif world.is_humidity_subhumid((x, y)):
+                pixels[x, y] = (0, 160, 160, 255)
+            elif world.is_humidity_humid((x, y)):
+                pixels[x, y] = (0, 192, 192, 255)
+            elif world.is_humidity_perhumid((x, y)):
+                pixels[x, y] = (0, 224, 224, 255)
+            elif world.is_humidity_superhumid((x, y)):
+                pixels[x, y] = (0, 255, 255, 255)
     img.save(filename)
 
 
@@ -444,21 +438,22 @@ class Counter:
             print("%s : %i" % (w, self.c[w]))
 
 
-biome_colors = {
-    'iceland': (208, 241, 245),
-    'jungle': (54, 240, 17),
-    'tundra': (180, 120, 130),
-    'ocean': (23, 94, 145),
-    'forest': (10, 89, 15),
-    'grassland': (69, 133, 73),
-    'steppe': (90, 117, 92),
-    'sand desert': (207, 204, 58),
-    'rock desert': (94, 93, 25),
-    'swamp': (255, 0, 0),
-    'glacier': (255, 255, 255),
-    'alpine': (100, 70, 5),
-    'savanna': (200, 140, 20)
-}
+#biome_colors = {
+#    'iceland': (208, 241, 245),
+#    'jungle': (54, 240, 17),
+#    'tundra': (180, 120, 130),
+#    'ocean': (23, 94, 145),
+#    'forest': (10, 89, 15),
+#    'grassland': (69, 133, 73),
+#    'steppe': (90, 117, 92),
+#    'sand desert': (207, 204, 58),
+#    'rock desert': (94, 93, 25),
+#    'swamp': (255, 0, 0),
+#    'glacier': (255, 255, 255),
+#    'alpine': (100, 70, 5),
+#    'savanna': (200, 140, 20),
+#    'bare rock': (128, 0, 128)
+#}
 
 
 def draw_world(world, filename):
@@ -492,35 +487,78 @@ def draw_temperature_levels(world, filename):
     pixels = img.load()
     for y in range(0, HEIGHT):
         for x in range(0, WIDTH):
-            if world.is_land((x, y)):
-                e = world.elevation['data'][y][x]
-                if world.is_temperature_very_low((x, y)):
-                    pixels[x, y] = (0, 0, 255, 255)
-                elif world.is_temperature_low((x, y)):
-                    pixels[x, y] = (80, 120, 255, 255)
-                elif world.is_temperature_medium((x, y)):
-                    pixels[x, y] = (180, 255, 180, 255)
-                elif world.is_temperature_high((x, y)):
-                    pixels[x, y] = (255, 0, 0, 255)
-            else:
-                pixels[x, y] = (0, 0, 0, 255)
+            if world.is_temperature_polar((x, y)):
+                pixels[x, y] = (0, 0, 255, 255)
+   	    elif world.is_temperature_alpine((x, y)):
+                pixels[x, y] = (42, 0, 213, 255)
+            elif world.is_temperature_boreal((x, y)):
+                pixels[x, y] = (85, 0, 170, 255)
+            elif world.is_temperature_cool((x, y)):
+                pixels[x, y] = (128, 0, 128, 255)
+            elif world.is_temperature_warm((x, y)):
+                pixels[x, y] = (170, 0, 85, 255)
+            elif world.is_temperature_subtropical((x, y)):
+                pixels[x, y] = (213, 0, 42, 255)
+            elif world.is_temperature_tropical((x, y)):
+                pixels[x, y] = (255, 0, 0, 255)
+
     img.save(filename)
 
 
 biome_colors = {
-    'iceland': (208, 241, 245),
-    'jungle': (54, 240, 17),
-    'tundra': (180, 120, 130),
-    'ocean': (23, 94, 145),
-    'forest': (10, 89, 15),
-    'grassland': (69, 133, 73),
-    'steppe': (90, 117, 92),
-    'sand desert': (207, 204, 58),
-    'rock desert': (94, 93, 25),
-    'swamp': (255, 0, 0),
-    'glacier': (255, 255, 255),
-    'alpine': (100, 70, 5),
-    'savanna': (200, 140, 20)
+#    'iceland': (208, 241, 245),
+#    'jungle': (54, 240, 17),
+#    'tundra': (180, 120, 130),
+#    'ocean': (23, 94, 145),
+#    'forest': (10, 89, 15),
+#    'grassland': (69, 133, 73),
+#    'steppe': (90, 117, 92),
+#    'sand desert': (207, 204, 58),
+#    'rock desert': (94, 93, 25),
+#    'swamp': (255, 0, 0),
+#    'glacier': (255, 255, 255),
+#    'alpine': (100, 70, 5),
+#    'savanna': (200, 140, 20),
+#    'bare rock': (128, 0, 128),
+    'ice' : (255, 255, 255),
+    'subpolar dry tundra': (128, 128, 128),
+    'subpolar moist tundra': (96, 128, 128),
+    'subpolar wet tundra': (64, 128, 128),
+    'subpolar rain tundra': (32, 128, 192),
+    'polar desert' : (192, 192, 192),
+    'boreal desert': (160, 160, 128),
+    'cool temperate desert': (192, 192, 128),
+    'warm temperate desert': (224, 224, 128),
+    'subtropical desert': (240, 240, 128),
+    'tropical desert': (255, 255, 128),
+    'boreal rain forest': (32, 160, 192),
+    'cool temperate rain forest': (32, 192, 192),
+    'warm temperate rain forest': (32, 224, 192),
+    'subtropical rain forest': (32, 240, 176),
+    'tropical rain forest': (32, 255, 160),
+    'boreal wet forest': (64, 160, 144),
+    'cool temperate wet forest': (64, 192, 144),
+    'warm temperate wet forest': (64, 224, 144),
+    'subtropical wet forest': (64, 240, 144),
+    'tropical wet forest': (64, 255, 144),
+    'boreal moist forest': (96, 160, 128),
+    'cool temperate moist forest': (96, 192, 128),
+    'warm temperate moist forest': (96, 224, 128),
+    'subtropical moist forest': (96, 240, 128),
+    'tropical moist forest': (96, 255, 128),
+    'warm temperate dry forest': (128, 224, 128),
+    'subtropical dry forest': (128, 240, 128),
+    'tropical dry forest': (128, 255, 128),
+    'boreal dry scrub': (128, 160, 128),
+    'cool temperate desert scrub': (160, 192, 128),
+    'warm temperate desert scrub': (192, 224, 128),
+    'subtropical desert scrub': (208, 240, 128),
+    'tropical desert scrub': (224, 255, 128),
+    'cool temperate steppe': (128, 192, 128),
+    'warm temperate thorn scrub': (160, 224, 128),
+    'subtropical thorn woodland': (176, 240, 128),
+    'tropical thorn woodland': (192, 255, 128),
+    'tropical very dry forest': (160, 255, 128),
 }
 
 
