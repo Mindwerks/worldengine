@@ -570,11 +570,6 @@ def place_oceans_at_map_borders(elevation):
     def place_ocean(x, y, i):
         elevation[y][x] = (elevation[y][x] * i) / OCEAN_BORDER
     
-    #Removed so map could wrap around along the equator.
-    #for y in xrange(height):
-    #    for i in range(0, OCEAN_BORDER):
-    #        place_ocean(i, y, i)
-    #        place_ocean(width - i - 1, y, i)
     for x in xrange(width):
         for i in range(0, OCEAN_BORDER):
             place_ocean(x, i, i)
@@ -792,37 +787,6 @@ def world_gen_from_elevation(name, elevation, seed, ocean_level, verbose, width,
                         biome[y][x] = 'tropical rain forest'
                 else:
                     biome[y][x] = 'bare rock'
-
-                #Old biome code
-
-                #e = w.elevation['data'][y][x]
-                # if w.is_mountain((x, y)):
-                #    if w.is_temperature_very_low((x, y)):
-                #        biome[y][x] = 'glacier'
-                #    else:
-                #        biome[y][x] = 'alpine'
-                #elif w.is_temperature_very_low((x, y)):
-                #    biome[y][x] = 'iceland'
-                #elif w.is_temperature_low((x, y)):
-                #    biome[y][x] = 'tundra'
-                #elif w.is_temperature_medium((x, y)):
-                #    if w.is_humidity_very_high((x, y)) or w.is_humidity_high((x, y)):
-                #        biome[y][x] = 'forest'
-                #    elif w.is_humidity_medium((x, y)):
-                #        biome[y][x] = 'grassland'
-                #    elif w.is_humidity_low((x, y)) or w.is_humidity_very_low((x, y)):
-                #        biome[y][x] = 'bare rock'
-                #    else:
-                #        raise Exception('No cases like that! (2)')
-                #elif w.is_temperature_high((x, y)):
-                #    if w.is_humidity_very_high((x, y)) or w.is_humidity_high((x, y)):
-                #        biome[y][x] = 'jungle'
-                #    elif w.is_humidity_above_quantile((x, y), 50):
-                #        biome[y][x] = 'savanna'
-                #    else:
-                #        biome[y][x] = 'sand desert'
-                #else:
-                #    raise Exception('No cases like that!')
             if not biome[y][x] in biome_cm:
                 biome_cm[biome[y][x]] = 0
             biome_cm[biome[y][x]] += 1
