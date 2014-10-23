@@ -89,6 +89,8 @@ def draw_simple_elevation(data, filename, shadow, width, height):
     for y in xrange(height):
         for x in xrange(width):
             e = data[y * width + x]
+            # c = 255-int(((e-min_elev)*255)/elev_delta) 	
+            #pixels[x,y] = (c,c,c,255)
             if min_elev == None or e < min_elev:
                 min_elev = e
             if max_elev == None or e > max_elev:
@@ -299,6 +301,20 @@ def draw_watermap(world, filename, th):
     img = Image.new('RGBA', (WIDTH, HEIGHT))
     pixels = img.load()
 
+    # min_elev = None 	
+    # max_elev = None 	
+    # for y in xrange(HEIGHT): 	
+    # for x in xrange(WIDTH): 	
+    # if not ocean[y][x]: 	
+    # e = _watermap[y][x]**1.5 	
+    # if min_elev==None or e<min_elev: 	
+    # min_elev=e 	
+    # if max_elev==None or e>max_elev: 	
+    # max_elev=e 	
+    # elev_delta = max_elev-min_elev 	
+    # if elev_delta<1: 	
+    # elev_delta=1 	
+
     for y in range(0, HEIGHT):
         for x in range(0, WIDTH):
             if ocean[y][x]:
@@ -309,7 +325,7 @@ def draw_watermap(world, filename, th):
                     c = 255
                 else:
                     c = 0
-
+                    #c = int(((e-min_elev)*255)/elev_delta)
                 pixels[x, y] = (c, 0, 0, 255)
     img.save(filename)
 

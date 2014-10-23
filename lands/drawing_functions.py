@@ -6,7 +6,6 @@ __author__ = 'Federico Tomassetti'
 
 import random
 
-
 def find_land_borders(world, factor):
     _ocean   = [[False for x in xrange(factor*world.width)] for y in xrange(factor*world.height)]
     _borders = [[False for x in xrange(factor*world.width)] for y in xrange(factor*world.height)]
