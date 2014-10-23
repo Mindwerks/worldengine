@@ -61,4 +61,5 @@ Libjpeg is required by PIL
 Contributors
 ============
 
-[Evan Sampson](https://github.com/esampson) contributed the amazing implementation of the Holdridge life zones model. Thanks a million!
+[Evan Sampson](https://github.com/esampson) contributed the amazing implementation of the Holdridge life zones model
+and improved a lot the ancient-looking-map generator. Thanks a million!
