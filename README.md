@@ -18,28 +18,35 @@ Once a world it can be used for simulation civs evolution (see project [civs](ht
 For a generated world is also possible to generate additional maps, for example ancient looking map:
 
 ```python
-python lands/generator.py ancient_map -w seed2.world
+python lands/generator.py ancient_map -w seed1.world
 ```
 
-![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/ancient_map_seed2.png)
+![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/ancient_map_seed1.png)
 
 Output
 ======
 
-The program produces a binary format with all the data of the generated world and a set of images. For examples seed 1 produes.
+The program produces a binary format with all the data of the generated world and a set of images. For examples seed 1 produces.
 
 ## Elevation Map
 
 ![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_elevation.png)
 
+## Precipitation Map
 
-## Ocean Map
+![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_precipitation.png)
 
-![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_ocean.png)
+## Temperature Map
+
+![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_temperature.png)
 
 ## Biome Map
 
 ![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_biome.png)
+
+## Ocean Map
+
+![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_ocean.png)
 
 Algorithm
 =========
@@ -62,4 +69,4 @@ Contributors
 ============
 
 [Evan Sampson](https://github.com/esampson) contributed the amazing implementation of the Holdridge life zones model
-and improved a lot the ancient-looking-map generator. Thanks a million!
+and improved a lot the ancient-looking-map, biome, precipitation and temperature generators. Thanks a million!
