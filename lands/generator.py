@@ -4,7 +4,7 @@ import sys
 from optparse import OptionParser
 
 from plates import world_gen
-from draw import draw_biome, draw_precipitation
+from draw import draw_biome, draw_precipitation, draw_temperature_levels
 import geo
 import draw
 import drawing_functions
@@ -42,9 +42,12 @@ def generate_world(seed, world_name, output_dir, width, height, step):
     print("* ocean image generated in '%s'" % filename)
 
     if step.include_precipitations:
-        filename = '%s/%s_precipitations.png' % (output_dir, world_name)
+        filename = '%s/%s_precipitation.png' % (output_dir, world_name)
         draw_precipitation(w, filename)
-        print("* precipitations image generated in '%s'" % filename)
+        print("* precipitation image generated in '%s'" % filename)
+        filename = '%s/%s_temperature.png' % (output_dir, world_name)
+        draw_temperature_levels(w, filename)
+        print("* temperature image generated in '%s'" % filename)
 
     if step.include_biome:
         filename = '%s/%s_biome.png' % (output_dir, world_name)
@@ -112,6 +115,7 @@ def operation_ancient_map(world, map_filename, resize_factor):
 
 
 def main():
+    sys.setrecursionlimit(2000) #increased because I was hitting recursion limits on 4096x2048 ancient maps.
     parser = OptionParser()
     parser.add_option('-o', '--output', dest='output_dir', help="generate files in OUTPUT", metavar="FILE", default='.')
     parser.add_option('-n', '--worldname', dest='world_name', help="set WORLDNAME", metavar="WORLDNAME")

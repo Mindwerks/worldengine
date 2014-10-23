@@ -71,56 +71,52 @@ class World(object):
         x, y = pos
         return self.elevation['data'][y][x] > hill_level and self.elevation['data'][y][x] < mountain_level
 
-    def is_temperature_very_low(self, pos):
+    def is_temperature_polar(self, pos):
         th_max = self.temperature['thresholds'][0][1]
         x, y = pos
         t = self.temperature['data'][y][x]
         return t < th_max
 
-    def is_temperature_low(self, pos):
+    def is_temperature_alpine(self, pos):
         th_min = self.temperature['thresholds'][0][1]
         th_max = self.temperature['thresholds'][1][1]
         x, y = pos
         t = self.temperature['data'][y][x]
         return t < th_max and t >= th_min
 
-    def is_temperature_medium(self, pos):
+    def is_temperature_boreal(self, pos):
         th_min = self.temperature['thresholds'][1][1]
         th_max = self.temperature['thresholds'][2][1]
         x, y = pos
         t = self.temperature['data'][y][x]
         return t < th_max and t >= th_min
 
-    def is_temperature_high(self, pos):
+    def is_temperature_cool(self, pos):
         th_min = self.temperature['thresholds'][2][1]
+        th_max = self.temperature['thresholds'][3][1]
+        x, y = pos
+        t = self.temperature['data'][y][x]
+        return t < th_max and t >= th_min
+
+    def is_temperature_warm(self, pos):
+        th_min = self.temperature['thresholds'][3][1]
+        th_max = self.temperature['thresholds'][4][1]
+        x, y = pos
+        t = self.temperature['data'][y][x]
+        return t < th_max and t >= th_min
+
+    def is_temperature_subtropical(self, pos):
+        th_min = self.temperature['thresholds'][4][1]
+        th_max = self.temperature['thresholds'][5][1]
+        x, y = pos
+        t = self.temperature['data'][y][x]
+        return t < th_max and t >= th_min
+
+    def is_temperature_tropical(self, pos):
+        th_min = self.temperature['thresholds'][5][1]
         x, y = pos
         t = self.temperature['data'][y][x]
         return t >= th_min
-
-    def is_humidity_very_low(self, pos):
-        th_max = self.humidity['quantiles']['75']
-        # print('Humidity Q10 %f' % th_max)
-        x, y = pos
-        t = self.humidity['data'][y][x]
-        return t < th_max
-
-    def is_humidity_low(self, pos):
-        th_min = self.humidity['quantiles']['75']
-        th_max = self.humidity['quantiles']['66']
-        # print('Humidity Q10 %f' % th_min)
-        #print('Humidity Q33 %f' % th_max)
-        x, y = pos
-        t = self.humidity['data'][y][x]
-        return t < th_max and t >= th_min
-
-    def is_humidity_medium(self, pos):
-        th_min = self.humidity['quantiles']['66']
-        th_max = self.humidity['quantiles']['33']
-        # print('Humidity Q33 %f' % th_min)
-        #print('Humidity Q66 %f' % th_max)
-        x, y = pos
-        t = self.humidity['data'][y][x]
-        return t < th_max and t >= th_min
 
     def is_humidity_above_quantile(self, pos, q):
         th = self.humidity['quantiles'][str(q)]
@@ -128,18 +124,56 @@ class World(object):
         v = self.humidity['data'][y][x]
         return v >= th
 
-    def is_humidity_high(self, pos):
-        th_min = self.humidity['quantiles']['33']
-        th_max = self.humidity['quantiles']['10']
-        # print('Humidity Q66 %f' % th_min)
-        #print('Humidity Q75 %f' % th_max)
+    def is_humidity_superarid(self, pos):
+        th_max = self.humidity['quantiles']['87']
+        x, y = pos
+        t = self.humidity['data'][y][x]
+        return t < th_max
+
+    def is_humidity_perarid(self, pos):
+        th_min = self.humidity['quantiles']['87']
+        th_max = self.humidity['quantiles']['75']
         x, y = pos
         t = self.humidity['data'][y][x]
         return t >= th_min and t < th_max
 
-    def is_humidity_very_high(self, pos):
-        th_min = self.humidity['quantiles']['10']
-        # print('Humidity Q75 %f' % th_min)
+    def is_humidity_arid(self, pos):
+        th_min = self.humidity['quantiles']['75']
+        th_max = self.humidity['quantiles']['62']
+        x, y = pos
+        t = self.humidity['data'][y][x]
+        return t >= th_min and t < th_max
+
+    def is_humidity_semiarid(self, pos):
+        th_min = self.humidity['quantiles']['62']
+        th_max = self.humidity['quantiles']['50']
+        x, y = pos
+        t = self.humidity['data'][y][x]
+        return t >= th_min and t < th_max
+
+    def is_humidity_subhumid(self, pos):
+        th_min = self.humidity['quantiles']['50']
+        th_max = self.humidity['quantiles']['37']
+        x, y = pos
+        t = self.humidity['data'][y][x]
+        return t >= th_min and t < th_max
+
+    def is_humidity_humid(self, pos):
+        th_min = self.humidity['quantiles']['37']
+        th_max = self.humidity['quantiles']['25']
+        x, y = pos
+        t = self.humidity['data'][y][x]
+        return t >= th_min and t < th_max
+
+    def is_humidity_perhumid(self, pos):
+        th_min = self.humidity['quantiles']['25']
+        th_max = self.humidity['quantiles']['12']
+        x, y = pos
+        t = self.humidity['data'][y][x]
+        return t >= th_min and t < th_max
+
+    def is_humidity_superhumid(self, pos):
+        th_min = self.humidity['quantiles']['12']
         x, y = pos
         t = self.humidity['data'][y][x]
         return t >= th_min
@@ -290,29 +324,141 @@ class World(object):
             raise Exception('Not found')
         return b
 
-    def is_forest(self, pos):
-        return isinstance(self.biome_at(pos), Forest)
+    def is_boreal_forest(self, pos):
+        if isinstance(self.biome_at(pos), BorealMoistForest):
+		return True
+	elif isinstance(self.biome_at(pos), BorealWetForest):
+		return True
+	elif isinstance(self.biome_at(pos), BorealRainForest):
+		return True
+	else:
+		return False
+
+    def is_temperate_forest(self, pos):
+	if isinstance(self.biome_at(pos), CoolTemperateMoistForest):
+		return True
+	elif isinstance(self.biome_at(pos), CoolTemperateWetForest):
+		return True
+	elif isinstance(self.biome_at(pos), CoolTemperateRainForest):
+		return True
+	else:
+		return False
+
+    def is_warm_temperate_forest(self, pos):
+	if isinstance(self.biome_at(pos), WarmTemperateMoistForest):
+		return True
+	elif isinstance(self.biome_at(pos), WarmTemperateWetForest):
+		return True
+	elif isinstance(self.biome_at(pos), WarmTemperateRainForest):
+		return True
+	else:
+		return False
+
+    def is_tropical_dry_forest(self, pos):
+	if isinstance(self.biome_at(pos), SubtropicalDryForest):
+		return True
+	elif isinstance(self.biome_at(pos), TropicalDryForest):
+		return True
+	else:
+		return False
 
     def is_tundra(self, pos):
-        return isinstance(self.biome_at(pos), Tundra)
+        if isinstance(self.biome_at(pos), SubpolarMoistTundra):
+		return True
+	elif isinstance(self.biome_at(pos), SubpolarWetTundra):
+		return True
+	elif isinstance(self.biome_at(pos), SubpolarRainTundra):
+		return True
+	else:
+		return False
 
     def is_glacier(self, pos):
-        return isinstance(self.biome_at(pos), Glacier)
+        return False
 
     def is_iceland(self, pos):
-        return isinstance(self.biome_at(pos), Iceland)
+        if isinstance(self.biome_at(pos), Ice):
+		return True
+	elif isinstance(self.biome_at(pos), PolarDesert):
+		return True
+	else:
+		return False
 
     def is_jungle(self, pos):
-        return isinstance(self.biome_at(pos), Jungle)
+        if isinstance(self.biome_at(pos), SubtropicalMoistForest):
+		return True
+	elif isinstance(self.biome_at(pos), SubtropicalWetForest):
+		return True
+	elif isinstance(self.biome_at(pos), SubtropicalRainForest):
+		return True
+	elif isinstance(self.biome_at(pos), TropicalMoistForest):
+		return True
+	elif isinstance(self.biome_at(pos), TropicalWetForest):
+		return True
+	elif isinstance(self.biome_at(pos), TropicalRainForest):
+		return True
+	else:
+		return False
 
     def is_savanna(self, pos):
-        return isinstance(self.biome_at(pos), Savanna)
+        if isinstance(self.biome_at(pos), SubtropicalThornWoodland):
+		return True
+	elif isinstance(self.biome_at(pos), TropicalThornWoodland):
+		return True
+	elif isinstance(self.biome_at(pos), TropicalVeryDryForest):
+		return True
+	else:
+		return False
 
-    def is_sand_desert(self, pos):
-        return isinstance(self.biome_at(pos), SandDesert)
+    def is_hot_desert(self, pos):
+        if isinstance(self.biome_at(pos), WarmTemperateDesert):
+		return True
+	elif isinstance(self.biome_at(pos), WarmTemperateDesertScrub):
+		return True
+	elif isinstance(self.biome_at(pos), SubtropicalDesert):
+		return True
+	elif isinstance(self.biome_at(pos), SubtropicalDesertScrub):
+		return True
+	elif isinstance(self.biome_at(pos), TropicalDesert):
+		return True
+	elif isinstance(self.biome_at(pos), TropicalDesertScrub):
+		return True
+	else:
+		return False
+
+    def is_cold_parklands(self, pos):
+        if isinstance(self.biome_at(pos), SubpolarDryTundra):
+		return True
+	elif isinstance(self.biome_at(pos), BorealDesert):
+		return True
+	elif isinstance(self.biome_at(pos), BorealDryScrub):
+		return True
+	else:
+		return False
+
+    def is_steppe(self, pos):
+        if isinstance(self.biome_at(pos), CoolTemperateSteppe):
+		return True
+	else:
+		return False
+
+    def is_cool_desert(self, pos):
+        if isinstance(self.biome_at(pos), CoolTemperateDesert):
+		return True
+	elif isinstance(self.biome_at(pos), CoolTemperateDesertScrub):
+		return True
+	else:
+		return False
+
+    def is_chaparral(self, pos):
+        if isinstance(self.biome_at(pos), WarmTemperateThornScrub):
+		return True
+	elif isinstance(self.biome_at(pos), WarmTemperateDryForest):
+		return True
+	else:
+		return False
 
     def is_rock_desert(self, pos):
-        return isinstance(self.biome_at(pos), RockDesert)
+        return False
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
