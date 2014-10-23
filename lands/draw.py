@@ -89,8 +89,6 @@ def draw_simple_elevation(data, filename, shadow, width, height):
     for y in xrange(height):
         for x in xrange(width):
             e = data[y * width + x]
-            # c = 255-int(((e-min_elev)*255)/elev_delta) 	
-            #pixels[x,y] = (c,c,c,255)
             if min_elev == None or e < min_elev:
                 min_elev = e
             if max_elev == None or e > max_elev:
@@ -100,6 +98,8 @@ def draw_simple_elevation(data, filename, shadow, width, height):
     for y in range(0, height):
         for x in range(0, width):
             e = data[y * width + x]
+            # c = 255-int(((e-min_elev)*255)/elev_delta) 	
+            #pixels[x,y] = (c,c,c,255)
             r, g, b = my_color(e)
             pixels[x, y] = (int(r * 255), int(g * 255), int(b * 255), 255)
     img.save(filename)
