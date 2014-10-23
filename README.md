@@ -51,7 +51,7 @@ The world generation algorithm goes through different phases:
 * erosion is calculated
 * humidity in each zone is calculated
 * terrain permeability is calculated
-* biome is calculated using the Holdridge life zones model
+* biome is calculated using the [Holdridge life zones](http://en.wikipedia.org/wiki/Holdridge_life_zones) model
 
 Requirements
 ============
