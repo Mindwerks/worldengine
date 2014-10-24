@@ -187,7 +187,7 @@ def main():
         print(' resize factor : %i' % resize_factor)
 
     print('')  # empty line
-    print('starting...')
+    print('starting (it could take a few minutes) ...')
     if operation == 'world':
         generate_world(seed, world_name, options.output_dir, width, height, step)
     elif operation == 'plates':

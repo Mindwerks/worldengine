@@ -6,12 +6,16 @@ __author__ = 'Federico Tomassetti'
 from geo import *
 import platec
 
+# We typically use low map_side for plates simulation (512) and scale the resulting map later/
+# Specifiying higher values we increase simulation time and quality. Consider that only
+# power of 2 are valid inputs.
 def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_period=60,
                                folding_ratio=0.02, aggr_overlap_abs=1000000, aggr_overlap_rel=0.33,
                                cycle_count=2, num_plates=10):
+    # TODO verify that map_side is a power of two
     # we use always the same values for plates simulation and we scale later
     # map_side = 2048 #Increased to produce more detailed maps. pyplatecmodule.c also has to be updated.
-    map_side = 512
+    map_side = 1024
     p = platec.create(seed, map_side, sea_level, erosion_period, folding_ratio,
                       aggr_overlap_abs, aggr_overlap_rel, cycle_count, num_plates)
 
