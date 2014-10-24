@@ -9,7 +9,7 @@ config = {
     'url'              : 'http://github.com/ftomassetti/lands',
     'download_url'     : 'http://github.com/ftomassetti/lands',
     'author_email'     : 'f.tomassetti@gmail.com',
-    'version'          : '0.3',
+    'version'          : '0.3.0',
     'install_requires' : ['nose'],
     'packages'         : ['lands'],
     'scripts'          : [],
