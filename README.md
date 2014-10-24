@@ -48,6 +48,27 @@ The program produces a binary format with all the data of the generated world an
 
 ![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_ocean.png)
 
+Usage
+=====
+
+| Short | Long | Description |
+|-------|------|-------------|
+| -o    | --output | generate files in OUTPUT |
+| -n    | --worldname | set WORLDNAME |
+| -s    | --seed | use SEED to initialize the pseudo-random generation |
+| -t    | --step | use STEP to specify how far to proceed in the world generation process |
+| -x    | --width | WIDTH of the world to be generated |
+| -y    | --height | HEIGHT of the world to be generated |
+| -w    | --worldfile | WORLD_FILE to be loaded (for ancient_map operation) |
+| -g    | --generatedfile | name of the GENERATED_FILE (for ancient_map operation) |
+| -f    | --resize-factor | resize factor |
+| -p    | --plates-resolution | plates resolution |
+| -q    | --number-of-plates | number of plates |
+
+```python
+python lands/generator.py world -s 4 -n seed3 -p 2048 -q 25 -x 2048 -y 2048
+```
+
 Algorithm
 =========
 
