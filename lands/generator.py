@@ -115,7 +115,10 @@ def operation_ancient_map(world, map_filename, resize_factor):
 
 
 def main():
-    sys.setrecursionlimit(2000) #increased because I was hitting recursion limits on 4096x2048 ancient maps.
+    # it needs to be increased to be able to generate very large maps
+    # the limit is hit when drawing ancient maps
+    sys.setrecursionlimit(2000)
+
     parser = OptionParser()
     parser.add_option('-o', '--output', dest='output_dir', help="generate files in OUTPUT", metavar="FILE", default='.')
     parser.add_option('-n', '--worldname', dest='world_name', help="set WORLDNAME", metavar="WORLDNAME")
@@ -173,8 +176,8 @@ def main():
 
     resize_factor = int(options.resize_factor)
 
-    print('Lands world generator')
-    print('---------------------')
+    print('Lands - world generator')
+    print('-----------------------')
     if generation_operation:
         print(' seed      : %i' % seed)
         print(' name      : %s' % world_name)
