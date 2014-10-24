@@ -65,9 +65,16 @@ Usage
 | -p    | --plates-resolution | plates resolution |
 | -q    | --number-of-plates | number of plates |
 
+For example these commands:
+
 ```python
 python lands/generator.py world -s 4 -n seed3 -p 2048 -q 25 -x 2048 -y 2048
+python lands/generator.py ancient_map -w seed3.world
 ```
+
+Produce this output
+
+![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/ancient_map_large.png)
 
 Algorithm
 =========
