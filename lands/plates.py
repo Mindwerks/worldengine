@@ -15,7 +15,7 @@ def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_peri
     # TODO verify that map_side is a power of two
     # we use always the same values for plates simulation and we scale later
     # map_side = 2048 #Increased to produce more detailed maps. pyplatecmodule.c also has to be updated.
-    map_side = 1024
+    map_side = 512
     p = platec.create(seed, map_side, sea_level, erosion_period, folding_ratio,
                       aggr_overlap_abs, aggr_overlap_rel, cycle_count, num_plates)
 
