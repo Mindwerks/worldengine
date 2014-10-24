@@ -6,11 +6,121 @@ from basic_map_operations import *
 
 
 class World(object):
+    """A world composed by name, dimensions and all the characteristics of each cell.
+
+
+    """
 
     def __init__(self, name, width, height):
         self.name = name
         self.width = width
         self.height = height
+
+    ###
+    ### General methods
+    ###
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
+    ###
+    ### Serialization/Unserialization
+    ###
+
+    @classmethod
+    def from_pickle_file(cls, filename):
+        with open(filename, "r") as f:
+            return pickle.load(f)
+
+    @classmethod
+    def from_dict(cls, dict):
+        instance = World(dict['name'], dict['width'], dict['height'])
+        for k in dict:
+            instance.__dict__[k] = dict[k]
+        return instance
+
+    ###
+    ### Land/Ocean
+    ###
+
+    def random_land(self):
+        x, y = random_point(self.width, self.height)
+        if self.ocean[y][x]:
+            return self.random_land()
+        else:
+            return (x, y)
+
+    def is_land(self, pos):
+        x, y = pos
+        return not self.ocean[y][x]
+
+    def is_ocean(self, pos):
+        x, y = pos
+        return self.ocean[y][x]
+
+    ###
+    ### Tiles around
+    ###
+
+    def on_tiles_around_factor(self, factor, pos, radius=1, action=None):
+        x, y = pos
+        for dx in range(-radius, radius + 1):
+            nx = x + dx
+            if nx >= 0 and nx/factor < self.width:
+                for dy in range(-radius, radius + 1):
+                    ny = y + dy
+                    if ny >= 0 and ny/factor < self.height and (dx != 0 or dy != 0):
+                        action((nx, ny))
+
+
+    def on_tiles_around(self, pos, radius=1, action=None):
+        x, y = pos
+        for dx in range(-radius, radius + 1):
+            nx = x + dx
+            if nx >= 0 and nx < self.width:
+                for dy in range(-radius, radius + 1):
+                    ny = y + dy
+                    if ny >= 0 and ny < self.height and (dx != 0 or dy != 0):
+                        action((nx, ny))
+
+    def tiles_around(self, pos, radius=1, predicate=None):
+        ps = []
+        x, y = pos
+        for dx in range(-radius, radius + 1):
+            nx = x + dx
+            if nx >= 0 and nx < self.width:
+                for dy in range(-radius, radius + 1):
+                    ny = y + dy
+                    if ny >= 0 and ny < self.height and (dx != 0 or dy != 0):
+                        if predicate == None or predicate((nx, ny)):
+                            ps.append((nx, ny))
+        return ps
+
+    def tiles_around_factor(self, factor, pos, radius=1, predicate=None):
+        ps = []
+        x, y = pos
+        for dx in range(-radius, radius + 1):
+            nx = x + dx
+            if nx >= 0 and nx < self.width*factor:
+                for dy in range(-radius, radius + 1):
+                    ny = y + dy
+                    if ny >= 0 and ny < self.height*factor and (dx != 0 or dy != 0):
+                        if predicate == None or predicate((nx, ny)):
+                            ps.append((nx, ny))
+        return ps
+
+    def tiles_around_many(self, pos_list, radius=1, predicate=None):
+        tiles = []
+        for pos in pos_list:
+            tiles += self.tiles_around(pos, radius, predicate)
+        # remove duplicates
+        # remove elements in pos
+        return list(set(tiles) - set(pos_list))
+
+
+    ###
+    ### Elevation
+    ###
 
     def is_mountain(self, pos):
         if not self.is_land(pos):
@@ -71,6 +181,10 @@ class World(object):
         x, y = pos
         return self.elevation['data'][y][x] > hill_level and self.elevation['data'][y][x] < mountain_level
 
+    ###
+    ### Temperature
+    ###
+
     def is_temperature_polar(self, pos):
         th_max = self.temperature['thresholds'][0][1]
         x, y = pos
@@ -117,6 +231,10 @@ class World(object):
         x, y = pos
         t = self.temperature['data'][y][x]
         return t >= th_min
+
+    ###
+    ### Humidity
+    ###
 
     def is_humidity_above_quantile(self, pos, q):
         th = self.humidity['quantiles'][str(q)]
@@ -178,52 +296,9 @@ class World(object):
         t = self.humidity['data'][y][x]
         return t >= th_min
 
-    def set_biome(self, biome):
-        if len(biome) != self.height:
-            raise Exception("Setting data with wrong height")
-        if len(biome[0]) != self.width:
-            raise Exception("Setting data with wrong width")
-
-        self.biome = biome
-
-    def set_ocean(self, ocean):
-        if (len(ocean) != self.height) or (len(ocean[0]) != self.width):
-            raise Exception("Setting ocean map with wrong dimension. Expected %d x %d, found %d x %d" % (
-            self.width, self.height, len(ocean[0]), len(ocean)))
-
-        self.ocean = ocean
-
-    def set_elevation(self, data, thresholds):
-        if (len(data) != self.height) or (len(data[0]) != self.width):
-            raise Exception("Setting elevation map with wrong dimension. Expected %d x %d, found %d x %d" % (
-            self.width, self.height, (len[data[0]], len(data))))
-        self.elevation = {'data': data, 'thresholds': thresholds}
-
-    def set_precipitation(self, data, thresholds):
-        """"Precipitation is a value in [-1,1]"""
-
-        if len(data) != self.height:
-            raise Exception("Setting data with wrong height")
-        if len(data[0]) != self.width:
-            raise Exception("Setting data with wrong width")
-
-        self.precipitation = {'data': data, 'thresholds': thresholds}
-
-    def set_temperature(self, data, thresholds):
-        if len(data) != self.height:
-            raise Exception("Setting data with wrong height")
-        if len(data[0]) != self.width:
-            raise Exception("Setting data with wrong width")
-
-        self.temperature = {'data': data, 'thresholds': thresholds}
-
-    def set_permeability(self, data, thresholds):
-        if len(data) != self.height:
-            raise Exception("Setting data with wrong height")
-        if len(data[0]) != self.width:
-            raise Exception("Setting data with wrong width")
-
-        self.permeability = {'data': data, 'thresholds': thresholds}
+    ###
+    ### Streams
+    ###
 
     def contains_stream(self, pos):
         return self.contains_creek(pos) or self.contains_river(pos) or self.contains_main_river(pos)
@@ -243,79 +318,14 @@ class World(object):
         v = self.watermap['data'][y][x]
         return v >= self.watermap['thresholds']['main river']
 
-    def random_land(self):
-        x, y = random_point(self.width, self.height)
-        if self.ocean[y][x]:
-            return self.random_land()
-        else:
-            return (x, y)
-
-    def is_land(self, pos):
-        x, y = pos
-        return not self.ocean[y][x]
-
-    def is_ocean(self, pos):
-        x, y = pos
-        return self.ocean[y][x]
-
-    def on_tiles_around_factor(self, factor, pos, radius=1, action=None):
-        x, y = pos
-        for dx in range(-radius, radius + 1):
-            nx = x + dx
-            if nx >= 0 and nx/factor < self.width:
-                for dy in range(-radius, radius + 1):
-                    ny = y + dy
-                    if ny >= 0 and ny/factor < self.height and (dx != 0 or dy != 0):
-                        action((nx, ny))
-
-
-    def on_tiles_around(self, pos, radius=1, action=None):
-        x, y = pos
-        for dx in range(-radius, radius + 1):
-            nx = x + dx
-            if nx >= 0 and nx < self.width:
-                for dy in range(-radius, radius + 1):
-                    ny = y + dy
-                    if ny >= 0 and ny < self.height and (dx != 0 or dy != 0):
-                        action((nx, ny))
-
-    def tiles_around(self, pos, radius=1, predicate=None):
-        ps = []
-        x, y = pos
-        for dx in range(-radius, radius + 1):
-            nx = x + dx
-            if nx >= 0 and nx < self.width:
-                for dy in range(-radius, radius + 1):
-                    ny = y + dy
-                    if ny >= 0 and ny < self.height and (dx != 0 or dy != 0):
-                        if predicate == None or predicate((nx, ny)):
-                            ps.append((nx, ny))
-        return ps
-
-    def tiles_around_factor(self, factor, pos, radius=1, predicate=None):
-        ps = []
-        x, y = pos
-        for dx in range(-radius, radius + 1):
-            nx = x + dx
-            if nx >= 0 and nx < self.width*factor:
-                for dy in range(-radius, radius + 1):
-                    ny = y + dy
-                    if ny >= 0 and ny < self.height*factor and (dx != 0 or dy != 0):
-                        if predicate == None or predicate((nx, ny)):
-                            ps.append((nx, ny))
-        return ps
-
-    def tiles_around_many(self, pos_list, radius=1, predicate=None):
-        tiles = []
-        for pos in pos_list:
-            tiles += self.tiles_around(pos, radius, predicate)
-        # remove duplicates
-        # remove elements in pos
-        return list(set(tiles) - set(pos_list))
-
     def watermap_at(self, pos):
         x, y = pos
         return self.watermap['data'][y][x]
+
+
+    ###
+    ### Biome
+    ###
 
     def biome_at(self, pos):
         x, y = pos
@@ -377,100 +387,136 @@ class World(object):
 
     def is_iceland(self, pos):
         if isinstance(self.biome_at(pos), Ice):
-		return True
-	elif isinstance(self.biome_at(pos), PolarDesert):
-		return True
-	else:
-		return False
+		    return True
+	    elif isinstance(self.biome_at(pos), PolarDesert):
+		    return True
+	    else:
+		    return False
 
     def is_jungle(self, pos):
         if isinstance(self.biome_at(pos), SubtropicalMoistForest):
-		return True
-	elif isinstance(self.biome_at(pos), SubtropicalWetForest):
-		return True
-	elif isinstance(self.biome_at(pos), SubtropicalRainForest):
-		return True
-	elif isinstance(self.biome_at(pos), TropicalMoistForest):
-		return True
-	elif isinstance(self.biome_at(pos), TropicalWetForest):
-		return True
-	elif isinstance(self.biome_at(pos), TropicalRainForest):
-		return True
-	else:
-		return False
+            return True
+        elif isinstance(self.biome_at(pos), SubtropicalWetForest):
+            return True
+        elif isinstance(self.biome_at(pos), SubtropicalRainForest):
+            return True
+        elif isinstance(self.biome_at(pos), TropicalMoistForest):
+            return True
+        elif isinstance(self.biome_at(pos), TropicalWetForest):
+            return True
+        elif isinstance(self.biome_at(pos), TropicalRainForest):
+            return True
+        else:
+            return False
 
     def is_savanna(self, pos):
         if isinstance(self.biome_at(pos), SubtropicalThornWoodland):
-		return True
-	elif isinstance(self.biome_at(pos), TropicalThornWoodland):
-		return True
-	elif isinstance(self.biome_at(pos), TropicalVeryDryForest):
-		return True
-	else:
-		return False
+            return True
+        elif isinstance(self.biome_at(pos), TropicalThornWoodland):
+            return True
+        elif isinstance(self.biome_at(pos), TropicalVeryDryForest):
+            return True
+        else:
+            return False
 
     def is_hot_desert(self, pos):
         if isinstance(self.biome_at(pos), WarmTemperateDesert):
-		return True
-	elif isinstance(self.biome_at(pos), WarmTemperateDesertScrub):
-		return True
-	elif isinstance(self.biome_at(pos), SubtropicalDesert):
-		return True
-	elif isinstance(self.biome_at(pos), SubtropicalDesertScrub):
-		return True
-	elif isinstance(self.biome_at(pos), TropicalDesert):
-		return True
-	elif isinstance(self.biome_at(pos), TropicalDesertScrub):
-		return True
-	else:
-		return False
+            return True
+        elif isinstance(self.biome_at(pos), WarmTemperateDesertScrub):
+            return True
+        elif isinstance(self.biome_at(pos), SubtropicalDesert):
+            return True
+        elif isinstance(self.biome_at(pos), SubtropicalDesertScrub):
+            return True
+        elif isinstance(self.biome_at(pos), TropicalDesert):
+            return True
+        elif isinstance(self.biome_at(pos), TropicalDesertScrub):
+            return True
+        else:
+            return False
 
     def is_cold_parklands(self, pos):
         if isinstance(self.biome_at(pos), SubpolarDryTundra):
-		return True
-	elif isinstance(self.biome_at(pos), BorealDesert):
-		return True
-	elif isinstance(self.biome_at(pos), BorealDryScrub):
-		return True
-	else:
-		return False
+            return True
+        elif isinstance(self.biome_at(pos), BorealDesert):
+            return True
+        elif isinstance(self.biome_at(pos), BorealDryScrub):
+            return True
+        else:
+            return False
 
     def is_steppe(self, pos):
         if isinstance(self.biome_at(pos), CoolTemperateSteppe):
-		return True
-	else:
-		return False
+            return True
+        else:
+            return False
 
     def is_cool_desert(self, pos):
         if isinstance(self.biome_at(pos), CoolTemperateDesert):
-		return True
-	elif isinstance(self.biome_at(pos), CoolTemperateDesertScrub):
-		return True
-	else:
-		return False
+            return True
+        elif isinstance(self.biome_at(pos), CoolTemperateDesertScrub):
+            return True
+        else:
+            return False
 
     def is_chaparral(self, pos):
         if isinstance(self.biome_at(pos), WarmTemperateThornScrub):
-		return True
-	elif isinstance(self.biome_at(pos), WarmTemperateDryForest):
-		return True
-	else:
-		return False
+            return True
+        elif isinstance(self.biome_at(pos), WarmTemperateDryForest):
+            return True
+        else:
+            return False
 
     def is_rock_desert(self, pos):
         return False
 
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+    ###
+    ### Setters
+    ###
 
-    @classmethod
-    def from_pickle_file(cls, filename):
-        with open(filename, "r") as f:
-            return pickle.load(f)
+    def set_elevation(self, data, thresholds):
+        if (len(data) != self.height) or (len(data[0]) != self.width):
+            raise Exception("Setting elevation map with wrong dimension. Expected %d x %d, found %d x %d" % (
+                self.width, self.height, (len[data[0]], len(data))))
+        self.elevation = {'data': data, 'thresholds': thresholds}
 
-    @classmethod
-    def from_dict(cls, dict):
-        instance = World(dict['name'], dict['width'], dict['height'])
-        for k in dict:
-            instance.__dict__[k] = dict[k]
-        return instance
+    def set_biome(self, biome):
+        if len(biome) != self.height:
+            raise Exception("Setting data with wrong height")
+        if len(biome[0]) != self.width:
+            raise Exception("Setting data with wrong width")
+
+        self.biome = biome
+
+    def set_ocean(self, ocean):
+        if (len(ocean) != self.height) or (len(ocean[0]) != self.width):
+            raise Exception("Setting ocean map with wrong dimension. Expected %d x %d, found %d x %d" % (
+                self.width, self.height, len(ocean[0]), len(ocean)))
+
+        self.ocean = ocean
+
+    def set_precipitation(self, data, thresholds):
+        """"Precipitation is a value in [-1,1]"""
+
+        if len(data) != self.height:
+            raise Exception("Setting data with wrong height")
+        if len(data[0]) != self.width:
+            raise Exception("Setting data with wrong width")
+
+        self.precipitation = {'data': data, 'thresholds': thresholds}
+
+    def set_temperature(self, data, thresholds):
+        if len(data) != self.height:
+            raise Exception("Setting data with wrong height")
+        if len(data[0]) != self.width:
+            raise Exception("Setting data with wrong width")
+
+        self.temperature = {'data': data, 'thresholds': thresholds}
+
+    def set_permeability(self, data, thresholds):
+        if len(data) != self.height:
+            raise Exception("Setting data with wrong height")
+        if len(data[0]) != self.width:
+            raise Exception("Setting data with wrong width")
+
+        self.permeability = {'data': data, 'thresholds': thresholds}
