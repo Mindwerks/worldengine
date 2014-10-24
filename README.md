@@ -13,7 +13,7 @@ python lands/generator.py world -s 1 -n seed1
 
 Worlds are generated using plate simulations, erosion, rain shadows, Holdridge life zones model and plenty of other phenomenons.
 
-Once a world it can be used for simulation civs evolution (see project [civs](https://github.com/ftomassetti/civs).
+Once a world it can be used for simulation civs evolution (see project [civs](https://github.com/ftomassetti/civs)).
 
 For a generated world is also possible to generate additional maps, for example ancient looking map:
 
