@@ -1,8 +1,10 @@
-__author__ = 'Federico Tomassetti'
+"""
+This file should contain only functions that operates on pixels, not on images,
+so no references to PIL are necessary and the module can be used also through
+Jython
+"""
 
-# This file should contain only functions that operates on pixels, not on images,
-# so no references to PIL are necessary and the module can be used also through
-# Jython
+__author__ = 'Federico Tomassetti'
 
 import random
 

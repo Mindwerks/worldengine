@@ -7,8 +7,6 @@ from basic_map_operations import *
 
 class World(object):
     """A world composed by name, dimensions and all the characteristics of each cell.
-
-
     """
 
     def __init__(self, name, width, height):
@@ -460,6 +458,10 @@ class World(object):
             return False
 
     def is_chaparral(self, pos):
+        """ Chaparral is a shrubland or heathland plant community.
+
+        For details see http://en.wikipedia.org/wiki/Chaparral.
+        """
         if isinstance(self.biome_at(pos), WarmTemperateThornScrub):
             return True
         elif isinstance(self.biome_at(pos), WarmTemperateDryForest):

@@ -1,3 +1,6 @@
+"""
+This file contains all possible Biome as separate classes.
+"""
 __author__ = 'Federico Tomassetti'
 
 
@@ -8,7 +11,6 @@ class Biome:
 
     def name(self):
         return str(type(self))
-
 
 class Ocean(Biome):
     def name(self):
