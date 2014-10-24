@@ -8,8 +8,6 @@ try:
 except:
     from geo import antialias
 
-from biome import *
-
 
 def draw_plates(plates, filename):
     WIDTH = len(plates[0])
