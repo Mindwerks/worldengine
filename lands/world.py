@@ -385,11 +385,11 @@ class World(object):
 
     def is_iceland(self, pos):
         if isinstance(self.biome_at(pos), Ice):
-		    return True
-	    elif isinstance(self.biome_at(pos), PolarDesert):
-		    return True
-	    else:
-		    return False
+            return True
+        elif isinstance(self.biome_at(pos), PolarDesert):
+            return True
+        else:
+            return False
 
     def is_jungle(self, pos):
         if isinstance(self.biome_at(pos), SubtropicalMoistForest):
