@@ -100,6 +100,8 @@ class Step:
 
         return step
 
+def is_pow_of_two(num):
+    return ((num & (num - 1)) == 0) and num != 0
 
 def check_step(step_name):
     step = Step.get_by_name(step_name)
@@ -132,12 +134,30 @@ def main():
                       default='512')
     parser.add_option('-w', '--worldfile', dest='world_file', help="WORLD_FILE to be loaded (for ancient_map operation)", metavar="WORLD_FILE")
     parser.add_option('-g', '--generatedfile', dest='generated_file', help="name of the GENERATED_FILE (for ancient_map operation)", metavar="GENERATED_FILE")
-    parser.add_option('-f', '--resize_factor', dest='resize_factor', help="resize factor", metavar="RESIZE_FACTOR", default='1')
+    parser.add_option('-f', '--resize-factor', dest='resize_factor', help="resize factor", metavar="RESIZE_FACTOR", default='1')
+    parser.add_option('-p', '--plates-resolution', dest='plates_resolution', help="plates resolution", metavar="PLATES_RESOLUTION", default='512')
+    parser.add_option('-q', '--number-of-plates', dest='number_of_plates', help="number of plates", metavar="NUMBER_OF_PLATES", default='10')
 
     (options, args) = parser.parse_args()
 
     if not os.path.isdir(options.output_dir):
         raise Exception("Output dir does not exist or it is not a dir")
+
+    try:
+        plates_resolution = int(options.plates_resolution)
+        if plates_resolution < 128 or plates_resolution > 65536:
+            usage(error="Plates resolution should be a power of 2 in [128, 65536]")
+        if not is_pow_of_two(plates_resolution):
+            usage(error="Plates resolution should be a power of 2 in [128, 65536]")
+    except:
+        usage(error="Plates resolution should be a number")
+
+    try:
+        number_of_plates = int(options.number_of_plates)
+        if number_of_plates < 1 or number_of_plates > 100:
+            usage(error="Number of plates should be a in [1, 100]")
+    except:
+        usage(error="Number of plates should be a number")
 
     try:
         width = int(options.width)
@@ -179,22 +199,24 @@ def main():
     print('Lands - world generator')
     print('-----------------------')
     if generation_operation:
-        print(' seed      : %i' % seed)
-        print(' name      : %s' % world_name)
-        print(' width     : %i' % width)
-        print(' height    : %i' % height)
-    print(' operation : %s generation' % operation)
+        print(' seed              : %i' % seed)
+        print(' name              : %s' % world_name)
+        print(' width             : %i' % width)
+        print(' height            : %i' % height)
+        print(' plates resolution : %i' % plates_resolution)
+        print(' number of plates  : %i' % number_of_plates)
+    print(' operation         : %s generation' % operation)
     if generation_operation:
-        print(' step      : %s' % step.name)
+        print(' step              : %s' % step.name)
     if operation=='ancient_map':
-        print(' resize factor : %i' % resize_factor)
+        print(' resize factor     : %i' % resize_factor)
 
     print('')  # empty line
     print('starting (it could take a few minutes) ...')
     if operation == 'world':
         generate_world(seed, world_name, options.output_dir, width, height, step)
     elif operation == 'plates':
-        generate_plates(seed, world_name, options.output_dir, width, height)
+        generate_plates(seed, world_name, options.output_dir, width, height, num_plates=number_of_plates, map_side=plates_resolution)
     elif operation == 'ancient_map':
         if not options.world_file:
             usage("For generating an ancient map is necessary to specify the world to be used (-w option)")
