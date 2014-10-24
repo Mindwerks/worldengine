@@ -134,7 +134,7 @@ Biome obtained:
          subtropical wet forest =   22955
                   boreal desert =    6617
      warm temperate thorn scrub =   25617
-                   polar desert =    183
+                   polar desert =    1838
 ```
 
 This is the corresponding ancient map

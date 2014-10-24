@@ -13,6 +13,7 @@ def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_peri
     Specifying higher values we increase simulation time and quality. Consider that only
     power of 2 are valid inputs.
     """
+
     p = platec.create(seed, map_side, sea_level, erosion_period, folding_ratio,
                       aggr_overlap_abs, aggr_overlap_rel, cycle_count, num_plates)
 
@@ -24,8 +25,8 @@ def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_peri
 
     return hm
 
-def world_gen(name, seed, verbose, width, height, step="full"):
-    e_as_array = generate_plates_simulation(seed, width, height)
+def world_gen(name, seed, verbose, width, height, step="full", num_plates=10, map_side=512):
+    e_as_array = generate_plates_simulation(seed, width, height, num_plates=num_plates, map_side=map_side)
     e_as_array = center_elevation_map(e_as_array, width, height)
     if verbose:
         print("...plates simulated")
