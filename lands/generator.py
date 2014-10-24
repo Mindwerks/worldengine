@@ -24,8 +24,8 @@ def draw_oldmap(world, filename, resize_factor):
     img.save(filename)
 
 
-def generate_world(seed, world_name, output_dir, width, height, step):
-    w = world_gen(world_name, seed, True, width, height, step)
+def generate_world(seed, world_name, output_dir, width, height, step, num_plates=10, map_side=512):
+    w = world_gen(world_name, seed, True, width, height, step, num_plates=num_plates, map_side=map_side)
 
     print('')  # empty line
     print('Producing ouput:')
@@ -63,8 +63,8 @@ def generate_world(seed, world_name, output_dir, width, height, step):
     print("* elevation image generated in '%s'" % filename)
 
 
-def generate_plates(seed, world_name, output_dir, width, height):
-    plates = geo.generate_plates_simulation(seed, width, height)
+def generate_plates(seed, world_name, output_dir, width, height, num_plates=10, map_side=512):
+    plates = geo.generate_plates_simulation(seed, width, height, num_plates=num_plates, map_side=map_side)
 
     # Generate images
     filename = '%s/plates_%s.png' % (output_dir, world_name)
@@ -214,7 +214,7 @@ def main():
     print('')  # empty line
     print('starting (it could take a few minutes) ...')
     if operation == 'world':
-        generate_world(seed, world_name, options.output_dir, width, height, step)
+        generate_world(seed, world_name, options.output_dir, width, height, step, num_plates=number_of_plates, map_side=plates_resolution)
     elif operation == 'plates':
         generate_plates(seed, world_name, options.output_dir, width, height, num_plates=number_of_plates, map_side=plates_resolution)
     elif operation == 'ancient_map':
