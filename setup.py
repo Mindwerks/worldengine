@@ -4,7 +4,7 @@ except ImportError:
     from distutils.core import setup
 
 config = {
-    'description'      : 'world generator simulating plate tectonics, erosion, etc.',
+    'description'      : 'World generator simulating plate tectonics, erosion, etc.',
     'author'           : 'Federico Tomassetti',
     'url'              : 'http://github.com/ftomassetti/lands',
     'download_url'     : 'http://github.com/ftomassetti/lands',
