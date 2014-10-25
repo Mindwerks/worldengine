@@ -167,6 +167,17 @@ The world generation algorithm goes through different phases:
 * terrain permeability is calculated
 * biome is calculated using the [Holdridge life zones](http://en.wikipedia.org/wiki/Holdridge_life_zones) model
 
+Install dependencies
+====================
+
+Using virtualenv you can install the dependencies in this way
+
+```python
+virtualenv venv
+source venv/bin/activate    
+pip install -r requirements.txt
+```
+
 Requirements
 ============
 
