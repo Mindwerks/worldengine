@@ -1,0 +1,3 @@
+Version 0.4.0
+
+* Evan Sampson added Holdridge life zones model
