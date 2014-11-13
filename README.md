@@ -64,6 +64,7 @@ Usage
 | -f    | --resize-factor | resize factor |
 | -p    | --plates-resolution | plates resolution |
 | -q    | --number-of-plates | number of plates |
+| --gs  | --grayscale-heightmap | produce a grayscale heightmap |
 
 For example these commands:
 
