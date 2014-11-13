@@ -132,25 +132,38 @@ def draw_riversmap(world, filename):
     img.save(filename)
 
 
-def draw_bw_heightmap(world, filename):
+def draw_grayscale_heightmap(world, filename):
     img = Image.new('RGBA', (world.width, world.height))
     pixels = img.load()
 
-    min_elev = None
-    max_elev = None
+    min_elev_sea = None
+    max_elev_sea = None
+    min_elev_land = None
+    max_elev_land = None
     for y in xrange(world.height):
         for x in xrange(world.width):
             e = world.elevation['data'][y][x]
-            if min_elev == None or e < min_elev:
-                min_elev = e
-            if max_elev == None or e > max_elev:
-                max_elev = e
-    elev_delta = max_elev - min_elev
+            if world.is_land((x,y)):
+                if min_elev_land == None or e < min_elev_land:
+                    min_elev_land = e
+                if max_elev_land == None or e > max_elev_land:
+                    max_elev_land = e
+            else:
+                if min_elev_sea == None or e < min_elev_sea:
+                    min_elev_sea = e
+                if max_elev_sea == None or e > max_elev_sea:
+                    max_elev_sea = e
+
+    elev_delta_land = max_elev_land - min_elev_land
+    elev_delta_sea = max_elev_sea - min_elev_sea
 
     for y in xrange(world.height):
         for x in xrange(world.width):
             e = world.elevation['data'][y][x]
-            c = int(((e - min_elev) * 255) / elev_delta)
+            if world.is_land((x,y)):
+                c = int(((e - min_elev_land) * 127) / elev_delta_land)+128
+            else:
+                c = int(((e - min_elev_sea) * 127) / elev_delta_sea)
             pixels[x, y] = (c, c, c, 255)
     img.save(filename)
 
