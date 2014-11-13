@@ -236,7 +236,7 @@ def main():
 def usage(error=None):
     print ' -------------------------------------------------------------------------'
     print ' Federico Tomassetti, 2013-2014'
-    print ' Lands - a world generator'
+    print ' Lands - a world generator (v. %s)' % VERSION
     print ' '
     print ' generator <world_name> [operation] [options]'
     print ' possible operations: %s' % OPERATIONS
