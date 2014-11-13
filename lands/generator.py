@@ -10,9 +10,11 @@ import draw
 import drawing_functions
 import os
 from world import *
+execfile('lands/version.py')
 
 from PIL import Image
 
+VERSION = __version__
 
 OPERATIONS = 'world|plates|ancient_map'
 
@@ -196,7 +198,7 @@ def main():
 
     resize_factor = int(options.resize_factor)
 
-    print('Lands - world generator')
+    print('Lands - a world generator (v. %s)' % VERSION)
     print('-----------------------')
     if generation_operation:
         print(' seed              : %i' % seed)
@@ -234,7 +236,7 @@ def main():
 def usage(error=None):
     print ' -------------------------------------------------------------------------'
     print ' Federico Tomassetti, 2013-2014'
-    print ' World generator'
+    print ' Lands - a world generator'
     print ' '
     print ' generator <world_name> [operation] [options]'
     print ' possible operations: %s' % OPERATIONS
