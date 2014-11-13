@@ -139,6 +139,7 @@ def main():
     parser.add_option('-f', '--resize-factor', dest='resize_factor', help="resize factor", metavar="RESIZE_FACTOR", default='1')
     parser.add_option('-p', '--plates-resolution', dest='plates_resolution', help="plates resolution", metavar="PLATES_RESOLUTION", default='512')
     parser.add_option('-q', '--number-of-plates', dest='number_of_plates', help="number of plates", metavar="NUMBER_OF_PLATES", default='10')
+    parser.add_option('--gs', '--grayscale-heightmap', dest='grayscale_heightmap', help='produce a grayscale heightmap', action="store_true", default=False)
 
     (options, args) = parser.parse_args()
 
@@ -198,6 +199,8 @@ def main():
 
     resize_factor = int(options.resize_factor)
 
+    produce_grayscale_heightmap = options.grayscale_heightmap
+
     print('Lands - a world generator (v. %s)' % VERSION)
     print('-----------------------')
     if generation_operation:
@@ -212,6 +215,8 @@ def main():
         print(' step              : %s' % step.name)
     if operation=='ancient_map':
         print(' resize factor     : %i' % resize_factor)
+    if produce_grayscale_heightmap:
+        print(' + greyscale heightmap')
 
     print('')  # empty line
     print('starting (it could take a few minutes) ...')
