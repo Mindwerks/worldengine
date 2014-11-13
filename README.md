@@ -64,7 +64,7 @@ Usage
 | -f    | --resize-factor | resize factor |
 | -p    | --plates-resolution | plates resolution |
 | -q    | --number-of-plates | number of plates |
-| --gs  | --grayscale-heightmap | produce a grayscale heightmap |
+| --gs  | --grayscale-heightmap | produce a grayscale heightmap, after the option it expects the name of the file where to generate the heightmap (e.g., --gs bw.png) |
 
 For example these commands:
 
