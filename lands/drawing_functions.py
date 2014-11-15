@@ -7,6 +7,7 @@ Jython
 __author__ = 'Federico Tomassetti'
 
 import random
+import math
 
 def find_land_borders(world, factor):
     _ocean   = [[False for x in xrange(factor*world.width)] for y in xrange(factor*world.height)]
@@ -716,11 +717,9 @@ def draw_oldmap_on_pixels(world, pixels, factor=1):
     return pixels
 
 
-def draw_riversmap_on_image(world, pixels, factor):
-    sea_color = (0, 0, 128, 255)
-    land_color = (255, 255, 255, 255)
-
-    for i in range(1, 45):
+def draw_riversmap_on_image(world, pixels, factor=1):
+    n_rivers = int(math.sqrt(world.width * world.height)/8)
+    for i in range(1, n_rivers):
         candidates = []
         for j in range(1, 10):
             candidates.append(pseudo_random_land_pos(world, i * j + j))

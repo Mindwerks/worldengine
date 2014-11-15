@@ -117,8 +117,8 @@ def draw_riversmap(world, filename):
     img = Image.new('RGBA', (world.width, world.height))
     pixels = img.load()
 
-    sea_color = (212, 198, 169, 255)
-    land_color = (181, 166, 127, 255)
+    sea_color = (255, 255, 255, 255)
+    land_color = (0, 0, 0, 255)
 
     for y in xrange(world.height):
         for x in xrange(world.width):
@@ -127,7 +127,7 @@ def draw_riversmap(world, filename):
             else:
                 pixels[x, y] = land_color
 
-    draw_riversmap_on_image(world, pixels)
+    draw_riversmap_on_image(world, pixels, 1)
 
     img.save(filename)
 

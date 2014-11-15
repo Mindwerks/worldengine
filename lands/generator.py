@@ -70,6 +70,12 @@ def generate_grayscale_heightmap(world, filename):
     draw.draw_grayscale_heightmap(world, filename)
     print("+ grayscale heightmap generated in '%s'" % filename)
 
+
+def generate_rivers_map(world, filename):
+    draw.draw_riversmap(world, filename)
+    print("+ rivers map generated in '%s'" % filename)
+
+
 def generate_plates(seed, world_name, output_dir, width, height, num_plates=10, map_side=512):
     plates = geo.generate_plates_simulation(seed, width, height, num_plates=num_plates, map_side=map_side)
 
@@ -144,6 +150,7 @@ def main():
     parser.add_option('-f', '--resize-factor', dest='resize_factor', help="resize factor", metavar="RESIZE_FACTOR", default='1')
     parser.add_option('-p', '--plates-resolution', dest='plates_resolution', help="plates resolution", metavar="PLATES_RESOLUTION", default='512')
     parser.add_option('-q', '--number-of-plates', dest='number_of_plates', help="number of plates", metavar="NUMBER_OF_PLATES", default='10')
+    parser.add_option('-r', '--rivers', dest='rivers_map', help="generate rivers map in RIVERSMAP_FILE", metavar="RIVERSMAP_FILE")
     parser.add_option('--gs', '--grayscale-heightmap', dest='grayscale_heightmap', help='produce a grayscale heightmap in GRAYSCALE_FILE', metavar="GRAYSCALE_FILE")
 
     (options, args) = parser.parse_args()
@@ -208,6 +215,10 @@ def main():
     if produce_grayscale_heightmap and not generation_operation:
         usage(error="Grayscale heightmap can be produced only during world generation")
 
+    produce_rivers_map = options.rivers_map
+    if produce_rivers_map and not generation_operation:
+        usage(error="Rivers map can be produced only during world generation")
+
     print('Lands - a world generator (v. %s)' % VERSION)
     print('-----------------------')
     if generation_operation:
@@ -224,6 +235,8 @@ def main():
         print(' resize factor     : %i' % resize_factor)
     if produce_grayscale_heightmap:
         print(' + greyscale heightmap in "%s"' % produce_grayscale_heightmap)
+    if produce_rivers_map:
+        print(' + rivers map in "%s"' % produce_rivers_map)
 
     print('')  # empty line
     print('starting (it could take a few minutes) ...')
@@ -231,6 +244,8 @@ def main():
         world = generate_world(seed, world_name, options.output_dir, width, height, step, num_plates=number_of_plates, map_side=plates_resolution)
         if produce_grayscale_heightmap:
             generate_grayscale_heightmap(world, produce_grayscale_heightmap)
+        if produce_rivers_map:
+            generate_rivers_map(world, produce_rivers_map)
 
     elif operation == 'plates':
         generate_plates(seed, world_name, options.output_dir, width, height, num_plates=number_of_plates, map_side=plates_resolution)
