@@ -23,6 +23,8 @@ python lands/generator.py ancient_map -w seed1.world
 
 ![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/ancient_map_seed1.png)
 
+_If you want to run Lands on Windows you can read these [instructions](https://github.com/ftomassetti/lands/wiki/Lands-on-Windows)_.
+
 Output
 ======
 
