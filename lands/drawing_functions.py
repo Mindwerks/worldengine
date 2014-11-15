@@ -718,7 +718,7 @@ def draw_oldmap_on_pixels(world, pixels, factor=1):
 
 
 def draw_riversmap_on_image(world, pixels, factor=1):
-    n_rivers = int(math.sqrt(world.width * world.height)/8)
+    n_rivers = int(math.sqrt(world.width * world.height))
     for i in range(1, n_rivers):
         candidates = []
         for j in range(1, 10):
