@@ -5,3 +5,7 @@ Version 0.4.0
 Version 0.4.1
 
 * Generation of grayscale heightmap
+
+Version 0.4.2
+
+* Generation of rivers map
