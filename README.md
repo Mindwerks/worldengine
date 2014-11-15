@@ -23,7 +23,20 @@ python lands/generator.py ancient_map -w seed1.world
 
 ![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/ancient_map_seed1.png)
 
-_If you want to run Lands on Windows you can read these [instructions](https://github.com/ftomassetti/lands/wiki/Lands-on-Windows)_.
+Install
+=======
+
+*Windows*
+
+If you want to run Lands on Windows you can read these [instructions](https://github.com/ftomassetti/lands/wiki/Lands-on-Windows).
+
+*Linux*
+
+1. Install python 2.7
+2. Install pip
+3. Git clone / download the repository
+4. Run pip install -r requirements.txt
+5. You should be good to go!
 
 Output
 ======
