@@ -28,7 +28,12 @@ Install
 
 *Windows*
 
-If you want to run Lands on Windows you can read these [instructions](https://github.com/ftomassetti/lands/wiki/Lands-on-Windows).
+Executable file is available here:
+[lands-0_4_1.exe](https://raw.githubusercontent.com/ftomassetti/lands/master/windows_binaries/lands-0_4_1.exe)
+
+Thanks to [Ryan](https://github.com/SourceRyan) for creating it!
+
+If you want to build Lands on Windows you can read these [instructions](https://github.com/ftomassetti/lands/wiki/Lands-on-Windows).
 
 *Linux*
 
