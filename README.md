@@ -28,8 +28,7 @@ Install
 
 *Windows*
 
-Executable file is available here:
-[lands-0_4_1.exe](https://raw.githubusercontent.com/ftomassetti/lands/master/windows_binaries/lands-0_4_1.exe)
+Executable file is available under [releases](https://github.com/ftomassetti/lands/releases)
 
 Thanks to [Ryan](https://github.com/SourceRyan) for creating it!
 
