@@ -30,8 +30,6 @@ Install
 
 Executable file is available under [releases](https://github.com/ftomassetti/lands/releases)
 
-Thanks to [Ryan](https://github.com/SourceRyan) for creating it!
-
 If you want to build Lands on Windows you can read these [instructions](https://github.com/ftomassetti/lands/wiki/Lands-on-Windows).
 
 *Linux*
@@ -209,3 +207,7 @@ Contributors
 
 [Evan Sampson](https://github.com/esampson) contributed the amazing implementation of the Holdridge life zones model
 and improved a lot the ancient-looking-map, biome, precipitation and temperature generators. Thanks a million!
+
+[Ryan](https://github.com/SourceRyan) contributed the Windows binary version and discussed Lands on Reddit bringing a lot of users. Thanks a million!
+
+[stefan-feltmann](https://github.com/stefan-feltmann) made Lands depends on pillow instead that on PIL (which is deprecated). This could also help when moving to Python 3. Thanks a million!
