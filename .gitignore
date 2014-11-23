@@ -1,4 +1,5 @@
 images
+*.png
 
 venv
 *.pyc
@@ -42,3 +43,5 @@ nosetests.xml
 #Intellj Idea
 .idea
 *.iml
+
+*.world
