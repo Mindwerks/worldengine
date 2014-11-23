@@ -9,3 +9,4 @@ Version 0.4.1
 Version 0.4.2
 
 * Generation of rivers map
+* Stefan Feltmann ported Lands to Pillow (removing PIL)
