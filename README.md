@@ -205,9 +205,18 @@ Libjpeg is required by PIL
 Contributors
 ============
 
-[Evan Sampson](https://github.com/esampson) contributed the amazing implementation of the Holdridge life zones model
-and improved a lot the ancient-looking-map, biome, precipitation and temperature generators. Thanks a million!
+All contributions, questions, ideas are more than welcome!
+Feel free to open an issue or drop me an e-mail.
 
-[Ryan](https://github.com/SourceRyan) contributed the Windows binary version and discussed Lands on Reddit bringing a lot of users. Thanks a million!
+I would like to thank you great people who helped me while working on Lands:
 
-[stefan-feltmann](https://github.com/stefan-feltmann) made Lands depends on pillow instead that on PIL (which is deprecated). This could also help when moving to Python 3. Thanks a million!
+* [Evan Sampson](https://github.com/esampson) contributed the amazing implementation of the Holdridge life zones model and improved a lot the ancient-looking-map, biome, precipitation and temperature generators. Thanks a million!
+
+* [Ryan](https://github.com/SourceRyan) contributed the Windows binary version and discussed Lands on Reddit bringing a lot of users. Thanks a million!
+
+* [stefan-feltmann](https://github.com/stefan-feltmann) made Lands depends on pillow instead that on PIL (which is deprecated). This could also help when moving to Python 3. Thanks a million!
+
+License
+=======
+
+Lands is available under the MIT License. You should find the LICENSE in the root of the project.
