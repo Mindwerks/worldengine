@@ -30,6 +30,8 @@ Install
 
 Executable file is available under [releases](https://github.com/ftomassetti/lands/releases)
 
+Note: you need also a copy of the lands src directory in the same folder as the exe.
+
 If you want to build Lands on Windows you can read these [instructions](https://github.com/ftomassetti/lands/wiki/Lands-on-Windows).
 
 *Linux*
