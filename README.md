@@ -34,6 +34,8 @@ Note: you need also a copy of the lands src directory in the same folder as the 
 
 If you want to build Lands on Windows you can read these [instructions](https://github.com/ftomassetti/lands/wiki/Lands-on-Windows).
 
+Note: the problem could crash after generating the files, it is a known problem but you should have anyway your nice maps generated! We are working on a fix for that
+
 *Linux*
 
 1. Install python 2.7
@@ -198,6 +200,13 @@ virtualenv venv
 source venv/bin/activate    
 pip install -r requirements.txt
 ```
+
+Do you have problems or suggestions for improvements?
+=====================================================
+
+Please write to me!
+You can write at f _dot_ tomassetti _at_ gmail _dot_ com
+Thank you, all the feedback is precious for me!
 
 Requirements
 ============
