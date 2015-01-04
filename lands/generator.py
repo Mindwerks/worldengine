@@ -26,8 +26,8 @@ def draw_oldmap(world, filename, resize_factor):
     img.save(filename)
 
 
-def generate_world(seed, world_name, output_dir, width, height, step, num_plates=10, map_side=512):
-    w = world_gen(world_name, seed, True, width, height, step, num_plates=num_plates, map_side=map_side)
+def generate_world(seed, world_name, output_dir, width, height, step, num_plates=10):
+    w = world_gen(world_name, seed, True, width, height, step, num_plates=num_plates)
 
     print('')  # empty line
     print('Producing ouput:')
@@ -76,8 +76,8 @@ def generate_rivers_map(world, filename):
     print("+ rivers map generated in '%s'" % filename)
 
 
-def generate_plates(seed, world_name, output_dir, width, height, num_plates=10, map_side=512):
-    plates = geo.generate_plates_simulation(seed, width, height, num_plates=num_plates, map_side=map_side)
+def generate_plates(seed, world_name, output_dir, width, height, num_plates=10):
+    plates = geo.generate_plates_simulation(seed, width, height, num_plates=num_plates)
 
     # Generate images
     filename = '%s/plates_%s.png' % (output_dir, world_name)
@@ -241,14 +241,14 @@ def main():
     print('')  # empty line
     print('starting (it could take a few minutes) ...')
     if operation == 'world':
-        world = generate_world(seed, world_name, options.output_dir, width, height, step, num_plates=number_of_plates, map_side=plates_resolution)
+        world = generate_world(seed, world_name, options.output_dir, width, height, step, num_plates=number_of_plates)
         if produce_grayscale_heightmap:
             generate_grayscale_heightmap(world, produce_grayscale_heightmap)
         if produce_rivers_map:
             generate_rivers_map(world, produce_rivers_map)
 
     elif operation == 'plates':
-        generate_plates(seed, world_name, options.output_dir, width, height, num_plates=number_of_plates, map_side=plates_resolution)
+        generate_plates(seed, world_name, options.output_dir, width, height, num_plates=number_of_plates)
     elif operation == 'ancient_map':
         if not options.world_file:
             usage("For generating an ancient map is necessary to specify the world to be used (-w option)")
