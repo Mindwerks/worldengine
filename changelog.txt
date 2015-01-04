@@ -10,3 +10,7 @@ Version 0.4.2
 
 * Generation of rivers map
 * Stefan Feltmann ported Lands to Pillow (removing PIL)
+
+Version 0.4.3
+
+* Adopting plate-tectonics (my fork of platec) which permits rectangular plate calculations
