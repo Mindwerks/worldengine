@@ -22,8 +22,6 @@ install:
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
   - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 90
   - sudo apt-get install libstdc++-4.8-dev
-
-install: 
   - echo "CXX=$CXX"
   - echo "version `$CXX --version`"
   - pip install --allow-all-external -r requirements.txt
