@@ -31,6 +31,8 @@ install:
   - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi 
 
 install: 
+  - echo "CXX=$CXX"
+  - echo "version `$CXX --version`"
   - CXXFLAGS='-std=c++11' pip install --allow-all-external -r requirements.txt
 # # command to run tests
 script: nosetests
