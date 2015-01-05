@@ -3,7 +3,6 @@ python:
   - "2.6"
   - "2.7"
 
-
 before_install:
     - echo "yes" | sudo add-apt-repository ppa:kalakris/cmake
     - echo "yes" | sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
@@ -12,7 +11,6 @@ before_install:
     - sudo apt-get install cmake
     # g++4.8.1
     - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-
     - sudo apt-get update -qq
 
 install:
@@ -25,5 +23,6 @@ install:
   - echo "CXX=$CXX"
   - echo "version `$CXX --version`"
   - pip install --allow-all-external -r requirements.txt
+
 # # command to run tests
 script: nosetests
