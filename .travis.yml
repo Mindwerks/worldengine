@@ -26,6 +26,6 @@ install:
 install: 
   - echo "CXX=$CXX"
   - echo "version `$CXX --version`"
-  - CFLAGS='-std=c99' CXXFLAGS='-std=c++11' pip install --allow-all-external -r requirements.txt
+  - pip install --allow-all-external -r requirements.txt
 # # command to run tests
 script: nosetests
