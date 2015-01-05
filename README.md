@@ -23,6 +23,15 @@ python lands/generator.py ancient_map -w seed1.world
 
 ![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/ancient_map_seed1.png)
 
+Gui
+===
+
+Since version 0.5.0 an experimental (and limited!) GUI is available. 
+
+```
+python lands/gui.py
+```
+
 Install
 =======
 

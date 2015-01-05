@@ -14,3 +14,7 @@ Version 0.4.2
 Version 0.4.3
 
 * Adopting plate-tectonics (my fork of platec) which permits rectangular plate calculations
+
+Version 0.5.0
+
+* Initial GUI
