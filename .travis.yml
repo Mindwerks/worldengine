@@ -2,6 +2,9 @@ language: python
 python:
   - "2.6"
   - "2.7"
+  - "3.2"  
+  - "3.3"  
+  - "3.4"      
 
 before_install:
     - echo "yes" | sudo add-apt-repository ppa:kalakris/cmake
@@ -22,7 +25,8 @@ install:
   - sudo apt-get install libstdc++-4.8-dev
   - echo "CXX=$CXX"
   - echo "version `$CXX --version`"
-  - pip install --allow-all-external -r requirements.txt
+  - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then pip install --allow-all-external -r requirements2.txt; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then pip install --allow-all-external -r requirements3.txt; fi
 
 # # command to run tests
 script: nosetests
