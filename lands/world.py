@@ -31,7 +31,7 @@ class World(object):
 
     @classmethod
     def from_pickle_file(cls, filename):
-        with open(filename, "r") as f:
+        with open(filename, "rb") as f:
             return pickle.load(f)
 
     @classmethod
