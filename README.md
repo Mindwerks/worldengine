@@ -204,10 +204,18 @@ Install dependencies
 
 Using virtualenv you can install the dependencies in this way
 
-```python
+Python 2:
+```bash
 virtualenv venv
 source venv/bin/activate    
 pip install -r requirements.txt
+```
+
+Python 3:
+```bash
+pyvenv venv3
+source venv3/bin/activate    
+pip3 install -r requirements3.txt
 ```
 
 Do you have problems or suggestions for improvements?
@@ -220,7 +228,7 @@ Thank you, all the feedback is precious for me!
 Requirements
 ============
 
-Libjpeg is required by PIL
+Libjpeg and libtiff are required by PIL
 
 Contributors
 ============
