@@ -8,6 +8,9 @@ try:
 except:
     from geo import antialias
 
+import sys
+if sys.version_info > (2,):
+    xrange = range
 
 def draw_plates(plates, filename):
     WIDTH = len(plates[0])

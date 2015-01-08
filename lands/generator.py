@@ -10,9 +10,14 @@ import draw
 import drawing_functions
 import os
 from world import *
-execfile('lands/version.py')
+with open("lands/version.py") as f:
+    code = compile(f.read(), "lands/version.py", 'exec')
+    exec(code)
 
 from PIL import Image
+
+if sys.version_info > (2,):
+    xrange = range
 
 VERSION = __version__
 
@@ -34,7 +39,7 @@ def generate_world(seed, world_name, output_dir, width, height, step, num_plates
 
     # Save data
     filename = "%s/%s.world" % (output_dir, world_name)
-    with open(filename, "w") as f:
+    with open(filename, "wb") as f:
         pickle.dump(w, f, pickle.HIGHEST_PROTOCOL)
     print("* world data saved in '%s'" % filename)
 
