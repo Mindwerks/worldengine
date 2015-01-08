@@ -595,31 +595,31 @@ def draw_oldmap_on_pixels(world, pixels, factor=1):
     for y in xrange(factor*world.height):
         for x in xrange(factor*world.width):
             if tundra_mask[y][x]:
-		draw_tundra(pixels, x, y)
+                draw_tundra(pixels, x, y)
 
     # Draw cold parklands
     for y in xrange(factor*world.height):
         for x in xrange(factor*world.width):
             if cold_parklands_mask[y][x]:
-		draw_cold_parklands(pixels, x, y)
+                draw_cold_parklands(pixels, x, y)
 
     # Draw steppes
     for y in xrange(factor*world.height):
         for x in xrange(factor*world.width):
             if steppe_mask[y][x]:
-		draw_steppe(pixels, x, y)
+                draw_steppe(pixels, x, y)
 
     # Draw chaparral
     for y in xrange(factor*world.height):
         for x in xrange(factor*world.width):
             if chaparral_mask[y][x]:
-		draw_chaparral(pixels, x, y)
+                draw_chaparral(pixels, x, y)
 
     # Draw savanna
     for y in xrange(factor*world.height):
         for x in xrange(factor*world.width):
             if savanna_mask[y][x]:
-		draw_savanna(pixels, x, y)
+                draw_savanna(pixels, x, y)
 
     # Draw cool desert
     for y in xrange(factor*world.height):
@@ -663,9 +663,9 @@ def draw_oldmap_on_pixels(world, pixels, factor=1):
                 r = 6
                 if len(world.tiles_around_factor(factor, (x, y), radius=r, predicate=on_border)) <= 2:
                     if random.random() <= .5:
-			draw_temperate_forest1(pixels, x, y, w=w, h=h)
+                        draw_temperate_forest1(pixels, x, y, w=w, h=h)
                     else:
-			draw_temperate_forest2(pixels, x, y, w=w, h=h)
+                        draw_temperate_forest2(pixels, x, y, w=w, h=h)
                     world.on_tiles_around_factor(factor, (x, y), radius=r, action=unset_temperate_forest_mask)
 
     # Draw warm temperate forest

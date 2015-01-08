@@ -361,7 +361,7 @@ def find_threshold_f(elevation, land_perc, ocean=None):
     width = len(elevation[0])
     height = len(elevation)
     if ocean:
-        if (width <> len(ocean[0])) or (height <> len(ocean)):
+        if (width != len(ocean[0])) or (height != len(ocean)):
             raise Exception(
                 "Dimension of elevation and ocean do not match. Elevation is %d x %d, while ocean is %d x%d" % (
                     width, height, len(ocean[0]), len(ocean)))
@@ -494,7 +494,7 @@ def precipitation(seed, width, height):
 
             #Added to allow noise pattern to wrap around right and left.
             if x < border: 
-		n = (snoise2(x / freq, y / freq, octaves, base=base) * x / border) + (snoise2((x+width) / freq, y / freq, octaves, base=base) * (border-x)/border)
+                n = (snoise2(x / freq, y / freq, octaves, base=base) * x / border) + (snoise2((x+width) / freq, y / freq, octaves, base=base) * (border-x)/border)
 
             t = (latitude_factor + n * 4) / 5.0
             temp[y][x] = t

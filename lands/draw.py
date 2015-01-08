@@ -500,7 +500,7 @@ def draw_temperature_levels(world, filename):
         for x in range(0, WIDTH):
             if world.is_temperature_polar((x, y)):
                 pixels[x, y] = (0, 0, 255, 255)
-   	    elif world.is_temperature_alpine((x, y)):
+            elif world.is_temperature_alpine((x, y)):
                 pixels[x, y] = (42, 0, 213, 255)
             elif world.is_temperature_boreal((x, y)):
                 pixels[x, y] = (85, 0, 170, 255)
