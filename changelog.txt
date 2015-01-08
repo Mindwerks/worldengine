@@ -17,4 +17,5 @@ Version 0.4.3
 
 Version 0.5.0
 
+* Supporting python 3
 * Initial GUI
