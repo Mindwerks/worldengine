@@ -3,6 +3,10 @@ __author__ = 'Federico Tomassetti'
 from noise import snoise2
 from world import *
 
+import sys
+if sys.version_info > (2,):
+    xrange = range
+
 
 def center_elevation_map(elevation, width, height):
     """Translate the map horizontally and vertically to put as much ocean as possible at the borders."""
@@ -316,7 +320,7 @@ def antialias(elevation, steps):
         antialias()
 
 
-def find_threshold(elevation, land_perc, ocean=None):
+def find_threshold(elevation, land_perc, ocean=None):    
     width = len(elevation[0])
     height = len(elevation)
 
@@ -329,6 +333,8 @@ def find_threshold(elevation, land_perc, ocean=None):
         return tot
 
     def search(a, b, desired):
+        if (not type(a) == int) or (not type(b) == int):
+            raise "A and B should be int"
         if a == b:
             return a
         if (b - a) == 1:
@@ -340,7 +346,7 @@ def find_threshold(elevation, land_perc, ocean=None):
                 return a
             else:
                 return b
-        m = (a + b) / 2
+        m = int((a + b) / 2)
         cm = count(m)
         if desired < cm:
             return search(m, b, desired)
@@ -565,7 +571,7 @@ def place_oceans_at_map_borders(elevation):
     width = len(elevation[0])
     height = len(elevation)
 
-    OCEAN_BORDER = min(30, max(width / 5, height / 5))
+    OCEAN_BORDER = int(min(30, max(width / 5, height / 5)))
 
     def place_ocean(x, y, i):
         elevation[y][x] = (elevation[y][x] * i) / OCEAN_BORDER
@@ -654,7 +660,8 @@ def world_gen_from_elevation(name, elevation, seed, ocean_level, verbose, width,
     if not step.include_erosion:
         return w
 
-    erode(w, 3000000)
+    erosion_n = (width*height*3000000)/(512*512)
+    erode(w, erosion_n)
     if verbose:
         print("...erosion calculated")
 
