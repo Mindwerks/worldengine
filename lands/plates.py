@@ -3,7 +3,10 @@ __author__ = 'Federico Tomassetti'
 # Every reference to platec has to be kept separated because it is a C extension
 # which is not available when using this project from jython
 
-from geo import *
+try:
+    from lands.geo import *
+except:
+    from geo import *
 import platec
 
 def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_period=60,
