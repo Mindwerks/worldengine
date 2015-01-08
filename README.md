@@ -208,7 +208,7 @@ Python 2:
 ```bash
 virtualenv venv
 source venv/bin/activate    
-pip install -r requirements.txt
+pip install -r requirements2.txt
 ```
 
 Python 3:
