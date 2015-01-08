@@ -1,8 +1,12 @@
 __author__ = 'Federico Tomassetti'
 
-from biome import *
+try:
+    from lands.biome import *
+    from lands.basic_map_operations import *
+except:
+    from biome import *
+    from basic_map_operations import *
 import pickle
-from basic_map_operations import *
 
 
 class World(object):
