@@ -1,12 +1,13 @@
 __author__ = 'Federico Tomassetti'
 
 from PIL import Image
-from drawing_functions import *
 
 try:
     from lands.geo import antialias
+    from lands.drawing_functions import *
 except:
     from geo import antialias
+    from drawing_functions import *
 
 import sys
 if sys.version_info > (2,):
