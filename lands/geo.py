@@ -664,7 +664,7 @@ def world_gen_from_elevation(name, elevation, seed, ocean_level, verbose, width,
     if not step.include_erosion:
         return w
 
-    erosion_n = (width*height*3000000)/(512*512)
+    erosion_n = int((width*height*3000000)/(512*512))
     erode(w, erosion_n)
     if verbose:
         print("...erosion calculated")
