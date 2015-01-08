@@ -2,14 +2,22 @@ __author__ = 'Federico Tomassetti'
 
 import sys
 from optparse import OptionParser
-
-from plates import world_gen
-from draw import draw_biome, draw_precipitation, draw_temperature_levels
-import geo
-import draw
-import drawing_functions
 import os
-from world import *
+
+try:
+    from lands.plates import world_gen
+    from lands.draw import draw_biome, draw_precipitation, draw_temperature_levels
+    import lands.geo
+    import lands.draw
+    import lands.drawing_functions
+    from lands.world import *
+except:
+    from plates import world_gen
+    from draw import draw_biome, draw_precipitation, draw_temperature_levels
+    import geo
+    import draw
+    import drawing_functions
+    from world import *
 with open("lands/version.py") as f:
     code = compile(f.read(), "lands/version.py", 'exec')
     exec(code)
