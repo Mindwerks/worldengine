@@ -4,7 +4,7 @@ from PIL import Image
 from drawing_functions import *
 
 try:
-    from worldgen.geo import antialias
+    from lands.geo import antialias
 except:
     from geo import antialias
 
