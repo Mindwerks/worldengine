@@ -8,13 +8,17 @@ __author__ = 'Federico Tomassetti'
 
 import random
 import math
+import sys
+
+if sys.version_info > (2,):
+    xrange = range
 
 def find_land_borders(world, factor):
     _ocean   = [[False for x in xrange(factor*world.width)] for y in xrange(factor*world.height)]
     _borders = [[False for x in xrange(factor*world.width)] for y in xrange(factor*world.height)]
     for y in xrange(world.height*factor):
         for x in xrange(world.width*factor):
-            if world.ocean[y/factor][x/factor]:
+            if world.ocean[int(y/factor)][int(x/factor)]:
                 _ocean[y][x] = True
 
     def my_is_ocean(pos):
@@ -32,8 +36,8 @@ def find_mountains_mask(world, factor):
     _mask = [[False for x in xrange(factor*world.width)] for y in xrange(factor*world.height)]
     for y in xrange(factor*world.height):
         for x in xrange(factor*world.width):
-            if world.is_mountain((x/factor, y/factor)):
-                v = len(world.tiles_around((x/factor, y/factor), radius=3, predicate=world.is_mountain))
+            if world.is_mountain((int(x/factor), int(y/factor))):
+                v = len(world.tiles_around((int(x/factor), int(y/factor)), radius=3, predicate=world.is_mountain))
                 if v > 32:
                     _mask[y][x] = v / 4
     return _mask
@@ -43,8 +47,10 @@ def mask(world, predicate, factor):
     _mask = [[False for x in xrange(factor*world.width)] for y in xrange(factor*world.height)]
     for y in xrange(factor*world.height):
         for x in xrange(factor*world.width):
-            if predicate((x/factor, y/factor)):
-                v = len(world.tiles_around((x/factor, y/factor), radius=1, predicate=predicate))
+            xf = int(x/factor)
+            yf = int(y/factor)
+            if predicate((xf, yf)):
+                v = len(world.tiles_around((xf, yf), radius=1, predicate=predicate))
                 if v > 5:
                     _mask[y][x] = v
     return _mask
@@ -77,21 +83,21 @@ def gradient(value, low, high, low_color, high_color):
     return (r, g, b, 255)
 
 def draw_glacier(pixels, x, y):
-    rg = 255 - (x ** (y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
+    rg = 255 - (x ** int(y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
     pixels[x, y] = (rg, rg, 255, 255)
 
 def draw_tundra(pixels, x, y):
-    b = (x ** (y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
+    b = (x ** int(y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
     r = 166 - b
     g = 148 - b
     b = 75 - b
     pixels[x, y] = (r, g, b, 255)
 
 def draw_cold_parklands(pixels, x, y):
-    b = (x ** (y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
+    b = (x ** int(y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
     r = 105 - b
     g = 96 - b
-    b = 38 - (b / 2)
+    b = 38 - int(b / 2)
     pixels[x, y] = (r, g, b, 255)
 
 def draw_boreal_forest(pixels, x, y, w, h):
@@ -209,7 +215,7 @@ def draw_temperate_forest2(pixels, x, y, w, h):
     pixels[x - 0, y + 1] = c2
 
 def draw_steppe(pixels, x, y):
-    b = (x ** (y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
+    b = (x ** int(y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
     r = 96 - b
     g = 192 - b
     b = 96 - b
@@ -281,7 +287,7 @@ def draw_warm_temperate_forest(pixels, x, y, w, h):
     pixels[x - 0, y + 1] = c2
 
 def draw_chaparral(pixels, x, y):
-    b = (x ** (y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
+    b = (x ** int(y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
     r = 180 - b
     g = 171 - b
     b = 113 - b
@@ -416,7 +422,7 @@ def draw_jungle(pixels, x, y, w, h):
 
 
 def draw_savanna(pixels, x, y):
-    b = (x ** (y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
+    b = (x ** int(y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
     r = 255 - b
     g = 246 - b
     b = 188 - b
@@ -430,8 +436,8 @@ def draw_a_mountain(pixels, x, y, w=3, h=3):
     for mody in range(-h, h + 1):
         bottomness = (float(mody + h) / 2.0) / w
         leftborder = int(bottomness * w)
-        darkarea = int(bottomness * w) / 2
-        lightarea = int(bottomness * w) / 2
+        darkarea = int(bottomness * w / 2)
+        lightarea = int(bottomness * w / 2)
         for itx in range(darkarea, leftborder + 1):
             pixels[x - itx, y + mody] = gradient(itx, darkarea, leftborder, (0, 0, 0), (64, 64, 64))
         for itx in range(-darkarea, lightarea + 1):
@@ -544,11 +550,13 @@ def draw_oldmap_on_pixels(world, pixels, factor=1):
 
     for y in xrange(factor*world.height):
         for x in xrange(factor*world.width):
-            e = world.elevation['data'][y/factor][x/factor]
+            xf = int(x/factor)
+            yf = int(y/factor)
+            e = world.elevation['data'][yf][xf]
             c = int(((e - min_elev) * 255) / elev_delta)
             if borders[y][x]:
                 pixels[x, y] = (0, 0, 0, 255)
-            elif world.ocean[y/factor][x/factor]:
+            elif world.ocean[yf][xf]:
                 pixels[x, y] = sea_color
             else:
                 pixels[x, y] = land_color
@@ -575,9 +583,9 @@ def draw_oldmap_on_pixels(world, pixels, factor=1):
                             tot_r += pixels[px, py][0]
                             tot_g += pixels[px, py][1]
                             tot_b += pixels[px, py][2]
-            r = (tot_r/n)
-            g = (tot_g/n)
-            b = (tot_b/n)
+            r = int(tot_r/n)
+            g = int(tot_g/n)
+            b = int(tot_b/n)
             pixels[x, y] = (r,g,b,255)
 
         for i in range(0, steps):
@@ -588,7 +596,7 @@ def draw_oldmap_on_pixels(world, pixels, factor=1):
     # Draw glacier
     for y in xrange(factor*world.height):
         for x in xrange(factor*world.width):
-            if not borders[y][x] and world.is_iceland((x/factor, y/factor)):
+            if not borders[y][x] and world.is_iceland((int(x/factor), int(y/factor))):
                 draw_glacier(pixels, x, y)
 
     # Draw tundra
@@ -708,8 +716,8 @@ def draw_oldmap_on_pixels(world, pixels, factor=1):
         for x in xrange(factor*world.width):
             if mountains_mask[y][x]:
                 w = mountains_mask[y][x]
-                h = 3 + int(world.level_of_mountain((x/factor, y/factor)))
-                r = max(w / 3 * 2, h)
+                h = 3 + int(world.level_of_mountain((int(x/factor), int(y/factor))))
+                r = max(int(w / 3 * 2), h)
                 if len(world.tiles_around_factor(factor, (x, y), radius=r, predicate=on_border)) <= 2:
                     draw_a_mountain(pixels, x, y, w=w, h=h)
                     world.on_tiles_around_factor(factor, (x, y), radius=r, action=unset_mask)
