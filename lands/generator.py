@@ -265,14 +265,14 @@ def main():
 
 
 def usage(error=None):
-    print ' -------------------------------------------------------------------------'
-    print ' Federico Tomassetti, 2013-2014'
-    print ' Lands - a world generator (v. %s)' % VERSION
-    print ' '
-    print ' generator <world_name> [operation] [options]'
-    print ' possible operations: %s' % OPERATIONS
-    print ' use -h to see options'
-    print ' -------------------------------------------------------------------------'
+    print(' -------------------------------------------------------------------------')
+    print(' Federico Tomassetti, 2013-2015')
+    print(' Lands - a world generator (v. %s)' % VERSION)
+    print(' ')
+    print(' generator <world_name> [operation] [options]')
+    print(' possible operations: %s' % OPERATIONS)
+    print(' use -h to see options')
+    print(' -------------------------------------------------------------------------')
     if error:
         print("ERROR: %s" % error)
     sys.exit(' ')
