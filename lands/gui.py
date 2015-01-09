@@ -1,6 +1,8 @@
-from Tkinter import *
-# if you are working under Python 3, comment the previous line and comment out the following line
-#from tkinter import *
+try:
+	from Tkinter import *
+except:
+	# for Python 3
+	from tkinter import *
 
 root = Tk()
 
