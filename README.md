@@ -32,6 +32,8 @@ Since version 0.5.0 an experimental (and limited!) GUI is available.
 python lands/gui.py
 ```
 
+Note: it requires to install tkinter. You can [read it here](http://tkinter.unpythonic.net/wiki/How_to_install_Tkinter) how to install tkinter for your platform.
+
 Install
 =======
 
