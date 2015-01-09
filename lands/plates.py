@@ -12,10 +12,6 @@ import platec
 def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_period=60,
                                folding_ratio=0.02, aggr_overlap_abs=1000000, aggr_overlap_rel=0.33,
                                cycle_count=2, num_plates=10):
-    """We typically use low map_side for plates simulation (512) and scale the resulting map later/
-    Specifying higher values we increase simulation time and quality. Consider that only
-    power of 2 are valid inputs.
-    """
 
     p = platec.create(seed, width, height, sea_level, erosion_period, folding_ratio,
                       aggr_overlap_abs, aggr_overlap_rel, cycle_count, num_plates)
