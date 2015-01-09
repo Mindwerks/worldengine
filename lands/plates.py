@@ -20,8 +20,6 @@ def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_peri
         platec.step(p)
     hm = platec.get_heightmap(p)
 
-    #hm = scale_map_in_array(hm, map_side, map_side, width, height)
-
     return hm
 
 def world_gen(name, seed, verbose, width, height, step="full", num_plates=10):
