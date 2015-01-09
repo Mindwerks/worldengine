@@ -4,9 +4,16 @@ except:
 	# for Python 3
 	from tkinter import *
 
-root = Tk()
+canvas_width = 800
+canvas_height = 600
 
-w = Label(root, text="Hello Tkinter!")
+root = Tk()
+root.wm_title("Lands - A world generator")
+root.resizable(0,0)
+
+w = Canvas(root, width=canvas_width, height=canvas_height)
 w.pack()
+
+
 
 root.mainloop()
