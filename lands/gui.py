@@ -10,6 +10,8 @@ import PIL
 canvas_width = 800
 canvas_height = 600
 platec_pointer = None
+label_image = None
+pi = None
 
 def prepare_menu():
     menubar = Menu(root)
@@ -38,6 +40,8 @@ def view_plates():
     show_plates_map(platec_pointer, canvas_width, canvas_height)
 
 def show_elevation_map(p, width, height):    
+    global label_image
+    global pi
     hm = platec.get_heightmap(p)
     img = PIL.Image.new('RGBA', (width, height))
     pixels = img.load()
@@ -51,9 +55,10 @@ def show_elevation_map(p, width, height):
     pi = ImageTk.PhotoImage(img)
     label_image = Label(root, image=pi)
     label_image.place(x=0,y=0,width=width,height=height)
-    raise ""
 
 def show_plates_map(p, width, height):    
+    global label_image
+    global pi
     pm = platec.get_platesmap(p)
     colors = ["#110000","#220000","#330000","#440000","#550000","#660000","#770000","#880000",
     "#990000","#aa0000","#bb0000"]
@@ -67,7 +72,6 @@ def show_plates_map(p, width, height):
     pi = ImageTk.PhotoImage(img)
     label_image = Label(root, image=pi)
     label_image.place(x=0,y=0,width=width,height=height)            
-    raise ""
 
 def file_new():
     global platec_pointer
