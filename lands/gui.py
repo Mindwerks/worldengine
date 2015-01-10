@@ -4,14 +4,16 @@ except:
     # for Python 3
     from tkinter import *
 import platec
+from PIL import ImageTk
+import PIL
 
 canvas_width = 800
 canvas_height = 600
+platec_pointer = None
 
 def prepare_menu():
     menubar = Menu(root)
 
-    # create a pulldown menu, and add it to the menu bar
     filemenu = Menu(menubar, tearoff=0)
     filemenu.add_command(label="New", command=file_new)
     filemenu.add_command(label="Open", command=file_open)
@@ -20,32 +22,55 @@ def prepare_menu():
     filemenu.add_command(label="Exit", command=file_exit)
     menubar.add_cascade(label="File", menu=filemenu)
 
+    viewmenu = Menu(menubar, tearoff=0)
+    viewmenu.add_command(label="Heightmap view", command=view_heightmap)
+    viewmenu.add_command(label="Plates view", command=view_plates)
+    menubar.add_cascade(label="View", menu=viewmenu)
+
     root.config(menu=menubar)
+
+def view_heightmap():    
+    global platec_pointer
+    show_elevation_map(platec_pointer, canvas_width, canvas_height)
+
+def view_plates():
+    global platec_pointer
+    show_plates_map(platec_pointer, canvas_width, canvas_height)
 
 def show_elevation_map(p, width, height):    
     hm = platec.get_heightmap(p)
-    img = PhotoImage(width=canvas_width, height=canvas_height)
-    canvas.create_image(canvas_width/2,canvas_height/2, image=img, state="normal")
-    for y in xrange(height):
-        for x in xrange(width):
-            elev = hm[y*width+x]
+    img = PIL.Image.new('RGBA', (width, height))
+    pixels = img.load()
+    for y in range(0, height):
+        for x in range(0, width):            
+            elev = hm[y*width + x]
             if elev>0.5:
-                img.put("#00ff00",(x,y))
+                pixels[x, y] = (0, 200, 0, 255)
             else:
-                img.put("#0000ff",(x,y))
-    
+                pixels[x, y] = (0, 0, 200, 255)
+    pi = ImageTk.PhotoImage(img)
+    label_image = Label(root, image=pi)
+    label_image.place(x=0,y=0,width=width,height=height)
+    raise ""
+
 def show_plates_map(p, width, height):    
     pm = platec.get_platesmap(p)
     colors = ["#110000","#220000","#330000","#440000","#550000","#660000","#770000","#880000",
     "#990000","#aa0000","#bb0000"]
-    img = PhotoImage(width=canvas_width, height=canvas_height)
-    canvas.create_image(canvas_width/2,canvas_height/2, image=img, state="normal")
+    img = PIL.Image.new('RGBA', (width, height))
+    pixels = img.load()
     for y in xrange(height):
         for x in xrange(width):
             pi = pm[y*width+x]
-            img.put(colors[pi],(x,y))
+            c = int((255*pi)/10)
+            pixels[x,y] = (c,c,c,255)
+    pi = ImageTk.PhotoImage(img)
+    label_image = Label(root, image=pi)
+    label_image.place(x=0,y=0,width=width,height=height)            
+    raise ""
 
 def file_new():
+    global platec_pointer
     print("Creating new map")
     seed=1
     width=canvas_width
@@ -61,9 +86,11 @@ def file_new():
                       aggr_overlap_abs, aggr_overlap_rel, cycle_count, num_plates)
     print("Simulation")
 
+    platec_pointer = p
+
     show_elevation_map(p, width, height)
 
-    root.update_idletasks()
+    #root.update_idletasks()
     print("Drawing")            
 
 def file_open():
