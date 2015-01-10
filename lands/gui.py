@@ -12,6 +12,7 @@ canvas_height = 600
 platec_pointer = None
 label_image = None
 pi = None
+current_view = "heightmap"
 
 def prepare_menu():
     menubar = Menu(root)
@@ -29,7 +30,40 @@ def prepare_menu():
     viewmenu.add_command(label="Plates view", command=view_plates)
     menubar.add_cascade(label="View", menu=viewmenu)
 
+    platesmenu = Menu(menubar, tearoff=0)
+    platesmenu.add_command(label="1 Step", command=plates_1)
+    platesmenu.add_command(label="10 Steps", command=plates_10)
+    platesmenu.add_command(label="100 Steps", command=plates_100)
+    platesmenu.add_command(label="Complete simulation", command=plates_to_end)
+    menubar.add_cascade(label="Plates", menu=platesmenu)    
+
     root.config(menu=menubar)
+
+def _plates(n):    
+    global platec_pointer
+    global current_view
+    if n==-1:
+        while platec.is_finished(p) == 0:
+            platec.step(platec_pointer)
+    else:
+        for i in range(0,n):
+            platec.step(platec_pointer)
+    if current_view=="heightmap":
+        view_heightmap()
+    else:
+        view_plates()
+
+def plates_1():
+    _plates(1)
+
+def plates_10():
+    _plates(10)
+
+def plates_100():
+    _plates(100)
+
+def plates_to_end():
+    _plates(-1)
 
 def view_heightmap():    
     global platec_pointer
@@ -42,6 +76,8 @@ def view_plates():
 def show_elevation_map(p, width, height):    
     global label_image
     global pi
+    global current_view
+    current_view = "heightmap"
     hm = platec.get_heightmap(p)
     img = PIL.Image.new('RGBA', (width, height))
     pixels = img.load()
@@ -59,6 +95,8 @@ def show_elevation_map(p, width, height):
 def show_plates_map(p, width, height):    
     global label_image
     global pi
+    global current_view
+    current_view = "platesmap"
     pm = platec.get_platesmap(p)
     colors = ["#110000","#220000","#330000","#440000","#550000","#660000","#770000","#880000",
     "#990000","#aa0000","#bb0000"]
