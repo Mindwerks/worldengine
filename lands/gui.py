@@ -43,7 +43,7 @@ def _plates(n):
     global platec_pointer
     global current_view
     if n==-1:
-        while platec.is_finished(p) == 0:
+        while platec.is_finished(platec_pointer) == 0:
             platec.step(platec_pointer)
     else:
         for i in range(0,n):
