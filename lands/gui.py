@@ -4,6 +4,10 @@ except:
     # for Python 3
     from tkinter import *
 import platec
+try:
+    from lands.draw import *
+except:
+    from draw import *
 from PIL import ImageTk
 import PIL
 
@@ -88,6 +92,7 @@ def show_elevation_map(p, width, height):
                 pixels[x, y] = (0, 200, 0, 255)
             else:
                 pixels[x, y] = (0, 0, 200, 255)
+    img = draw_simple_elevation_on_image(hm, True, width, height)
     pi = ImageTk.PhotoImage(img)
     label_image = Label(root, image=pi)
     label_image.place(x=0,y=0,width=width,height=height)
