@@ -18,6 +18,10 @@ label_image = None
 pi = None
 current_view = "heightmap"
 
+def cos(x):
+    import math
+    return math.cos(x/180 * 3.14)    
+
 def prepare_menu():
     menubar = Menu(root)
 
@@ -32,6 +36,7 @@ def prepare_menu():
     viewmenu = Menu(menubar, tearoff=0)
     viewmenu.add_command(label="Heightmap view", command=view_heightmap)
     viewmenu.add_command(label="Plates view", command=view_plates)
+    viewmenu.add_command(label="Plates and elevation view", command=view_plates_and_elevation)
     menubar.add_cascade(label="View", menu=viewmenu)
 
     platesmenu = Menu(menubar, tearoff=0)
@@ -54,6 +59,8 @@ def _plates(n):
             platec.step(platec_pointer)
     if current_view=="heightmap":
         view_heightmap()
+    elif current_view=="plates_and_elevation":
+        view_plates_and_elevation()
     else:
         view_plates()
 
@@ -77,25 +84,80 @@ def view_plates():
     global platec_pointer
     show_plates_map(platec_pointer, canvas_width, canvas_height)
 
+def view_plates_and_elevation():
+    global platec_pointer
+    show_plates_and_elevation_map(platec_pointer, canvas_width, canvas_height)
+
 def show_elevation_map(p, width, height):    
     global label_image
     global pi
     global current_view
     current_view = "heightmap"
     hm = platec.get_heightmap(p)
-    img = PIL.Image.new('RGBA', (width, height))
-    pixels = img.load()
-    for y in range(0, height):
-        for x in range(0, width):            
-            elev = hm[y*width + x]
-            if elev>0.5:
-                pixels[x, y] = (0, 200, 0, 255)
-            else:
-                pixels[x, y] = (0, 0, 200, 255)
     img = draw_simple_elevation_on_image(hm, True, width, height)
     pi = ImageTk.PhotoImage(img)
     label_image = Label(root, image=pi)
     label_image.place(x=0,y=0,width=width,height=height)
+
+def hsi_to_rgb(hue, saturation, intensity):
+    h = H = hue % 360
+    S = saturation
+    I = intensity
+    IS = saturation * intensity
+
+    if h==0:
+        R = I + 2 * IS
+        G = I - IS
+        B = I - IS
+    elif 0 < H and H < 120:
+        R = I + IS*cos(H)/cos(60-H)
+        G = I + IS*(1 - cos(H)/cos(60-H))
+        B = I - IS
+    elif H == 120:
+        R = I - IS
+        G = I + 2 * IS
+        B = I - IS
+    elif 120 < H and H < 240:
+        R = I - IS
+        G = I + ((IS*cos(H-120))/cos(180-H))
+        B = I + IS*(1 - cos(H-120)/cos(180-H))
+    elif H == 240:
+        R = I - IS
+        G = I - IS
+        B = I + 2 * IS
+    elif 240 < H and H < 360:
+        R = I + IS*(1 - cos(H-240)/cos(300-H))
+        G = I - IS
+        B = I + IS*cos(H-240)/cos(300-H)    
+    else:
+        raise "Unexpected"
+    return (int(R), int(G), int(B))
+
+def show_plates_and_elevation_map(p, width, height):    
+    global label_image
+    global pi
+    global current_view
+    current_view = "plates_and_elevation"
+    hm = platec.get_heightmap(p)
+    pm = platec.get_platesmap(p)
+
+    n_plates = 1 + max(pm)
+    max_elev = max(hm)
+    min_elev = min(hm)
+    elev_delta = max_elev - min_elev
+
+    img = PIL.Image.new('RGBA', (width, height))
+    pixels = img.load()
+    for y in range(0, height):
+        for x in range(0, width):          
+            h = pm[y*width+x]*(360/n_plates)
+            s = 1.0
+            i = 255.0 * ((hm[y*width+x]-min_elev)/elev_delta)
+            pixels[x, y] = hsi_to_rgb(h,s,i)
+
+    pi = ImageTk.PhotoImage(img)
+    label_image = Label(root, image=pi)
+    label_image.place(x=0,y=0,width=width,height=height)    
 
 def show_plates_map(p, width, height):    
     global label_image
