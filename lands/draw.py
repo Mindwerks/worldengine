@@ -40,8 +40,7 @@ def draw_land_profile(elevation, sea_level, filename):
                 pixels[x, y] = (0, 0, 255, 255)
     img.save(filename)
 
-
-def draw_simple_elevation(data, filename, shadow, width, height):
+def draw_simple_elevation_on_image(data, shadow, width, height):
     COLOR_STEP = 1.5
 
     def my_color(c):
@@ -100,10 +99,14 @@ def draw_simple_elevation(data, filename, shadow, width, height):
     for y in range(0, height):
         for x in range(0, width):
             e = data[y * width + x]
-            # c = 255-int(((e-min_elev)*255)/elev_delta) 	
+            # c = 255-int(((e-min_elev)*255)/elev_delta)    
             #pixels[x,y] = (c,c,c,255)
             r, g, b = my_color(e)
             pixels[x, y] = (int(r * 255), int(g * 255), int(b * 255), 255)
+    return img
+
+def draw_simple_elevation(data, filename, shadow, width, height):
+    img = draw_simple_elevation_on_image(data, shadow, width, height)
     img.save(filename)
 
 
