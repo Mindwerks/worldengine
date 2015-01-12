@@ -152,7 +152,7 @@ def show_plates_and_elevation_map(p, width, height):
         for x in range(0, width):          
             h = pm[y*width+x]*(360/n_plates)
             s = 1.0
-            i = 255.0 * ((hm[y*width+x]-min_elev)/elev_delta)
+            i = 20.0 + 235.0 * ((hm[y*width+x]-min_elev)/elev_delta)
             pixels[x, y] = hsi_to_rgb(h,s,i)
 
     pi = ImageTk.PhotoImage(img)
@@ -165,15 +165,15 @@ def show_plates_map(p, width, height):
     global current_view
     current_view = "platesmap"
     pm = platec.get_platesmap(p)
-    colors = ["#110000","#220000","#330000","#440000","#550000","#660000","#770000","#880000",
-    "#990000","#aa0000","#bb0000"]
+    n_plates = 1 + max(pm)
     img = PIL.Image.new('RGBA', (width, height))
     pixels = img.load()
     for y in xrange(height):
         for x in xrange(width):
-            pi = pm[y*width+x]
-            c = int((255*pi)/10)
-            pixels[x,y] = (c,c,c,255)
+            h = pm[y*width+x]*(360/n_plates)
+            s = 1.0
+            i = 255.0
+            pixels[x, y] = hsi_to_rgb(h,s,i)
     pi = ImageTk.PhotoImage(img)
     label_image = Label(root, image=pi)
     label_image.place(x=0,y=0,width=width,height=height)            
