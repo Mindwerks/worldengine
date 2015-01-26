@@ -1,2 +1,2 @@
--r base.txt
+-r requirements_base.txt
 wsgiref==0.1.2
