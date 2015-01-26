@@ -53,7 +53,8 @@ Note: the problem could crash after generating the files, it is a known problem 
 2. Install pip
 3. Git clone / download the repository
 4. Run pip install -r requirements.txt
-5. You should be good to go!
+5. Install Tk (on ubuntu ```sudo apt install python-tk python-imaging-tk```)
+6. You should be good to go!
 
 Output
 ======
