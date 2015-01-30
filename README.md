@@ -7,7 +7,11 @@ You can generate worlds data (heighmap, biome, etc.) and images for your own wor
 
 For example:
 
-```python
+```bash
+# Lands 0.5.1 or next
+lands world -s 1 -n seed1
+
+# Lands 0.5.0 or previous
 python lands/generator.py world -s 1 -n seed1
 ```
 
@@ -17,7 +21,11 @@ Once a world it can be used for simulation civs evolution (see project [civs](ht
 
 For a generated world is also possible to generate additional maps, for example ancient looking map:
 
-```python
+```bash
+# Lands 0.5.1 or next
+lands ancient_map -w seed1.world
+
+# Lands 0.5.0 or previous
 python lands/generator.py ancient_map -w seed1.world
 ```
 
@@ -37,7 +45,7 @@ Note: it requires to install tkinter. You can [read it here](http://tkinter.unpy
 Install
 =======
 
-*Windows*
+### _On Windows_
 
 Executable file is available under [releases](https://github.com/ftomassetti/lands/releases)
 
@@ -47,7 +55,7 @@ If you want to build Lands on Windows you can read these [instructions](https://
 
 Note: the problem could crash after generating the files, it is a known problem but you should have anyway your nice maps generated! We are working on a fix for that
 
-*Linux*
+### _On Linux or Mac_
 
 1. Install python 2.7
 2. Install pip
