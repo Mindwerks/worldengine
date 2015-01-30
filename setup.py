@@ -11,7 +11,9 @@ config = {
     'version'          : __version__,
     'install_requires' : ['nose'],
     'packages'         : ['lands'],
-    'scripts'          : [],
+    'entry_points'     : {
+        'console_scripts': ['lands=lands.generator:main'],
+    },
     'name'             : 'lands'
 }
 
