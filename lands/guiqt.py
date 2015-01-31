@@ -8,20 +8,20 @@ GUI Interface for Lands
 import sys
 from PyQt4 import QtGui
 
-class LandsGui(QtGui.QWidget):
+class LandsGui(QtGui.QMainWindow):
     
     def __init__(self):
         super(LandsGui, self).__init__()
         
         self.initUI()
         
+    def set_status(self, message):
+    	self.statusBar().showMessage(message)
         
-    def initUI(self):
-        
-        self.setGeometry(300, 300, 250, 150)
-        self.setWindowTitle('Icon')
-        self.setWindowIcon(QtGui.QIcon('web.png'))        
-    
+    def initUI(self):            
+    	self.resize(800, 600)
+    	self.setWindowTitle('Lands - A world generator')        
+    	self.set_status('No world selected: create or load a world')
         self.show()
 
 
@@ -29,10 +29,7 @@ def main():
     
     app = QtGui.QApplication(sys.argv)
 
-    w = QtGui.QWidget()
-    w.resize(800, 600)
-    w.setWindowTitle('Lands - A world generator')
-    w.show()
+    lg = LandsGui()
     
     sys.exit(app.exec_())
 
