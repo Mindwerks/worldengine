@@ -10,6 +10,7 @@ from PyQt4 import QtGui, QtCore
 import random
 import threading
 import platec
+from lands.world import World
 
 class GenerateDialog(QtGui.QDialog):
 
@@ -95,13 +96,16 @@ class GenerateDialog(QtGui.QDialog):
     def num_plates(self):        
         return self.plates_num_value.value()
 
+    def name(self):
+        return self.name_value.text()        
+
 class GenerationProgressDialog(QtGui.QDialog):
 
-    def __init__(self, parent, seed, width, height, num_plates):
+    def __init__(self, parent, seed, name, width, height, num_plates):
         QtGui.QDialog.__init__(self, parent)
         self._init_ui()
         self.world = None
-        self.gen_thread = GenerationThread(self, seed, width, height, num_plates)
+        self.gen_thread = GenerationThread(self, seed, name, width, height, num_plates)
         self.gen_thread.start()
 
     def _init_ui(self):            
@@ -139,9 +143,9 @@ class GenerationProgressDialog(QtGui.QDialog):
 
 class GenerationThread(threading.Thread):
 
-    def __init__(self, ui, seed, width, height, num_plates):
+    def __init__(self, ui, seed, name, width, height, num_plates):
         threading.Thread.__init__(self)
-        self.plates_generation = PlatesGeneration(seed, width, height, num_plates=num_plates)
+        self.plates_generation = PlatesGeneration(seed, name, width, height, num_plates=num_plates)
         self.ui = ui
     
     def run(self):        
@@ -156,10 +160,13 @@ class GenerationThread(threading.Thread):
 
 class PlatesGeneration():
 
-    def __init__(self, seed, width, height, 
+    def __init__(self, seed, name, width, height, 
                  sea_level=0.65, erosion_period=60,
                  folding_ratio=0.02, aggr_overlap_abs=1000000, aggr_overlap_rel=0.33,
                  cycle_count=2, num_plates=10):
+        self.name   = name
+        self.width  = width
+        self.height = height
         self.p = platec.create(seed, width, height, sea_level, erosion_period, folding_ratio,
                                aggr_overlap_abs, aggr_overlap_rel, cycle_count, num_plates)
         self.steps = 0
@@ -173,6 +180,7 @@ class PlatesGeneration():
             return (True, self.steps)      
 
     def world(self):
+        world = World(self.name, self.width, self.height)
         return platec.get_heightmap(self.p)
 
 class MapCanvas(QtGui.QImage):
@@ -181,7 +189,7 @@ class MapCanvas(QtGui.QImage):
         QtGui.QImage.__init__(self, 800, 600, QtGui.QImage.Format_RGB32);
 
     def draw_world(self, world):
-        print("Draw %s" % world.length)
+        print("Draw %s" % world)
         for x in range(100):
             for y in range(100):                
                 self.setPixel(x, y, 255*(65536))    
@@ -233,7 +241,8 @@ class LandsGui(QtGui.QMainWindow):
             width = dialog.width()
             height = dialog.height()
             num_plates = dialog.num_plates()
-            dialog2 = GenerationProgressDialog(self, seed, width, height, num_plates)            
+            name = dialog.name()
+            dialog2 = GenerationProgressDialog(self, seed, name, width, height, num_plates)            
             ok2     = dialog2.exec_()
             if ok2:                
                 self.world = dialog2.world
