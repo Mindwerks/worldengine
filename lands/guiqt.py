@@ -59,10 +59,12 @@ class GenerateDialog(QtGui.QDialog):
         grid.addWidget(platesres_h_value, 6,1,1,2)
 
         buttons_row = 7
-        cancel = QtGui.QPushButton('Cancel')
+        cancel   = QtGui.QPushButton('Cancel')
         generate = QtGui.QPushButton('Generate')
         grid.addWidget(cancel,   buttons_row, 1, 1, 1)
         grid.addWidget(generate, buttons_row, 2, 1, 1)
+        cancel.clicked.connect(self._on_cancel)
+        generate.clicked.connect(self._on_generate)
 
         self.setLayout(grid)
 
@@ -72,6 +74,41 @@ class GenerateDialog(QtGui.QDialog):
         spinner.setMaximum(max)
         spinner.setValue(value)
         return spinner
+
+    def _on_cancel(self):
+        QtGui.QDialog.reject(self)
+
+    def _on_generate(self):        
+        QtGui.QDialog.accept(self)
+
+class GenerationProgressDialog(QtGui.QDialog):
+
+    def __init__(self,parent=None):
+        QtGui.QDialog.__init__(self,parent)
+        self._init_ui()
+
+    def _init_ui(self):            
+        self.resize(400, 100)
+        self.setWindowTitle('Generating a new world...')
+        grid = QtGui.QGridLayout()
+
+        status = QtGui.QLabel('....') 
+        grid.addWidget(status, 0, 0, 1, 3)       
+
+        progress = QtGui.QProgressBar()
+        progress.setMinimum(0)
+        progress.setMaximum(100)
+        progress.setValue(0)
+        grid.addWidget(progress, 1, 0, 1, 3)       
+
+        cancel   = QtGui.QPushButton('Cancel')
+        grid.addWidget(cancel, 2, 0, 1, 1)
+        cancel.clicked.connect(self._on_cancel)
+
+        self.setLayout(grid)
+
+    def _on_cancel(self):
+        QtGui.QDialog.reject(self)        
 
 class LandsGui(QtGui.QMainWindow):
     
@@ -106,10 +143,11 @@ class LandsGui(QtGui.QMainWindow):
         fileMenu.addAction(exitAction)
 
     def _on_generate(self):
-        print("Generate...")
         dialog = GenerateDialog()
-        dialog.exec_()
-        
+        ok = dialog.exec_()
+        if ok:
+            dialog2 = GenerationProgressDialog()
+            ok2     = dialog2.exec_()         
 
 def main():
     
