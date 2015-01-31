@@ -8,6 +8,7 @@ GUI Interface for Lands
 import sys
 from PyQt4 import QtGui
 import random
+import threading
 
 class GenerateDialog(QtGui.QDialog):
 
@@ -110,6 +111,15 @@ class GenerationProgressDialog(QtGui.QDialog):
     def _on_cancel(self):
         QtGui.QDialog.reject(self)        
 
+
+class GenerationThread(threading.Thread):
+
+    def __init__(self):
+        threading.Thread.__init__(self)
+    
+    def run (self):
+        print("thread")        
+
 class LandsGui(QtGui.QMainWindow):
     
     def __init__(self):
@@ -146,7 +156,9 @@ class LandsGui(QtGui.QMainWindow):
         dialog = GenerateDialog()
         ok = dialog.exec_()
         if ok:
+            gen_thread = GenerationThread()
             dialog2 = GenerationProgressDialog()
+            gen_thread.start()
             ok2     = dialog2.exec_()         
 
 def main():
