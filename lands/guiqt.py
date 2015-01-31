@@ -22,8 +22,29 @@ class LandsGui(QtGui.QMainWindow):
     	self.resize(800, 600)
     	self.setWindowTitle('Lands - A world generator')        
     	self.set_status('No world selected: create or load a world')
+    	self._prepare_menu()
         self.show()
 
+
+    def _prepare_menu(self):
+    	generateAction = QtGui.QAction('&Generate', self)        
+        generateAction.setShortcut('Ctrl+G')
+        generateAction.setStatusTip('Generate new world')
+        generateAction.triggered.connect(self._on_generate)
+
+    	exitAction = QtGui.QAction('&Exit', self)        
+        exitAction.setShortcut('Ctrl+Q')
+        exitAction.setStatusTip('Exit application')
+        exitAction.triggered.connect(QtGui.qApp.quit)
+
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('&File')
+        fileMenu.addAction(generateAction)
+        fileMenu.addAction(exitAction)
+
+    def _on_generate(self):
+    	print("Generate...")
+        
 
 def main():
     
