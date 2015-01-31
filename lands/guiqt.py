@@ -6,7 +6,7 @@ GUI Interface for Lands
 """
 
 import sys
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 import random
 import threading
 import platec
@@ -160,6 +160,17 @@ class PlatesGeneration():
         else:
             return (True, self.steps)            
 
+class MapCanvas(QtGui.QImage):
+
+    def __init__(self):
+        QtGui.QImage.__init__(self, 800, 600, QtGui.QImage.Format_RGB32);
+
+    def draw_world(self):
+        for x in range(100):
+            for y in range(100):                
+                self.setPixel(x, y, 255*(65536))    
+
+
 class LandsGui(QtGui.QMainWindow):
     
     def __init__(self):
@@ -174,6 +185,11 @@ class LandsGui(QtGui.QMainWindow):
         self.setWindowTitle('Lands - A world generator')        
         self.set_status('No world selected: create or load a world')
         self._prepare_menu()
+        self.canvas = MapCanvas()
+        self.canvas.draw_world()
+        self.label = QtGui.QLabel()
+        self.label.setPixmap(QtGui.QPixmap.fromImage(self.canvas))
+        self.setCentralWidget(self.label)        
         self.show()
 
     def _prepare_menu(self):
@@ -201,7 +217,7 @@ class LandsGui(QtGui.QMainWindow):
             height = dialog.height()
             num_plates = dialog.num_plates()
             dialog2 = GenerationProgressDialog(seed, width, height, num_plates)            
-            ok2     = dialog2.exec_()         
+            ok2     = dialog2.exec_()
 
 def main():
     
