@@ -13,8 +13,8 @@ import platec
 
 class GenerateDialog(QtGui.QDialog):
 
-    def __init__(self,parent=None):
-        QtGui.QDialog.__init__(self,parent)
+    def __init__(self,parent):
+        QtGui.QDialog.__init__(self, parent)
         self._init_ui()
 
     def _init_ui(self):            
@@ -97,9 +97,10 @@ class GenerateDialog(QtGui.QDialog):
 
 class GenerationProgressDialog(QtGui.QDialog):
 
-    def __init__(self, seed, width, height, num_plates):
-        QtGui.QDialog.__init__(self)
+    def __init__(self, parent, seed, width, height, num_plates):
+        QtGui.QDialog.__init__(self, parent)
         self._init_ui()
+        self.world = None
         self.gen_thread = GenerationThread(self, seed, width, height, num_plates)
         self.gen_thread.start()
 
@@ -115,10 +116,22 @@ class GenerationProgressDialog(QtGui.QDialog):
         grid.addWidget(cancel, 1, 0, 1, 1)
         cancel.clicked.connect(self._on_cancel)
 
+        done   = QtGui.QPushButton('Done')
+        grid.addWidget(done, 1, 2, 1, 1)
+        done.clicked.connect(self._on_done)
+        done.setEnabled(False)
+        self.done = done
+
         self.setLayout(grid)
 
     def _on_cancel(self):
         QtGui.QDialog.reject(self)       
+
+    def _on_done(self):        
+        QtGui.QDialog.accept(self)       
+
+    def on_finish(self):
+        self.done.setEnabled(True) 
 
     def set_status(self, message):
         self.status.setText(message)
@@ -128,19 +141,18 @@ class GenerationThread(threading.Thread):
 
     def __init__(self, ui, seed, width, height, num_plates):
         threading.Thread.__init__(self)
-        print('seed %i' % seed)
-        print('width %i' % width)
-        print('height %i' % height)
-        print('num_plates %i' % num_plates)
         self.plates_generation = PlatesGeneration(seed, width, height, num_plates=num_plates)
         self.ui = ui
     
-    def run (self):        
+    def run(self):        
         finished = False
         while not finished:
             (finished, n_steps) = self.plates_generation.step() 
-            print("n_steps %i %s" % (n_steps, finished))       
-            self.ui.set_status('Step %i' % n_steps)        
+            self.ui.set_status('Step %i' % n_steps)   
+        w = self.plates_generation.world()
+        self.ui.world = w
+        self.ui.on_finish()
+        #print("C %s" % self.ui.world)
 
 class PlatesGeneration():
 
@@ -158,14 +170,18 @@ class PlatesGeneration():
             self.steps += 1
             return (False, self.steps)
         else:
-            return (True, self.steps)            
+            return (True, self.steps)      
+
+    def world(self):
+        return platec.get_heightmap(self.p)
 
 class MapCanvas(QtGui.QImage):
 
     def __init__(self):
         QtGui.QImage.__init__(self, 800, 600, QtGui.QImage.Format_RGB32);
 
-    def draw_world(self):
+    def draw_world(self, world):
+        print("Draw %s" % world.length)
         for x in range(100):
             for y in range(100):                
                 self.setPixel(x, y, 255*(65536))    
@@ -176,6 +192,7 @@ class LandsGui(QtGui.QMainWindow):
     def __init__(self):
         super(LandsGui, self).__init__()        
         self._init_ui()
+        self.world = None
 
     def set_status(self, message):
         self.statusBar().showMessage(message)
@@ -186,7 +203,7 @@ class LandsGui(QtGui.QMainWindow):
         self.set_status('No world selected: create or load a world')
         self._prepare_menu()
         self.canvas = MapCanvas()
-        self.canvas.draw_world()
+        #self.canvas.draw_world()
         self.label = QtGui.QLabel()
         self.label.setPixmap(QtGui.QPixmap.fromImage(self.canvas))
         self.setCentralWidget(self.label)        
@@ -209,15 +226,18 @@ class LandsGui(QtGui.QMainWindow):
         fileMenu.addAction(exitAction)
 
     def _on_generate(self):
-        dialog = GenerateDialog()
+        dialog = GenerateDialog(self)
         ok = dialog.exec_()
         if ok:            
             seed = dialog.seed()
             width = dialog.width()
             height = dialog.height()
             num_plates = dialog.num_plates()
-            dialog2 = GenerationProgressDialog(seed, width, height, num_plates)            
+            dialog2 = GenerationProgressDialog(self, seed, width, height, num_plates)            
             ok2     = dialog2.exec_()
+            if ok2:                
+                self.world = dialog2.world
+                self.canvas.draw_world(self.world)
 
 def main():
     
