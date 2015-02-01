@@ -12,6 +12,7 @@ import threading
 import platec
 from draw import elevation_color
 from world import World
+import geo
 
 def _draw_simple_elevation_on_screen(world, canvas):
     width = world.width
@@ -177,8 +178,11 @@ class GenerationThread(threading.Thread):
         finished = False
         while not finished:
             (finished, n_steps) = self.plates_generation.step() 
-            self.ui.set_status('Step %i' % n_steps)   
+            self.ui.set_status('Plate simulation: step %i' % n_steps)
+        self.ui.set_status('Plate simulation: finalization')
         w = self.plates_generation.world()
+        geo.initialize_ocean_and_thresholds(w)
+        self.ui.set_status('Plate simulation: completed')
         self.ui.world = w
         self.ui.on_finish()
 

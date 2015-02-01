@@ -432,11 +432,15 @@ def fill_ocean(elevation, sea_level):
     ocean = [[False for x in xrange(width)] for y in xrange(height)]
     to_expand = []
     for x in range(0, width):
-        to_expand.append((x, 0))
-        to_expand.append((x, height - 1))
+        if elevation[x][0] <= sea_level:
+            to_expand.append((x, 0))
+        if elevation[x][height -1] <= sea_level:
+            to_expand.append((x, height - 1))
     for y in range(0, height):
-        to_expand.append((0, y))
-        to_expand.append((width - 1, y))
+        if elevation[0][y] <= sea_level:
+            to_expand.append((0, y))
+        if elevation[width - 1][y] <= sea_level:
+            to_expand.append((width - 1, y))
     for t in to_expand:
         tx, ty = t
         if not ocean[ty][tx]:
@@ -607,6 +611,22 @@ def humidity(world):
     return humidity
 
 
+def initialize_ocean_and_thresholds(world, ocean_level=1.0):
+    """
+    Calculate the ocean, the sea depth and the elevation thresholds
+    :param world: a world having elevation but not thresholds
+    :param ocean_level: the elevation representing the ocean level
+    :return: nothing, the world will be changed
+    """
+    e = world.elevation['data']
+    ocean = fill_ocean(e, ocean_level)
+    hl = find_threshold_f(e, 0.10)
+    ml = find_threshold_f(e, 0.03)
+    e_th = [('sea', ocean_level), ('plain', hl), ('hill', ml), ('mountain', None)]
+    world.set_ocean(ocean)
+    world.set_elevation(e, e_th)
+    world.sea_depth = sea_depth(world, ocean_level)
+
 def init_world_from_elevation(name, elevation, ocean_level, verbose):
     width = len(elevation[0])
     height = len(elevation)
@@ -619,6 +639,7 @@ def init_world_from_elevation(name, elevation, ocean_level, verbose):
         sl = ocean_level
     else:
         sl = find_threshold(e, 0.3) + 1.5
+    # TODO: refactor to use initialize_ocean_and_thresholds
     ocean = fill_ocean(e, sl)
     hl = find_threshold(e, 0.10)
     ml = find_threshold(e, 0.03)
