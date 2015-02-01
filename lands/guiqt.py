@@ -256,10 +256,22 @@ class LandsGui(QtGui.QMainWindow):
         exitAction.setStatusTip('Exit application')
         exitAction.triggered.connect(QtGui.qApp.quit)
 
+        bw_view = QtGui.QAction('Black and white', self)
+        plates_view = QtGui.QAction('Plates', self)
+        plates_bw_view = QtGui.QAction('Plates and elevation', self)
+        land_and_ocean_view = QtGui.QAction('Land and ocean', self)
+
         menubar = self.menuBar()
-        fileMenu = menubar.addMenu('&File')
-        fileMenu.addAction(generateAction)
-        fileMenu.addAction(exitAction)
+
+        file_menu = menubar.addMenu('&File')
+        file_menu.addAction(generateAction)
+        file_menu.addAction(exitAction)
+
+        view_menu = menubar.addMenu('&View')
+        view_menu.addAction(bw_view)
+        view_menu.addAction(plates_view)
+        view_menu.addAction(plates_bw_view)
+        view_menu.addAction(land_and_ocean_view)
 
     def _on_generate(self):
         dialog = GenerateDialog(self)
