@@ -124,6 +124,24 @@ class World(object):
     ### Elevation
     ###
 
+    def max_elevation(self):
+        max_el = None
+        for y in xrange(self.height):
+            for x in xrange(self.width):
+                el = self.elevation['data'][y][x]
+                if max_el == None or el > max_el:
+                    max_el = el
+        return max_el
+
+    def min_elevation(self):
+        min_el = None
+        for y in xrange(self.height):
+            for x in xrange(self.width):
+                el = self.elevation['data'][y][x]
+                if min_el == None or el < min_el:
+                    min_el = el
+        return min_el        
+
     def is_mountain(self, pos):
         if not self.is_land(pos):
             return False
