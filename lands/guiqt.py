@@ -10,33 +10,9 @@ from PyQt4 import QtGui, QtCore
 import random
 import threading
 import platec
-from draw import elevation_color
 from world import World
 import geo
-
-def _draw_simple_elevation_on_screen(world, canvas):
-    width = world.width
-    height = world.height
-    for y in range(0, height):
-        for x in range(0, width):
-            e = world.elevation['data'][y][x]
-            r, g, b = elevation_color(e)
-            col = QtGui.QColor(int(r*255),int(g*255),int(b*255))
-            canvas.setPixel(x, y, col.rgb())    
-
-def _draw_bw_elevation_on_screen(world, canvas):
-    width = world.width
-    height = world.height
-    max_el = world.max_elevation()
-    min_el = world.min_elevation()
-    delta_el = max_el - min_el
-    for y in range(0, height):
-        for x in range(0, width):
-            e = world.elevation['data'][y][x]
-            e_normalized = (e - min_el) / delta_el
-            r = g = b = e_normalized
-            col = QtGui.QColor(int(r*255),int(g*255),int(b*255))             
-            canvas.setPixel(x, y, col.rgb())
+from gui.view import *
 
 class GenerateDialog(QtGui.QDialog):
 
@@ -231,9 +207,8 @@ class MapCanvas(QtGui.QImage):
         self._update()
 
     def draw_world(self, world):
-        #_draw_simple_elevation_on_screen(world, self)
         self.label.resize(world.width, world.height)
-        _draw_bw_elevation_on_screen(world, self)
+        draw_bw_elevation_on_screen(world, self)
         self._update()
 
     def _update(self):
