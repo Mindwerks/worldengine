@@ -40,8 +40,8 @@ def draw_land_profile(elevation, sea_level, filename):
                 pixels[x, y] = (0, 0, 255, 255)
     img.save(filename)
 
-def elevation_color(c):
-    COLOR_STEP = 1.5
+def elevation_color(c, color_step = 1.5):
+    COLOR_STEP = color_step
     if c < 0.5:
         return (0.0, 0.0, 0.25 + 1.5 * c)
     elif c < 1.0:
