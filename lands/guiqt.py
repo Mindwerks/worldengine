@@ -10,7 +10,17 @@ from PyQt4 import QtGui, QtCore
 import random
 import threading
 import platec
-from lands.world import World
+from draw import elevation_color
+from world import World
+
+def _draw_simple_elevation_on_screen(world, canvas):
+    width = world.width
+    height = world.height
+    for y in range(0, height):
+        for x in range(0, width):
+            e = world.elevation['data'][y][x]
+            r, g, b = elevation_color(e)
+            canvas.setPixel(x, y, int(r * 255 * 255 * 255) + int(g * 255 * 255) + int(b * 255))    
 
 class GenerateDialog(QtGui.QDialog):
 
@@ -156,7 +166,16 @@ class GenerationThread(threading.Thread):
         w = self.plates_generation.world()
         self.ui.world = w
         self.ui.on_finish()
-        #print("C %s" % self.ui.world)
+
+def array_to_matrix(array, width, height):
+    if (len(array) != (width * height)):
+        raise Exception("Array as not expected length")
+    matrix = []
+    for y in xrange(height):
+        matrix.append([])
+        for x in xrange(width):
+            matrix[y].append(array[y * width + x])
+    return matrix
 
 class PlatesGeneration():
 
@@ -181,19 +200,23 @@ class PlatesGeneration():
 
     def world(self):
         world = World(self.name, self.width, self.height)
-        return platec.get_heightmap(self.p)
+        hm = platec.get_heightmap(self.p)
+        world.set_elevation(array_to_matrix(hm, self.width, self.height), None)
+        return world
 
 class MapCanvas(QtGui.QImage):
 
-    def __init__(self):
+    def __init__(self, label):
         QtGui.QImage.__init__(self, 800, 600, QtGui.QImage.Format_RGB32);
+        self.label = label
+        self._update()
 
     def draw_world(self, world):
-        print("Draw %s" % world)
-        for x in range(100):
-            for y in range(100):                
-                self.setPixel(x, y, 255*(65536))    
+        _draw_simple_elevation_on_screen(world, self)
+        self._update()
 
+    def _update(self):
+        self.label.setPixmap(QtGui.QPixmap.fromImage(self))
 
 class LandsGui(QtGui.QMainWindow):
     
@@ -210,10 +233,9 @@ class LandsGui(QtGui.QMainWindow):
         self.setWindowTitle('Lands - A world generator')        
         self.set_status('No world selected: create or load a world')
         self._prepare_menu()
-        self.canvas = MapCanvas()
-        #self.canvas.draw_world()
         self.label = QtGui.QLabel()
-        self.label.setPixmap(QtGui.QPixmap.fromImage(self.canvas))
+        self.canvas = MapCanvas(self.label)            
+        #self.label.setPixmap(QtGui.QPixmap.fromImage(self.canvas))
         self.setCentralWidget(self.label)        
         self.show()
 
