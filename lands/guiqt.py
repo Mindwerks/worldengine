@@ -221,13 +221,14 @@ class PlatesGeneration():
 
 class MapCanvas(QtGui.QImage):
 
-    def __init__(self, label):
-        QtGui.QImage.__init__(self, 800, 600, QtGui.QImage.Format_RGB32);
+    def __init__(self, label, width, height):
+        QtGui.QImage.__init__(self, width, height, QtGui.QImage.Format_RGB32);
         self.label = label
         self._update()
 
     def draw_world(self, world):
         #_draw_simple_elevation_on_screen(world, self)
+        self.label.resize(world.width, world.height)
         _draw_bw_elevation_on_screen(world, self)
         self._update()
 
@@ -250,9 +251,19 @@ class LandsGui(QtGui.QMainWindow):
         self.set_status('No world selected: create or load a world')
         self._prepare_menu()
         self.label = QtGui.QLabel()
-        self.canvas = MapCanvas(self.label)            
-        #self.label.setPixmap(QtGui.QPixmap.fromImage(self.canvas))
-        self.setCentralWidget(self.label)        
+        self.canvas = MapCanvas(self.label, 0, 0)            
+
+        self.main_widget = QtGui.QWidget(self) # dummy widget to contain the
+                                               # layout manager
+        self.setCentralWidget(self.main_widget)
+        self.layout = QtGui.QGridLayout(self.main_widget)
+        # Set the stretch
+        self.layout.setColumnStretch(0, 1)
+        self.layout.setColumnStretch(2, 1)
+        self.layout.setRowStretch(0, 1)
+        self.layout.setRowStretch(2, 1)
+        # Add widgets
+        self.layout.addWidget(self.label, 1, 1)
         self.show()
 
     def _prepare_menu(self):
@@ -284,6 +295,7 @@ class LandsGui(QtGui.QMainWindow):
             ok2     = dialog2.exec_()
             if ok2:                
                 self.world = dialog2.world
+                self.canvas = MapCanvas(self.label, self.world.width, self.world.height) 
                 self.canvas.draw_world(self.world)
 
 def main():
