@@ -96,6 +96,7 @@ Usage
 |-------|------|-------------|
 | -o    | --output | generate files in OUTPUT |
 | -n    | --worldname | set WORLDNAME |
+| -b    | --protocol-buffer | save world using protocol buffer format (smaller file) |
 | -s    | --seed | use SEED to initialize the pseudo-random generation |
 | -t    | --step | use STEP to specify how far to proceed in the world generation process |
 | -x    | --width | WIDTH of the world to be generated |
