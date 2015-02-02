@@ -21,7 +21,7 @@ class TestSerialization(unittest.TestCase):
         self.assertEqual(w.irrigation,              unserialized.irrigation)
         self.assertEqual(w.permeability,            unserialized.permeability)
         self.assertEqual(w.watermap,                unserialized.watermap)
-        self.assertEqual(w.precipation,             unserialized.precipation)
+        self.assertEqual(w.precipitation,           unserialized.precipitation)
         self.assertEqual(w.temperature,             unserialized.temperature)
         self.assertEqual(w, unserialized)
 

@@ -137,6 +137,11 @@ class World(object):
             p_world.watermap_river = self.watermap['thresholds']['river']
             p_world.watermap_mainriver = self.watermap['thresholds']['main river']            
 
+        if self.precipitation:
+            self._to_protobuf_matrix(self.precipitation['data'], p_world.precipitationData)
+            p_world.precipitation_low = self.precipitation['thresholds'][0][1]
+            p_world.precipitation_med = self.precipitation['thresholds'][1][1]
+
         return p_world
 
     @classmethod
@@ -177,6 +182,14 @@ class World(object):
         w.watermap['thresholds']['creek'] = p_world.watermap_creek
         w.watermap['thresholds']['river'] = p_world.watermap_river
         w.watermap['thresholds']['main river'] = p_world.watermap_mainriver
+
+        p = World._from_protobuf_matrix(p_world.precipitationData)
+        p_th = [
+            ('low' , p_world.precipitation_low),
+            ('med' , p_world.precipitation_med),
+            ('hig' , None)
+        ]
+        w.set_precipitation(p, p_th)
 
         return w
 
