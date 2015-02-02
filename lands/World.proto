@@ -69,11 +69,15 @@ message World {
     optional double permeability_low       = 13;
     optional double permeability_med       = 14;
 
+    // Watermap
+    optional DoubleMatrix watermapData     = 15;
+    optional double watermap_creek         = 16;
+    optional double watermap_river         = 17;
+    optional double watermap_mainriver     = 18;
+
     // Precipitation
 
     // Temperature
-
-    // Watermap
 }
 
 
