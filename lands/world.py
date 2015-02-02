@@ -123,6 +123,14 @@ class World(object):
         # Humidty
         self._to_protobuf_matrix_with_quantiles(self.humidity, p_world.humidity)
 
+        if self.irrigation:
+            self._to_protobuf_matrix(self.irrigation, p_world.irrigation)
+
+        if self.permeability:
+            self._to_protobuf_matrix(self.permeability['data'], p_world.permeabilityData)
+            p_world.permeability_low = self.permeability['thresholds'][0][1]
+            p_world.permeability_med = self.permeability['thresholds'][1][1]
+
         return p_world
 
     @classmethod
@@ -146,6 +154,16 @@ class World(object):
         # Humidity
         # FIXME: use setters
         w.humidity = World._from_protobuf_matrix_with_quantiles(p_world.humidity)
+
+        w.irrigation = World._from_protobuf_matrix(p_world.irrigation)
+
+        p = World._from_protobuf_matrix(p_world.permeabilityData)
+        p_th = [
+            ('low' , p_world.permeability_low),
+            ('med' , p_world.permeability_med),
+            ('hig' , None)
+        ]
+        w.set_permeability(p, p_th)
 
         return w
 
