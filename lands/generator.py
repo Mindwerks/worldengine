@@ -39,7 +39,7 @@ def draw_oldmap(world, filename, resize_factor):
     img.save(filename)
 
 
-def generate_world(seed, world_name, output_dir, width, height, step, num_plates=10):
+def generate_world(seed, world_name, output_dir, width, height, step, num_plates=10, world_format='pickle'):
     w = world_gen(world_name, seed, True, width, height, step, num_plates=num_plates)
 
     print('')  # empty line
@@ -48,7 +48,12 @@ def generate_world(seed, world_name, output_dir, width, height, step, num_plates
     # Save data
     filename = "%s/%s.world" % (output_dir, world_name)
     with open(filename, "wb") as f:
-        pickle.dump(w, f, pickle.HIGHEST_PROTOCOL)
+        if world_format == 'pickle':
+            pickle.dump(w, f, pickle.HIGHEST_PROTOCOL)
+        elif world_format == 'protobuf':
+            f.write(w.protobuf_serialize())
+        else:
+            print("Unknown format '%s', not saving " % world_format)
     print("* world data saved in '%s'" % filename)
 
     # Generate images
@@ -150,6 +155,7 @@ def main():
     parser = OptionParser()
     parser.add_option('-o', '--output', dest='output_dir', help="generate files in OUTPUT", metavar="FILE", default='.')
     parser.add_option('-n', '--worldname', dest='world_name', help="set WORLDNAME", metavar="WORLDNAME")
+    parser.add_option('-b', '--protocol-buffer', dest='protobuf', action="store_true", help="save using protocol buffer", default=False)
     parser.add_option('-s', '--seed', dest='seed', help="use SEED to initialize the pseudo-random generation",
                       metavar="SEED")
     parser.add_option('-t', '--step', dest='step',
@@ -220,6 +226,10 @@ def main():
     else:
         step = Step.get_by_name("full")
 
+    world_format = 'pickle'
+    if options.protobuf:
+        world_format = 'protobuf'
+
     generation_operation = (operation == 'world') or (operation == 'plates')
 
     resize_factor = int(options.resize_factor)
@@ -241,6 +251,7 @@ def main():
         print(' height            : %i' % height)
         print(' plates resolution : %i' % plates_resolution)
         print(' number of plates  : %i' % number_of_plates)
+        print(' world format      : %s' % world_format)
     print(' operation         : %s generation' % operation)
     if generation_operation:
         print(' step              : %s' % step.name)
@@ -254,7 +265,7 @@ def main():
     print('')  # empty line
     print('starting (it could take a few minutes) ...')
     if operation == 'world':
-        world = generate_world(seed, world_name, options.output_dir, width, height, step, num_plates=number_of_plates)
+        world = generate_world(seed, world_name, options.output_dir, width, height, step, num_plates=number_of_plates, world_format=world_format)
         if produce_grayscale_heightmap:
             generate_grayscale_heightmap(world, produce_grayscale_heightmap)
         if produce_rivers_map:
