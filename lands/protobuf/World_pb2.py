@@ -13,20 +13,20 @@ from google.protobuf import descriptor_pb2
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='World.proto',
   package='World',
-  serialized_pb='\n\x0bWorld.proto\x12\x05World\"\xfe\x01\n\x05World\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\r\n\x05width\x18\x02 \x02(\x05\x12\x0e\n\x06height\x18\x03 \x02(\x05\x12-\n\rheightMapData\x18\x04 \x02(\x0b\x32\x16.World.World.HeightMap\x12\x17\n\x0fheightMapTh_sea\x18\x05 \x02(\x01\x12\x19\n\x11heightMapTh_plain\x18\x06 \x02(\x01\x12\x18\n\x10heightMapTh_hill\x18\x07 \x02(\x01\x1a\x19\n\x08\x46loatRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x01\x1a\x30\n\tHeightMap\x12#\n\x04rows\x18\x01 \x03(\x0b\x32\x15.World.World.FloatRow')
+  serialized_pb='\n\x0bWorld.proto\x12\x05World\"\x86\x03\n\x05World\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\r\n\x05width\x18\x02 \x02(\x05\x12\x0e\n\x06height\x18\x03 \x02(\x05\x12\x30\n\rheightMapData\x18\x04 \x02(\x0b\x32\x19.World.World.DoubleMatrix\x12\x17\n\x0fheightMapTh_sea\x18\x05 \x02(\x01\x12\x19\n\x11heightMapTh_plain\x18\x06 \x02(\x01\x12\x18\n\x10heightMapTh_hill\x18\x07 \x02(\x01\x12)\n\x05ocean\x18\x08 \x02(\x0b\x32\x1a.World.World.BooleanMatrix\x1a\x1a\n\tDoubleRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x01\x1a\x1b\n\nBooleanRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x08\x1a\x34\n\x0c\x44oubleMatrix\x12$\n\x04rows\x18\x01 \x03(\x0b\x32\x16.World.World.DoubleRow\x1a\x36\n\rBooleanMatrix\x12%\n\x04rows\x18\x01 \x03(\x0b\x32\x17.World.World.BooleanRow')
 
 
 
 
-_WORLD_FLOATROW = _descriptor.Descriptor(
-  name='FloatRow',
-  full_name='World.World.FloatRow',
+_WORLD_DOUBLEROW = _descriptor.Descriptor(
+  name='DoubleRow',
+  full_name='World.World.DoubleRow',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='cells', full_name='World.World.FloatRow.cells', index=0,
+      name='cells', full_name='World.World.DoubleRow.cells', index=0,
       number=1, type=1, cpp_type=5, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -41,19 +41,46 @@ _WORLD_FLOATROW = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=202,
-  serialized_end=227,
+  serialized_start=248,
+  serialized_end=274,
 )
 
-_WORLD_HEIGHTMAP = _descriptor.Descriptor(
-  name='HeightMap',
-  full_name='World.World.HeightMap',
+_WORLD_BOOLEANROW = _descriptor.Descriptor(
+  name='BooleanRow',
+  full_name='World.World.BooleanRow',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='rows', full_name='World.World.HeightMap.rows', index=0,
+      name='cells', full_name='World.World.BooleanRow.cells', index=0,
+      number=1, type=8, cpp_type=7, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=276,
+  serialized_end=303,
+)
+
+_WORLD_DOUBLEMATRIX = _descriptor.Descriptor(
+  name='DoubleMatrix',
+  full_name='World.World.DoubleMatrix',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='rows', full_name='World.World.DoubleMatrix.rows', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -68,8 +95,35 @@ _WORLD_HEIGHTMAP = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=229,
-  serialized_end=277,
+  serialized_start=305,
+  serialized_end=357,
+)
+
+_WORLD_BOOLEANMATRIX = _descriptor.Descriptor(
+  name='BooleanMatrix',
+  full_name='World.World.BooleanMatrix',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='rows', full_name='World.World.BooleanMatrix.rows', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=359,
+  serialized_end=413,
 )
 
 _WORLD = _descriptor.Descriptor(
@@ -128,39 +182,62 @@ _WORLD = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='ocean', full_name='World.World.ocean', index=7,
+      number=8, type=11, cpp_type=10, label=2,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
-  nested_types=[_WORLD_FLOATROW, _WORLD_HEIGHTMAP, ],
+  nested_types=[_WORLD_DOUBLEROW, _WORLD_BOOLEANROW, _WORLD_DOUBLEMATRIX, _WORLD_BOOLEANMATRIX, ],
   enum_types=[
   ],
   options=None,
   is_extendable=False,
   extension_ranges=[],
   serialized_start=23,
-  serialized_end=277,
+  serialized_end=413,
 )
 
-_WORLD_FLOATROW.containing_type = _WORLD;
-_WORLD_HEIGHTMAP.fields_by_name['rows'].message_type = _WORLD_FLOATROW
-_WORLD_HEIGHTMAP.containing_type = _WORLD;
-_WORLD.fields_by_name['heightMapData'].message_type = _WORLD_HEIGHTMAP
+_WORLD_DOUBLEROW.containing_type = _WORLD;
+_WORLD_BOOLEANROW.containing_type = _WORLD;
+_WORLD_DOUBLEMATRIX.fields_by_name['rows'].message_type = _WORLD_DOUBLEROW
+_WORLD_DOUBLEMATRIX.containing_type = _WORLD;
+_WORLD_BOOLEANMATRIX.fields_by_name['rows'].message_type = _WORLD_BOOLEANROW
+_WORLD_BOOLEANMATRIX.containing_type = _WORLD;
+_WORLD.fields_by_name['heightMapData'].message_type = _WORLD_DOUBLEMATRIX
+_WORLD.fields_by_name['ocean'].message_type = _WORLD_BOOLEANMATRIX
 DESCRIPTOR.message_types_by_name['World'] = _WORLD
 
 class World(_message.Message):
   __metaclass__ = _reflection.GeneratedProtocolMessageType
 
-  class FloatRow(_message.Message):
+  class DoubleRow(_message.Message):
     __metaclass__ = _reflection.GeneratedProtocolMessageType
-    DESCRIPTOR = _WORLD_FLOATROW
+    DESCRIPTOR = _WORLD_DOUBLEROW
 
-    # @@protoc_insertion_point(class_scope:World.World.FloatRow)
+    # @@protoc_insertion_point(class_scope:World.World.DoubleRow)
 
-  class HeightMap(_message.Message):
+  class BooleanRow(_message.Message):
     __metaclass__ = _reflection.GeneratedProtocolMessageType
-    DESCRIPTOR = _WORLD_HEIGHTMAP
+    DESCRIPTOR = _WORLD_BOOLEANROW
 
-    # @@protoc_insertion_point(class_scope:World.World.HeightMap)
+    # @@protoc_insertion_point(class_scope:World.World.BooleanRow)
+
+  class DoubleMatrix(_message.Message):
+    __metaclass__ = _reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _WORLD_DOUBLEMATRIX
+
+    # @@protoc_insertion_point(class_scope:World.World.DoubleMatrix)
+
+  class BooleanMatrix(_message.Message):
+    __metaclass__ = _reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _WORLD_BOOLEANMATRIX
+
+    # @@protoc_insertion_point(class_scope:World.World.BooleanMatrix)
   DESCRIPTOR = _WORLD
 
   # @@protoc_insertion_point(class_scope:World.World)
