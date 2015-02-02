@@ -7,7 +7,7 @@ except:
     from biome import *
     from basic_map_operations import *
 import pickle
-
+import protobuf.World_pb2
 
 class World(object):
     """A world composed by name, dimensions and all the characteristics of each cell.
@@ -40,6 +40,50 @@ class World(object):
         for k in dict:
             instance.__dict__[k] = dict[k]
         return instance
+
+    def protobuf_serialize(self):
+        p_world = self._to_protobuf_world()
+        return p_world.SerializeToString()
+
+    @classmethod
+    def protobuf_unserialize(cls, serialized):
+        p_world = protobuf.World_pb2.World()
+        p_world.ParseFromString(serialized)
+        return World._from_protobuf_world(p_world)
+
+    def _to_protobuf_world(self):
+        p_world = protobuf.World_pb2.World()
+        p_world.name   = self.name
+        p_world.width  = self.width
+        p_world.height = self.height
+
+        # Elevation
+        for row in self.elevation['data']:
+            p_row = p_world.heightMapData.rows.add()
+            for cell in row:
+                p_row.cells.append(cell)
+        p_world.heightMapTh_sea   = self.elevation['thresholds'][0][1];
+        p_world.heightMapTh_plain = self.elevation['thresholds'][1][1];
+        p_world.heightMapTh_hill  = self.elevation['thresholds'][2][1];                                
+        return p_world
+
+    @classmethod
+    def _from_protobuf_world(cls, p_world):
+        w = World(p_world.name, p_world.width, p_world.height)
+
+        e = []
+        for p_row in p_world.heightMapData.rows:
+            row = []
+            for p_cell in p_row.cells:
+                row.append(p_cell)
+            e.append(row)
+        e_th = [('sea',      p_world.heightMapTh_sea), 
+                ('plain',    p_world.heightMapTh_plain), 
+                ('hill',     p_world.heightMapTh_hill), 
+                ('mountain', None)]
+
+        w.set_elevation(e, e_th)
+        return w
 
     ###
     ### Land/Ocean

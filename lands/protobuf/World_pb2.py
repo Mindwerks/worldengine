@@ -13,7 +13,7 @@ from google.protobuf import descriptor_pb2
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='World.proto',
   package='World',
-  serialized_pb='\n\x0bWorld.proto\x12\x05World\"\xac\x01\n\x05World\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\r\n\x05width\x18\x02 \x02(\x05\x12\x0e\n\x06height\x18\x03 \x02(\x05\x12)\n\theightMap\x18\x04 \x02(\x0b\x32\x16.World.World.HeightMap\x1a\x19\n\x08\x46loatRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x02\x1a\x30\n\tHeightMap\x12#\n\x04rows\x18\x01 \x03(\x0b\x32\x15.World.World.FloatRow')
+  serialized_pb='\n\x0bWorld.proto\x12\x05World\"\xfe\x01\n\x05World\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\r\n\x05width\x18\x02 \x02(\x05\x12\x0e\n\x06height\x18\x03 \x02(\x05\x12-\n\rheightMapData\x18\x04 \x02(\x0b\x32\x16.World.World.HeightMap\x12\x17\n\x0fheightMapTh_sea\x18\x05 \x02(\x01\x12\x19\n\x11heightMapTh_plain\x18\x06 \x02(\x01\x12\x18\n\x10heightMapTh_hill\x18\x07 \x02(\x01\x1a\x19\n\x08\x46loatRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x01\x1a\x30\n\tHeightMap\x12#\n\x04rows\x18\x01 \x03(\x0b\x32\x15.World.World.FloatRow')
 
 
 
@@ -27,7 +27,7 @@ _WORLD_FLOATROW = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='cells', full_name='World.World.FloatRow.cells', index=0,
-      number=1, type=2, cpp_type=6, label=3,
+      number=1, type=1, cpp_type=5, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -41,8 +41,8 @@ _WORLD_FLOATROW = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=120,
-  serialized_end=145,
+  serialized_start=202,
+  serialized_end=227,
 )
 
 _WORLD_HEIGHTMAP = _descriptor.Descriptor(
@@ -68,8 +68,8 @@ _WORLD_HEIGHTMAP = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=147,
-  serialized_end=195,
+  serialized_start=229,
+  serialized_end=277,
 )
 
 _WORLD = _descriptor.Descriptor(
@@ -101,9 +101,30 @@ _WORLD = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='heightMap', full_name='World.World.heightMap', index=3,
+      name='heightMapData', full_name='World.World.heightMapData', index=3,
       number=4, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='heightMapTh_sea', full_name='World.World.heightMapTh_sea', index=4,
+      number=5, type=1, cpp_type=5, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='heightMapTh_plain', full_name='World.World.heightMapTh_plain', index=5,
+      number=6, type=1, cpp_type=5, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='heightMapTh_hill', full_name='World.World.heightMapTh_hill', index=6,
+      number=7, type=1, cpp_type=5, label=2,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -117,13 +138,13 @@ _WORLD = _descriptor.Descriptor(
   is_extendable=False,
   extension_ranges=[],
   serialized_start=23,
-  serialized_end=195,
+  serialized_end=277,
 )
 
 _WORLD_FLOATROW.containing_type = _WORLD;
 _WORLD_HEIGHTMAP.fields_by_name['rows'].message_type = _WORLD_FLOATROW
 _WORLD_HEIGHTMAP.containing_type = _WORLD;
-_WORLD.fields_by_name['heightMap'].message_type = _WORLD_HEIGHTMAP
+_WORLD.fields_by_name['heightMapData'].message_type = _WORLD_HEIGHTMAP
 DESCRIPTOR.message_types_by_name['World'] = _WORLD
 
 class World(_message.Message):
