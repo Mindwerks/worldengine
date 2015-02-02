@@ -59,7 +59,20 @@ class World(object):
                 value = cell
                 if transformation:
                     value = transformation(value)
-                p_row.cells.append(value)        
+                p_row.cells.append(value) 
+
+    @staticmethod
+    def _to_protobuf_quantiles(quantiles, p_quantiles):
+        for k in quantiles:
+            entry = p_quantiles.add()
+            v = quantiles[k]
+            entry.key   = int(k)
+            entry.value = v   
+
+    @staticmethod
+    def _to_protobuf_matrix_with_quantiles(matrix, p_matrix):
+        World._to_protobuf_quantiles(matrix['quantiles'], p_matrix.quantiles)
+        World._to_protobuf_matrix(matrix['data'], p_matrix)                    
 
     @staticmethod
     def _from_protobuf_matrix(p_matrix, transformation = None):
@@ -73,6 +86,21 @@ class World(object):
                 row.append(value)
             matrix.append(row)                
         return matrix
+
+    @staticmethod
+    def _from_protobuf_quantiles(p_quantiles):
+        quantiles = {}
+        for p_quantile in p_quantiles:
+            quantiles[str(p_quantile.key)] = p_quantile.value
+        return quantiles
+
+    @staticmethod
+    def _from_protobuf_matrix_with_quantiles(p_matrix):
+        matrix = {}
+        matrix['data'] = World._from_protobuf_matrix(p_matrix)
+        matrix['quantiles'] = World._from_protobuf_quantiles(p_matrix.quantiles)
+        return matrix
+
 
     def _to_protobuf_world(self):
         p_world = protobuf.World_pb2.World()
@@ -91,6 +119,9 @@ class World(object):
 
         # Biome
         self._to_protobuf_matrix(self.biome, p_world.biome, biome_name_to_index)
+
+        # Humidty
+        self._to_protobuf_matrix_with_quantiles(self.humidity, p_world.humidity)
 
         return p_world
 
@@ -111,6 +142,10 @@ class World(object):
 
         # Biome
         w.set_biome(World._from_protobuf_matrix(p_world.biome, biome_index_to_name))
+
+        # Humidity
+        # FIXME: use setters
+        w.humidity = World._from_protobuf_matrix_with_quantiles(p_world.humidity)
 
         return w
 

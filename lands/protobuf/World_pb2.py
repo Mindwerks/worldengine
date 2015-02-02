@@ -13,7 +13,7 @@ from google.protobuf import descriptor_pb2
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='World.proto',
   package='World',
-  serialized_pb='\n\x0bWorld.proto\x12\x05World\"\x86\x04\n\x05World\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\r\n\x05width\x18\x02 \x02(\x05\x12\x0e\n\x06height\x18\x03 \x02(\x05\x12\x30\n\rheightMapData\x18\x04 \x02(\x0b\x32\x19.World.World.DoubleMatrix\x12\x17\n\x0fheightMapTh_sea\x18\x05 \x02(\x01\x12\x19\n\x11heightMapTh_plain\x18\x06 \x02(\x01\x12\x18\n\x10heightMapTh_hill\x18\x07 \x02(\x01\x12)\n\x05ocean\x18\x08 \x02(\x0b\x32\x1a.World.World.BooleanMatrix\x12)\n\x05\x62iome\x18\t \x01(\x0b\x32\x1a.World.World.IntegerMatrix\x1a\x1a\n\tDoubleRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x01\x1a\x1b\n\nBooleanRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x08\x1a\x1b\n\nIntegerRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x05\x1a\x34\n\x0c\x44oubleMatrix\x12$\n\x04rows\x18\x01 \x03(\x0b\x32\x16.World.World.DoubleRow\x1a\x36\n\rBooleanMatrix\x12%\n\x04rows\x18\x01 \x03(\x0b\x32\x17.World.World.BooleanRow\x1a\x36\n\rIntegerMatrix\x12%\n\x04rows\x18\x01 \x03(\x0b\x32\x17.World.World.IntegerRow')
+  serialized_pb='\n\x0bWorld.proto\x12\x05World\"\xfb\x05\n\x05World\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\r\n\x05width\x18\x02 \x02(\x05\x12\x0e\n\x06height\x18\x03 \x02(\x05\x12\x30\n\rheightMapData\x18\x04 \x02(\x0b\x32\x19.World.World.DoubleMatrix\x12\x17\n\x0fheightMapTh_sea\x18\x05 \x02(\x01\x12\x19\n\x11heightMapTh_plain\x18\x06 \x02(\x01\x12\x18\n\x10heightMapTh_hill\x18\x07 \x02(\x01\x12)\n\x05ocean\x18\x08 \x02(\x0b\x32\x1a.World.World.BooleanMatrix\x12)\n\x05\x62iome\x18\t \x01(\x0b\x32\x1a.World.World.IntegerMatrix\x12\x38\n\x08humidity\x18\n \x01(\x0b\x32&.World.World.DoubleMatrixWithQuantiles\x1a\x1a\n\tDoubleRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x01\x1a\x1b\n\nBooleanRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x08\x1a\x1b\n\nIntegerRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x05\x1a\x18\n\x07\x42yteRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x05\x1a\x34\n\x0c\x44oubleMatrix\x12$\n\x04rows\x18\x01 \x03(\x0b\x32\x16.World.World.DoubleRow\x1a\x36\n\rBooleanMatrix\x12%\n\x04rows\x18\x01 \x03(\x0b\x32\x17.World.World.BooleanRow\x1a\x36\n\rIntegerMatrix\x12%\n\x04rows\x18\x01 \x03(\x0b\x32\x17.World.World.IntegerRow\x1a,\n\x0e\x44oubleQuantile\x12\x0b\n\x03key\x18\x01 \x02(\x05\x12\r\n\x05value\x18\x02 \x02(\x01\x1aq\n\x19\x44oubleMatrixWithQuantiles\x12.\n\tquantiles\x18\x01 \x03(\x0b\x32\x1b.World.World.DoubleQuantile\x12$\n\x04rows\x18\x02 \x03(\x0b\x32\x16.World.World.DoubleRow')
 
 
 
@@ -41,8 +41,8 @@ _WORLD_DOUBLEROW = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=291,
-  serialized_end=317,
+  serialized_start=349,
+  serialized_end=375,
 )
 
 _WORLD_BOOLEANROW = _descriptor.Descriptor(
@@ -68,8 +68,8 @@ _WORLD_BOOLEANROW = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=319,
-  serialized_end=346,
+  serialized_start=377,
+  serialized_end=404,
 )
 
 _WORLD_INTEGERROW = _descriptor.Descriptor(
@@ -95,8 +95,35 @@ _WORLD_INTEGERROW = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=348,
-  serialized_end=375,
+  serialized_start=406,
+  serialized_end=433,
+)
+
+_WORLD_BYTEROW = _descriptor.Descriptor(
+  name='ByteRow',
+  full_name='World.World.ByteRow',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='cells', full_name='World.World.ByteRow.cells', index=0,
+      number=1, type=5, cpp_type=1, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=435,
+  serialized_end=459,
 )
 
 _WORLD_DOUBLEMATRIX = _descriptor.Descriptor(
@@ -122,8 +149,8 @@ _WORLD_DOUBLEMATRIX = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=377,
-  serialized_end=429,
+  serialized_start=461,
+  serialized_end=513,
 )
 
 _WORLD_BOOLEANMATRIX = _descriptor.Descriptor(
@@ -149,8 +176,8 @@ _WORLD_BOOLEANMATRIX = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=431,
-  serialized_end=485,
+  serialized_start=515,
+  serialized_end=569,
 )
 
 _WORLD_INTEGERMATRIX = _descriptor.Descriptor(
@@ -176,8 +203,76 @@ _WORLD_INTEGERMATRIX = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=487,
-  serialized_end=541,
+  serialized_start=571,
+  serialized_end=625,
+)
+
+_WORLD_DOUBLEQUANTILE = _descriptor.Descriptor(
+  name='DoubleQuantile',
+  full_name='World.World.DoubleQuantile',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='World.World.DoubleQuantile.key', index=0,
+      number=1, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='World.World.DoubleQuantile.value', index=1,
+      number=2, type=1, cpp_type=5, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=627,
+  serialized_end=671,
+)
+
+_WORLD_DOUBLEMATRIXWITHQUANTILES = _descriptor.Descriptor(
+  name='DoubleMatrixWithQuantiles',
+  full_name='World.World.DoubleMatrixWithQuantiles',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='quantiles', full_name='World.World.DoubleMatrixWithQuantiles.quantiles', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='rows', full_name='World.World.DoubleMatrixWithQuantiles.rows', index=1,
+      number=2, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=673,
+  serialized_end=786,
 )
 
 _WORLD = _descriptor.Descriptor(
@@ -250,31 +345,44 @@ _WORLD = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='humidity', full_name='World.World.humidity', index=9,
+      number=10, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
-  nested_types=[_WORLD_DOUBLEROW, _WORLD_BOOLEANROW, _WORLD_INTEGERROW, _WORLD_DOUBLEMATRIX, _WORLD_BOOLEANMATRIX, _WORLD_INTEGERMATRIX, ],
+  nested_types=[_WORLD_DOUBLEROW, _WORLD_BOOLEANROW, _WORLD_INTEGERROW, _WORLD_BYTEROW, _WORLD_DOUBLEMATRIX, _WORLD_BOOLEANMATRIX, _WORLD_INTEGERMATRIX, _WORLD_DOUBLEQUANTILE, _WORLD_DOUBLEMATRIXWITHQUANTILES, ],
   enum_types=[
   ],
   options=None,
   is_extendable=False,
   extension_ranges=[],
   serialized_start=23,
-  serialized_end=541,
+  serialized_end=786,
 )
 
 _WORLD_DOUBLEROW.containing_type = _WORLD;
 _WORLD_BOOLEANROW.containing_type = _WORLD;
 _WORLD_INTEGERROW.containing_type = _WORLD;
+_WORLD_BYTEROW.containing_type = _WORLD;
 _WORLD_DOUBLEMATRIX.fields_by_name['rows'].message_type = _WORLD_DOUBLEROW
 _WORLD_DOUBLEMATRIX.containing_type = _WORLD;
 _WORLD_BOOLEANMATRIX.fields_by_name['rows'].message_type = _WORLD_BOOLEANROW
 _WORLD_BOOLEANMATRIX.containing_type = _WORLD;
 _WORLD_INTEGERMATRIX.fields_by_name['rows'].message_type = _WORLD_INTEGERROW
 _WORLD_INTEGERMATRIX.containing_type = _WORLD;
+_WORLD_DOUBLEQUANTILE.containing_type = _WORLD;
+_WORLD_DOUBLEMATRIXWITHQUANTILES.fields_by_name['quantiles'].message_type = _WORLD_DOUBLEQUANTILE
+_WORLD_DOUBLEMATRIXWITHQUANTILES.fields_by_name['rows'].message_type = _WORLD_DOUBLEROW
+_WORLD_DOUBLEMATRIXWITHQUANTILES.containing_type = _WORLD;
 _WORLD.fields_by_name['heightMapData'].message_type = _WORLD_DOUBLEMATRIX
 _WORLD.fields_by_name['ocean'].message_type = _WORLD_BOOLEANMATRIX
 _WORLD.fields_by_name['biome'].message_type = _WORLD_INTEGERMATRIX
+_WORLD.fields_by_name['humidity'].message_type = _WORLD_DOUBLEMATRIXWITHQUANTILES
 DESCRIPTOR.message_types_by_name['World'] = _WORLD
 
 class World(_message.Message):
@@ -298,6 +406,12 @@ class World(_message.Message):
 
     # @@protoc_insertion_point(class_scope:World.World.IntegerRow)
 
+  class ByteRow(_message.Message):
+    __metaclass__ = _reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _WORLD_BYTEROW
+
+    # @@protoc_insertion_point(class_scope:World.World.ByteRow)
+
   class DoubleMatrix(_message.Message):
     __metaclass__ = _reflection.GeneratedProtocolMessageType
     DESCRIPTOR = _WORLD_DOUBLEMATRIX
@@ -315,6 +429,18 @@ class World(_message.Message):
     DESCRIPTOR = _WORLD_INTEGERMATRIX
 
     # @@protoc_insertion_point(class_scope:World.World.IntegerMatrix)
+
+  class DoubleQuantile(_message.Message):
+    __metaclass__ = _reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _WORLD_DOUBLEQUANTILE
+
+    # @@protoc_insertion_point(class_scope:World.World.DoubleQuantile)
+
+  class DoubleMatrixWithQuantiles(_message.Message):
+    __metaclass__ = _reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _WORLD_DOUBLEMATRIXWITHQUANTILES
+
+    # @@protoc_insertion_point(class_scope:World.World.DoubleMatrixWithQuantiles)
   DESCRIPTOR = _WORLD
 
   # @@protoc_insertion_point(class_scope:World.World)
