@@ -62,8 +62,12 @@ message World {
     optional DoubleMatrixWithQuantiles humidity = 10;
 
     // Irrigation
+    optional DoubleMatrix irrigation  = 11;
 
     // Permeability
+    optional DoubleMatrix permeabilityData = 12;
+    optional double permeability_low       = 13;
+    optional double permeability_med       = 14;
 
     // Precipitation
 
