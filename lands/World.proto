@@ -81,6 +81,14 @@ message World {
     optional double precipitation_med       = 21;    
 
     // Temperature
+    optional DoubleMatrix temperatureData    = 22;
+    optional double temperature_polar        = 23;
+    optional double temperature_alpine       = 24;
+    optional double temperature_boreal       = 25;
+    optional double temperature_cool         = 26;
+    optional double temperature_warm         = 27;
+    optional double temperature_subtropical  = 28;
+
 }
 
 
