@@ -1,0 +1,19 @@
+package World;
+
+message World {
+
+    message FloatRow {
+        repeated float cells = 1;
+    }
+
+    message HeightMap {
+        repeated FloatRow rows = 1;
+    }
+
+    required string name   = 1;
+    required int32  width  = 2;
+    required int32  height = 3;
+    required HeightMap heightMap = 4;
+}
+
+
