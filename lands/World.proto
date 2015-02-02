@@ -52,8 +52,8 @@ message World {
     required double heightMapTh_hill     = 7;
 
     // Ocean
-
     required BooleanMatrix ocean         = 8;
+    required DoubleMatrix  sea_depth     = 29;
 
     // Biome
     optional IntegerMatrix biome         = 9;

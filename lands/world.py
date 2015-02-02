@@ -116,6 +116,7 @@ class World(object):
 
         # Ocean                            
         self._to_protobuf_matrix(self.ocean, p_world.ocean)
+        self._to_protobuf_matrix(self.sea_depth, p_world.sea_depth)
 
         # Biome
         self._to_protobuf_matrix(self.biome, p_world.biome, biome_name_to_index)
@@ -167,6 +168,7 @@ class World(object):
 
         # Ocean
         w.set_ocean(World._from_protobuf_matrix(p_world.ocean))
+        w.sea_depth = World._from_protobuf_matrix(p_world.sea_depth)
 
         # Biome
         w.set_biome(World._from_protobuf_matrix(p_world.biome, biome_index_to_name))
