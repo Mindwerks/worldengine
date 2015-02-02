@@ -28,7 +28,17 @@ message World {
 
     message IntegerMatrix {
         repeated IntegerRow rows = 1;
-    }        
+    }   
+
+    message DoubleQuantile {
+        required int32 key = 1;
+        required double value = 2;
+    }
+
+    message DoubleMatrixWithQuantiles {
+        repeated DoubleQuantile quantiles = 1;
+        repeated DoubleRow rows = 2;
+    }     
 
     required string name   = 1;
     required int32  width  = 2;
@@ -49,6 +59,7 @@ message World {
     optional IntegerMatrix biome         = 9;
 
     // Humidity
+    optional DoubleMatrixWithQuantiles humidity = 10;
 
     // Irrigation
 
