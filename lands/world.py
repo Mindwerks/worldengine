@@ -7,7 +7,7 @@ except:
     from biome import *
     from basic_map_operations import *
 import pickle
-
+import protobuf.World_pb2
 
 class World(object):
     """A world composed by name, dimensions and all the characteristics of each cell.
@@ -40,6 +40,181 @@ class World(object):
         for k in dict:
             instance.__dict__[k] = dict[k]
         return instance
+
+    def protobuf_serialize(self):
+        p_world = self._to_protobuf_world()
+        return p_world.SerializeToString()
+
+    @classmethod
+    def protobuf_unserialize(cls, serialized):
+        p_world = protobuf.World_pb2.World()
+        p_world.ParseFromString(serialized)
+        return World._from_protobuf_world(p_world)
+
+    @staticmethod
+    def _to_protobuf_matrix(matrix, p_matrix, transformation = None):
+        for row in matrix:
+            p_row = p_matrix.rows.add()
+            for cell in row:
+                value = cell
+                if transformation:
+                    value = transformation(value)
+                p_row.cells.append(value) 
+
+    @staticmethod
+    def _to_protobuf_quantiles(quantiles, p_quantiles):
+        for k in quantiles:
+            entry = p_quantiles.add()
+            v = quantiles[k]
+            entry.key   = int(k)
+            entry.value = v   
+
+    @staticmethod
+    def _to_protobuf_matrix_with_quantiles(matrix, p_matrix):
+        World._to_protobuf_quantiles(matrix['quantiles'], p_matrix.quantiles)
+        World._to_protobuf_matrix(matrix['data'], p_matrix)                    
+
+    @staticmethod
+    def _from_protobuf_matrix(p_matrix, transformation = None):
+        matrix = []
+        for p_row in p_matrix.rows:
+            row = []
+            for p_cell in p_row.cells:
+                value = p_cell
+                if transformation:
+                    value = transformation(value)
+                row.append(value)
+            matrix.append(row)                
+        return matrix
+
+    @staticmethod
+    def _from_protobuf_quantiles(p_quantiles):
+        quantiles = {}
+        for p_quantile in p_quantiles:
+            quantiles[str(p_quantile.key)] = p_quantile.value
+        return quantiles
+
+    @staticmethod
+    def _from_protobuf_matrix_with_quantiles(p_matrix):
+        matrix = {}
+        matrix['data'] = World._from_protobuf_matrix(p_matrix)
+        matrix['quantiles'] = World._from_protobuf_quantiles(p_matrix.quantiles)
+        return matrix
+
+
+    def _to_protobuf_world(self):
+        p_world = protobuf.World_pb2.World()
+        p_world.name   = self.name
+        p_world.width  = self.width
+        p_world.height = self.height
+
+        # Elevation
+        self._to_protobuf_matrix(self.elevation['data'], p_world.heightMapData)
+        p_world.heightMapTh_sea   = self.elevation['thresholds'][0][1];
+        p_world.heightMapTh_plain = self.elevation['thresholds'][1][1];
+        p_world.heightMapTh_hill  = self.elevation['thresholds'][2][1];    
+
+        # Ocean                            
+        self._to_protobuf_matrix(self.ocean, p_world.ocean)
+        self._to_protobuf_matrix(self.sea_depth, p_world.sea_depth)
+
+        # Biome
+        self._to_protobuf_matrix(self.biome, p_world.biome, biome_name_to_index)
+
+        # Humidty
+        self._to_protobuf_matrix_with_quantiles(self.humidity, p_world.humidity)
+
+        if self.irrigation:
+            self._to_protobuf_matrix(self.irrigation, p_world.irrigation)
+
+        if self.permeability:
+            self._to_protobuf_matrix(self.permeability['data'], p_world.permeabilityData)
+            p_world.permeability_low = self.permeability['thresholds'][0][1]
+            p_world.permeability_med = self.permeability['thresholds'][1][1]
+
+        if self.watermap:
+            self._to_protobuf_matrix(self.watermap['data'], p_world.watermapData)
+            p_world.watermap_creek = self.watermap['thresholds']['creek']
+            p_world.watermap_river = self.watermap['thresholds']['river']
+            p_world.watermap_mainriver = self.watermap['thresholds']['main river']            
+
+        if self.precipitation:
+            self._to_protobuf_matrix(self.precipitation['data'], p_world.precipitationData)
+            p_world.precipitation_low = self.precipitation['thresholds'][0][1]
+            p_world.precipitation_med = self.precipitation['thresholds'][1][1]
+
+        if self.temperature:
+            self._to_protobuf_matrix(self.temperature['data'], p_world.temperatureData)
+            p_world.temperature_polar       = self.temperature['thresholds'][0][1]
+            p_world.temperature_alpine      = self.temperature['thresholds'][1][1]
+            p_world.temperature_boreal      = self.temperature['thresholds'][2][1]
+            p_world.temperature_cool        = self.temperature['thresholds'][3][1]
+            p_world.temperature_warm        = self.temperature['thresholds'][4][1]
+            p_world.temperature_subtropical = self.temperature['thresholds'][5][1]
+
+        return p_world
+
+    @classmethod
+    def _from_protobuf_world(cls, p_world):
+        w = World(p_world.name, p_world.width, p_world.height)
+
+        # Elevation
+        e = World._from_protobuf_matrix(p_world.heightMapData)
+        e_th = [('sea',      p_world.heightMapTh_sea), 
+                ('plain',    p_world.heightMapTh_plain), 
+                ('hill',     p_world.heightMapTh_hill), 
+                ('mountain', None)]
+        w.set_elevation(e, e_th)
+
+        # Ocean
+        w.set_ocean(World._from_protobuf_matrix(p_world.ocean))
+        w.sea_depth = World._from_protobuf_matrix(p_world.sea_depth)
+
+        # Biome
+        w.set_biome(World._from_protobuf_matrix(p_world.biome, biome_index_to_name))
+
+        # Humidity
+        # FIXME: use setters
+        w.humidity = World._from_protobuf_matrix_with_quantiles(p_world.humidity)
+
+        w.irrigation = World._from_protobuf_matrix(p_world.irrigation)
+
+        p = World._from_protobuf_matrix(p_world.permeabilityData)
+        p_th = [
+            ('low' , p_world.permeability_low),
+            ('med' , p_world.permeability_med),
+            ('hig' , None)
+        ]
+        w.set_permeability(p, p_th)
+
+        w.watermap = {}
+        w.watermap['data'] = World._from_protobuf_matrix(p_world.watermapData)
+        w.watermap['thresholds'] = {}
+        w.watermap['thresholds']['creek'] = p_world.watermap_creek
+        w.watermap['thresholds']['river'] = p_world.watermap_river
+        w.watermap['thresholds']['main river'] = p_world.watermap_mainriver
+
+        p = World._from_protobuf_matrix(p_world.precipitationData)
+        p_th = [
+            ('low' , p_world.precipitation_low),
+            ('med' , p_world.precipitation_med),
+            ('hig' , None)
+        ]
+        w.set_precipitation(p, p_th)
+
+        t = World._from_protobuf_matrix(p_world.temperatureData)
+        t_th = [
+            ('polar',       p_world.temperature_polar),
+            ('alpine',      p_world.temperature_alpine),
+            ('boreal',      p_world.temperature_boreal),
+            ('cool',        p_world.temperature_cool),
+            ('warm',        p_world.temperature_warm),
+            ('subtropical', p_world.temperature_subtropical),
+            ('tropical',    None)
+        ]
+        w.set_temperature(t, t_th)
+
+        return w
 
     ###
     ### Land/Ocean
