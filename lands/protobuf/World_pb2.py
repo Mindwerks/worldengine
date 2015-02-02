@@ -13,7 +13,7 @@ from google.protobuf import descriptor_pb2
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='World.proto',
   package='World',
-  serialized_pb='\n\x0bWorld.proto\x12\x05World\"\x86\x03\n\x05World\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\r\n\x05width\x18\x02 \x02(\x05\x12\x0e\n\x06height\x18\x03 \x02(\x05\x12\x30\n\rheightMapData\x18\x04 \x02(\x0b\x32\x19.World.World.DoubleMatrix\x12\x17\n\x0fheightMapTh_sea\x18\x05 \x02(\x01\x12\x19\n\x11heightMapTh_plain\x18\x06 \x02(\x01\x12\x18\n\x10heightMapTh_hill\x18\x07 \x02(\x01\x12)\n\x05ocean\x18\x08 \x02(\x0b\x32\x1a.World.World.BooleanMatrix\x1a\x1a\n\tDoubleRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x01\x1a\x1b\n\nBooleanRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x08\x1a\x34\n\x0c\x44oubleMatrix\x12$\n\x04rows\x18\x01 \x03(\x0b\x32\x16.World.World.DoubleRow\x1a\x36\n\rBooleanMatrix\x12%\n\x04rows\x18\x01 \x03(\x0b\x32\x17.World.World.BooleanRow')
+  serialized_pb='\n\x0bWorld.proto\x12\x05World\"\x86\x04\n\x05World\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\r\n\x05width\x18\x02 \x02(\x05\x12\x0e\n\x06height\x18\x03 \x02(\x05\x12\x30\n\rheightMapData\x18\x04 \x02(\x0b\x32\x19.World.World.DoubleMatrix\x12\x17\n\x0fheightMapTh_sea\x18\x05 \x02(\x01\x12\x19\n\x11heightMapTh_plain\x18\x06 \x02(\x01\x12\x18\n\x10heightMapTh_hill\x18\x07 \x02(\x01\x12)\n\x05ocean\x18\x08 \x02(\x0b\x32\x1a.World.World.BooleanMatrix\x12)\n\x05\x62iome\x18\t \x01(\x0b\x32\x1a.World.World.IntegerMatrix\x1a\x1a\n\tDoubleRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x01\x1a\x1b\n\nBooleanRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x08\x1a\x1b\n\nIntegerRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x05\x1a\x34\n\x0c\x44oubleMatrix\x12$\n\x04rows\x18\x01 \x03(\x0b\x32\x16.World.World.DoubleRow\x1a\x36\n\rBooleanMatrix\x12%\n\x04rows\x18\x01 \x03(\x0b\x32\x17.World.World.BooleanRow\x1a\x36\n\rIntegerMatrix\x12%\n\x04rows\x18\x01 \x03(\x0b\x32\x17.World.World.IntegerRow')
 
 
 
@@ -41,8 +41,8 @@ _WORLD_DOUBLEROW = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=248,
-  serialized_end=274,
+  serialized_start=291,
+  serialized_end=317,
 )
 
 _WORLD_BOOLEANROW = _descriptor.Descriptor(
@@ -68,8 +68,35 @@ _WORLD_BOOLEANROW = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=276,
-  serialized_end=303,
+  serialized_start=319,
+  serialized_end=346,
+)
+
+_WORLD_INTEGERROW = _descriptor.Descriptor(
+  name='IntegerRow',
+  full_name='World.World.IntegerRow',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='cells', full_name='World.World.IntegerRow.cells', index=0,
+      number=1, type=5, cpp_type=1, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=348,
+  serialized_end=375,
 )
 
 _WORLD_DOUBLEMATRIX = _descriptor.Descriptor(
@@ -95,8 +122,8 @@ _WORLD_DOUBLEMATRIX = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=305,
-  serialized_end=357,
+  serialized_start=377,
+  serialized_end=429,
 )
 
 _WORLD_BOOLEANMATRIX = _descriptor.Descriptor(
@@ -122,8 +149,35 @@ _WORLD_BOOLEANMATRIX = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=359,
-  serialized_end=413,
+  serialized_start=431,
+  serialized_end=485,
+)
+
+_WORLD_INTEGERMATRIX = _descriptor.Descriptor(
+  name='IntegerMatrix',
+  full_name='World.World.IntegerMatrix',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='rows', full_name='World.World.IntegerMatrix.rows', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=487,
+  serialized_end=541,
 )
 
 _WORLD = _descriptor.Descriptor(
@@ -189,27 +243,38 @@ _WORLD = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='biome', full_name='World.World.biome', index=8,
+      number=9, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
-  nested_types=[_WORLD_DOUBLEROW, _WORLD_BOOLEANROW, _WORLD_DOUBLEMATRIX, _WORLD_BOOLEANMATRIX, ],
+  nested_types=[_WORLD_DOUBLEROW, _WORLD_BOOLEANROW, _WORLD_INTEGERROW, _WORLD_DOUBLEMATRIX, _WORLD_BOOLEANMATRIX, _WORLD_INTEGERMATRIX, ],
   enum_types=[
   ],
   options=None,
   is_extendable=False,
   extension_ranges=[],
   serialized_start=23,
-  serialized_end=413,
+  serialized_end=541,
 )
 
 _WORLD_DOUBLEROW.containing_type = _WORLD;
 _WORLD_BOOLEANROW.containing_type = _WORLD;
+_WORLD_INTEGERROW.containing_type = _WORLD;
 _WORLD_DOUBLEMATRIX.fields_by_name['rows'].message_type = _WORLD_DOUBLEROW
 _WORLD_DOUBLEMATRIX.containing_type = _WORLD;
 _WORLD_BOOLEANMATRIX.fields_by_name['rows'].message_type = _WORLD_BOOLEANROW
 _WORLD_BOOLEANMATRIX.containing_type = _WORLD;
+_WORLD_INTEGERMATRIX.fields_by_name['rows'].message_type = _WORLD_INTEGERROW
+_WORLD_INTEGERMATRIX.containing_type = _WORLD;
 _WORLD.fields_by_name['heightMapData'].message_type = _WORLD_DOUBLEMATRIX
 _WORLD.fields_by_name['ocean'].message_type = _WORLD_BOOLEANMATRIX
+_WORLD.fields_by_name['biome'].message_type = _WORLD_INTEGERMATRIX
 DESCRIPTOR.message_types_by_name['World'] = _WORLD
 
 class World(_message.Message):
@@ -227,6 +292,12 @@ class World(_message.Message):
 
     # @@protoc_insertion_point(class_scope:World.World.BooleanRow)
 
+  class IntegerRow(_message.Message):
+    __metaclass__ = _reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _WORLD_INTEGERROW
+
+    # @@protoc_insertion_point(class_scope:World.World.IntegerRow)
+
   class DoubleMatrix(_message.Message):
     __metaclass__ = _reflection.GeneratedProtocolMessageType
     DESCRIPTOR = _WORLD_DOUBLEMATRIX
@@ -238,6 +309,12 @@ class World(_message.Message):
     DESCRIPTOR = _WORLD_BOOLEANMATRIX
 
     # @@protoc_insertion_point(class_scope:World.World.BooleanMatrix)
+
+  class IntegerMatrix(_message.Message):
+    __metaclass__ = _reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _WORLD_INTEGERMATRIX
+
+    # @@protoc_insertion_point(class_scope:World.World.IntegerMatrix)
   DESCRIPTOR = _WORLD
 
   # @@protoc_insertion_point(class_scope:World.World)
