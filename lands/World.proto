@@ -10,6 +10,14 @@ message World {
         repeated bool cells = 1;
     }
 
+    message IntegerRow {
+        repeated int32 cells = 1;
+    }
+
+    message ByteRow {
+        repeated int32 cells = 1;
+    }
+
     message DoubleMatrix {
         repeated DoubleRow rows = 1;
     }
@@ -17,6 +25,10 @@ message World {
     message BooleanMatrix {
         repeated BooleanRow rows = 1;
     }    
+
+    message IntegerMatrix {
+        repeated IntegerRow rows = 1;
+    }        
 
     required string name   = 1;
     required int32  width  = 2;
@@ -34,6 +46,7 @@ message World {
     required BooleanMatrix ocean         = 8;
 
     // Biome
+    optional IntegerMatrix biome         = 9;
 
     // Humidity
 

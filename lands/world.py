@@ -52,19 +52,25 @@ class World(object):
         return World._from_protobuf_world(p_world)
 
     @staticmethod
-    def _to_protobuf_matrix(matrix, p_matrix):
+    def _to_protobuf_matrix(matrix, p_matrix, transformation = None):
         for row in matrix:
             p_row = p_matrix.rows.add()
             for cell in row:
-                p_row.cells.append(cell)        
+                value = cell
+                if transformation:
+                    value = transformation(value)
+                p_row.cells.append(value)        
 
     @staticmethod
-    def _from_protobuf_matrix(p_matrix):
+    def _from_protobuf_matrix(p_matrix, transformation = None):
         matrix = []
         for p_row in p_matrix.rows:
             row = []
             for p_cell in p_row.cells:
-                row.append(p_cell)
+                value = p_cell
+                if transformation:
+                    value = transformation(value)
+                row.append(value)
             matrix.append(row)                
         return matrix
 
@@ -83,6 +89,9 @@ class World(object):
         # Ocean                            
         self._to_protobuf_matrix(self.ocean, p_world.ocean)
 
+        # Biome
+        self._to_protobuf_matrix(self.biome, p_world.biome, biome_name_to_index)
+
         return p_world
 
     @classmethod
@@ -99,6 +108,9 @@ class World(object):
 
         # Ocean
         w.set_ocean(World._from_protobuf_matrix(p_world.ocean))
+
+        # Biome
+        w.set_biome(World._from_protobuf_matrix(p_world.biome, biome_index_to_name))
 
         return w
 

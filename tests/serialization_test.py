@@ -16,6 +16,13 @@ class TestSerialization(unittest.TestCase):
         self.assertEqual(w.elevation['data'],       unserialized.elevation['data'])
         self.assertEqual(w.elevation['thresholds'], unserialized.elevation['thresholds'])
         self.assertEqual(w.ocean,                   unserialized.ocean)
+        self.assertEqual(w.biome,                   unserialized.biome)
+        self.assertEqual(w.humidity,                unserialized.humidity)
+        self.assertEqual(w.irrigation,              unserialized.irrigation)
+        self.assertEqual(w.permeability,            unserialized.permeability)
+        self.assertEqual(w.watermap,                unserialized.watermap)
+        self.assertEqual(w.precipation,             unserialized.precipation)
+        self.assertEqual(w.temperature,             unserialized.temperature)
         self.assertEqual(w, unserialized)
 
 
