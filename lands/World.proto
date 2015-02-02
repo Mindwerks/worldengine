@@ -76,6 +76,9 @@ message World {
     optional double watermap_mainriver     = 18;
 
     // Precipitation
+    optional DoubleMatrix precipitationData = 19;
+    optional double precipitation_low       = 20;
+    optional double precipitation_med       = 21;    
 
     // Temperature
 }
