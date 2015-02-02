@@ -2,18 +2,22 @@ package World;
 
 message World {
 
-    message FloatRow {
-        repeated float cells = 1;
+    message DoubleRow {
+        repeated double cells = 1;
     }
 
     message HeightMap {
-        repeated FloatRow rows = 1;
+        repeated DoubleRow rows = 1;
     }
 
     required string name   = 1;
     required int32  width  = 2;
     required int32  height = 3;
-    required HeightMap heightMap = 4;
+
+    required HeightMap heightMapData    = 4;
+    required double heightMapTh_sea      = 5;
+    required double heightMapTh_plain    = 6;
+    required double heightMapTh_hill     = 7;
 }
 
 
