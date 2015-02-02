@@ -6,18 +6,46 @@ message World {
         repeated double cells = 1;
     }
 
-    message HeightMap {
+    message BooleanRow {
+        repeated bool cells = 1;
+    }
+
+    message DoubleMatrix {
         repeated DoubleRow rows = 1;
     }
+
+    message BooleanMatrix {
+        repeated BooleanRow rows = 1;
+    }    
 
     required string name   = 1;
     required int32  width  = 2;
     required int32  height = 3;
 
-    required HeightMap heightMapData    = 4;
+    // Elevation
+
+    required DoubleMatrix heightMapData  = 4;
     required double heightMapTh_sea      = 5;
     required double heightMapTh_plain    = 6;
     required double heightMapTh_hill     = 7;
+
+    // Ocean
+
+    required BooleanMatrix ocean         = 8;
+
+    // Biome
+
+    // Humidity
+
+    // Irrigation
+
+    // Permeability
+
+    // Precipitation
+
+    // Temperature
+
+    // Watermap
 }
 
 

@@ -15,6 +15,7 @@ class TestSerialization(unittest.TestCase):
         unserialized = World.protobuf_unserialize(serialized)
         self.assertEqual(w.elevation['data'],       unserialized.elevation['data'])
         self.assertEqual(w.elevation['thresholds'], unserialized.elevation['thresholds'])
+        self.assertEqual(w.ocean,                   unserialized.ocean)
         self.assertEqual(w, unserialized)
 
 
