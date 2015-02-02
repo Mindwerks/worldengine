@@ -131,6 +131,12 @@ class World(object):
             p_world.permeability_low = self.permeability['thresholds'][0][1]
             p_world.permeability_med = self.permeability['thresholds'][1][1]
 
+        if self.watermap:
+            self._to_protobuf_matrix(self.watermap['data'], p_world.watermapData)
+            p_world.watermap_creek = self.watermap['thresholds']['creek']
+            p_world.watermap_river = self.watermap['thresholds']['river']
+            p_world.watermap_mainriver = self.watermap['thresholds']['main river']            
+
         return p_world
 
     @classmethod
@@ -164,6 +170,13 @@ class World(object):
             ('hig' , None)
         ]
         w.set_permeability(p, p_th)
+
+        w.watermap = {}
+        w.watermap['data'] = World._from_protobuf_matrix(p_world.watermapData)
+        w.watermap['thresholds'] = {}
+        w.watermap['thresholds']['creek'] = p_world.watermap_creek
+        w.watermap['thresholds']['river'] = p_world.watermap_river
+        w.watermap['thresholds']['main river'] = p_world.watermap_mainriver
 
         return w
 
