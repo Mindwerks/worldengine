@@ -4,10 +4,15 @@ from lands.plates import *
 from lands.generator import *
 import tempfile
 
+def _sort(l):
+	l2 = l
+	l2.sort()
+	return l2
+
 class TestSerialization(unittest.TestCase):
 
     def setUp(self):
-        pass
+        self.maxDiff = None
 
     def test_protobuf_serialize_unserialize(self):
         w = world_gen("Dummy", 1, False, 32, 16, Step.get_by_name("full"))
@@ -23,6 +28,8 @@ class TestSerialization(unittest.TestCase):
         self.assertEqual(w.watermap,                unserialized.watermap)
         self.assertEqual(w.precipitation,           unserialized.precipitation)
         self.assertEqual(w.temperature,             unserialized.temperature)
+        self.assertEqual(w.sea_depth,               unserialized.sea_depth)
+        self.assertEqual(_sort(dir(w)), _sort(dir(unserialized)))
         self.assertEqual(w, unserialized)
 
 
