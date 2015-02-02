@@ -176,6 +176,19 @@ class TropicalRainForest(Biome):
     def name(self):
         return 'tropical rain forest'
 
+def biome_name_to_index(biome_name):
+    names = BIOMES.keys()
+    names.sort()
+    for i in xrange(len(names)):
+        if names[i] == biome_name:
+            return i
+    raise "Not found"
+
+def biome_index_to_name(biome_index):
+    names = BIOMES.keys()
+    names.sort()
+    return names[biome_index]
+
 BIOMES = {
     'ocean': Ocean(),
     'polar desert': PolarDesert(),

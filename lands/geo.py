@@ -690,6 +690,7 @@ def world_gen_from_elevation(name, elevation, seed, ocean_level, verbose, width,
     if verbose:
         print("...erosion calculated")
 
+    # FIXME: create setters
     w.watermap = watermap(w, 20000)
     w.irrigation = irrigation(w)
     w.humidity = humidity(w)
