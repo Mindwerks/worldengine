@@ -142,6 +142,15 @@ class World(object):
             p_world.precipitation_low = self.precipitation['thresholds'][0][1]
             p_world.precipitation_med = self.precipitation['thresholds'][1][1]
 
+        if self.temperature:
+            self._to_protobuf_matrix(self.temperature['data'], p_world.temperatureData)
+            p_world.temperature_polar       = self.temperature['thresholds'][0][1]
+            p_world.temperature_alpine      = self.temperature['thresholds'][1][1]
+            p_world.temperature_boreal      = self.temperature['thresholds'][2][1]
+            p_world.temperature_cool        = self.temperature['thresholds'][3][1]
+            p_world.temperature_warm        = self.temperature['thresholds'][4][1]
+            p_world.temperature_subtropical = self.temperature['thresholds'][5][1]
+
         return p_world
 
     @classmethod
@@ -190,6 +199,18 @@ class World(object):
             ('hig' , None)
         ]
         w.set_precipitation(p, p_th)
+
+        t = World._from_protobuf_matrix(p_world.temperatureData)
+        t_th = [
+            ('polar',       p_world.temperature_polar),
+            ('alpine',      p_world.temperature_alpine),
+            ('boreal',      p_world.temperature_boreal),
+            ('cool',        p_world.temperature_cool),
+            ('warm',        p_world.temperature_warm),
+            ('subtropical', p_world.temperature_subtropical),
+            ('tropical',    None)
+        ]
+        w.set_temperature(t, t_th)
 
         return w
 
