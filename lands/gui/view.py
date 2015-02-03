@@ -74,14 +74,29 @@ def draw_plates_on_screen(world, canvas):
     width = world.width
     height = world.height
     n_plates = world.n_plates()
-    print("N plates %i" % n_plates)
     for y in range(0, height):
         for x in range(0, width):
             h = world.plates[y][x]*(360/n_plates)
             s = 0.5
             i = 64.0
             r, g, b = hsi_to_rgb(h, s, i)
-            print("H % i S %i I %i" % (h, s, i))
-            print("R % i G %i B %i" % (r, g, b))
+            col = QtGui.QColor(r, g, b)
+            canvas.setPixel(x, y, col.rgb())
+
+
+def draw_plates_and_elevation_on_screen(world, canvas):
+    width = world.width
+    height = world.height
+    n_plates = world.n_plates()
+    max_el = world.max_elevation()
+    min_el = world.min_elevation()
+    delta_el = max_el - min_el
+    for y in range(0, height):
+        for x in range(0, width):
+            h = world.plates[y][x]*(360/n_plates)
+            el = world.elevation['data'][y][x]
+            s = 0.6
+            i = 40.0 + 60.0 * ((el-min_el)/delta_el)
+            r, g, b = hsi_to_rgb(h, s, i)
             col = QtGui.QColor(r, g, b)
             canvas.setPixel(x, y, col.rgb())
