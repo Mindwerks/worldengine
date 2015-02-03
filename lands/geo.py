@@ -12,8 +12,47 @@ if sys.version_info > (2,):
     xrange = range
 
 
+def center_land(world):
+    """Translate the map horizontally and vertically to put as much ocean as possible at the borders.
+       It operates on elevation and plates map"""
+    miny = None
+    ymin = None
+    minx = None
+    xmin = None
+
+    for y in xrange(world.height):
+        sumy = 0
+        for x in xrange(world.width):
+            sumy += world.elevation['data'][y][x]
+        if miny == None or sumy < miny:
+            miny = sumy
+            ymin = y
+
+    for x in xrange(world.width):
+        sumx = 0
+        for y in xrange(world.height):
+            sumx += world.elevation['data'][y][x]
+        if minx == None or sumx < minx:
+            minx = sumx
+            xmin = x
+
+    new_elevation_data = []
+    new_plates         = []
+    for y in xrange(world.height):
+        new_elevation_data.append([])
+        new_plates.append([])
+        srcy = (ymin + y) % world.height
+        for x in xrange(world.width):
+            srcx = (xmin + x) % world.width
+            new_elevation_data[y].append( world.elevation['data'][srcy][srcx] )
+            new_plates[y].append( world.plates[srcy][srcx] )
+    world.elevation['data'] = new_elevation_data
+    world.plates = new_plates
+
+
 def center_elevation_map(elevation, width, height):
     """Translate the map horizontally and vertically to put as much ocean as possible at the borders."""
+    # FIXME this is bad because plates are not translated
     miny = None
     ymin = None
     minx = None
@@ -576,6 +615,11 @@ def elevnoise(elevation, seed):
 
 
 def place_oceans_at_map_borders(elevation):
+    """
+    Lower the elevation near the border of the map
+    :param elevation:
+    :return:
+    """
     width = len(elevation[0])
     height = len(elevation)
 
