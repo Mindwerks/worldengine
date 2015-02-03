@@ -165,7 +165,7 @@ class GenerationThread(threading.Thread):
         elevnoise_on_world(w, random.randint(0, 4096))
         self.ui.set_status('Plate simulation: forcing oceans at borders')
         place_oceans_at_map_borders_on_world(w)
-        self.ui.set_status('Plate simulation: finalization')
+        self.ui.set_status('Plate simulation: finalization (can take a while)')
         initialize_ocean_and_thresholds(w)
         self.ui.set_status('Plate simulation: completed')
         self.ui.world = w
