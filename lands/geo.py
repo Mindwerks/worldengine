@@ -703,31 +703,6 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
     world.set_elevation(e, e_th)
     world.sea_depth = sea_depth(world, ocean_level)
 
-def init_world_from_elevation(name, elevation, ocean_level, verbose):
-    width = len(elevation[0])
-    height = len(elevation)
-
-    w = World(name, width, height)
-
-    # Elevation with thresholds
-    e = elevation
-    if ocean_level:
-        sl = ocean_level
-    else:
-        sl = find_threshold(e, 0.3) + 1.5
-    # TODO: refactor to use initialize_ocean_and_thresholds
-    ocean = fill_ocean(e, sl)
-    hl = find_threshold(e, 0.10)
-    ml = find_threshold(e, 0.03)
-    e_th = [('sea', sl), ('plain', hl), ('hill', ml), ('mountain', None)]
-    w.set_ocean(ocean)
-    w.set_elevation(e, e_th)
-    w.sea_depth = sea_depth(w, sl)
-    if verbose:
-        print("...elevation level calculated")
-
-    return [w, ocean, sl, hl, ml, e_th]
-
 
 def world_gen_precipitation(w, seed, verbose):
     p = precipitation(seed, w.width, w.height)
