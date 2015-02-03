@@ -742,12 +742,13 @@ def world_gen_precipitation(w, seed, verbose):
     return [p, p_th]
 
 
-def world_gen_from_elevation(name, elevation, seed, ocean_level, verbose, width, height, step):
+def world_gen_from_elevation(w, name, seed, ocean_level, verbose, width, height, step):
     if isinstance(step, str):
         step = Step.get_by_name(step)
     i = seed
-    e = elevation
-    w, ocean, sl, hl, ml, e_th = init_world_from_elevation(name, elevation, ocean_level, verbose)
+    e = w.elevation['data']
+    ocean = w.ocean
+    ml = w.start_mountain_th()
 
     if not step.include_precipitations:
         return w

@@ -324,6 +324,9 @@ class World(object):
     ### Elevation
     ###
 
+    def start_mountain_th(self):
+        return self.elevation['thresholds'][2][1]
+
     def max_elevation(self):
         max_el = None
         for y in xrange(self.height):
