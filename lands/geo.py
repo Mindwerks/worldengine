@@ -729,11 +729,8 @@ def init_world_from_elevation(name, elevation, ocean_level, verbose):
     return [w, ocean, sl, hl, ml, e_th]
 
 
-def world_gen_precipitation(w, i, ocean, verbose):
-    width = len(ocean[0])
-    height = len(ocean)
-
-    p = precipitation(i, width, height)
+def world_gen_precipitation(w, seed, ocean, verbose):
+    p = precipitation(seed, w.width, w.height)
     p_th = [
         ('low', find_threshold_f(p, 0.75, ocean)),
         ('med', find_threshold_f(p, 0.3, ocean)),
@@ -756,7 +753,7 @@ def world_gen_from_elevation(name, elevation, seed, ocean_level, verbose, width,
         return w
 
     # Precipitation with thresholds
-    p, p_th = world_gen_precipitation(w, i, ocean, verbose)
+    p, p_th = world_gen_precipitation(w, seed, verbose)
 
     if not step.include_erosion:
         return w
