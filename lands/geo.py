@@ -602,7 +602,17 @@ def classify(data, thresholds, x, y):
             return name
 
 
+def elevnoise_on_world(world, seed):
+    octaves = 6
+    freq = 16.0 * octaves
+    for y in range(0, world.height):
+        for x in range(0, world.width):
+            n = snoise2(x / freq * 2, y / freq * 2, octaves, base=seed)
+            world.elevation['data'][y][x] += n
+
+
 def elevnoise(elevation, seed):
+    # FIXME use elevnoise_on_world instead
     width = len(elevation[0])
     height = len(elevation)
 
