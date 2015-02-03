@@ -12,7 +12,7 @@ config = {
     'install_requires' : ['nose'],
     'packages'         : ['lands'],
     'entry_points'     : {
-        'console_scripts': ['lands=lands.generator:main'],
+        'console_scripts': ['lands=lands.generator:main', 'landsgui=lands.gui.main:main'],
     },
     'name'             : 'lands'
 }
