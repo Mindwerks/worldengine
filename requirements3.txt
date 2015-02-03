@@ -1,2 +1,3 @@
+--allow-all-external
 -r requirements_base.txt
-protobuf-py3==2.5.0
+--allow-unverified protobuf-py3==2.5.0
