@@ -1,7 +1,7 @@
 __author__ = 'Federico Tomassetti'
 
 from PyQt4 import QtGui
-from draw import elevation_color
+from lands.draw import elevation_color
 
 
 def draw_simple_elevation_on_screen(world, canvas):
