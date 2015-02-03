@@ -1,14 +1,9 @@
 __author__ = 'Federico Tomassetti'
 
-from biome import biome_index_to_name
-try:
-    from lands.biome import *
-    from lands.basic_map_operations import *
-except:
-    from biome import *
-    from basic_map_operations import *
+from lands.biome import *
+from lands.basic_map_operations import *
 import pickle
-import protobuf.World_pb2
+import lands.protobuf.World_pb2
 
 class World(object):
     """A world composed by name, dimensions and all the characteristics of each cell.
