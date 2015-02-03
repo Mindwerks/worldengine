@@ -234,6 +234,78 @@ class MapCanvas(QtGui.QImage):
     def _update(self):
         self.label.setPixmap(QtGui.QPixmap.fromImage(self))
 
+class OperationDialog(QtGui.QDialog):
+
+    def __init__(self, parent, world, operation):
+        QtGui.QDialog.__init__(self, parent)
+        self.operation = operation
+        self._init_ui()
+        self.op_thread = OperationThread(world, operation, self)
+        self.op_thread.start()
+
+    def _init_ui(self):
+        self.resize(400, 100)
+        self.setWindowTitle(self.operation.title())
+        grid = QtGui.QGridLayout()
+
+        self.status = QtGui.QLabel('....')
+        grid.addWidget(self.status, 0, 0, 1, 3)
+
+        cancel   = QtGui.QPushButton('Cancel')
+        grid.addWidget(cancel, 1, 0, 1, 1)
+        cancel.clicked.connect(self._on_cancel)
+
+        done   = QtGui.QPushButton('Done')
+        grid.addWidget(done, 1, 2, 1, 1)
+        done.clicked.connect(self._on_done)
+        done.setEnabled(False)
+        self.done = done
+
+        self.setLayout(grid)
+
+    def _on_cancel(self):
+        QtGui.QDialog.reject(self)
+
+    def _on_done(self):
+        QtGui.QDialog.accept(self)
+
+    def on_finish(self):
+        self.done.setEnabled(True)
+
+    def set_status(self, message):
+        self.status.setText(message)
+
+class OperationThread(threading.Thread):
+
+    def __init__(self, world, operation, ui):
+        threading.Thread.__init__(self)
+        self.world = world
+        self.operation = operation
+        self.ui = ui
+
+    def run(self):
+        self.operation.execute(self.world, self.ui)
+
+class PrecipitationsOp():
+
+    def __init__(self):
+        pass
+
+    def title(self):
+        return "Simulation precipitations"
+
+    def execute(self, world, ui):
+        """
+
+        :param ui: the dialog with the set_status and on_finish methods
+        :return:
+        """
+        ui.set_status("Precipitation: started")
+
+        ui.set_status("Precipitation: done")
+        ui.on_finish()
+
+
 class LandsGui(QtGui.QMainWindow):
     
     def __init__(self):
@@ -271,6 +343,7 @@ class LandsGui(QtGui.QMainWindow):
         self.canvas = MapCanvas(self.label, self.world.width, self.world.height)
         self._on_bw_view()
         self.saveproto_action.setEnabled(world != None)
+        self.precipitations_action.setEnabled(world != None)
 
     def _prepare_menu(self):
         generate_action = QtGui.QAction('&Generate', self)
@@ -301,6 +374,10 @@ class LandsGui(QtGui.QMainWindow):
         land_and_ocean_view = QtGui.QAction('Land and ocean', self)
         land_and_ocean_view.triggered.connect(self._on_land_view)
 
+        self.precipitations_action = QtGui.QAction('Precipitations', self)
+        self.precipitations_action.triggered.connect(self._on_precipitations)
+        self.precipitations_action.setEnabled(False)
+
         menubar = self.menuBar()
 
         file_menu = menubar.addMenu('&File')
@@ -308,6 +385,9 @@ class LandsGui(QtGui.QMainWindow):
         file_menu.addAction(open_action)
         file_menu.addAction(self.saveproto_action)
         file_menu.addAction(exit_action)
+
+        simulations_menu = menubar.addMenu('&Simulations')
+        simulations_menu.addAction(self.precipitations_action)
 
         view_menu = menubar.addMenu('&View')
         view_menu.addAction(bw_view)
@@ -353,6 +433,12 @@ class LandsGui(QtGui.QMainWindow):
         filename = QtGui.QFileDialog.getOpenFileName(self, "Open world", "", "*.world")
         world = World.open_protobuf(filename)
         self.set_world(world)
+
+    def _on_precipitations(self):
+        dialog = OperationDialog(self, self.world, PrecipitationsOp())
+        ok = dialog.exec_()
+        if ok:
+            pass
 
 def main():
     
