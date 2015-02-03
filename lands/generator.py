@@ -4,20 +4,13 @@ import sys
 from optparse import OptionParser
 import os
 
-try:
-    from lands.plates import world_gen
-    from lands.draw import draw_biome, draw_precipitation, draw_temperature_levels
-    import lands.geo
-    import lands.draw
-    import lands.drawing_functions
-    from lands.world import *
-except:
-    from plates import world_gen
-    from draw import draw_biome, draw_precipitation, draw_temperature_levels
-    import geo
-    import draw
-    import drawing_functions
-    from world import *
+from lands.plates import world_gen
+from lands.draw import *
+import lands.geo
+import lands.draw
+import lands.drawing_functions
+from lands.world import *
+
 with open("lands/version.py") as f:
     code = compile(f.read(), "lands/version.py", 'exec')
     exec(code)
@@ -58,7 +51,7 @@ def generate_world(seed, world_name, output_dir, width, height, step, num_plates
 
     # Generate images
     filename = '%s/%s_ocean.png' % (output_dir, world_name)
-    draw.draw_ocean(w.ocean, filename)
+    draw_ocean(w.ocean, filename)
     print("* ocean image generated in '%s'" % filename)
 
     if step.include_precipitations:
@@ -79,18 +72,18 @@ def generate_world(seed, world_name, output_dir, width, height, step, num_plates
     for y in xrange(height):
         for x in xrange(width):
             e_as_array.append(w.elevation['data'][y][x])
-    draw.draw_simple_elevation(e_as_array, filename, shadow=True, width=width, height=height)
+    draw_simple_elevation(e_as_array, filename, shadow=True, width=width, height=height)
     print("* elevation image generated in '%s'" % filename)
     return w
 
 
 def generate_grayscale_heightmap(world, filename):
-    draw.draw_grayscale_heightmap(world, filename)
+    draw_grayscale_heightmap(world, filename)
     print("+ grayscale heightmap generated in '%s'" % filename)
 
 
 def generate_rivers_map(world, filename):
-    draw.draw_riversmap(world, filename)
+    draw_riversmap(world, filename)
     print("+ rivers map generated in '%s'" % filename)
 
 
@@ -99,11 +92,11 @@ def generate_plates(seed, world_name, output_dir, width, height, num_plates=10):
 
     # Generate images
     filename = '%s/plates_%s.png' % (output_dir, world_name)
-    draw.draw_simple_elevation(elevation, filename)
+    draw_simple_elevation(elevation, filename)
     print("+ plates image generated in '%s'" % filename)
     plates = geo.center_elevation_map(elevation, width, height)
     filename = '%s/centered_plates_%s.png' % (output_dir, world_name)
-    draw.draw_simple_elevation(elevation, filename)
+    draw_simple_elevation(elevation, filename)
     print("+ centered plates image generated in '%s'" % filename)
 
 

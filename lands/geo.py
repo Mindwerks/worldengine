@@ -713,7 +713,7 @@ def world_gen_precipitation(w, seed, verbose):
     ]
     w.set_precipitation(p, p_th)
     if verbose:
-        print("...precipations calculated")
+        print("...precipitations calculated")
     return [p, p_th]
 
 
