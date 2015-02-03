@@ -95,15 +95,15 @@ def generate_rivers_map(world, filename):
 
 
 def generate_plates(seed, world_name, output_dir, width, height, num_plates=10):
-    plates = geo.generate_plates_simulation(seed, width, height, num_plates=num_plates)
+    elevation, plates = geo.generate_plates_simulation(seed, width, height, num_plates=num_plates)
 
     # Generate images
     filename = '%s/plates_%s.png' % (output_dir, world_name)
-    draw.draw_simple_elevation(plates, filename)
+    draw.draw_simple_elevation(elevation, filename)
     print("+ plates image generated in '%s'" % filename)
-    plates = geo.center_elevation_map(plates, width, height)
+    plates = geo.center_elevation_map(elevation, width, height)
     filename = '%s/centered_plates_%s.png' % (output_dir, world_name)
-    draw.draw_simple_elevation(plates, filename)
+    draw.draw_simple_elevation(elevation, filename)
     print("+ centered plates image generated in '%s'" % filename)
 
 

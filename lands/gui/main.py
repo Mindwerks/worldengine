@@ -14,6 +14,7 @@ from lands.world import World
 import lands.geo
 from lands.geo import *
 from view import *
+from lands.plates import *
 
 class GenerateDialog(QtGui.QDialog):
 
@@ -171,15 +172,6 @@ class GenerationThread(threading.Thread):
         self.ui.world = w
         self.ui.on_finish()
 
-def array_to_matrix(array, width, height):
-    if (len(array) != (width * height)):
-        raise Exception("Array as not expected length")
-    matrix = []
-    for y in xrange(height):
-        matrix.append([])
-        for x in xrange(width):
-            matrix[y].append(array[y * width + x])
-    return matrix
 
 class PlatesGeneration():
 
