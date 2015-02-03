@@ -153,24 +153,37 @@ def main():
     sys.setrecursionlimit(2000)
 
     parser = OptionParser()
-    parser.add_option('-o', '--output', dest='output_dir', help="generate files in OUTPUT", metavar="FILE", default='.')
-    parser.add_option('-n', '--worldname', dest='world_name', help="set WORLDNAME", metavar="WORLDNAME")
-    parser.add_option('-b', '--protocol-buffer', dest='protobuf', action="store_true", help="save using protocol buffer", default=False)
-    parser.add_option('-s', '--seed', dest='seed', help="use SEED to initialize the pseudo-random generation",
+    parser.add_option('-o', '--output', dest='output_dir',
+                      help="generate files in OUTPUT", metavar="FILE", default='.')
+    parser.add_option('-n', '--worldname', dest='world_name',
+                      help="set WORLDNAME", metavar="WORLDNAME")
+    parser.add_option('-b', '--protocol-buffer', dest='protobuf', action="store_true",
+                      help="save using protocol buffer", default=False)
+    parser.add_option('-s', '--seed', dest='seed',
+                      help="use SEED to initialize the pseudo-random generation",
                       metavar="SEED")
     parser.add_option('-t', '--step', dest='step',
                       help="use STEP to specify how far to proceed in the world generation process", metavar="STEP")
-    parser.add_option('-x', '--width', dest='width', help="WIDTH of the world to be generated", metavar="WIDTH",
+    parser.add_option('-x', '--width', dest='width',
+                      help="WIDTH of the world to be generated", metavar="WIDTH",
                       default='512')
-    parser.add_option('-y', '--height', dest='height', help="HEIGHT of the world to be generated", metavar="HEIGHT",
+    parser.add_option('-y', '--height', dest='height',
+                      help="HEIGHT of the world to be generated", metavar="HEIGHT",
                       default='512')
-    parser.add_option('-w', '--worldfile', dest='world_file', help="WORLD_FILE to be loaded (for ancient_map operation)", metavar="WORLD_FILE")
-    parser.add_option('-g', '--generatedfile', dest='generated_file', help="name of the GENERATED_FILE (for ancient_map operation)", metavar="GENERATED_FILE")
-    parser.add_option('-f', '--resize-factor', dest='resize_factor', help="resize factor", metavar="RESIZE_FACTOR", default='1')
-    parser.add_option('-p', '--plates-resolution', dest='plates_resolution', help="plates resolution", metavar="PLATES_RESOLUTION", default='512')
-    parser.add_option('-q', '--number-of-plates', dest='number_of_plates', help="number of plates", metavar="NUMBER_OF_PLATES", default='10')
-    parser.add_option('-r', '--rivers', dest='rivers_map', help="generate rivers map in RIVERSMAP_FILE", metavar="RIVERSMAP_FILE")
-    parser.add_option('--gs', '--grayscale-heightmap', dest='grayscale_heightmap', help='produce a grayscale heightmap in GRAYSCALE_FILE', metavar="GRAYSCALE_FILE")
+    parser.add_option('-w', '--worldfile', dest='world_file',
+                      help="WORLD_FILE to be loaded (for ancient_map operation)", metavar="WORLD_FILE")
+    parser.add_option('-g', '--generatedfile', dest='generated_file',
+                      help="name of the GENERATED_FILE (for ancient_map operation)", metavar="GENERATED_FILE")
+    parser.add_option('-f', '--resize-factor', dest='resize_factor',
+                      help="resize factor", metavar="RESIZE_FACTOR", default='1')
+    parser.add_option('-p', '--plates-resolution', dest='plates_resolution',
+                      help="plates resolution", metavar="PLATES_RESOLUTION", default='512')
+    parser.add_option('-q', '--number-of-plates', dest='number_of_plates',
+                      help="number of plates", metavar="NUMBER_OF_PLATES", default='10')
+    parser.add_option('-r', '--rivers', dest='rivers_map',
+                      help="generate rivers map in RIVERSMAP_FILE", metavar="RIVERSMAP_FILE")
+    parser.add_option('--gs', '--grayscale-heightmap', dest='grayscale_heightmap',
+                      help='produce a grayscale heightmap in GRAYSCALE_FILE', metavar="GRAYSCALE_FILE")
 
     (options, args) = parser.parse_args()
 
@@ -265,7 +278,8 @@ def main():
     print('')  # empty line
     print('starting (it could take a few minutes) ...')
     if operation == 'world':
-        world = generate_world(seed, world_name, options.output_dir, width, height, step, num_plates=number_of_plates, world_format=world_format)
+        world = generate_world(seed, world_name, options.output_dir, width, height, step, num_plates=number_of_plates,
+                               world_format=world_format)
         if produce_grayscale_heightmap:
             generate_grayscale_heightmap(world, produce_grayscale_heightmap)
         if produce_rivers_map:
