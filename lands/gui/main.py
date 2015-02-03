@@ -12,6 +12,7 @@ import threading
 import platec
 from lands.world import World
 import lands.geo
+from lands.geo import *
 from view import *
 
 class GenerateDialog(QtGui.QDialog):
@@ -150,14 +151,16 @@ class GenerationThread(threading.Thread):
         self.plates_generation = PlatesGeneration(seed, name, width, height, num_plates=num_plates)
         self.ui = ui
     
-    def run(self):        
+    def run(self):
+        # FIXME it should be merged with world_gen
         finished = False
         while not finished:
             (finished, n_steps) = self.plates_generation.step() 
             self.ui.set_status('Plate simulation: step %i' % n_steps)
         self.ui.set_status('Plate simulation: finalization')
         w = self.plates_generation.world()
-        geo.initialize_ocean_and_thresholds(w)
+        self.ui.set_status('Plate simulation: center land')
+        center_land(w)
         self.ui.set_status('Plate simulation: completed')
         self.ui.world = w
         self.ui.on_finish()

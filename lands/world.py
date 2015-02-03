@@ -275,7 +275,6 @@ class World(object):
                     if ny >= 0 and ny/factor < self.height and (dx != 0 or dy != 0):
                         action((nx, ny))
 
-
     def on_tiles_around(self, pos, radius=1, action=None):
         x, y = pos
         for dx in range(-radius, radius + 1):
