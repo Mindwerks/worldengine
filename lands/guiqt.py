@@ -196,7 +196,9 @@ class PlatesGeneration():
     def world(self):
         world = World(self.name, self.width, self.height)
         hm = platec.get_heightmap(self.p)
+        pm = platec.get_platesmap(self.p)
         world.set_elevation(array_to_matrix(hm, self.width, self.height), None)
+        world.set_plates(array_to_matrix(pm, self.width, self.height))
         return world
 
 class MapCanvas(QtGui.QImage):
@@ -206,9 +208,14 @@ class MapCanvas(QtGui.QImage):
         self.label = label
         self._update()
 
-    def draw_world(self, world):
+    def draw_world(self, world, view):
         self.label.resize(world.width, world.height)
-        draw_bw_elevation_on_screen(world, self)
+        if view == 'bw':
+            draw_bw_elevation_on_screen(world, self)
+        elif view == 'plates':
+            draw_plates_on_screen(world, self)
+        else:
+            raise Exception("Unknown view %s" % view)
         self._update()
 
     def _update(self):
@@ -220,6 +227,7 @@ class LandsGui(QtGui.QMainWindow):
         super(LandsGui, self).__init__()        
         self._init_ui()
         self.world = None
+        self.current_view = None
 
     def set_status(self, message):
         self.statusBar().showMessage(message)
@@ -248,7 +256,7 @@ class LandsGui(QtGui.QMainWindow):
     def set_world(self, world):
         self.world = world
         self.canvas = MapCanvas(self.label, self.world.width, self.world.height)
-        self.canvas.draw_world(self.world)
+        self._on_bw_view()
         self.saveproto_action.setEnabled(world != None)
 
     def _prepare_menu(self):
@@ -272,7 +280,9 @@ class LandsGui(QtGui.QMainWindow):
         self.saveproto_action.triggered.connect(self._on_save_protobuf)
 
         bw_view = QtGui.QAction('Black and white', self)
+        bw_view.triggered.connect(self._on_bw_view)
         plates_view = QtGui.QAction('Plates', self)
+        plates_view.triggered.connect(self._on_plates_view)
         plates_bw_view = QtGui.QAction('Plates and elevation', self)
         land_and_ocean_view = QtGui.QAction('Land and ocean', self)
 
@@ -289,6 +299,14 @@ class LandsGui(QtGui.QMainWindow):
         view_menu.addAction(plates_view)
         view_menu.addAction(plates_bw_view)
         view_menu.addAction(land_and_ocean_view)
+
+    def _on_bw_view(self):
+        self.current_view = 'bw'
+        self.canvas.draw_world(self.world, self.current_view)
+
+    def _on_plates_view(self):
+        self.current_view = 'plates'
+        self.canvas.draw_world(self.world, self.current_view)
 
     def _on_generate(self):
         dialog = GenerateDialog(self)

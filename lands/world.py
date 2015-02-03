@@ -123,7 +123,10 @@ class World(object):
         self._to_protobuf_matrix(self.elevation['data'], p_world.heightMapData)
         p_world.heightMapTh_sea   = self.elevation['thresholds'][0][1];
         p_world.heightMapTh_plain = self.elevation['thresholds'][1][1];
-        p_world.heightMapTh_hill  = self.elevation['thresholds'][2][1];    
+        p_world.heightMapTh_hill  = self.elevation['thresholds'][2][1];
+
+        # Plates
+        self._to_protobuf_matrix(self.plates, p_world.plates)
 
         # Ocean                            
         self._to_protobuf_matrix(self.ocean, p_world.ocean)
@@ -178,6 +181,9 @@ class World(object):
                 ('hill',     p_world.heightMapTh_hill), 
                 ('mountain', None)]
         w.set_elevation(e, e_th)
+
+        # Plates
+        w.set_plates( World._from_protobuf_matrix(p_world.plates) )
 
         # Ocean
         w.set_ocean(World._from_protobuf_matrix(p_world.ocean))
@@ -698,6 +704,13 @@ class World(object):
             raise Exception("Setting elevation map with wrong dimension. Expected %d x %d, found %d x %d" % (
                 self.width, self.height, (len[data[0]], len(data))))
         self.elevation = {'data': data, 'thresholds': thresholds}
+
+
+    def set_plates(self, data):
+        if (len(data) != self.height) or (len(data[0]) != self.width):
+            raise Exception("Setting plates map with wrong dimension. Expected %d x %d, found %d x %d" % (
+                self.width, self.height, (len[data[0]], len(data))))
+        self.plates = data
 
     def set_biome(self, biome):
         if len(biome) != self.height:
