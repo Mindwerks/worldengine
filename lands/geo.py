@@ -729,11 +729,11 @@ def init_world_from_elevation(name, elevation, ocean_level, verbose):
     return [w, ocean, sl, hl, ml, e_th]
 
 
-def world_gen_precipitation(w, seed, ocean, verbose):
+def world_gen_precipitation(w, seed, verbose):
     p = precipitation(seed, w.width, w.height)
     p_th = [
-        ('low', find_threshold_f(p, 0.75, ocean)),
-        ('med', find_threshold_f(p, 0.3, ocean)),
+        ('low', find_threshold_f(p, 0.75, w.ocean)),
+        ('med', find_threshold_f(p, 0.3, w.ocean)),
         ('hig', None)
     ]
     w.set_precipitation(p, p_th)
