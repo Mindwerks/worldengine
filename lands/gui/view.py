@@ -100,3 +100,16 @@ def draw_plates_and_elevation_on_screen(world, canvas):
             r, g, b = hsi_to_rgb(h, s, i)
             col = QtGui.QColor(r, g, b)
             canvas.setPixel(x, y, col.rgb())
+
+
+def draw_land_on_screen(world, canvas):
+    width = world.width
+    height = world.height
+    land_color = QtGui.QColor(0, 200, 0).rgb()
+    ocean_color = QtGui.QColor(0, 0, 200).rgb()
+    for y in range(0, height):
+        for x in range(0, width):
+            if world.is_land((x,y)):
+                canvas.setPixel(x, y, land_color)
+            else:
+                canvas.setPixel(x, y, ocean_color)

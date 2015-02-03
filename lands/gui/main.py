@@ -225,6 +225,8 @@ class MapCanvas(QtGui.QImage):
             draw_plates_on_screen(world, self)
         elif view == 'plates and elevation':
             draw_plates_and_elevation_on_screen(world, self)
+        elif view == 'land':
+            draw_land_on_screen(world, self)
         else:
             raise Exception("Unknown view %s" % view)
         self._update()
@@ -297,6 +299,7 @@ class LandsGui(QtGui.QMainWindow):
         plates_bw_view = QtGui.QAction('Plates and elevation', self)
         plates_bw_view.triggered.connect(self._on_plates_and_elevation_view)
         land_and_ocean_view = QtGui.QAction('Land and ocean', self)
+        land_and_ocean_view.triggered.connect(self._on_land_view)
 
         menubar = self.menuBar()
 
@@ -320,11 +323,13 @@ class LandsGui(QtGui.QMainWindow):
         self.current_view = 'plates'
         self.canvas.draw_world(self.world, self.current_view)
 
-
     def _on_plates_and_elevation_view(self):
         self.current_view = 'plates and elevation'
         self.canvas.draw_world(self.world, self.current_view)
 
+    def _on_land_view(self):
+        self.current_view = 'land'
+        self.canvas.draw_world(self.world, self.current_view)
 
     def _on_generate(self):
         dialog = GenerateDialog(self)
