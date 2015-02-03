@@ -1,5 +1,6 @@
 __author__ = 'Federico Tomassetti'
 
+from biome import biome_index_to_name
 try:
     from lands.biome import *
     from lands.basic_map_operations import *
@@ -48,6 +49,12 @@ class World(object):
     def protobuf_to_file(self, filename):
         with open(filename, "wb") as f:
             f.write(self.protobuf_serialize())
+
+    @staticmethod
+    def open_protobuf(filename):
+        with open(filename, "rb") as f:
+            content = f.read()
+            return World.protobuf_unserialize(content)
 
     @classmethod
     def protobuf_unserialize(cls, serialized):
@@ -177,48 +184,55 @@ class World(object):
         w.sea_depth = World._from_protobuf_matrix(p_world.sea_depth)
 
         # Biome
-        w.set_biome(World._from_protobuf_matrix(p_world.biome, biome_index_to_name))
+        if len(p_world.biome.rows) > 0:
+            w.set_biome(World._from_protobuf_matrix(p_world.biome, biome_index_to_name))
 
         # Humidity
         # FIXME: use setters
-        w.humidity = World._from_protobuf_matrix_with_quantiles(p_world.humidity)
+        if len(p_world.humidity.rows) > 0:
+            w.humidity = World._from_protobuf_matrix_with_quantiles(p_world.humidity)
 
-        w.irrigation = World._from_protobuf_matrix(p_world.irrigation)
+        if len(p_world.irrigation.rows) > 0:
+            w.irrigation = World._from_protobuf_matrix(p_world.irrigation)
 
-        p = World._from_protobuf_matrix(p_world.permeabilityData)
-        p_th = [
-            ('low' , p_world.permeability_low),
-            ('med' , p_world.permeability_med),
-            ('hig' , None)
-        ]
-        w.set_permeability(p, p_th)
+        if len(p_world.permeabilityData.rows) > 0:
+            p = World._from_protobuf_matrix(p_world.permeabilityData)
+            p_th = [
+                ('low' , p_world.permeability_low),
+                ('med' , p_world.permeability_med),
+                ('hig' , None)
+            ]
+            w.set_permeability(p, p_th)
 
-        w.watermap = {}
-        w.watermap['data'] = World._from_protobuf_matrix(p_world.watermapData)
-        w.watermap['thresholds'] = {}
-        w.watermap['thresholds']['creek'] = p_world.watermap_creek
-        w.watermap['thresholds']['river'] = p_world.watermap_river
-        w.watermap['thresholds']['main river'] = p_world.watermap_mainriver
+        if len(p_world.watermapData.rows) > 0:
+            w.watermap = {}
+            w.watermap['data'] = World._from_protobuf_matrix(p_world.watermapData)
+            w.watermap['thresholds'] = {}
+            w.watermap['thresholds']['creek'] = p_world.watermap_creek
+            w.watermap['thresholds']['river'] = p_world.watermap_river
+            w.watermap['thresholds']['main river'] = p_world.watermap_mainriver
 
-        p = World._from_protobuf_matrix(p_world.precipitationData)
-        p_th = [
-            ('low' , p_world.precipitation_low),
-            ('med' , p_world.precipitation_med),
-            ('hig' , None)
-        ]
-        w.set_precipitation(p, p_th)
+        if len(p_world.precipitationData.rows) > 0:
+            p = World._from_protobuf_matrix(p_world.precipitationData)
+            p_th = [
+                ('low' , p_world.precipitation_low),
+                ('med' , p_world.precipitation_med),
+                ('hig' , None)
+            ]
+            w.set_precipitation(p, p_th)
 
-        t = World._from_protobuf_matrix(p_world.temperatureData)
-        t_th = [
-            ('polar',       p_world.temperature_polar),
-            ('alpine',      p_world.temperature_alpine),
-            ('boreal',      p_world.temperature_boreal),
-            ('cool',        p_world.temperature_cool),
-            ('warm',        p_world.temperature_warm),
-            ('subtropical', p_world.temperature_subtropical),
-            ('tropical',    None)
-        ]
-        w.set_temperature(t, t_th)
+        if len(p_world.temperatureData.rows) > 0:
+            t = World._from_protobuf_matrix(p_world.temperatureData)
+            t_th = [
+                ('polar',       p_world.temperature_polar),
+                ('alpine',      p_world.temperature_alpine),
+                ('boreal',      p_world.temperature_boreal),
+                ('cool',        p_world.temperature_cool),
+                ('warm',        p_world.temperature_warm),
+                ('subtropical', p_world.temperature_subtropical),
+                ('tropical',    None)
+            ]
+            w.set_temperature(t, t_th)
 
         return w
 
@@ -687,7 +701,7 @@ class World(object):
 
     def set_biome(self, biome):
         if len(biome) != self.height:
-            raise Exception("Setting data with wrong height")
+            raise Exception("Setting data with wrong height: biome has height %i while the height is currently %i" % (len(biome), self.height))
         if len(biome[0]) != self.width:
             raise Exception("Setting data with wrong width")
 

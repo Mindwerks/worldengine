@@ -262,6 +262,9 @@ class LandsGui(QtGui.QMainWindow):
         exit_action.setStatusTip('Exit application')
         exit_action.triggered.connect(QtGui.qApp.quit)
 
+        open_action = QtGui.QAction('&Open', self)
+        open_action.triggered.connect(self._on_open)
+
         self.saveproto_action = QtGui.QAction('&Save (protobuf)', self)
         self.saveproto_action.setEnabled(False)
         self.saveproto_action.setShortcut('Ctrl+S')
@@ -277,6 +280,7 @@ class LandsGui(QtGui.QMainWindow):
 
         file_menu = menubar.addMenu('&File')
         file_menu.addAction(generate_action)
+        file_menu.addAction(open_action)
         file_menu.addAction(self.saveproto_action)
         file_menu.addAction(exit_action)
 
@@ -301,8 +305,13 @@ class LandsGui(QtGui.QMainWindow):
                 self.set_world(dialog2.world)
 
     def _on_save_protobuf(self):
-        filename = QtGui.QFileDialog.getSaveFileName(self, "Save world", "", ".world")
+        filename = QtGui.QFileDialog.getSaveFileName(self, "Save world", "", "*.world")
         self.world.protobuf_to_file(filename)
+
+    def _on_open(self):
+        filename = QtGui.QFileDialog.getOpenFileName(self, "Open world", "", "*.world")
+        world = World.open_protobuf(filename)
+        self.set_world(world)
 
 def main():
     
