@@ -113,3 +113,40 @@ def draw_land_on_screen(world, canvas):
                 canvas.setPixel(x, y, land_color)
             else:
                 canvas.setPixel(x, y, ocean_color)
+
+
+def _color_prop(color_a, color_b, value_a, value_b, v):
+    ip = (v - value_a)/(value_b - value_a)
+    p = 1.0 - ip
+    ra, ga, ba = color_a
+    rb, gb, bb = color_b
+    return ((ra * p + rb * ip), (ga * p + gb * ip), (ba * p + bb * ip))
+
+def draw_precipitations_on_screen(world, canvas):
+    width = world.width
+    height = world.height
+    low_th = world.precipitation['thresholds'][0][1]
+    med_th = world.precipitation['thresholds'][1][1] - 0.10
+    hig_th = med_th + 0.25
+    color1 = (0, 47, 255)
+    color2 = (0, 255, 255)
+    color3 = (0, 255, 0)
+    color4 = (255, 85, 0)
+    color5 = (255, 0, 0)
+    print(low_th)
+    print(med_th)
+    for y in range(0, height):
+        for x in range(0, width):
+            p = world.precipitation['data'][y][x]
+            if world.is_ocean((x,y)):
+                r = g = b = 255
+            elif p < low_th:
+                r, g, b =_color_prop(color1, color2, -1.0, low_th, p)
+            elif p < med_th:
+                r, g, b =_color_prop(color2, color3, low_th, med_th, p)
+            elif p < hig_th:
+                r, g, b =_color_prop(color3, color4, med_th, hig_th, p)
+            else:
+                r, g, b =_color_prop(color4, color5, hig_th, 1.0, p)
+            col = QtGui.QColor(r, g, b)
+            canvas.setPixel(x, y, col.rgb())

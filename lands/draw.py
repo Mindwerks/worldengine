@@ -402,6 +402,7 @@ def draw_temp(temp, filename):
 
 
 def draw_precipitation(world, filename):
+    # FIXME we are drawing humidity, not precipitations
     WIDTH = world.width
     HEIGHT = world.height
 

@@ -227,6 +227,8 @@ class MapCanvas(QtGui.QImage):
             draw_plates_and_elevation_on_screen(world, self)
         elif view == 'land':
             draw_land_on_screen(world, self)
+        elif view == 'precipitations':
+            draw_precipitations_on_screen(world, self)
         else:
             raise Exception("Unknown view %s" % view)
         self._update()
@@ -344,7 +346,12 @@ class LandsGui(QtGui.QMainWindow):
         self.canvas = MapCanvas(self.label, self.world.width, self.world.height)
         self._on_bw_view()
         self.saveproto_action.setEnabled(world != None)
+        self.bw_view.setEnabled(world != None)
+        self.plates_view.setEnabled(world != None)
+        self.plates_bw_view.setEnabled(world != None)
+        self.land_and_ocean_view.setEnabled(world != None)
         self.precipitations_action.setEnabled(world != None and (not world.has_precipitations()))
+        self.precipitations_view.setEnabled(world != None and world.has_precipitations())
 
     def _prepare_menu(self):
         generate_action = QtGui.QAction('&Generate', self)
@@ -366,14 +373,22 @@ class LandsGui(QtGui.QMainWindow):
         self.saveproto_action.setStatusTip('Save (protobuf format)')
         self.saveproto_action.triggered.connect(self._on_save_protobuf)
 
-        bw_view = QtGui.QAction('Black and white', self)
-        bw_view.triggered.connect(self._on_bw_view)
-        plates_view = QtGui.QAction('Plates', self)
-        plates_view.triggered.connect(self._on_plates_view)
-        plates_bw_view = QtGui.QAction('Plates and elevation', self)
-        plates_bw_view.triggered.connect(self._on_plates_and_elevation_view)
-        land_and_ocean_view = QtGui.QAction('Land and ocean', self)
-        land_and_ocean_view.triggered.connect(self._on_land_view)
+        self.bw_view = QtGui.QAction('Black and white', self)
+        self.bw_view.triggered.connect(self._on_bw_view)
+        self.plates_view = QtGui.QAction('Plates', self)
+        self.plates_view.triggered.connect(self._on_plates_view)
+        self.plates_bw_view = QtGui.QAction('Plates and elevation', self)
+        self.plates_bw_view.triggered.connect(self._on_plates_and_elevation_view)
+        self.land_and_ocean_view = QtGui.QAction('Land and ocean', self)
+        self.land_and_ocean_view.triggered.connect(self._on_land_view)
+        self.precipitations_view = QtGui.QAction('Precipitations', self)
+        self.precipitations_view.triggered.connect(self._on_precipitations_view)
+
+        self.bw_view.setEnabled(False)
+        self.plates_view.setEnabled(False)
+        self.plates_bw_view.setEnabled(False)
+        self.land_and_ocean_view.setEnabled(False)
+        self.precipitations_view.setEnabled(False)
 
         self.precipitations_action = QtGui.QAction('Precipitations', self)
         self.precipitations_action.triggered.connect(self._on_precipitations)
@@ -391,10 +406,11 @@ class LandsGui(QtGui.QMainWindow):
         simulations_menu.addAction(self.precipitations_action)
 
         view_menu = menubar.addMenu('&View')
-        view_menu.addAction(bw_view)
-        view_menu.addAction(plates_view)
-        view_menu.addAction(plates_bw_view)
-        view_menu.addAction(land_and_ocean_view)
+        view_menu.addAction(self.bw_view)
+        view_menu.addAction(self.plates_view)
+        view_menu.addAction(self.plates_bw_view)
+        view_menu.addAction(self.land_and_ocean_view)
+        view_menu.addAction(self.precipitations_view)
 
     def _on_bw_view(self):
         self.current_view = 'bw'
@@ -410,6 +426,11 @@ class LandsGui(QtGui.QMainWindow):
 
     def _on_land_view(self):
         self.current_view = 'land'
+        self.canvas.draw_world(self.world, self.current_view)
+
+
+    def _on_precipitations_view(self):
+        self.current_view = 'precipitations'
         self.canvas.draw_world(self.world, self.current_view)
 
     def _on_generate(self):

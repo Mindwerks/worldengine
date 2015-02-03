@@ -532,7 +532,7 @@ def precipitation(seed, width, height):
     border = width / 4 
     random.seed(seed * 13)
     base = random.randint(0, 4096)
-    temp = [[0 for x in xrange(width)] for y in xrange(height)]
+    precipitations = [[0 for x in xrange(width)] for y in xrange(height)]
 
     from noise import snoise2
 
@@ -545,14 +545,14 @@ def precipitation(seed, width, height):
         for x in range(0, width):
             n = snoise2(x / freq, y / freq, octaves, base=base)
 
-            #Added to allow noise pattern to wrap around right and left.
+            # Added to allow noise pattern to wrap around right and left.
             if x < border: 
                 n = (snoise2(x / freq, y / freq, octaves, base=base) * x / border) + (snoise2((x+width) / freq, y / freq, octaves, base=base) * (border-x)/border)
 
-            t = (latitude_factor + n * 4) / 5.0
-            temp[y][x] = t
+            prec = (latitude_factor + n * 4) / 5.0
+            precipitations[y][x] = prec
 
-    return temp
+    return precipitations
 
 
 def irrigation(world):
