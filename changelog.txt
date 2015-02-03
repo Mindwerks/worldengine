@@ -18,9 +18,10 @@ Version 0.4.3
 Version 0.5.0
 
 * Supporting python 3
-* Initial GUI
+* Initial GUI (only plates simulation)
 
 Version 0.5.1
 
 * Packaging lands as a script
 * Supporting protocol buffer serialization
+* QT based Gui
