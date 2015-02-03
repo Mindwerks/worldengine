@@ -51,6 +51,9 @@ message World {
     required double heightMapTh_plain    = 6;
     required double heightMapTh_hill     = 7;
 
+    // Plates
+    required IntegerMatrix plates        = 30;
+
     // Ocean
     required BooleanMatrix ocean         = 8;
     required DoubleMatrix  sea_depth     = 29;
