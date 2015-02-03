@@ -10,9 +10,9 @@ from PyQt4 import QtGui, QtCore
 import random
 import threading
 import platec
-from world import World
-import geo
-from gui.view import *
+from lands.world import World
+import lands.geo
+from view import *
 
 class GenerateDialog(QtGui.QDialog):
 
