@@ -624,12 +624,34 @@ def elevnoise(elevation, seed):
             elevation[y][x] += n
 
 
+def place_oceans_at_map_borders_on_world(world):
+    """
+    Lower the elevation near the border of the map
+    """
+
+    OCEAN_BORDER = int(min(30, max(world.width / 5, world.height / 5)))
+
+    def place_ocean(x, y, i):
+        world.elevation['data'][y][x] = (world.elevation['data'][y][x] * i) / OCEAN_BORDER
+
+    for x in xrange(world.width):
+        for i in range(0, OCEAN_BORDER):
+            place_ocean(x, i, i)
+            place_ocean(x, world.height - i - 1, i)
+
+    for y in xrange(world.height):
+        for i in range(0, OCEAN_BORDER):
+            place_ocean(i, y, i)
+            place_ocean(world.width - i - 1, y, i)
+
+
 def place_oceans_at_map_borders(elevation):
     """
     Lower the elevation near the border of the map
     :param elevation:
     :return:
     """
+    # FIXME remove and use place_ocenas_at_map_borders_on_world instead
     width = len(elevation[0])
     height = len(elevation)
 
