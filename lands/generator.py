@@ -131,8 +131,10 @@ class Step:
 
         return step
 
+
 def is_pow_of_two(num):
     return ((num & (num - 1)) == 0) and num != 0
+
 
 def check_step(step_name):
     step = Step.get_by_name(step_name)
@@ -141,6 +143,7 @@ def check_step(step_name):
         return Step.get_by_name("full")
     else:
         return step
+
 
 def operation_ancient_map(world, map_filename, resize_factor):
     draw_oldmap(world, map_filename, resize_factor)
