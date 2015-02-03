@@ -1,2 +1,2 @@
 -r requirements_base.txt
-protobuf-py3==2.5.1
+protobuf-py3==2.5.0
