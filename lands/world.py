@@ -45,6 +45,10 @@ class World(object):
         p_world = self._to_protobuf_world()
         return p_world.SerializeToString()
 
+    def protobuf_to_file(self, filename):
+        with open(filename, "wb") as f:
+            f.write(self.protobuf_serialize())
+
     @classmethod
     def protobuf_unserialize(cls, serialized):
         p_world = protobuf.World_pb2.World()
@@ -119,31 +123,33 @@ class World(object):
         self._to_protobuf_matrix(self.sea_depth, p_world.sea_depth)
 
         # Biome
-        self._to_protobuf_matrix(self.biome, p_world.biome, biome_name_to_index)
+        if hasattr(self, 'biome'):
+            self._to_protobuf_matrix(self.biome, p_world.biome, biome_name_to_index)
 
         # Humidty
-        self._to_protobuf_matrix_with_quantiles(self.humidity, p_world.humidity)
+        if hasattr(self, 'humidity'):
+            self._to_protobuf_matrix_with_quantiles(self.humidity, p_world.humidity)
 
-        if self.irrigation:
+        if hasattr(self, 'irrigation'):
             self._to_protobuf_matrix(self.irrigation, p_world.irrigation)
 
-        if self.permeability:
+        if hasattr(self, 'permeability'):
             self._to_protobuf_matrix(self.permeability['data'], p_world.permeabilityData)
             p_world.permeability_low = self.permeability['thresholds'][0][1]
             p_world.permeability_med = self.permeability['thresholds'][1][1]
 
-        if self.watermap:
+        if hasattr(self, 'watermap'):
             self._to_protobuf_matrix(self.watermap['data'], p_world.watermapData)
             p_world.watermap_creek = self.watermap['thresholds']['creek']
             p_world.watermap_river = self.watermap['thresholds']['river']
             p_world.watermap_mainriver = self.watermap['thresholds']['main river']            
 
-        if self.precipitation:
+        if hasattr(self, 'precipitation'):
             self._to_protobuf_matrix(self.precipitation['data'], p_world.precipitationData)
             p_world.precipitation_low = self.precipitation['thresholds'][0][1]
             p_world.precipitation_med = self.precipitation['thresholds'][1][1]
 
-        if self.temperature:
+        if hasattr(self, 'temperature'):
             self._to_protobuf_matrix(self.temperature['data'], p_world.temperatureData)
             p_world.temperature_polar       = self.temperature['thresholds'][0][1]
             p_world.temperature_alpine      = self.temperature['thresholds'][1][1]

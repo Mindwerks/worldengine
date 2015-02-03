@@ -245,16 +245,28 @@ class LandsGui(QtGui.QMainWindow):
         self.layout.addWidget(self.label, 1, 1)
         self.show()
 
-    def _prepare_menu(self):
-        generateAction = QtGui.QAction('&Generate', self)        
-        generateAction.setShortcut('Ctrl+G')
-        generateAction.setStatusTip('Generate new world')
-        generateAction.triggered.connect(self._on_generate)
+    def set_world(self, world):
+        self.world = world
+        self.canvas = MapCanvas(self.label, self.world.width, self.world.height)
+        self.canvas.draw_world(self.world)
+        self.saveproto_action.setEnabled(world != None)
 
-        exitAction = QtGui.QAction('&Exit', self)        
-        exitAction.setShortcut('Ctrl+Q')
-        exitAction.setStatusTip('Exit application')
-        exitAction.triggered.connect(QtGui.qApp.quit)
+    def _prepare_menu(self):
+        generate_action = QtGui.QAction('&Generate', self)
+        generate_action.setShortcut('Ctrl+G')
+        generate_action.setStatusTip('Generate new world')
+        generate_action.triggered.connect(self._on_generate)
+
+        exit_action = QtGui.QAction('Leave', self)
+        exit_action.setShortcut('Ctrl+L')
+        exit_action.setStatusTip('Exit application')
+        exit_action.triggered.connect(QtGui.qApp.quit)
+
+        self.saveproto_action = QtGui.QAction('&Save (protobuf)', self)
+        self.saveproto_action.setEnabled(False)
+        self.saveproto_action.setShortcut('Ctrl+S')
+        self.saveproto_action.setStatusTip('Save (protobuf format)')
+        self.saveproto_action.triggered.connect(self._on_save_protobuf)
 
         bw_view = QtGui.QAction('Black and white', self)
         plates_view = QtGui.QAction('Plates', self)
@@ -264,8 +276,9 @@ class LandsGui(QtGui.QMainWindow):
         menubar = self.menuBar()
 
         file_menu = menubar.addMenu('&File')
-        file_menu.addAction(generateAction)
-        file_menu.addAction(exitAction)
+        file_menu.addAction(generate_action)
+        file_menu.addAction(self.saveproto_action)
+        file_menu.addAction(exit_action)
 
         view_menu = menubar.addMenu('&View')
         view_menu.addAction(bw_view)
@@ -281,13 +294,15 @@ class LandsGui(QtGui.QMainWindow):
             width = dialog.width()
             height = dialog.height()
             num_plates = dialog.num_plates()
-            name = dialog.name()
+            name = str(dialog.name())
             dialog2 = GenerationProgressDialog(self, seed, name, width, height, num_plates)            
-            ok2     = dialog2.exec_()
-            if ok2:                
-                self.world = dialog2.world
-                self.canvas = MapCanvas(self.label, self.world.width, self.world.height) 
-                self.canvas.draw_world(self.world)
+            ok2 = dialog2.exec_()
+            if ok2:
+                self.set_world(dialog2.world)
+
+    def _on_save_protobuf(self):
+        filename = QtGui.QFileDialog.getSaveFileName(self, "Save world", "", ".world")
+        self.world.protobuf_to_file(filename)
 
 def main():
     
