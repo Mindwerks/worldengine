@@ -157,10 +157,16 @@ class GenerationThread(threading.Thread):
         while not finished:
             (finished, n_steps) = self.plates_generation.step() 
             self.ui.set_status('Plate simulation: step %i' % n_steps)
-        self.ui.set_status('Plate simulation: finalization')
+        self.ui.set_status('Plate simulation: terminating plates simulation')
         w = self.plates_generation.world()
         self.ui.set_status('Plate simulation: center land')
         center_land(w)
+        self.ui.set_status('Plate simulation: adding noise')
+        elevnoise_on_world(w, random.randint(0, 4096))
+        #self.ui.set_status('Plate simulation: forcing oceans at borders')
+        #place_oceans_at_map_borders(e)
+        self.ui.set_status('Plate simulation: finalization')
+        initialize_ocean_and_thresholds(w)
         self.ui.set_status('Plate simulation: completed')
         self.ui.world = w
         self.ui.on_finish()
