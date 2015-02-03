@@ -471,14 +471,14 @@ def fill_ocean(elevation, sea_level):
     ocean = [[False for x in xrange(width)] for y in xrange(height)]
     to_expand = []
     for x in range(0, width):
-        if elevation[x][0] <= sea_level:
+        if elevation[0][x] <= sea_level:
             to_expand.append((x, 0))
-        if elevation[x][height -1] <= sea_level:
+        if elevation[height -1][x] <= sea_level:
             to_expand.append((x, height - 1))
     for y in range(0, height):
-        if elevation[0][y] <= sea_level:
+        if elevation[y][0] <= sea_level:
             to_expand.append((0, y))
-        if elevation[width - 1][y] <= sea_level:
+        if elevation[y][width - 1] <= sea_level:
             to_expand.append((width - 1, y))
     for t in to_expand:
         tx, ty = t
