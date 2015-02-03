@@ -344,7 +344,7 @@ class LandsGui(QtGui.QMainWindow):
         self.canvas = MapCanvas(self.label, self.world.width, self.world.height)
         self._on_bw_view()
         self.saveproto_action.setEnabled(world != None)
-        self.precipitations_action.setEnabled(world != None)
+        self.precipitations_action.setEnabled(world != None and not world.has_precipitations())
 
     def _prepare_menu(self):
         generate_action = QtGui.QAction('&Generate', self)
@@ -439,7 +439,10 @@ class LandsGui(QtGui.QMainWindow):
         dialog = OperationDialog(self, self.world, PrecipitationsOp())
         ok = dialog.exec_()
         if ok:
-            pass
+            # just to refresh things to enable
+            print("Updating")
+            self.set_world(self.world)
+            print("Updating %s" % self.world.has_precipitations())
 
 def main():
     

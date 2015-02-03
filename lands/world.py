@@ -762,3 +762,7 @@ class World(object):
             raise Exception("Setting data with wrong width")
 
         self.permeability = {'data': data, 'thresholds': thresholds}
+
+
+    def has_precipitations(self):
+        return hasattr(self, 'precipitation')
