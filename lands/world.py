@@ -3,7 +3,7 @@ __author__ = 'Federico Tomassetti'
 from lands.biome import *
 from lands.basic_map_operations import *
 import pickle
-import lands.protobuf.World_pb2
+import lands.protobuf.World_pb2 as Protobuf
 
 class World(object):
     """A world composed by name, dimensions and all the characteristics of each cell.
@@ -53,7 +53,7 @@ class World(object):
 
     @classmethod
     def protobuf_unserialize(cls, serialized):
-        p_world = protobuf.World_pb2.World()
+        p_world = Protobuf.World()
         p_world.ParseFromString(serialized)
         return World._from_protobuf_world(p_world)
 
@@ -65,7 +65,7 @@ class World(object):
                 value = cell
                 if transformation:
                     value = transformation(value)
-                p_row.cells.append(value) 
+                p_row.cells.append(value)
 
     @staticmethod
     def _to_protobuf_quantiles(quantiles, p_quantiles):
@@ -109,7 +109,7 @@ class World(object):
 
 
     def _to_protobuf_world(self):
-        p_world = protobuf.World_pb2.World()
+        p_world = Protobuf.World()
         p_world.name   = self.name
         p_world.width  = self.width
         p_world.height = self.height
