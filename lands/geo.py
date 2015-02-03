@@ -1,11 +1,7 @@
 __author__ = 'Federico Tomassetti'
 
 from noise import snoise2
-
-try:
-    from lands.world import *
-except:
-    from world import *
+from lands.world import *
 
 import sys
 if sys.version_info > (2,):
