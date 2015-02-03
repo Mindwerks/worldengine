@@ -300,9 +300,10 @@ class PrecipitationsOp():
         :param ui: the dialog with the set_status and on_finish methods
         :return:
         """
-        ui.set_status("Precipitation: started")
-
-        ui.set_status("Precipitation: done")
+        seed = random.randint(0, 65536)
+        ui.set_status("Precipitation: started (seed %i)" % seed)
+        world_gen_precipitation(world, seed, False)
+        ui.set_status("Precipitation: done (seed %i)" % seed)
         ui.on_finish()
 
 
