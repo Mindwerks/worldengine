@@ -696,6 +696,17 @@ class World(object):
         return False
 
     ###
+    ### Plates
+    ###
+
+    def n_plates(self):
+        res = -1
+        for row in self.plates:
+            for cell in row:
+                res = max([cell, res])
+        return res + 1
+
+    ###
     ### Setters
     ###
 
