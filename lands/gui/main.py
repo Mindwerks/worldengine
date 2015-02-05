@@ -17,6 +17,10 @@ from view import *
 from lands.plates import *
 from lands.simulations.WatermapSimulation import *
 from lands.simulations.IrrigationSimulation import *
+from lands.simulations.HumiditySimulation import *
+from lands.simulations.TemperatureSimulation import *
+from lands.simulations.PermeabilitySimulation import *
+from lands.simulations.BiomeSimulation import *
 
 class GenerateDialog(QtGui.QDialog):
 
@@ -370,6 +374,10 @@ class LandsGui(QtGui.QMainWindow):
         self.precipitations_view.setEnabled(world != None and world.has_precipitations())
         self.watermap_action.setEnabled( WatermapSimulation().is_applicable(world) )
         self.irrigation_action.setEnabled( IrrigationSimulation().is_applicable(world) )
+        self.humidity_action.setEnabled( HumiditySimulation().is_applicable(world) )
+        self.temperature_action.setEnabled( TemperatureSimulation().is_applicable(world) )
+        self.permeability_action.setEnabled( PermeabilitySimulation().is_applicable(world) )
+        self.biome_action.setEnabled( BiomeSimulation().is_applicable(world) )
 
     def _prepare_menu(self):
         generate_action = QtGui.QAction('&Generate', self)
@@ -533,16 +541,32 @@ class LandsGui(QtGui.QMainWindow):
             self.set_world(self.world)
 
     def _on_humidity(self):
-        pass
+        dialog = OperationDialog(self, self.world, SimulationOp("Simulating humidity", HumiditySimulation()))
+        ok = dialog.exec_()
+        if ok:
+            # just to refresh things to enable
+            self.set_world(self.world)
 
     def _on_temperature(self):
-        pass
+        dialog = OperationDialog(self, self.world, SimulationOp("Simulating temperature", TemperatureSimulation()))
+        ok = dialog.exec_()
+        if ok:
+            # just to refresh things to enable
+            self.set_world(self.world)
 
     def _on_permeability(self):
-        pass
+        dialog = OperationDialog(self, self.world, SimulationOp("Simulating permeability", PermeabilitySimulation()))
+        ok = dialog.exec_()
+        if ok:
+            # just to refresh things to enable
+            self.set_world(self.world)
 
     def _on_biome(self):
-        pass
+        dialog = OperationDialog(self, self.world, SimulationOp("Simulating biome", BiomeSimulation()))
+        ok = dialog.exec_()
+        if ok:
+            # just to refresh things to enable
+            self.set_world(self.world)
 
 
 def main():

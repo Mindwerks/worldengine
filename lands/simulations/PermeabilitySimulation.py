@@ -2,31 +2,37 @@ __author__ = 'Federico Tomassetti'
 
 from lands.simulations.basic import *
 import math
+import random
 
 class PermeabilitySimulation:
 
     def is_applicable(self, world):
-        return world.has_precipitations() and world.has_irrigation() and (not world.has_humidity())
+        return not world.has_permeability()
 
     def execute(self, world, seed):
-        world.permeability = self._calculate(world)
+        perm = self._calculate(seed, world.width, world.height)
+        perm_th = [
+            ('low', find_threshold_f(perm, 0.75, world.ocean)),
+            ('med', find_threshold_f(perm, 0.25, world.ocean)),
+            ('hig', None)
+        ]
+        world.set_permeability(perm, perm_th)
 
-    def _calculate(self, world):
-        humidity = {}
-        humidity['data'] = [[0 for x in xrange(world.width)] for y in xrange(world.height)]
+    def _calculate(self, seed, width, height):
+        random.seed(seed * 37)
+        base = random.randint(0, 4096)
+        perm = [[0 for x in xrange(width)] for y in xrange(height)]
 
-        for y in xrange(world.height):
-            for x in xrange(world.width):
-                humidity['data'][y][x] = world.precipitation['data'][y][x] + world.irrigation[y][x]
+        from noise import snoise2
 
-        #These were originally evenly spaced at 12.5% each but changing them to a bell curve produced
-        #better results
-        humidity['quantiles'] = {}
-        humidity['quantiles']['12'] = find_threshold_f(humidity['data'], 0.02, world.ocean)
-        humidity['quantiles']['25'] = find_threshold_f(humidity['data'], 0.09, world.ocean)
-        humidity['quantiles']['37'] = find_threshold_f(humidity['data'], 0.26, world.ocean)
-        humidity['quantiles']['50'] = find_threshold_f(humidity['data'], 0.50, world.ocean)
-        humidity['quantiles']['62'] = find_threshold_f(humidity['data'], 0.74, world.ocean)
-        humidity['quantiles']['75'] = find_threshold_f(humidity['data'], 0.91, world.ocean)
-        humidity['quantiles']['87'] = find_threshold_f(humidity['data'], 0.98, world.ocean)
-        return humidity
+        octaves = 6
+        freq = 64.0 * octaves
+
+        for y in range(0, height):
+            yscaled = float(y) / height
+            for x in range(0, width):
+                n = snoise2(x / freq, y / freq, octaves, base=base)
+                t = n
+                perm[y][x] = t
+
+        return perm
