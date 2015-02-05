@@ -386,6 +386,10 @@ class LandsGui(QtGui.QMainWindow):
         self.precipitations_action.triggered.connect(self._on_precipitations)
         self.precipitations_action.setEnabled(False)
 
+        self.erosion_action = QtGui.QAction('Erosion', self)
+        self.erosion_action.triggered.connect(self._on_erosion)
+        self.erosion_action.setEnabled(False)
+
         menubar = self.menuBar()
 
         file_menu = menubar.addMenu('&File')
@@ -396,6 +400,7 @@ class LandsGui(QtGui.QMainWindow):
 
         simulations_menu = menubar.addMenu('&Simulations')
         simulations_menu.addAction(self.precipitations_action)
+        simulations_menu.addAction(self.erosion_action)
 
         view_menu = menubar.addMenu('&View')
         view_menu.addAction(self.bw_view)
@@ -454,6 +459,9 @@ class LandsGui(QtGui.QMainWindow):
         if ok:
             # just to refresh things to enable
             self.set_world(self.world)
+
+    def _on_erosion(self):
+        pass
 
 def main():
     
