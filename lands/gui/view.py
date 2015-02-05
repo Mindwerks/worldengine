@@ -122,6 +122,7 @@ def _color_prop(color_a, color_b, value_a, value_b, v):
     rb, gb, bb = color_b
     return ((ra * p + rb * ip), (ga * p + gb * ip), (ba * p + bb * ip))
 
+
 def draw_precipitations_on_screen(world, canvas):
     width = world.width
     height = world.height
@@ -150,6 +151,7 @@ def draw_precipitations_on_screen(world, canvas):
                 r, g, b =_color_prop(color4, color5, hig_th, 1.0, p)
             col = QtGui.QColor(r, g, b)
             canvas.setPixel(x, y, col.rgb())
+
 
 def draw_ancientmap_on_screen(world, canvas):
     drawing_functions.draw_oldmap_on_pixels(world, pixels)

@@ -761,6 +761,8 @@ class World(object):
 
         self.permeability = {'data': data, 'thresholds': thresholds}
 
-
     def has_precipitations(self):
         return hasattr(self, 'precipitation')
+
+    def has_watermap(self):
+        return hasattr(self, 'watermap')
