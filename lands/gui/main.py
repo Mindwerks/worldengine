@@ -390,6 +390,30 @@ class LandsGui(QtGui.QMainWindow):
         self.erosion_action.triggered.connect(self._on_erosion)
         self.erosion_action.setEnabled(False)
 
+        self.watermap_action = QtGui.QAction('Watermap', self)
+        self.watermap_action.triggered.connect(self._on_watermap)
+        self.watermap_action.setEnabled(False)
+
+        self.irrigation_action = QtGui.QAction('Irrigation', self)
+        self.irrigation_action.triggered.connect(self._on_irrigation)
+        self.irrigation_action.setEnabled(False)
+
+        self.humidity_action = QtGui.QAction('Humidity', self)
+        self.humidity_action.triggered.connect(self._on_humidity)
+        self.humidity_action.setEnabled(False)
+
+        self.temperature_action = QtGui.QAction('Temperature', self)
+        self.temperature_action.triggered.connect(self._on_temperature)
+        self.temperature_action.setEnabled(False)
+
+        self.permeability_action = QtGui.QAction('Permeability', self)
+        self.permeability_action.triggered.connect(self._on_permeability)
+        self.permeability_action.setEnabled(False)
+
+        self.biome_action = QtGui.QAction('Biome', self)
+        self.biome_action.triggered.connect(self._on_biome)
+        self.biome_action.setEnabled(False)
+
         menubar = self.menuBar()
 
         file_menu = menubar.addMenu('&File')
@@ -401,6 +425,12 @@ class LandsGui(QtGui.QMainWindow):
         simulations_menu = menubar.addMenu('&Simulations')
         simulations_menu.addAction(self.precipitations_action)
         simulations_menu.addAction(self.erosion_action)
+        simulations_menu.addAction(self.watermap_action)
+        simulations_menu.addAction(self.irrigation_action)
+        simulations_menu.addAction(self.humidity_action)
+        simulations_menu.addAction(self.temperature_action)
+        simulations_menu.addAction(self.permeability_action)
+        simulations_menu.addAction(self.biome_action)
 
         view_menu = menubar.addMenu('&View')
         view_menu.addAction(self.bw_view)
@@ -462,6 +492,25 @@ class LandsGui(QtGui.QMainWindow):
 
     def _on_erosion(self):
         pass
+
+    def _on_watermap(self):
+        pass
+
+    def _on_irrigation(self):
+        pass
+
+    def _on_humidity(self):
+        pass
+
+    def _on_temperature(self):
+        pass
+
+    def _on_permeability(self):
+        pass
+
+    def _on_biome(self):
+        pass
+
 
 def main():
     
