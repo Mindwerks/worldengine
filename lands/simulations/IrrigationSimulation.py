@@ -8,7 +8,7 @@ class IrrigationSimulation:
     def is_applicable(self, world):
         return world.has_watermap() and (not world.has_irrigation())
 
-    def execute(self, world):
+    def execute(self, world, seed):
         world.irrigation = self._calculate(world)
 
     def _calculate(self, world):

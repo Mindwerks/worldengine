@@ -318,10 +318,12 @@ class SimulationOp():
         :param ui: the dialog with the set_status and on_finish methods
         :return:
         """
-        ui.set_status("%s: started" % self.title())
-        self.simulation.execute(world)
-        ui.set_status("%s: done" % self.title())
+        seed = random.randint(0, 65536)
+        ui.set_status("%s: started (seed %i)" % (self.title(), seed))
+        self.simulation.execute(world, seed)
+        ui.set_status("%s: done (seed %i)" % (self.title(), seed))
         ui.on_finish()
+
 
 class LandsGui(QtGui.QMainWindow):
     
