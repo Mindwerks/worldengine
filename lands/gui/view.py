@@ -2,7 +2,7 @@ __author__ = 'Federico Tomassetti'
 
 from PyQt4 import QtGui
 from lands.draw import elevation_color
-
+import lands.drawing_functions
 
 def draw_simple_elevation_on_screen(world, canvas):
     width = world.width
@@ -150,3 +150,6 @@ def draw_precipitations_on_screen(world, canvas):
                 r, g, b =_color_prop(color4, color5, hig_th, 1.0, p)
             col = QtGui.QColor(r, g, b)
             canvas.setPixel(x, y, col.rgb())
+
+def draw_ancientmap_on_screen(world, canvas):
+    drawing_functions.draw_oldmap_on_pixels(world, pixels)
