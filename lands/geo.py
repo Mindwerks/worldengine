@@ -3,6 +3,7 @@ __author__ = 'Federico Tomassetti'
 from noise import snoise2
 from lands.world import *
 from lands.simulations.WatermapSimulation import *
+from lands.simulations.IrrigationSimulation import *
 from lands.simulations.basic import *
 
 import sys
@@ -409,26 +410,6 @@ def precipitation(seed, width, height):
     return precipitations
 
 
-def irrigation(world):
-    width = world.width
-    height = world.height
-
-    values = [[0 for x in xrange(width)] for y in xrange(height)]
-    radius = 10
-
-    for y in xrange(height):
-        for x in xrange(width):
-            if world.is_land((x, y)):
-                for dy in range(-radius, radius + 1):
-                    if (y + dy) >= 0 and (y + dy) < world.height:
-                        for dx in range(-radius, radius + 1):
-                            if (x + dx) >= 0 and (x + dx) < world.width:
-                                dist = math.sqrt(dx ** 2 + dy ** 2)
-                                values[y + dy][x + dx] += world.watermap['data'][y][x] / (math.log(dist + 1) + 1)
-
-    return values
-
-
 def permeability(seed, width, height):
     random.seed(seed * 37)
     base = random.randint(0, 4096)
@@ -596,7 +577,7 @@ def world_gen_from_elevation(w, name, seed, ocean_level, verbose, width, height,
     WatermapSimulation().execute(w)
 
     # FIXME: create setters
-    w.irrigation = irrigation(w)
+    IrrigationSimulation.execute(w)
     w.humidity = humidity(w)
     hu_th = [
         ('low', find_threshold_f(w.humidity['data'], 0.75, ocean)),

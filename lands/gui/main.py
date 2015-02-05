@@ -15,6 +15,8 @@ import lands.geo
 from lands.geo import *
 from view import *
 from lands.plates import *
+from lands.simulations.WatermapSimulation import *
+from lands.simulations.IrrigationSimulation import *
 
 class GenerateDialog(QtGui.QDialog):
 
@@ -365,6 +367,7 @@ class LandsGui(QtGui.QMainWindow):
         self.precipitations_action.setEnabled(world != None and (not world.has_precipitations()))
         self.precipitations_view.setEnabled(world != None and world.has_precipitations())
         self.watermap_action.setEnabled( WatermapSimulation().is_applicable(world) )
+        self.irrigation_action.setEnabled( IrrigationSimulation().is_applicable(world) )
 
     def _prepare_menu(self):
         generate_action = QtGui.QAction('&Generate', self)
@@ -521,7 +524,11 @@ class LandsGui(QtGui.QMainWindow):
             self.set_world(self.world)
 
     def _on_irrigation(self):
-        pass
+        dialog = OperationDialog(self, self.world, SimulationOp("Simulating irrigation", IrrigationSimulation()))
+        ok = dialog.exec_()
+        if ok:
+            # just to refresh things to enable
+            self.set_world(self.world)
 
     def _on_humidity(self):
         pass
