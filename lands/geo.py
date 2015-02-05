@@ -4,6 +4,10 @@ from noise import snoise2
 from lands.world import *
 from lands.simulations.WatermapSimulation import *
 from lands.simulations.IrrigationSimulation import *
+from lands.simulations.HumiditySimulation import *
+from lands.simulations.TemperatureSimulation import *
+from lands.simulations.PermeabilitySimulation import *
+from lands.simulations.BiomeSimulation import *
 from lands.simulations.basic import *
 
 import sys
@@ -346,42 +350,6 @@ def fill_ocean(elevation, sea_level):
     return ocean
 
 
-def temperature(seed, elevation, mountain_level):
-    width = len(elevation[0])
-    height = len(elevation)
-
-    random.seed(seed * 7)
-    base = random.randint(0, 4096)
-    temp = [[0 for x in xrange(width)] for y in xrange(height)]
-
-    from noise import snoise2
-
-    border = width / 4
-    octaves = 6
-    freq = 16.0 * octaves
-
-    for y in range(0, height):
-        yscaled = float(y) / height
-        latitude_factor = 1.0 - (abs(yscaled - 0.5) * 2)
-        for x in range(0, width):
-            n = snoise2(x / freq, y / freq, octaves, base=base)
-
-            #Added to allow noise pattern to wrap around right and left.
-            if x <= border:
-                n = (snoise2(x / freq, y / freq, octaves, base=base) * x / border) + (snoise2((x+width) / freq, y / freq, octaves, base=base) * (border-x)/border)
-
-            t = (latitude_factor * 3 + n * 2) / 5.0
-            if elevation[y][x] > mountain_level:
-                if elevation[y][x] > (mountain_level + 29):
-                    altitude_factor = 0.033
-                else:
-                    altitude_factor = 1.00 - (float(elevation[y][x] - mountain_level) / 30)
-                t *= altitude_factor
-            temp[y][x] = t
-
-    return temp
-
-
 def precipitation(seed, width, height):
     """"Precipitation is a value in [-1,1]"""
     border = width / 4 
@@ -501,27 +469,6 @@ def place_oceans_at_map_borders(elevation):
             place_ocean(x, height - i - 1, i)
 
 
-def humidity(world):
-    humidity = {}
-    humidity['data'] = [[0 for x in xrange(world.width)] for y in xrange(world.height)]
-
-    for y in xrange(world.height):
-        for x in xrange(world.width):
-            humidity['data'][y][x] = world.precipitation['data'][y][x] + world.irrigation[y][x]
-
-    #These were originally evenly spaced at 12.5% each but changing them to a bell curve produced
-    #better results
-    humidity['quantiles'] = {}
-    humidity['quantiles']['12'] = find_threshold_f(humidity['data'], 0.02, world.ocean)
-    humidity['quantiles']['25'] = find_threshold_f(humidity['data'], 0.09, world.ocean)
-    humidity['quantiles']['37'] = find_threshold_f(humidity['data'], 0.26, world.ocean)
-    humidity['quantiles']['50'] = find_threshold_f(humidity['data'], 0.50, world.ocean)
-    humidity['quantiles']['62'] = find_threshold_f(humidity['data'], 0.74, world.ocean)
-    humidity['quantiles']['75'] = find_threshold_f(humidity['data'], 0.91, world.ocean)
-    humidity['quantiles']['87'] = find_threshold_f(humidity['data'], 0.98, world.ocean)
-    return humidity
-
-
 def initialize_ocean_and_thresholds(world, ocean_level=1.0):
     """
     Calculate the ocean, the sea depth and the elevation thresholds
@@ -574,31 +521,15 @@ def world_gen_from_elevation(w, name, seed, ocean_level, verbose, width, height,
     if verbose:
         print("...erosion calculated")
 
-    WatermapSimulation().execute(w)
+    WatermapSimulation().execute(w, seed)
 
     # FIXME: create setters
-    IrrigationSimulation.execute(w)
-    w.humidity = humidity(w)
-    hu_th = [
-        ('low', find_threshold_f(w.humidity['data'], 0.75, ocean)),
-        ('med', find_threshold_f(w.humidity['data'], 0.3, ocean)),
-        ('hig', None)
-    ]
+    IrrigationSimulation().execute(w, seed)
+    HumiditySimulation().execute(w, seed)
     if verbose:
         print("...humidity calculated")
 
-    # Temperature with thresholds
-    t = temperature(i, e, ml)
-    t_th = [
-	('polar', find_threshold_f(t, 0.90, ocean)),
-        ('alpine', find_threshold_f(t, 0.76, ocean)),
-        ('boreal', find_threshold_f(t, 0.59, ocean)),
-        ('cool', find_threshold_f(t, 0.38, ocean)),
-        ('warm', find_threshold_f(t, 0.26, ocean)),
-        ('subtropical', find_threshold_f(t, 0.14, ocean)),
-        ('tropical', None)
-    ]
-    w.set_temperature(t, t_th)
+    TemperatureSimulation().execute(w, seed)
 
     # Permeability with thresholds
     perm = permeability(i, width, height)

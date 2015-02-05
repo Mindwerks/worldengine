@@ -7,7 +7,7 @@ class WatermapSimulation:
     def is_applicable(self, world):
         return world.has_precipitations() and (not world.has_watermap())
 
-    def execute(self, world):
+    def execute(self, world, seed):
         world.watermap = self._watermap(world, 20000)
 
 
