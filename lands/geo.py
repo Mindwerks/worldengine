@@ -2,6 +2,8 @@ __author__ = 'Federico Tomassetti'
 
 from noise import snoise2
 from lands.world import *
+from lands.simulations.WatermapSimulation import *
+from lands.simulations.basic import *
 
 import sys
 if sys.version_info > (2,):
@@ -182,61 +184,6 @@ def scale_map_in_array(original_map, original_width, original_height, target_wid
     return scaled_map
 
 
-def watermap(world, n):
-    def droplet(world, pos, q, _watermap):
-        if q < 0:
-            return
-        x, y = pos
-        pos_elev = world.elevation['data'][y][x] + _watermap[y][x]
-        lowers = []
-        min_higher = None
-        min_lower = None
-        pos_min_higher = None
-        tot_lowers = 0
-        for p in world.tiles_around((x, y)):
-            px, py = p
-            e = world.elevation['data'][py][px] + _watermap[py][px]
-            if e < pos_elev:
-                dq = int(pos_elev - e) << 2
-                if min_lower == None or e < min_lower:
-                    min_lower = e
-                    if dq == 0:
-                        dq = 1
-                lowers.append((dq, p))
-                tot_lowers += dq
-
-            else:
-                if min_higher == None or e > min_higher:
-                    min_higher = e
-                    pos_min_higher = p
-        if lowers:
-            f = q / tot_lowers
-            for l in lowers:
-                s, p = l
-                if world.is_land(p):
-                    px, py = p
-                    ql = f * s
-                    # ql = q
-                    going = ql > 0.05
-                    _watermap[py][px] += ql
-                    if going:
-                        droplet(world, p, ql, _watermap)
-        else:
-            _watermap[y][x] += q
-
-    _watermap_data = [[0 for x in xrange(world.width)] for y in xrange(world.height)]
-    for i in xrange(n):
-        x, y = world.random_land()
-        if True and world.precipitation['data'][y][x] > 0:
-            droplet(world, (x, y), world.precipitation['data'][y][x], _watermap_data)
-    _watermap = {'data': _watermap_data}
-    _watermap['thresholds'] = {}
-    _watermap['thresholds']['creek'] = find_threshold_f(_watermap_data, 0.05, ocean=world.ocean)
-    _watermap['thresholds']['river'] = find_threshold_f(_watermap_data, 0.02, ocean=world.ocean)
-    _watermap['thresholds']['main river'] = find_threshold_f(_watermap_data, 0.007, ocean=world.ocean)
-    return _watermap
-
-
 def erode(world, n):
     EROSION_FACTOR = 250.0
 
@@ -357,95 +304,6 @@ def antialias(elevation, steps):
 
     for i in range(0, steps):
         antialias()
-
-
-def find_threshold(elevation, land_perc, ocean=None):    
-    width = len(elevation[0])
-    height = len(elevation)
-
-    def count(e):
-        tot = 0
-        for y in range(0, height):
-            for x in range(0, width):
-                if elevation[y][x] > e and (ocean == None or not ocean[y][x]):
-                    tot += 1
-        return tot
-
-    def search(a, b, desired):
-        if (not type(a) == int) or (not type(b) == int):
-            raise "A and B should be int"
-        if a == b:
-            return a
-        if (b - a) == 1:
-            ca = count(a)
-            cb = count(b)
-            dista = abs(desired - ca)
-            distb = abs(desired - cb)
-            if dista < distb:
-                return a
-            else:
-                return b
-        m = int((a + b) / 2)
-        cm = count(m)
-        if desired < cm:
-            return search(m, b, desired)
-        else:
-            return search(a, m, desired)
-
-    all_land = width * height
-    if ocean:
-        for y in range(0, height):
-            for x in range(0, width):
-                if ocean[y][x]:
-                    all_land -= 1
-    desired_land = all_land * land_perc
-    return search(0, 255, desired_land)
-
-
-def find_threshold_f(elevation, land_perc, ocean=None):
-    width = len(elevation[0])
-    height = len(elevation)
-    if ocean:
-        if (width != len(ocean[0])) or (height != len(ocean)):
-            raise Exception(
-                "Dimension of elevation and ocean do not match. Elevation is %d x %d, while ocean is %d x%d" % (
-                    width, height, len(ocean[0]), len(ocean)))
-
-    def count(e):
-        tot = 0
-        for y in range(0, height):
-            for x in range(0, width):
-                if elevation[y][x] > e and (ocean == None or not ocean[y][x]):
-                    tot += 1
-        return tot
-
-    def search(a, b, desired):
-        if a == b:
-            return a
-        if abs(b - a) < 0.005:
-            ca = count(a)
-            cb = count(b)
-            dista = abs(desired - ca)
-            distb = abs(desired - cb)
-            if dista < distb:
-                return a
-            else:
-                return b
-        m = (a + b) / 2.0
-        cm = count(m)
-        if desired < cm:
-            return search(m, b, desired)
-        else:
-            return search(a, m, desired)
-
-    all_land = width * height
-    if ocean:
-        for y in range(0, height):
-            for x in range(0, width):
-                if ocean[y][x]:
-                    all_land -= 1
-    desired_land = all_land * land_perc
-    return search(-1000.0, 1000.0, desired_land)
 
 
 def around(x, y, width, height):
@@ -735,8 +593,9 @@ def world_gen_from_elevation(w, name, seed, ocean_level, verbose, width, height,
     if verbose:
         print("...erosion calculated")
 
+    WatermapSimulation().execute(w)
+
     # FIXME: create setters
-    w.watermap = watermap(w, 20000)
     w.irrigation = irrigation(w)
     w.humidity = humidity(w)
     hu_th = [

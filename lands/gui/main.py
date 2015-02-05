@@ -301,6 +301,26 @@ class PrecipitationsOp():
         ui.on_finish()
 
 
+class SimulationOp():
+
+    def __init__(self, title, simulation):
+        self._title = title
+        self.simulation = simulation
+
+    def title(self):
+        return self._title
+
+    def execute(self, world, ui):
+        """
+
+        :param ui: the dialog with the set_status and on_finish methods
+        :return:
+        """
+        ui.set_status("%s: started" % self.title())
+        self.simulation.execute(world)
+        ui.set_status("%s: done" % self.title())
+        ui.on_finish()
+
 class LandsGui(QtGui.QMainWindow):
     
     def __init__(self):
@@ -344,6 +364,7 @@ class LandsGui(QtGui.QMainWindow):
         self.land_and_ocean_view.setEnabled(world != None)
         self.precipitations_action.setEnabled(world != None and (not world.has_precipitations()))
         self.precipitations_view.setEnabled(world != None and world.has_precipitations())
+        self.watermap_action.setEnabled( WatermapSimulation().is_applicable(world) )
 
     def _prepare_menu(self):
         generate_action = QtGui.QAction('&Generate', self)
@@ -455,7 +476,6 @@ class LandsGui(QtGui.QMainWindow):
         self.current_view = 'land'
         self.canvas.draw_world(self.world, self.current_view)
 
-
     def _on_precipitations_view(self):
         self.current_view = 'precipitations'
         self.canvas.draw_world(self.world, self.current_view)
@@ -494,7 +514,11 @@ class LandsGui(QtGui.QMainWindow):
         pass
 
     def _on_watermap(self):
-        pass
+        dialog = OperationDialog(self, self.world, SimulationOp("Simulating water flow", WatermapSimulation()))
+        ok = dialog.exec_()
+        if ok:
+            # just to refresh things to enable
+            self.set_world(self.world)
 
     def _on_irrigation(self):
         pass
