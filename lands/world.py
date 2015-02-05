@@ -766,3 +766,6 @@ class World(object):
 
     def has_watermap(self):
         return hasattr(self, 'watermap')
+
+    def has_irrigation(self):
+        return hasattr(self, 'irrigation')
