@@ -36,40 +36,40 @@ class GenerateDialog(QtGui.QDialog):
         seed =  random.randint(0, 65535)
 
         name_label = QtGui.QLabel('Name')
-        grid.addWidget(name_label, 0,0,1,1)
+        grid.addWidget(name_label, 0, 0, 1, 1)
         name = 'world_seed_%i' % seed 
         self.name_value = QtGui.QLineEdit(name)
-        grid.addWidget(self.name_value, 0,1,1,2)
+        grid.addWidget(self.name_value, 0, 1, 1, 2)
 
         seed_label = QtGui.QLabel('Seed')
-        grid.addWidget(seed_label, 1,0,1,1)        
+        grid.addWidget(seed_label, 1, 0, 1, 1)
         self.seed_value = self._spinner_box(0, 65525, seed)
-        grid.addWidget(self.seed_value, 1,1,1,2)
+        grid.addWidget(self.seed_value, 1, 1, 1, 2)
 
         width_label = QtGui.QLabel('Width')
-        grid.addWidget(width_label, 2,0,1,1)        
+        grid.addWidget(width_label, 2, 0, 1, 1)
         self.width_value = self._spinner_box(100, 8192, 512)
-        grid.addWidget(self.width_value, 2,1,1,2)
+        grid.addWidget(self.width_value, 2, 1, 1, 2)
 
         height_label = QtGui.QLabel('Height')
-        grid.addWidget(height_label, 3,0,1,1)
+        grid.addWidget(height_label, 3, 0, 1, 1)
         self.height_value = self._spinner_box(100, 8192, 512)
-        grid.addWidget(self.height_value, 3,1,1,2)        
+        grid.addWidget(self.height_value, 3, 1, 1, 2)
 
         plates_num_label = QtGui.QLabel('Number of plates')
-        grid.addWidget(plates_num_label, 4,0,1,1)
+        grid.addWidget(plates_num_label, 4, 0, 1, 1)
         self.plates_num_value = self._spinner_box(2, 100, 10)
-        grid.addWidget(self.plates_num_value, 4,1,1,2)
+        grid.addWidget(self.plates_num_value, 4, 1, 1, 2)
 
         platesres_w_label = QtGui.QLabel('Plates resolution (width)')
-        grid.addWidget(platesres_w_label, 5,0,1,1)
+        grid.addWidget(platesres_w_label, 5, 0, 1, 1)
         self.platesres_w_value = self._spinner_box(50, 4096, 512)
-        grid.addWidget(self.platesres_w_value, 5,1,1,2)
+        grid.addWidget(self.platesres_w_value, 5, 1, 1, 2)
 
         platesres_h_label = QtGui.QLabel('Plates resolution (height)')
-        grid.addWidget(platesres_h_label, 6,0,1,1)
+        grid.addWidget(platesres_h_label, 6, 0, 1, 1)
         self.platesres_h_value = self._spinner_box(50, 4096, 512)
-        grid.addWidget(self.platesres_h_value, 6,1,1,2)
+        grid.addWidget(self.platesres_h_value, 6, 1, 1, 2)
 
         buttons_row = 7
         cancel   = QtGui.QPushButton('Cancel')

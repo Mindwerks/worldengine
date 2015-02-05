@@ -8,6 +8,13 @@ You can generate worlds data (heighmap, biome, etc.) and images for your own wor
 For example:
 
 ```bash
+# before using lands: if you plan to change the code
+python setup.py develop 
+
+# before using lands: if you want just to install lands
+# on unix-ish system you could have to prepend sudo
+python setup.py install
+
 # Lands 0.5.1 or next
 lands world -s 1 -n seed1
 
@@ -37,10 +44,10 @@ Gui
 Since version 0.5.0 an experimental (and limited!) GUI is available. 
 
 ```
-python lands/gui.py
+landsgui
 ```
 
-Note: it requires to install tkinter. You can [read it here](http://tkinter.unpythonic.net/wiki/How_to_install_Tkinter) how to install tkinter for your platform.
+Note: it requires to install QT (available here [http://qt-project.org/](http://qt-project.org/))
 
 Install
 =======
