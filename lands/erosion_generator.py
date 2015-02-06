@@ -3,12 +3,8 @@ __author__ = 'Federico Tomassetti'
 import sys
 import random
 
-try:
-    from lands.geo import World, erode
-    from lands.draw import draw_elevation
-except:
-    from geo import World, erode
-    from draw import draw_elevation
+from lands.geo import World, erode
+from lands.draw import draw_elevation
 
 
 def save(world, i):
@@ -31,7 +27,6 @@ def main():
     world = World.from_json_file(filename)
     print("+ data loaded from '%s'" % filename)
 
-    _watermap = None
     for i in xrange(20):
         filename = 'world_%s_%i_elevation.png' % (world_name, i)
         draw_elevation(world, filename)

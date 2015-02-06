@@ -27,7 +27,7 @@ def center_land(world):
         sumy = 0
         for x in xrange(world.width):
             sumy += world.elevation['data'][y][x]
-        if miny == None or sumy < miny:
+        if miny is None or sumy < miny:
             miny = sumy
             ymin = y
 
@@ -35,7 +35,7 @@ def center_land(world):
         sumx = 0
         for y in xrange(world.height):
             sumx += world.elevation['data'][y][x]
-        if minx == None or sumx < minx:
+        if minx is None or sumx < minx:
             minx = sumx
             xmin = x
 
@@ -65,7 +65,7 @@ def center_elevation_map(elevation, width, height):
         sumy = 0
         for x in xrange(width):
             sumy += elevation[y * width + x]
-        if miny == None or sumy < miny:
+        if miny is None or sumy < miny:
             miny = sumy
             ymin = y
 
@@ -73,7 +73,7 @@ def center_elevation_map(elevation, width, height):
         sumx = 0
         for y in xrange(height):
             sumx += elevation[y * width + x]
-        if minx == None or sumx < minx:
+        if minx is None or sumx < minx:
             minx = sumx
             xmin = x
 
@@ -210,10 +210,10 @@ def erode(world, n):
                     dq = 1
                 lowers.append((dq, p))
                 tot_lowers += dq
-                if min_lower == None or e < min_lower:
+                if min_lower is None or e < min_lower:
                     min_lower = e
             else:
-                if min_higher == None or e > min_higher:
+                if min_higher is None or e > min_higher:
                     min_higher = e
         if lowers:
             f = q / tot_lowers
@@ -252,9 +252,9 @@ def matrix_extremes(matrix):
     for row in matrix:
         for el in row:
             val = el
-            if min == None or val < min:
+            if min is None or val < min:
                 min = val
-            if max == None or val > max:
+            if max is None or val > max:
                 max = val
     return (min, max)
 
@@ -381,7 +381,7 @@ def precipitation(seed, width, height):
 def classify(data, thresholds, x, y):
     value = data[y][x]
     for name, level in thresholds:
-        if (level == None) or (value < level):
+        if (level is None) or (value < level):
             return name
 
 
