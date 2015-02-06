@@ -3,7 +3,7 @@ __author__ = 'Federico Tomassetti'
 from lands.simulations.basic import *
 import math
 
-class IrrigationSimulation:
+class IrrigationSimulation(object):
 
     def is_applicable(self, world):
         return world.has_watermap() and (not world.has_irrigation())

@@ -179,7 +179,7 @@ class GenerationThread(threading.Thread):
         self.ui.on_finish()
 
 
-class PlatesGeneration():
+class PlatesGeneration(object):
 
     def __init__(self, seed, name, width, height, 
                  sea_level=0.65, erosion_period=60,
@@ -286,7 +286,7 @@ class OperationThread(threading.Thread):
     def run(self):
         self.operation.execute(self.world, self.ui)
 
-class PrecipitationsOp():
+class PrecipitationsOp(object):
 
     def __init__(self):
         pass
@@ -307,7 +307,7 @@ class PrecipitationsOp():
         ui.on_finish()
 
 
-class SimulationOp():
+class SimulationOp(object):
 
     def __init__(self, title, simulation):
         self._title = title
@@ -348,8 +348,9 @@ class LandsGui(QtGui.QMainWindow):
         self.label = QtGui.QLabel()
         self.canvas = MapCanvas(self.label, 0, 0)            
 
-        self.main_widget = QtGui.QWidget(self) # dummy widget to contain the
-                                               # layout manager
+        # dummy widget to contain the layout manager
+        self.main_widget = QtGui.QWidget(self)
+
         self.setCentralWidget(self.main_widget)
         self.layout = QtGui.QGridLayout(self.main_widget)
         # Set the stretch

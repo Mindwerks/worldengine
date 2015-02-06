@@ -2,7 +2,7 @@ __author__ = 'Federico Tomassetti'
 
 from lands.simulations.basic import *
 
-class WatermapSimulation:
+class WatermapSimulation(object):
 
     def is_applicable(self, world):
         return world.has_precipitations() and (not world.has_watermap())

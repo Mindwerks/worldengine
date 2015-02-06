@@ -100,7 +100,7 @@ def generate_plates(seed, world_name, output_dir, width, height, num_plates=10):
     print("+ centered plates image generated in '%s'" % filename)
 
 
-class Step:
+class Step(object):
     def __init__(self, name):
         self.name = name
         self.include_plates = True
