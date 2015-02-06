@@ -23,6 +23,7 @@ from lands.simulations.PermeabilitySimulation import *
 from lands.simulations.BiomeSimulation import *
 
 from lands.views.PrecipitationsView import *
+from lands.views.WatermapView import *
 
 class GenerateDialog(QtGui.QDialog):
 
@@ -219,6 +220,8 @@ class MapCanvas(QtGui.QImage):
             draw_land_on_screen(world, self)
         elif view == 'precipitations':
             PrecipitationsView().draw(world, self)
+        elif view == 'watermap':
+            WatermapView().draw(world, self)
         else:
             raise Exception("Unknown view %s" % view)
         self._update()
@@ -358,19 +361,23 @@ class LandsGui(QtGui.QMainWindow):
         self.world = world
         self.canvas = MapCanvas(self.label, self.world.width, self.world.height)
         self._on_bw_view()
+
         self.saveproto_action.setEnabled(world is not None)
         self.bw_view.setEnabled(world is not None)
         self.plates_view.setEnabled(world is not None)
         self.plates_bw_view.setEnabled(world is not None)
-        self.land_and_ocean_view.setEnabled(world is not None)
-        self.precipitations_action.setEnabled(world is not None and (not world.has_precipitations()))
+        self.watermap_view.setEnabled(world is not None and WatermapView().is_applicable(world))
         self.precipitations_view.setEnabled(world is not None and PrecipitationsView().is_applicable(world))
-        self.watermap_action.setEnabled( WatermapSimulation().is_applicable(world) )
-        self.irrigation_action.setEnabled( IrrigationSimulation().is_applicable(world) )
-        self.humidity_action.setEnabled( HumiditySimulation().is_applicable(world) )
-        self.temperature_action.setEnabled( TemperatureSimulation().is_applicable(world) )
-        self.permeability_action.setEnabled( PermeabilitySimulation().is_applicable(world) )
-        self.biome_action.setEnabled( BiomeSimulation().is_applicable(world) )
+        self.land_and_ocean_view.setEnabled(world is not None)
+
+        self.precipitations_action.setEnabled(world is not None and (not world.has_precipitations()))
+        self.watermap_action.setEnabled(world is not None and  WatermapSimulation().is_applicable(world) )
+        self.irrigation_action.setEnabled(world is not None and  IrrigationSimulation().is_applicable(world) )
+        self.humidity_action.setEnabled(world is not None and  HumiditySimulation().is_applicable(world) )
+        self.temperature_action.setEnabled(world is not None and  TemperatureSimulation().is_applicable(world) )
+        self.permeability_action.setEnabled(world is not None and  PermeabilitySimulation().is_applicable(world) )
+        self.biome_action.setEnabled(world is not None and  BiomeSimulation().is_applicable(world) )
+        self.erosion_action.setEnabled(world is not None and ErosionSimulation().is_applicable(world) )
 
     def _prepare_menu(self):
         generate_action = QtGui.QAction('&Generate', self)
@@ -402,12 +409,15 @@ class LandsGui(QtGui.QMainWindow):
         self.land_and_ocean_view.triggered.connect(self._on_land_view)
         self.precipitations_view = QtGui.QAction('Precipitations', self)
         self.precipitations_view.triggered.connect(self._on_precipitations_view)
+        self.watermap_view = QtGui.QAction('Watermap', self)
+        self.watermap_view.triggered.connect(self._on_watermap_view)
 
         self.bw_view.setEnabled(False)
         self.plates_view.setEnabled(False)
         self.plates_bw_view.setEnabled(False)
         self.land_and_ocean_view.setEnabled(False)
         self.precipitations_view.setEnabled(False)
+        self.watermap_view.setEnabled(False)
 
         self.precipitations_action = QtGui.QAction('Precipitations', self)
         self.precipitations_action.triggered.connect(self._on_precipitations)
@@ -465,6 +475,7 @@ class LandsGui(QtGui.QMainWindow):
         view_menu.addAction(self.plates_bw_view)
         view_menu.addAction(self.land_and_ocean_view)
         view_menu.addAction(self.precipitations_view)
+        view_menu.addAction(self.watermap_view)
 
     def _on_bw_view(self):
         self.current_view = 'bw'
@@ -484,6 +495,10 @@ class LandsGui(QtGui.QMainWindow):
 
     def _on_precipitations_view(self):
         self.current_view = 'precipitations'
+        self.canvas.draw_world(self.world, self.current_view)
+
+    def _on_watermap_view(self):
+        self.current_view = 'watermap'
         self.canvas.draw_world(self.world, self.current_view)
 
     def _on_generate(self):
@@ -517,7 +532,11 @@ class LandsGui(QtGui.QMainWindow):
             self.set_world(self.world)
 
     def _on_erosion(self):
-        pass
+        dialog = OperationDialog(self, self.world, SimulationOp("Simulating erosion", ErosionSimulation()))
+        ok = dialog.exec_()
+        if ok:
+            # just to refresh things to enable
+            self.set_world(self.world)
 
     def _on_watermap(self):
         dialog = OperationDialog(self, self.world, SimulationOp("Simulating water flow", WatermapSimulation()))

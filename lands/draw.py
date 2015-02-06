@@ -285,6 +285,7 @@ def draw_humidity(world, filename):
 
 
 def draw_watermap(world, filename, th):
+    # TODO use WatermapView
     WIDTH = world.width
     HEIGHT = world.height
 
@@ -415,6 +416,7 @@ def draw_sea(world, filename):
 
 
 class Counter(object):
+
     def __init__(self):
         self.c = {}
 
