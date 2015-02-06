@@ -2,28 +2,11 @@ __author__ = 'Federico Tomassetti'
 
 from PIL import Image
 
-try:
-    from lands.geo import antialias
-    from lands.drawing_functions import *
-except:
-    from geo import antialias
-    from drawing_functions import *
+from lands.drawing_functions import *
 
 import sys
 if sys.version_info > (2,):
     xrange = range
-
-def draw_plates(plates, filename):
-    WIDTH = len(plates[0])
-    HEIGHT = len(plates)
-
-    img = Image.new('RGBA', (WIDTH, HEIGHT))
-    pixels = img.load()
-    for y in range(0, HEIGHT):
-        for x in range(0, WIDTH):
-            n = plates[y][x] * 255 / N_PLATES
-            pixels[x, y] = (n, n, n, 255)
-    img.save(filename)
 
 
 def draw_land_profile(elevation, sea_level, filename):
@@ -39,6 +22,7 @@ def draw_land_profile(elevation, sea_level, filename):
             else:
                 pixels[x, y] = (0, 0, 255, 255)
     img.save(filename)
+
 
 def elevation_color(c, color_step = 1.5):
     COLOR_STEP = color_step
@@ -448,7 +432,7 @@ def draw_sea(world, filename):
     img.save(filename)
 
 
-class Counter:
+class Counter(object):
     def __init__(self):
         self.c = {}
 

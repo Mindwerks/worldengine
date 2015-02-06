@@ -3,7 +3,7 @@ __author__ = 'Federico Tomassetti'
 from lands.simulations.basic import *
 import math
 
-class HumiditySimulation:
+class HumiditySimulation(object):
 
     def is_applicable(self, world):
         return world.has_precipitations() and world.has_irrigation() and (not world.has_humidity())

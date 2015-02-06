@@ -4,7 +4,7 @@ from lands.simulations.basic import *
 import math
 import random
 
-class PermeabilitySimulation:
+class PermeabilitySimulation(object):
 
     def is_applicable(self, world):
         return not world.has_permeability()
