@@ -22,6 +22,8 @@ from lands.simulations.TemperatureSimulation import *
 from lands.simulations.PermeabilitySimulation import *
 from lands.simulations.BiomeSimulation import *
 
+from lands.views.PrecipitationsView import *
+
 class GenerateDialog(QtGui.QDialog):
 
     def __init__(self,parent):
@@ -216,7 +218,7 @@ class MapCanvas(QtGui.QImage):
         elif view == 'land':
             draw_land_on_screen(world, self)
         elif view == 'precipitations':
-            draw_precipitations_on_screen(world, self)
+            PrecipitationsView().draw(world, self)
         else:
             raise Exception("Unknown view %s" % view)
         self._update()
@@ -362,7 +364,7 @@ class LandsGui(QtGui.QMainWindow):
         self.plates_bw_view.setEnabled(world is not None)
         self.land_and_ocean_view.setEnabled(world is not None)
         self.precipitations_action.setEnabled(world is not None and (not world.has_precipitations()))
-        self.precipitations_view.setEnabled(world is not None and world.has_precipitations())
+        self.precipitations_view.setEnabled(world is not None and PrecipitationsView().is_applicable(world))
         self.watermap_action.setEnabled( WatermapSimulation().is_applicable(world) )
         self.irrigation_action.setEnabled( IrrigationSimulation().is_applicable(world) )
         self.humidity_action.setEnabled( HumiditySimulation().is_applicable(world) )
