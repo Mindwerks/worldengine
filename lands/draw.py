@@ -374,8 +374,6 @@ def draw_precipitation(world, filename):
     WIDTH = world.width
     HEIGHT = world.height
 
-    data = world.precipitation['data']
-    ocean = world.ocean
     img = Image.new('RGBA', (WIDTH, HEIGHT))
     pixels = img.load()
     for y in range(0, HEIGHT):
@@ -421,7 +419,7 @@ class Counter(object):
         self.c = {}
 
     def count(self, what):
-        if not what in self.c:
+        if what not in self.c:
             self.c[what] = 0
         self.c[what] += 1
 
