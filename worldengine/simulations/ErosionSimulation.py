@@ -36,12 +36,17 @@ class ErosionSimulation(object):
         waterPath = numpy.zeros((world.width, world.height), dtype=int)
         riverList = []
         lakeList = []
+        riverMap = numpy.zeros((world.width, world.height))
+        lakeMap = numpy.zeros((world.width, world.height))
+
 
         # step one: water flow per cell based on rainfall
         self.findWaterFlow(world, waterPath)
 
         # step two: find river sources (seeds)
         riverSources = self.riverSources(world, waterFlow, waterPath)
+
+        print("RiverSources %s" % riverSources)
 
         # step three: for each source, find a path to sea
         for source in riverSources:
@@ -52,6 +57,18 @@ class ErosionSimulation(object):
                 rx, ry = river[-1]  # find last cell in river
                 if not world.is_ocean((rx, ry)):
                     lakeList.append(river[-1])  # river flowed into a lake
+
+        # step four: simulate erosion and updating river map
+        for river in riverList:
+            self.riverErosion(river, world)
+            self.riverMapUpdate(river, waterFlow, riverMap, world.precipitation['data'])
+
+        # step five: rivers with no paths to sea form lakes
+        for lake in lakeList:
+            # print "Found lake at:",lake
+            lx, ly = lake
+            lakeMap[lx, ly] = 0.1  # TODO: make this based on rainfall/flow
+            # lakeWater = self.simulateFlood(lake['x'], lake['y'], self.heightmap[lake['x'], lake['y']] + 0.001)
 
     def findWaterFlow(self, world, waterPath):
         '''Find the flow direction for each cell in heightmap'''
@@ -109,6 +126,9 @@ class ErosionSimulation(object):
     def riverSources(self, world, waterFlow, waterPath):
         '''Find places on map where sources of river can be found'''
         riverSourceList = []
+
+        RIVER_TH = 0.02
+
         # Version 2, with rainfall
         #  Using the wind and rainfall data, create river 'seeds' by
         #     flowing rainfall along paths until a 'flow' threshold is reached
@@ -133,7 +153,7 @@ class ErosionSimulation(object):
                 while not neighbourSeedFound:  # follow flow path to where it may lead
 
                     # have we found a seed?
-                    if world.is_mountain((cx, cy)) and waterFlow[cx, cy] >= 10.0:
+                    if world.is_mountain((cx, cy)) and waterFlow[cx, cy] >= RIVER_TH:
 
                         # try not to create seeds around other seeds
                         for seed in riverSourceList:
@@ -204,7 +224,7 @@ class ErosionSimulation(object):
             isWrapped, lowerElevation = self.findLowerElevation(currentLocation, world)
             if lowerElevation and not isWrapped:
                 lowerPath = None
-                lowerPath = aStar.pathFinder().find(world.elevation['data'], currentLocation, lowerElevation)
+                lowerPath = lands.aStar.pathFinder().find(world.elevation['data'], currentLocation, lowerElevation)
                 if lowerPath:
                     path += lowerPath
                     currentLocation = path[-1]
@@ -250,7 +270,7 @@ class ErosionSimulation(object):
 
                 # find our way to the edge
                 edgePath = None
-                edgePath = aStar.pathFinder().find(world.elevation['data'], [cx,cy], [lx,ly])
+                edgePath = lands.aStar.pathFinder().find(world.elevation['data'], [cx,cy], [lx,ly])
                 if not edgePath:
 #                    print "We've reached the end of this river, we cannot get through."
                     # can't find another other path, make it a lake
@@ -264,7 +284,7 @@ class ErosionSimulation(object):
 #                print "We then wrap on: ", [nx, ny]
 
                 # find our way to lowest position original found
-                lowerPath = aStar.pathFinder().find(world.elevation['data'], currentLocation, lowerElevation)
+                lowerPath = lands.aStar.pathFinder().find(world.elevation['data'], currentLocation, lowerElevation)
                 path += lowerPath
                 currentLocation = path[-1]
 #                print "We then go to our destination: ", lowerElevation
@@ -343,3 +363,65 @@ class ErosionSimulation(object):
             isWrapped = True
 #            print "Wrapped lower elevation found:", rx, ry, "!"
         return isWrapped, destination
+
+    def riverErosion(self, river, world):
+        '''Simulate erosion in heightmap based on river path.
+            * current location must be equal to or less than previous location
+            * riverbed is carved out by % of volume/flow
+            * sides of river are also eroded to slope into riverbed.
+            '''
+        # erosion of riverbed itself
+        #maxElevation = 1.0
+        #minElevation = 0.0
+        #for r in river:
+        #    rx, ry = r
+        #    if self.heightmap[rx, ry] < maxElevation:
+        #        maxElevation = self.heightmap[rx, ry]
+        #    minElevation = maxElevation * 0.99
+        #    maxElevation = random.uniform(minElevation, maxElevation)
+        #    self.heightmap[rx, ry] = maxElevation
+
+        # erosion around river, create river valley
+        for r in river:
+            rx, ry = r
+            radius = 2
+            for x in range(rx - radius, rx + radius):
+                for y in range(ry - radius, ry + radius):
+                    if not self.wrap and not world.contains((x, y)):  # ignore edges of map
+                        continue
+                    x, y = overflow(x, world.width), overflow(y, world.height)
+                    curve = 1.0
+                    if [x, y] == [0, 0]:  # ignore center
+                        continue
+                    if [x, y] in river:  # ignore river itself
+                        continue
+                    if world.elevation['data'][y][x] <=  world.elevation['data'][ry][rx]:  # ignore areas lower than river itself
+                        continue
+                    if not inCircle(radius, rx, ry, x, y):  # ignore things outside a circle
+                        continue
+
+                    adx, ady = math.fabs(rx - x), math.fabs(ry - y)
+                    if adx == 1 or ady == 1:
+                        curve = 0.2
+                    elif adx == 2 or ady == 2:
+                        curve = 0.05
+
+                    diff = world.elevation['data'][ry][rx] - world.elevation['data'][y][x]
+                    newElevation = world.elevation['data'][y][x] + (diff * curve)
+                    if newElevation <= world.elevation['data'][ry][rx]:
+                        print('newElevation is <= than river, fix me...')
+                        newElevation = world.elevation['data'][r][x]
+                    world.elevation['data'][y][x] = newElevation
+        return
+
+    def riverMapUpdate(self, river, waterFlow, riverMap, precipitations):
+        '''Update the rivermap with the rainfall that is to become the waterflow'''
+        isSeed = True
+        px, py = (0, 0)
+        for x, y in river:
+            if isSeed:
+                riverMap[x, y] = waterFlow[x, y]
+                isSeed = False
+            else:
+                riverMap[x, y] = precipitations[y][x] +riverMap[px, py]
+            px, py = x, y
