@@ -542,9 +542,9 @@ def draw_oldmap_on_pixels(world, pixels, factor=1):
     for y in xrange(world.height):
         for x in xrange(world.width):
             e = world.elevation['data'][y][x]
-            if min_elev == None or e < min_elev:
+            if min_elev is None or e < min_elev:
                 min_elev = e
-            if max_elev == None or e > max_elev:
+            if max_elev is None or e > max_elev:
                 max_elev = e
     elev_delta = max_elev - min_elev
 
@@ -736,7 +736,7 @@ def draw_riversmap_on_image(world, pixels, factor=1):
         for c in candidates:
             cx, cy = c
             wl = world.humidity['data'][cy][cx] * world.precipitation['data'][cy][cx] * world.elevation['data'][cy][cx]
-            if max == None or wl > max:
+            if max is None or wl > max:
                 max = wl
                 cc = c
         draw_river(world, pixels, cc, factor)

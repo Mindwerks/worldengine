@@ -1,21 +1,15 @@
 __author__ = 'Federico Tomassetti'
 
-import sys
 from optparse import OptionParser
 import os
-
 from lands.plates import world_gen
 from lands.draw import *
-import lands.geo
-import lands.draw
-import lands.drawing_functions
 from lands.world import *
+from PIL import Image
 
 with open("lands/version.py") as f:
     code = compile(f.read(), "lands/version.py", 'exec')
     exec(code)
-
-from PIL import Image
 
 if sys.version_info > (2,):
     xrange = range
