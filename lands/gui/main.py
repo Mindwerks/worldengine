@@ -29,7 +29,7 @@ class GenerateDialog(QtGui.QDialog):
         self._init_ui()
 
     def _init_ui(self):            
-        self.resize(500, 300)
+        self.resize(500, 250)
         self.setWindowTitle('Generate a new world')
         grid = QtGui.QGridLayout()
 
@@ -61,17 +61,7 @@ class GenerateDialog(QtGui.QDialog):
         self.plates_num_value = self._spinner_box(2, 100, 10)
         grid.addWidget(self.plates_num_value, 4, 1, 1, 2)
 
-        platesres_w_label = QtGui.QLabel('Plates resolution (width)')
-        grid.addWidget(platesres_w_label, 5, 0, 1, 1)
-        self.platesres_w_value = self._spinner_box(50, 4096, 512)
-        grid.addWidget(self.platesres_w_value, 5, 1, 1, 2)
-
-        platesres_h_label = QtGui.QLabel('Plates resolution (height)')
-        grid.addWidget(platesres_h_label, 6, 0, 1, 1)
-        self.platesres_h_value = self._spinner_box(50, 4096, 512)
-        grid.addWidget(self.platesres_h_value, 6, 1, 1, 2)
-
-        buttons_row = 7
+        buttons_row = 5
         cancel   = QtGui.QPushButton('Cancel')
         generate = QtGui.QPushButton('Generate')
         grid.addWidget(cancel,   buttons_row, 1, 1, 1)
@@ -98,10 +88,10 @@ class GenerateDialog(QtGui.QDialog):
         return self.seed_value.value()
 
     def width(self):
-        return self.platesres_w_value.value()
+        return self.width_value.value()
 
     def height(self):
-        return self.platesres_h_value.value()
+        return self.height_value.value()
 
     def num_plates(self):        
         return self.plates_num_value.value()
@@ -366,13 +356,13 @@ class LandsGui(QtGui.QMainWindow):
         self.world = world
         self.canvas = MapCanvas(self.label, self.world.width, self.world.height)
         self._on_bw_view()
-        self.saveproto_action.setEnabled(world != None)
-        self.bw_view.setEnabled(world != None)
-        self.plates_view.setEnabled(world != None)
-        self.plates_bw_view.setEnabled(world != None)
-        self.land_and_ocean_view.setEnabled(world != None)
-        self.precipitations_action.setEnabled(world != None and (not world.has_precipitations()))
-        self.precipitations_view.setEnabled(world != None and world.has_precipitations())
+        self.saveproto_action.setEnabled(world is not None)
+        self.bw_view.setEnabled(world is not None)
+        self.plates_view.setEnabled(world is not None)
+        self.plates_bw_view.setEnabled(world is not None)
+        self.land_and_ocean_view.setEnabled(world is not None)
+        self.precipitations_action.setEnabled(world is not None and (not world.has_precipitations()))
+        self.precipitations_view.setEnabled(world is not None and world.has_precipitations())
         self.watermap_action.setEnabled( WatermapSimulation().is_applicable(world) )
         self.irrigation_action.setEnabled( IrrigationSimulation().is_applicable(world) )
         self.humidity_action.setEnabled( HumiditySimulation().is_applicable(world) )
