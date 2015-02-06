@@ -1,67 +1,84 @@
 from worldengine.simulations.basic import *
 import math
+import numpy
+
+# Direction
+NORTH       = [0, -1]
+NORTH_EAST  = [1, -1]
+EAST        = [1, 0]
+SOUTH_EAST  = [1, 1]
+SOUTH       = [0, 1]
+SOUTH_WEST  = [-1, 1]
+WEST        = [-1, 0]
+NORTH_WEST  = [-1, -1]
+CENTER      = [0, 0]
+
+DIR_NEIGHBORS           = [NORTH, EAST, SOUTH, WEST]
+DIR_NEIGHBORS_CENTER    = [CENTER, NORTH, EAST, SOUTH, WEST]
+
+overflow = lambda value, maxValue: value % maxValue
 
 class ErosionSimulation(object):
+
+    def __init__(self):
+        self.wrap = True
 
     def is_applicable(self, world):
         return world.has_precipitations()
 
     def execute(self, world, seed):
-        erosion_n = int((world.width * world.height * 3000000) / (512 * 512))
-        self._erode(world, erosion_n)
+        waterPath = numpy.zeros((world.width, world.height), dtype=int)
+        self.findWaterFlow(world, waterPath)
 
-    def _erode(self, world, n):
-        EROSION_FACTOR = 250.0
+    def findWaterFlow(self, world, waterPath):
+        '''Find the flow direction for each cell in heightmap'''
+        # iterate through each cell
+        for x in range(world.width - 1):
+            for y in range(world.height - 1):
+                # search around cell for a direction
+                path = self.findQuickPath([x, y], world)
+                if path:
+                    tx, ty = path
+                    flowDir = [tx - x, ty - y]
+                    key = 0
+                    for direction in DIR_NEIGHBORS_CENTER:
+                        if direction == flowDir:
+                            waterPath[x, y] = key
+                        key += 1
 
-        def droplet(world, pos, q, v):
-            if q < 0:
-                raise Exception('why?')
-            x, y = pos
-            pos_elev = world.elevation['data'][y][x]
-            lowers = []
-            min_higher = None
-            min_lower = None
-            tot_lowers = 0
-            for p in world.tiles_around((x, y)):
-                px, py = p
-                e = world.elevation['data'][py][px]
-                if e < pos_elev:
-                    dq = int(pos_elev - e) << 2
-                    if dq == 0:
-                        dq = 1
-                    lowers.append((dq, p))
-                    tot_lowers += dq
-                    if min_lower is None or e < min_lower:
-                        min_lower = e
-                else:
-                    if min_higher is None or e > min_higher:
-                        min_higher = e
-            if lowers:
-                f = q / tot_lowers
-                for l in lowers:
-                    s, p = l
-                    if world.is_land(p):
-                        px, py = p
-                        ql = f * s
-                        if ql < 0:
-                            raise Exception('Why ql<0? f=%f s=%f' % (f, s))
-                        # if ql<0.8*q:
-                        # ql = q # rafforzativo
-                        #ql = q
-                        #going = world.elevation['data'][py][px]==min_higher
-                        going = ql > 0.05
-                        world.elevation['data'][py][px] -= ql / EROSION_FACTOR
-                        if going:
-                            droplet(world, p, ql, 0)
-                            #elif random.random()<s:
-                            #    droplet(world,p,ql,0)
-            else:
-                world.elevation['data'][y][x] += 0.3 / EROSION_FACTOR
-                if world.elevation['data'][y][x] > min_higher:
-                    world.elevation['data'][y][x] = min_higher
-                    # world.elevation['data'][y][x] = min_higher
+    def findQuickPath(self, river, world):
+        # Water flows based on cost, seeking the highest elevation difference
+        # highest positive number is the path of least resistance (lowest point)
+        # Cost
+        # *** 1,0 ***
+        # 0,1 *** 2,1
+        # *** 1,2 ***
+        x, y = river
+        newPath = []
+        lowestElevation = world.elevation['data'][y][x]
+        # lowestDirection = [0, 0]
 
-        for i in xrange(n):
-            x, y = world.random_land()
-            if True and world.precipitation['data'][y][x] > 0:
-                droplet(world, (x, y), world.precipitation['data'][y][x] * 1, 0)
+        for dx, dy in DIR_NEIGHBORS:
+            tempDir = [x + dx, y + dy]
+            tx, ty = tempDir
+
+            if not self.wrap and world.contains(tempDir):
+                continue
+
+            tx, ty = overflow(tx, world.width), overflow(ty, world.height)
+
+            elevation = world.elevation['data'][ty][tx]
+
+            # print river, direction, tempDir, elevation, direction[0], direction[1]
+
+            if elevation < lowestElevation:
+                if world.contains(tempDir):
+                    #print "Lower OOB:",tempDir, "Corrected:", tx, ty
+                    pass
+                lowestElevation = elevation
+                newPath = [tx,ty]
+
+        # print newPath, lowestDirection, elevation
+        # sys.exit()
+
+        return newPath

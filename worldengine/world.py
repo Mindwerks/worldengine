@@ -252,6 +252,14 @@ class World(object):
         return w
 
     ###
+    ### General
+    ###
+
+    def contains(self, pos):
+        x, y = pos
+        return x >= 0 and y >= 0 and x < self.width and y < self.height
+
+    ###
     ### Land/Ocean
     ###
 
