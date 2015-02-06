@@ -805,3 +805,9 @@ class World(object):
 
     def has_biome(self):
         return hasattr(self, 'biome')
+
+    def set_rivermap(self, river_map):
+        self.river_map = river_map
+
+    def set_lakemap(self, lake_map):
+        self.lake_map = lake_map

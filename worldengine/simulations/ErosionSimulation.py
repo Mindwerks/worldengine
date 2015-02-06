@@ -58,6 +58,8 @@ class ErosionSimulation(object):
                 if not world.is_ocean((rx, ry)):
                     lakeList.append(river[-1])  # river flowed into a lake
 
+        print("RiverList %s" % riverList)
+
         # step four: simulate erosion and updating river map
         for river in riverList:
             self.riverErosion(river, world)
@@ -69,6 +71,9 @@ class ErosionSimulation(object):
             lx, ly = lake
             lakeMap[lx, ly] = 0.1  # TODO: make this based on rainfall/flow
             # lakeWater = self.simulateFlood(lake['x'], lake['y'], self.heightmap[lake['x'], lake['y']] + 0.001)
+
+        world.set_rivermap(riverMap)
+        world.set_lakemap(lakeMap)
 
     def findWaterFlow(self, world, waterPath):
         '''Find the flow direction for each cell in heightmap'''
