@@ -1,7 +1,5 @@
 __author__ = 'Federico Tomassetti'
 
-from lands.simulations.basic import *
-import math
 
 class BiomeSimulation(object):
 

@@ -9,7 +9,7 @@ def find_threshold(elevation, land_perc, ocean=None):
         tot = 0
         for y in range(0, height):
             for x in range(0, width):
-                if elevation[y][x] > e and (ocean == None or not ocean[y][x]):
+                if elevation[y][x] > e and (ocean is None or not ocean[y][x]):
                     tot += 1
         return tot
 
