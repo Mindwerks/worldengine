@@ -295,6 +295,16 @@ Requirements
 
 Libjpeg and libtiff are required by PIL
 
+Code stolen around
+==================
+
+Rivers and erosion generator from [WorldSynth](https://github.com/psi29a/worldsynth)
+
+License
+=======
+
+LGPL (I would prefer to put everything under BSD/MIT but I stolen LGPL code)
+
 Contributors
 ============
 
