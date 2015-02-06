@@ -1,7 +1,6 @@
 __author__ = 'Federico Tomassetti'
 
 from lands.simulations.basic import *
-import math
 import random
 
 class TemperatureSimulation(object):
@@ -49,7 +48,8 @@ class TemperatureSimulation(object):
 
                 #Added to allow noise pattern to wrap around right and left.
                 if x <= border:
-                    n = (snoise2(x / freq, y / freq, octaves, base=base) * x / border) + (snoise2((x+width) / freq, y / freq, octaves, base=base) * (border-x)/border)
+                    n = (snoise2(x / freq, y / freq, octaves, base=base) * x / border) \
+                        + (snoise2((x+width) / freq, y / freq, octaves, base=base) * (border-x)/border)
 
                 t = (latitude_factor * 3 + n * 2) / 5.0
                 if elevation[y][x] > mountain_level:
