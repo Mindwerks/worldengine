@@ -121,14 +121,14 @@ def draw_grayscale_heightmap(world, filename):
         for x in xrange(world.width):
             e = world.elevation['data'][y][x]
             if world.is_land((x,y)):
-                if min_elev_land == None or e < min_elev_land:
+                if min_elev_land is None or e < min_elev_land:
                     min_elev_land = e
-                if max_elev_land == None or e > max_elev_land:
+                if max_elev_land is None or e > max_elev_land:
                     max_elev_land = e
             else:
-                if min_elev_sea == None or e < min_elev_sea:
+                if min_elev_sea is None or e < min_elev_sea:
                     min_elev_sea = e
-                if max_elev_sea == None or e > max_elev_sea:
+                if max_elev_sea is None or e > max_elev_sea:
                     max_elev_sea = e
 
     elev_delta_land = max_elev_land - min_elev_land
@@ -154,9 +154,9 @@ def draw_bw_heightmap_for_a_biome(world, filename, biome):
     for y in xrange(world.height):
         for x in xrange(world.width):
             e = world.elevation['data'][y][x]
-            if min_elev == None or e < min_elev:
+            if min_elev is None or e < min_elev:
                 min_elev = e
-            if max_elev == None or e > max_elev:
+            if max_elev is None or e > max_elev:
                 max_elev = e
     elev_delta = max_elev - min_elev
 
@@ -187,9 +187,9 @@ def draw_elevation(world, filename, shadow=True):
         for x in xrange(WIDTH):
             if not ocean[y][x]:
                 e = data[y][x]
-                if min_elev == None or e < min_elev:
+                if min_elev is None or e < min_elev:
                     min_elev = e
-                if max_elev == None or e > max_elev:
+                if max_elev is None or e > max_elev:
                     max_elev = e
     elev_delta = max_elev - min_elev
 
@@ -229,9 +229,9 @@ def draw_irrigation(world, filename):
         for x in xrange(WIDTH):
             if not ocean[y][x]:
                 e = data[y][x]
-                if min_elev == None or e < min_elev:
+                if min_elev is None or e < min_elev:
                     min_elev = e
-                if max_elev == None or e > max_elev:
+                if max_elev is None or e > max_elev:
                     max_elev = e
     elev_delta = max_elev - min_elev
 
@@ -260,9 +260,9 @@ def draw_humidity(world, filename):
         for x in xrange(WIDTH):
             if not ocean[y][x]:
                 e = world.humidity['data'][y][x]
-                if min_elev == None or e < min_elev:
+                if min_elev is None or e < min_elev:
                     min_elev = e
-                if max_elev == None or e > max_elev:
+                if max_elev is None or e > max_elev:
                     max_elev = e
     elev_middle = world.humidity['quantiles']['50']
     elev_delta_plus = max_elev - elev_middle
@@ -318,22 +318,6 @@ def draw_watermap(world, filename, th):
                     c = 0
                     #c = int(((e-min_elev)*255)/elev_delta)
                 pixels[x, y] = (c, 0, 0, 255)
-    img.save(filename)
-
-def draw_basic_elevation(elevation, filename):
-    WIDTH = len(elevation[0])
-    HEIGHT = len(elevation)
-
-    img = Image.new('RGBA', (WIDTH, HEIGHT))
-    pixels = img.load()
-    for y in range(0, HEIGHT):
-        for x in range(0, WIDTH):
-            e = int(elevation[y][x] * 255 / MAX_ELEV)
-            if e < 0:
-                e = 0
-            if e > 255:
-                e = 255
-            pixels[x, y] = (e, e, e, 255)
     img.save(filename)
 
 
