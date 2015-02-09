@@ -25,3 +25,7 @@ Version 0.5.1
 * Packaging lands as a script
 * Supporting protocol buffer serialization
 * QT based Gui
+
+Version 0.5.2
+
+* Basic GUI implemented, supporting all views and simulations
