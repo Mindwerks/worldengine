@@ -2,7 +2,10 @@ __author__ = 'Federico Tomassetti'
 
 from PIL import Image
 
-from lands.drawing_functions import *
+try:
+    from lands.drawing_functions import *
+except:
+    from drawing_functions import *
 
 import sys
 if sys.version_info > (2,):

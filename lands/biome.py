@@ -4,7 +4,7 @@ This file contains all possible Biome as separate classes.
 __author__ = 'Federico Tomassetti'
 
 
-class Biome(object):
+class Biome:
     @classmethod
     def by_name(cls, name):
         return BIOMES[name]
