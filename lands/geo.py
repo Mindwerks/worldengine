@@ -1,14 +1,8 @@
 __author__ = 'Federico Tomassetti'
 
 from noise import snoise2
-from lands.world import *
-from lands.simulations.WatermapSimulation import *
-from lands.simulations.IrrigationSimulation import *
-from lands.simulations.HumiditySimulation import *
-from lands.simulations.TemperatureSimulation import *
-from lands.simulations.PermeabilitySimulation import *
-from lands.simulations.BiomeSimulation import *
-from lands.simulations.basic import *
+from world import *
+import time
 
 import sys
 if sys.version_info > (2,):
@@ -27,17 +21,21 @@ def center_land(world):
         sumy = 0
         for x in xrange(world.width):
             sumy += world.elevation['data'][y][x]
-        if miny is None or sumy < miny:
+        if miny == None or sumy < miny:
             miny = sumy
             ymin = y
+    if world.verbose:
+        print("geo.center_land: height complete");
 
     for x in xrange(world.width):
         sumx = 0
         for y in xrange(world.height):
             sumx += world.elevation['data'][y][x]
-        if minx is None or sumx < minx:
+        if minx == None or sumx < minx:
             minx = sumx
             xmin = x
+    if world.verbose:
+        print("geo.center_land: width complete");
 
     new_elevation_data = []
     new_plates         = []
@@ -51,6 +49,8 @@ def center_land(world):
             new_plates[y].append( world.plates[srcy][srcx] )
     world.elevation['data'] = new_elevation_data
     world.plates = new_plates
+    if world.verbose:
+        print("geo.center_land: width complete");
 
 
 def center_elevation_map(elevation, width, height):
@@ -65,7 +65,7 @@ def center_elevation_map(elevation, width, height):
         sumy = 0
         for x in xrange(width):
             sumy += elevation[y * width + x]
-        if miny is None or sumy < miny:
+        if miny == None or sumy < miny:
             miny = sumy
             ymin = y
 
@@ -73,7 +73,7 @@ def center_elevation_map(elevation, width, height):
         sumx = 0
         for y in xrange(height):
             sumx += elevation[y * width + x]
-        if minx is None or sumx < minx:
+        if minx == None or sumx < minx:
             minx = sumx
             xmin = x
 
@@ -189,10 +189,68 @@ def scale_map_in_array(original_map, original_width, original_height, target_wid
     return scaled_map
 
 
+def watermap(world, n):
+    def droplet(world, pos, q, _watermap):
+        if q < 0:
+            return
+        x, y = pos
+        pos_elev = world.elevation['data'][y][x] + _watermap[y][x]
+        lowers = []
+        min_higher = None
+        min_lower = None
+        pos_min_higher = None
+        tot_lowers = 0
+        for p in world.tiles_around((x, y)):
+            px, py = p
+            e = world.elevation['data'][py][px] + _watermap[py][px]
+            if e < pos_elev:
+                dq = int(pos_elev - e) << 2
+                if min_lower == None or e < min_lower:
+                    min_lower = e
+                    if dq == 0:
+                        dq = 1
+                lowers.append((dq, p))
+                tot_lowers += dq
+
+            else:
+                if min_higher == None or e > min_higher:
+                    min_higher = e
+                    pos_min_higher = p
+        if lowers:
+            f = q / tot_lowers
+            for l in lowers:
+                s, p = l
+                if world.is_land(p):
+                    px, py = p
+                    ql = f * s
+                    # ql = q
+                    going = ql > 0.05
+                    _watermap[py][px] += ql
+                    if going:
+                        droplet(world, p, ql, _watermap)
+        else:
+            _watermap[y][x] += q
+
+    _watermap_data = [[0 for x in xrange(world.width)] for y in xrange(world.height)]
+    for i in xrange(n):
+        x, y = world.random_land()
+        if True and world.precipitation['data'][y][x] > 0:
+            droplet(world, (x, y), world.precipitation['data'][y][x], _watermap_data)
+    _watermap = {'data': _watermap_data}
+    _watermap['thresholds'] = {}
+    _watermap['thresholds']['creek'] = find_threshold_f(_watermap_data, 0.05, ocean=world.ocean)
+    _watermap['thresholds']['river'] = find_threshold_f(_watermap_data, 0.02, ocean=world.ocean)
+    _watermap['thresholds']['main river'] = find_threshold_f(_watermap_data, 0.007, ocean=world.ocean)
+    return _watermap
+
+
 def erode(world, n):
+    if world.verbose:
+        start_time = time.time()
     EROSION_FACTOR = 250.0
 
     def droplet(world, pos, q, v):
+        # q = precipitation
         if q < 0:
             raise Exception('why?')
         x, y = pos
@@ -205,23 +263,23 @@ def erode(world, n):
             px, py = p
             e = world.elevation['data'][py][px]
             if e < pos_elev:
-                dq = int(pos_elev - e) << 2
+                dq = int(pos_elev - e) << 2  # diff elev * 4
                 if dq == 0:
                     dq = 1
                 lowers.append((dq, p))
                 tot_lowers += dq
-                if min_lower is None or e < min_lower:
+                if min_lower == None or e < min_lower:
                     min_lower = e
             else:
-                if min_higher is None or e > min_higher:
+                if min_higher == None or e > min_higher:
                     min_higher = e
         if lowers:
-            f = q / tot_lowers
+            f = q / tot_lowers # f = precipitation / weighted # of lower surrounding 'tiles'
             for l in lowers:
-                s, p = l
+                s, p = l      # s = dq = proportional to elevation difference, p = position
                 if world.is_land(p):
                     px, py = p
-                    ql = f * s
+                    ql = f * s  # = amount of precipitation that reaches this 'tile'
                     if ql < 0:
                         raise Exception('Why ql<0? f=%f s=%f' % (f, s))
                     # if ql<0.8*q:
@@ -231,19 +289,32 @@ def erode(world, n):
                     going = ql > 0.05
                     world.elevation['data'][py][px] -= ql / EROSION_FACTOR
                     if going:
-                        droplet(world, p, ql, 0)
+                        # RBB: is recursion really necessary? 
+                        #      we just made this tile lower than it was. Most of the time,
+                        #      won't the surrounding tiles now be higher? Furthermore, isn't
+                        #      this "double dipping"? we are lowering other things, before 
+                        #      this step is complete. Shouldn't we do more rounds of erode()
+                        #      instead?
+                        # RBB: another way to look at it, is if there is enough overflow
+                        #      precipitation, then go down to the next level
+                        droplet(world, p, ql, 0)      
                         #elif random.random()<s:
                         #    droplet(world,p,ql,0)
         else:
-            world.elevation['data'][y][x] += 0.3 / EROSION_FACTOR
+            # If there is not a surrounding 'tile' lower than this one,
+            # then increase the elevation, but don't go any higher than
+            # the highest surrounding 'tile'
+            world.elevation['data'][y][x] += 0.3 / EROSION_FACTOR # only grow at 30% the rate of erosion
             if world.elevation['data'][y][x] > min_higher:
                 world.elevation['data'][y][x] = min_higher
-                # world.elevation['data'][y][x] = min_higher
 
     for i in xrange(n):
         x, y = world.random_land()
         if True and world.precipitation['data'][y][x] > 0:
             droplet(world, (x, y), world.precipitation['data'][y][x] * 1, 0)
+    if world.verbose:
+        elapsed_time = time.time() - start_time
+        print("...erosion calculated. Elapsed time " +str(elapsed_time) +" seconds.")
 
 
 def matrix_extremes(matrix):
@@ -252,9 +323,9 @@ def matrix_extremes(matrix):
     for row in matrix:
         for el in row:
             val = el
-            if min is None or val < min:
+            if min == None or val < min:
                 min = val
-            if max is None or val > max:
+            if max == None or val > max:
                 max = val
     return (min, max)
 
@@ -311,6 +382,95 @@ def antialias(elevation, steps):
         antialias()
 
 
+def find_threshold(elevation, land_perc, ocean=None):    
+    width = len(elevation[0])
+    height = len(elevation)
+
+    def count(e):
+        tot = 0
+        for y in range(0, height):
+            for x in range(0, width):
+                if elevation[y][x] > e and (ocean == None or not ocean[y][x]):
+                    tot += 1
+        return tot
+
+    def search(a, b, desired):
+        if (not type(a) == int) or (not type(b) == int):
+            raise "A and B should be int"
+        if a == b:
+            return a
+        if (b - a) == 1:
+            ca = count(a)
+            cb = count(b)
+            dista = abs(desired - ca)
+            distb = abs(desired - cb)
+            if dista < distb:
+                return a
+            else:
+                return b
+        m = int((a + b) / 2)
+        cm = count(m)
+        if desired < cm:
+            return search(m, b, desired)
+        else:
+            return search(a, m, desired)
+
+    all_land = width * height
+    if ocean:
+        for y in range(0, height):
+            for x in range(0, width):
+                if ocean[y][x]:
+                    all_land -= 1
+    desired_land = all_land * land_perc
+    return search(0, 255, desired_land)
+
+
+def find_threshold_f(elevation, land_perc, ocean=None):
+    width = len(elevation[0])
+    height = len(elevation)
+    if ocean:
+        if (width != len(ocean[0])) or (height != len(ocean)):
+            raise Exception(
+                "Dimension of elevation and ocean do not match. Elevation is %d x %d, while ocean is %d x%d" % (
+                    width, height, len(ocean[0]), len(ocean)))
+
+    def count(e):
+        tot = 0
+        for y in range(0, height):
+            for x in range(0, width):
+                if elevation[y][x] > e and (ocean == None or not ocean[y][x]):
+                    tot += 1
+        return tot
+
+    def search(a, b, desired):
+        if a == b:
+            return a
+        if abs(b - a) < 0.005:
+            ca = count(a)
+            cb = count(b)
+            dista = abs(desired - ca)
+            distb = abs(desired - cb)
+            if dista < distb:
+                return a
+            else:
+                return b
+        m = (a + b) / 2.0
+        cm = count(m)
+        if desired < cm:
+            return search(m, b, desired)
+        else:
+            return search(a, m, desired)
+
+    all_land = width * height
+    if ocean:
+        for y in range(0, height):
+            for x in range(0, width):
+                if ocean[y][x]:
+                    all_land -= 1
+    desired_land = all_land * land_perc
+    return search(-1000.0, 1000.0, desired_land)
+
+
 def around(x, y, width, height):
     ps = []
     for dx in range(-1, 2):
@@ -350,6 +510,42 @@ def fill_ocean(elevation, sea_level):
     return ocean
 
 
+def temperature(seed, elevation, mountain_level):
+    width = len(elevation[0])
+    height = len(elevation)
+
+    random.seed(seed * 7)
+    base = random.randint(0, 4096)
+    temp = [[0 for x in xrange(width)] for y in xrange(height)]
+
+    from noise import snoise2
+
+    border = width / 4
+    octaves = 6
+    freq = 16.0 * octaves
+
+    for y in range(0, height):
+        yscaled = float(y) / height
+        latitude_factor = 1.0 - (abs(yscaled - 0.5) * 2)
+        for x in range(0, width):
+            n = snoise2(x / freq, y / freq, octaves, base=base)
+
+            #Added to allow noise pattern to wrap around right and left.
+            if x <= border:
+                n = (snoise2(x / freq, y / freq, octaves, base=base) * x / border) + (snoise2((x+width) / freq, y / freq, octaves, base=base) * (border-x)/border)
+
+            t = (latitude_factor * 3 + n * 2) / 5.0
+            if elevation[y][x] > mountain_level:
+                if elevation[y][x] > (mountain_level + 29):
+                    altitude_factor = 0.033
+                else:
+                    altitude_factor = 1.00 - (float(elevation[y][x] - mountain_level) / 30)
+                t *= altitude_factor
+            temp[y][x] = t
+
+    return temp
+
+
 def precipitation(seed, width, height):
     """"Precipitation is a value in [-1,1]"""
     border = width / 4 
@@ -378,10 +574,50 @@ def precipitation(seed, width, height):
     return precipitations
 
 
+def irrigation(world):
+    width = world.width
+    height = world.height
+
+    values = [[0 for x in xrange(width)] for y in xrange(height)]
+    radius = 10
+
+    for y in xrange(height):
+        for x in xrange(width):
+            if world.is_land((x, y)):
+                for dy in range(-radius, radius + 1):
+                    if (y + dy) >= 0 and (y + dy) < world.height:
+                        for dx in range(-radius, radius + 1):
+                            if (x + dx) >= 0 and (x + dx) < world.width:
+                                dist = math.sqrt(dx ** 2 + dy ** 2)
+                                values[y + dy][x + dx] += world.watermap['data'][y][x] / (math.log(dist + 1) + 1)
+
+    return values
+
+
+def permeability(seed, width, height):
+    random.seed(seed * 37)
+    base = random.randint(0, 4096)
+    temp = [[0 for x in xrange(width)] for y in xrange(height)]
+
+    from noise import snoise2
+
+    octaves = 6
+    freq = 64.0 * octaves
+
+    for y in range(0, height):
+        yscaled = float(y) / height
+        for x in range(0, width):
+            n = snoise2(x / freq, y / freq, octaves, base=base)
+            t = n
+            temp[y][x] = t
+
+    return temp
+
+
 def classify(data, thresholds, x, y):
     value = data[y][x]
     for name, level in thresholds:
-        if (level is None) or (value < level):
+        if (level == None) or (value < level):
             return name
 
 
@@ -449,6 +685,27 @@ def place_oceans_at_map_borders(elevation):
             place_ocean(x, height - i - 1, i)
 
 
+def humidity(world):
+    humidity = {}
+    humidity['data'] = [[0 for x in xrange(world.width)] for y in xrange(world.height)]
+
+    for y in xrange(world.height):
+        for x in xrange(world.width):
+            humidity['data'][y][x] = world.precipitation['data'][y][x] + world.irrigation[y][x]
+
+    #These were originally evenly spaced at 12.5% each but changing them to a bell curve produced
+    #better results
+    humidity['quantiles'] = {}
+    humidity['quantiles']['12'] = find_threshold_f(humidity['data'], 0.02, world.ocean)
+    humidity['quantiles']['25'] = find_threshold_f(humidity['data'], 0.09, world.ocean)
+    humidity['quantiles']['37'] = find_threshold_f(humidity['data'], 0.26, world.ocean)
+    humidity['quantiles']['50'] = find_threshold_f(humidity['data'], 0.50, world.ocean)
+    humidity['quantiles']['62'] = find_threshold_f(humidity['data'], 0.74, world.ocean)
+    humidity['quantiles']['75'] = find_threshold_f(humidity['data'], 0.91, world.ocean)
+    humidity['quantiles']['87'] = find_threshold_f(humidity['data'], 0.98, world.ocean)
+    return humidity
+
+
 def initialize_ocean_and_thresholds(world, ocean_level=1.0):
     """
     Calculate the ocean, the sea depth and the elevation thresholds
@@ -466,23 +723,24 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
     world.sea_depth = sea_depth(world, ocean_level)
 
 
-def world_gen_precipitation(w, seed, verbose):
-    p = precipitation(seed, w.width, w.height)
+def world_gen_precipitation(w):
+    start_time = time.time()
+    p = precipitation(w.seed, w.width, w.height)
     p_th = [
         ('low', find_threshold_f(p, 0.75, w.ocean)),
         ('med', find_threshold_f(p, 0.3, w.ocean)),
         ('hig', None)
     ]
     w.set_precipitation(p, p_th)
-    if verbose:
-        print("...precipitations calculated")
+    elapsed_time = time.time() - start_time
+    if w.verbose:
+        print("...precipitations calculated. Elapsed time " +str(elapsed_time) +" seconds.")
     return [p, p_th]
 
 
-def world_gen_from_elevation(w, name, seed, ocean_level, verbose, width, height, step):
+def world_gen_from_elevation(w, step):
     if isinstance(step, str):
         step = Step.get_by_name(step)
-    i = seed
     e = w.elevation['data']
     ocean = w.ocean
     ml = w.start_mountain_th()
@@ -491,45 +749,179 @@ def world_gen_from_elevation(w, name, seed, ocean_level, verbose, width, height,
         return w
 
     # Precipitation with thresholds
-    p, p_th = world_gen_precipitation(w, seed, verbose)
+    p, p_th = world_gen_precipitation(w)
 
     if not step.include_erosion:
         return w
 
-    erosion_n = int((width*height*3000000)/(512*512))
+    erosion_n = int((w.width*w.height*3000000)/(512*512)) # if the plate size is ever changed, then these 512 values should probably change too
     erode(w, erosion_n)
-    if verbose:
-        print("...erosion calculated")
-
-    WatermapSimulation().execute(w, seed)
 
     # FIXME: create setters
-    IrrigationSimulation().execute(w, seed)
-    HumiditySimulation().execute(w, seed)
-    if verbose:
-        print("...humidity calculated")
+    if w.verbose:
+        start_time = time.time()
+    w.watermap = watermap(w, 20000)
+    w.irrigation = irrigation(w)
+    w.humidity = humidity(w)
+    hu_th = [
+        ('low', find_threshold_f(w.humidity['data'], 0.75, ocean)),
+        ('med', find_threshold_f(w.humidity['data'], 0.3, ocean)),
+        ('hig', None)
+    ]
+    if w.verbose:
+        elapsed_time = time.time() - start_time
+        print("...humidity calculated. Elapsed time " +str(elapsed_time) +" seconds.")
 
-    TemperatureSimulation().execute(w, seed)
-    PermeabilitySimulation().execute(w, seed)
+    # Temperature with thresholds
+    if w.verbose:
+        start_time = time.time()
+    t = temperature(w.seed, e, ml)
+    t_th = [
+	('polar', find_threshold_f(t, 0.90, ocean)),
+        ('alpine', find_threshold_f(t, 0.76, ocean)),
+        ('boreal', find_threshold_f(t, 0.59, ocean)),
+        ('cool', find_threshold_f(t, 0.38, ocean)),
+        ('warm', find_threshold_f(t, 0.26, ocean)),
+        ('subtropical', find_threshold_f(t, 0.14, ocean)),
+        ('tropical', None)
+    ]
+    w.set_temperature(t, t_th)
+    if w.verbose:
+        elapsed_time = time.time() - start_time
+        print("...set temperature. Elapsed time " +str(elapsed_time) +" seconds.")
 
-    if verbose:
-        print("...permeability level calculated")
+    # Permeability with thresholds
+    if w.verbose:
+        start_time = time.time()
+    perm = permeability(w.seed, w.width, w.height)
+    perm_th = [
+        ('low', find_threshold_f(perm, 0.75, ocean)),
+        ('med', find_threshold_f(perm, 0.25, ocean)),
+        ('hig', None)
+    ]
+    w.set_permeability(perm, perm_th)
 
-    cm, biome_cm = BiomeSimulation().execute(w, seed)
+    if w.verbose:
+        elapsed_time = time.time() - start_time
+        print("...permeability level calculated. Elapsed time " +str(elapsed_time) +" seconds.")
+
+    if w.verbose:
+        start_time = time.time()
+    cm = {}
+    biome_cm = {}
+    biome = [[None for x in xrange(w.width)] for y in xrange(w.height)]
+    for y in xrange(w.height):
+        for x in xrange(w.width):
+            if ocean[y][x]:
+                biome[y][x] = 'ocean'
+            else:
+                if w.is_temperature_polar((x, y)):
+                    if w.is_humidity_superarid((x, y)):
+                        biome[y][x] = 'polar desert'
+                    else:
+                        biome[y][x] = 'ice'
+                elif w.is_temperature_alpine((x, y)):
+                    if w.is_humidity_superarid((x, y)):
+                        biome[y][x] = 'subpolar dry tundra'
+                    elif w.is_humidity_perarid((x, y)):
+                        biome[y][x] = 'subpolar moist tundra'
+                    elif w.is_humidity_arid((x, y)):
+                        biome[y][x] = 'subpolar wet tundra'
+                    else:
+                        biome[y][x] = 'subpolar rain tundra'
+                elif w.is_temperature_boreal((x, y)):
+                    if w.is_humidity_superarid((x, y)):
+                        biome[y][x] = 'boreal desert'
+                    elif w.is_humidity_perarid((x, y)):
+                        biome[y][x] = 'boreal dry scrub'
+                    elif w.is_humidity_arid((x, y)):
+                        biome[y][x] = 'boreal moist forest'
+                    elif w.is_humidity_semiarid((x, y)):
+                        biome[y][x] = 'boreal wet forest'
+                    else:
+                        biome[y][x] = 'boreal rain forest'
+                elif w.is_temperature_cool((x, y)):
+                    if w.is_humidity_superarid((x, y)):
+                        biome[y][x] = 'cool temperate desert'
+                    elif w.is_humidity_perarid((x, y)):
+                        biome[y][x] = 'cool temperate desert scrub'
+                    elif w.is_humidity_arid((x, y)):
+                        biome[y][x] = 'cool temperate steppe'
+                    elif w.is_humidity_semiarid((x, y)):
+                        biome[y][x] = 'cool temperate moist forest'
+                    elif w.is_humidity_subhumid((x, y)):
+                        biome[y][x] = 'cool temperate wet forest'
+                    else:
+                        biome[y][x] = 'cool temperate rain forest'
+                elif w.is_temperature_warm((x, y)):
+                    if w.is_humidity_superarid((x, y)):
+                        biome[y][x] = 'warm temperate desert'
+                    elif w.is_humidity_perarid((x, y)):
+                        biome[y][x] = 'warm temperate desert scrub'
+                    elif w.is_humidity_arid((x, y)):
+                        biome[y][x] = 'warm temperate thorn scrub'
+                    elif w.is_humidity_semiarid((x, y)):
+                        biome[y][x] = 'warm temperate dry forest'
+                    elif w.is_humidity_subhumid((x, y)):
+                        biome[y][x] = 'warm temperate moist forest'
+                    elif w.is_humidity_humid((x, y)):
+                        biome[y][x] = 'warm temperate wet forest'
+                    else:
+                        biome[y][x] = 'warm temperate rain forest'
+                elif w.is_temperature_subtropical((x, y)):
+                    if w.is_humidity_superarid((x, y)):
+                        biome[y][x] = 'subtropical desert'
+                    elif w.is_humidity_perarid((x, y)):
+                        biome[y][x] = 'subtropical desert scrub'
+                    elif w.is_humidity_arid((x, y)):
+                        biome[y][x] = 'subtropical thorn woodland'
+                    elif w.is_humidity_semiarid((x, y)):
+                        biome[y][x] = 'subtropical dry forest'
+                    elif w.is_humidity_subhumid((x, y)):
+                        biome[y][x] = 'subtropical moist forest'
+                    elif w.is_humidity_humid((x, y)):
+                        biome[y][x] = 'subtropical wet forest'
+                    else:
+                        biome[y][x] = 'subtropical rain forest'
+                elif w.is_temperature_tropical((x, y)):
+                    if w.is_humidity_superarid((x, y)):
+                        biome[y][x] = 'tropical desert'
+                    elif w.is_humidity_perarid((x, y)):
+                        biome[y][x] = 'tropical desert scrub'
+                    elif w.is_humidity_arid((x, y)):
+                        biome[y][x] = 'tropical thorn woodland'
+                    elif w.is_humidity_semiarid((x, y)):
+                        biome[y][x] = 'tropical very dry forest'
+                    elif w.is_humidity_subhumid((x, y)):
+                        biome[y][x] = 'tropical dry forest'
+                    elif w.is_humidity_humid((x, y)):
+                        biome[y][x] = 'tropical moist forest'
+                    elif w.is_humidity_perhumid((x, y)):
+                        biome[y][x] = 'tropical wet forest'
+                    else:
+                        biome[y][x] = 'tropical rain forest'
+                else:
+                    biome[y][x] = 'bare rock'
+            if not biome[y][x] in biome_cm:
+                biome_cm[biome[y][x]] = 0
+            biome_cm[biome[y][x]] += 1
 
     for cl in cm.keys():
         count = cm[cl]
-        if verbose:
+        if w.verbose:
             print("%s = %i" % (str(cl), count))
 
-    if verbose:
+    if w.verbose:
+        elapsed_time = time.time() - start_time
+        print("... biome calculated. Elapsed time " +str(elapsed_time) +" seconds.")
         print('')  # empty line
         print('Biome obtained:')
 
     for cl in biome_cm.keys():
         count = biome_cm[cl]
-        if verbose:
+        if w.verbose:
             print(" %30s = %7i" % (str(cl), count))
 
+    w.set_biome(biome)
     return w
 
