@@ -1,15 +1,9 @@
 __author__ = 'Federico Tomassetti'
 
+import time
 from noise import snoise2
-from lands.world import *
-from lands.simulations.WatermapSimulation import *
-from lands.simulations.IrrigationSimulation import *
-from lands.simulations.HumiditySimulation import *
-from lands.simulations.TemperatureSimulation import *
-from lands.simulations.PermeabilitySimulation import *
-from lands.simulations.ErosionSimulation import *
-from lands.simulations.BiomeSimulation import *
-from lands.simulations.basic import *
+from world import *
+from simulations import *
 
 import sys
 if sys.version_info > (2,):
@@ -31,6 +25,8 @@ def center_land(world):
         if miny is None or sumy < miny:
             miny = sumy
             ymin = y
+    if world.verbose:
+        print("geo.center_land: height complete");
 
     for x in xrange(world.width):
         sumx = 0
@@ -39,6 +35,8 @@ def center_land(world):
         if minx is None or sumx < minx:
             minx = sumx
             xmin = x
+    if world.verbose:
+        print("geo.center_land: width complete");
 
     new_elevation_data = []
     new_plates         = []
@@ -52,6 +50,8 @@ def center_land(world):
             new_plates[y].append( world.plates[srcy][srcx] )
     world.elevation['data'] = new_elevation_data
     world.plates = new_plates
+    if world.verbose:
+        print("geo.center_land: width complete");
 
 
 def center_elevation_map(elevation, width, height):
@@ -393,6 +393,27 @@ def place_oceans_at_map_borders(elevation):
             place_ocean(x, height - i - 1, i)
 
 
+def humidity(world):
+    humidity = {}
+    humidity['data'] = [[0 for x in xrange(world.width)] for y in xrange(world.height)]
+
+    for y in xrange(world.height):
+        for x in xrange(world.width):
+            humidity['data'][y][x] = world.precipitation['data'][y][x] + world.irrigation[y][x]
+
+    #These were originally evenly spaced at 12.5% each but changing them to a bell curve produced
+    #better results
+    humidity['quantiles'] = {}
+    humidity['quantiles']['12'] = find_threshold_f(humidity['data'], 0.02, world.ocean)
+    humidity['quantiles']['25'] = find_threshold_f(humidity['data'], 0.09, world.ocean)
+    humidity['quantiles']['37'] = find_threshold_f(humidity['data'], 0.26, world.ocean)
+    humidity['quantiles']['50'] = find_threshold_f(humidity['data'], 0.50, world.ocean)
+    humidity['quantiles']['62'] = find_threshold_f(humidity['data'], 0.74, world.ocean)
+    humidity['quantiles']['75'] = find_threshold_f(humidity['data'], 0.91, world.ocean)
+    humidity['quantiles']['87'] = find_threshold_f(humidity['data'], 0.98, world.ocean)
+    return humidity
+
+
 def initialize_ocean_and_thresholds(world, ocean_level=1.0):
     """
     Calculate the ocean, the sea depth and the elevation thresholds
@@ -410,23 +431,24 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
     world.sea_depth = sea_depth(world, ocean_level)
 
 
-def world_gen_precipitation(w, seed, verbose):
-    p = precipitation(seed, w.width, w.height)
+def world_gen_precipitation(w):
+    start_time = time.time()
+    p = precipitation(w.seed, w.width, w.height)
     p_th = [
         ('low', find_threshold_f(p, 0.75, w.ocean)),
         ('med', find_threshold_f(p, 0.3, w.ocean)),
         ('hig', None)
     ]
     w.set_precipitation(p, p_th)
-    if verbose:
-        print("...precipitations calculated")
+    elapsed_time = time.time() - start_time
+    if w.verbose:
+        print("...precipitations calculated. Elapsed time " +str(elapsed_time) +" seconds.")
     return [p, p_th]
 
 
-def world_gen_from_elevation(w, name, seed, ocean_level, verbose, width, height, step):
+def world_gen_from_elevation(w, step):
     if isinstance(step, str):
         step = Step.get_by_name(step)
-    i = seed
     e = w.elevation['data']
     ocean = w.ocean
     ml = w.start_mountain_th()
@@ -435,11 +457,10 @@ def world_gen_from_elevation(w, name, seed, ocean_level, verbose, width, height,
         return w
 
     # Precipitation with thresholds
-    p, p_th = world_gen_precipitation(w, seed, verbose)
+    p, p_th = world_gen_precipitation(w)
 
     if not step.include_erosion:
         return w
-
     ErosionSimulation().execute(w, seed)
     if verbose:
         print("...erosion calculated")
@@ -449,29 +470,25 @@ def world_gen_from_elevation(w, name, seed, ocean_level, verbose, width, height,
     # FIXME: create setters
     IrrigationSimulation().execute(w, seed)
     HumiditySimulation().execute(w, seed)
-    if verbose:
-        print("...humidity calculated")
 
     TemperatureSimulation().execute(w, seed)
     PermeabilitySimulation().execute(w, seed)
 
-    if verbose:
-        print("...permeability level calculated")
+
 
     cm, biome_cm = BiomeSimulation().execute(w, seed)
-
     for cl in cm.keys():
         count = cm[cl]
-        if verbose:
+        if hasattr(w, 'verbose') and w.verbose:
             print("%s = %i" % (str(cl), count))
 
-    if verbose:
+    if hasattr(w, 'verbose') and w.verbose:
         print('')  # empty line
         print('Biome obtained:')
 
     for cl in biome_cm.keys():
         count = biome_cm[cl]
-        if verbose:
+        if w.verbose:
             print(" %30s = %7i" % (str(cl), count))
 
     return w

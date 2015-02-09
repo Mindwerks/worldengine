@@ -1,18 +1,25 @@
 __author__ = 'Federico Tomassetti'
 
-from lands.biome import *
-from lands.basic_map_operations import *
+from biome import *
+from basic_map_operations import *
 import pickle
-import lands.protobuf.World_pb2 as Protobuf
+import protobuf.World_pb2 as Protobuf
 
 class World(object):
     """A world composed by name, dimensions and all the characteristics of each cell.
     """
 
-    def __init__(self, name, width, height):
+    def __init__(self, name, width, height, seed, num_plates, ocean_level, step, recursion_limit=2000, verbose=True):
         self.name = name
         self.width = width
         self.height = height
+        self.seed = seed
+        self.num_plates = num_plates
+        self.ocean_level = ocean_level
+        self.step = step
+        self.recursion_limit = recursion_limit
+        self.verbose = verbose
+        #TODO: add self.step
 
     ###
     ### General methods
@@ -113,6 +120,12 @@ class World(object):
         p_world.name   = self.name
         p_world.width  = self.width
         p_world.height = self.height
+        p_world.seed = self.seed
+        p_world.num_plates = self.num_plates
+        p_world.ocean_level = self.ocean_level
+        p_world.step = self.step
+        p_world.recursion_limit = self.recursion_limit
+        p_world.verbose = self.verbose
 
         # Elevation
         self._to_protobuf_matrix(self.elevation['data'], p_world.heightMapData)
@@ -167,7 +180,9 @@ class World(object):
 
     @classmethod
     def _from_protobuf_world(cls, p_world):
-        w = World(p_world.name, p_world.width, p_world.height)
+        w = World(p_world.name, p_world.width, p_world.height, p_world.seed,
+                p_world.num_plate, p_world.ocean_level, p_world.step, 
+                p_world.recursion_limit, p_world.verbose)
 
         # Elevation
         e = World._from_protobuf_matrix(p_world.heightMapData)
@@ -761,23 +776,6 @@ class World(object):
 
         self.permeability = {'data': data, 'thresholds': thresholds}
 
+
     def has_precipitations(self):
         return hasattr(self, 'precipitation')
-
-    def has_watermap(self):
-        return hasattr(self, 'watermap')
-
-    def has_irrigation(self):
-        return hasattr(self, 'irrigation')
-
-    def has_humidity(self):
-        return hasattr(self, 'humidity')
-
-    def has_temperature(self):
-        return hasattr(self, 'temperature')
-
-    def has_permeability(self):
-        return hasattr(self, 'permeability')
-
-    def has_biome(self):
-        return hasattr(self, 'biome')
