@@ -7,6 +7,7 @@ from lands.basic_map_operations import *
 import lands.protobuf.World_pb2 as Protobuf
 from lands.step import Step
 
+
 class World(object):
     """A world composed by name, dimensions and all the characteristics of each cell.
     """
@@ -112,7 +113,6 @@ class World(object):
         matrix['data'] = World._from_protobuf_matrix(p_matrix)
         matrix['quantiles'] = World._from_protobuf_quantiles(p_matrix.quantiles)
         return matrix
-
 
     def _to_protobuf_world(self):
         p_world = Protobuf.World()
@@ -258,7 +258,7 @@ class World(object):
         if self.ocean[y][x]:
             return self.random_land()
         else:
-            return (x, y)
+            return x, y
 
     def is_land(self, pos):
         x, y = pos
@@ -339,7 +339,7 @@ class World(object):
         for y in xrange(self.height):
             for x in xrange(self.width):
                 el = self.elevation['data'][y][x]
-                if max_el == None or el > max_el:
+                if max_el is None or el > max_el:
                     max_el = el
         return max_el
 
@@ -348,7 +348,7 @@ class World(object):
         for y in xrange(self.height):
             for x in xrange(self.width):
                 el = self.elevation['data'][y][x]
-                if min_el == None or el < min_el:
+                if min_el is None or el < min_el:
                     min_el = el
         return min_el        
 
@@ -426,35 +426,35 @@ class World(object):
         th_max = self.temperature['thresholds'][1][1]
         x, y = pos
         t = self.temperature['data'][y][x]
-        return t < th_max and t >= th_min
+        return th_max > t >= th_min
 
     def is_temperature_boreal(self, pos):
         th_min = self.temperature['thresholds'][1][1]
         th_max = self.temperature['thresholds'][2][1]
         x, y = pos
         t = self.temperature['data'][y][x]
-        return t < th_max and t >= th_min
+        return th_max > t >= th_min
 
     def is_temperature_cool(self, pos):
         th_min = self.temperature['thresholds'][2][1]
         th_max = self.temperature['thresholds'][3][1]
         x, y = pos
         t = self.temperature['data'][y][x]
-        return t < th_max and t >= th_min
+        return th_max > t >= th_min
 
     def is_temperature_warm(self, pos):
         th_min = self.temperature['thresholds'][3][1]
         th_max = self.temperature['thresholds'][4][1]
         x, y = pos
         t = self.temperature['data'][y][x]
-        return t < th_max and t >= th_min
+        return th_max > t >= th_min
 
     def is_temperature_subtropical(self, pos):
         th_min = self.temperature['thresholds'][4][1]
         th_max = self.temperature['thresholds'][5][1]
         x, y = pos
         t = self.temperature['data'][y][x]
-        return t < th_max and t >= th_min
+        return th_max > t >= th_min
 
     def is_temperature_tropical(self, pos):
         th_min = self.temperature['thresholds'][5][1]
@@ -483,42 +483,42 @@ class World(object):
         th_max = self.humidity['quantiles']['75']
         x, y = pos
         t = self.humidity['data'][y][x]
-        return t >= th_min and t < th_max
+        return th_max > t >= th_min
 
     def is_humidity_arid(self, pos):
         th_min = self.humidity['quantiles']['75']
         th_max = self.humidity['quantiles']['62']
         x, y = pos
         t = self.humidity['data'][y][x]
-        return t >= th_min and t < th_max
+        return th_max > t >= th_min
 
     def is_humidity_semiarid(self, pos):
         th_min = self.humidity['quantiles']['62']
         th_max = self.humidity['quantiles']['50']
         x, y = pos
         t = self.humidity['data'][y][x]
-        return t >= th_min and t < th_max
+        return th_max > t >= th_min
 
     def is_humidity_subhumid(self, pos):
         th_min = self.humidity['quantiles']['50']
         th_max = self.humidity['quantiles']['37']
         x, y = pos
         t = self.humidity['data'][y][x]
-        return t >= th_min and t < th_max
+        return th_max > t >= th_min
 
     def is_humidity_humid(self, pos):
         th_min = self.humidity['quantiles']['37']
         th_max = self.humidity['quantiles']['25']
         x, y = pos
         t = self.humidity['data'][y][x]
-        return t >= th_min and t < th_max
+        return th_max > t >= th_min
 
     def is_humidity_perhumid(self, pos):
         th_min = self.humidity['quantiles']['25']
         th_max = self.humidity['quantiles']['12']
         x, y = pos
         t = self.humidity['data'][y][x]
-        return t >= th_min and t < th_max
+        return th_max > t >= th_min
 
     def is_humidity_superhumid(self, pos):
         th_min = self.humidity['quantiles']['12']
@@ -560,7 +560,7 @@ class World(object):
     def biome_at(self, pos):
         x, y = pos
         b = Biome.by_name(self.biome[y][x])
-        if b == None:
+        if b is None:
             raise Exception('Not found')
         return b
 
@@ -613,6 +613,7 @@ class World(object):
             return False
 
     def is_glacier(self, pos):
+        # FIXME
         return False
 
     def is_iceland(self, pos):
@@ -702,6 +703,7 @@ class World(object):
             return False
 
     def is_rock_desert(self, pos):
+        # FIXME
         return False
 
     ###
@@ -772,7 +774,6 @@ class World(object):
             raise Exception("Setting data with wrong width")
 
         self.permeability = {'data': data, 'thresholds': thresholds}
-
 
     def has_precipitations(self):
         return hasattr(self, 'precipitation')
