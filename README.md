@@ -101,22 +101,41 @@ The program produces a binary format with all the data of the generated world an
 Usage
 =====
 
+```
+lands [options] [world|plates|ancient_map]
+```
+_Note that options were changed in version 0.5.3_
+
+### General options
+
 | Short     | Long | Description |
 |-----------|------|-------------|
 | -o DIR    | --output-dir=DIR | generate files in DIR default = '.' |
 | -n STR    | --worldname=STR | set world name to STR |
 | -b        | --protocol-buffer | save world using protocol buffer format (smaller file) |
 | -s N      | --seed=N | use SEED to initialize the pseudo-random generation |
-| -t STR    | --step=STR | use STEP to specify how far to proceed in the world generation process. Valid values are plates|precipitations|full |
-| -x    | --width | WIDTH of the world to be generated |
-| -y    | --height | HEIGHT of the world to be generated |
-| -w    | --worldfile | WORLD_FILE to be loaded (for ancient_map operation) |
-| -g    | --generatedfile | name of the GENERATED_FILE (for ancient_map operation) |
-| -f    | --resize-factor | resize factor |
-| -p    | --plates-resolution | plates resolution |
-| -q    | --number-of-plates | number of plates |
-| --gs  | --grayscale-heightmap | produce a grayscale heightmap, after the option it expects the name of the file where to generate the heightmap (e.g., --gs bw.png) |
-| -r    | --rivers | produce a map of reivers, after the option it expects the name of the file where to generate the map (e.g., -r rivers.png) |
+| -t STR    | --step=STR | use STEP to specify how far to proceed in the world generation process. Valid values are: plates precipitations full |
+| -x N      | --width=N | WIDTH of the world to be generated |
+| -y N      | --height=N | HEIGHT of the world to be generated |
+| -q N   | --number-of-plates=N | number of plates |
+|       | --recursion-limit=N | you need that just if you encounter an error while generating very large maps |
+| -v    | --verbose | Enable verbose messages |
+
+### Options valid only for generate
+
+| Short     | Long | Description |
+|-----------|------|-------------|
+| -r FILE   | --rivers=FILE | produce a map of reivers, after the option it expects the name of the file where to generate the map  |
+| --gs=FILE  | --grayscale-heightmap=FILE | produce a grayscale heightmap, after the option it expects the name of the file where to generate the heightmap |
+|   | --ocean_level=N   |  elevation cut off for sea level (default = 1.0) |
+
+### Options valid only for ancient map operations
+
+| Short     | Long | Description |
+|-----------|------|-------------|
+| -w FILE   | --worldfile=FILE | WORLD_FILE to be loaded |
+| -g FILE   | --generatedfile=FILE | name of the GENERATED_FILE |
+| -f N   | --resize-factor=N | resize factor |
 
 For example these commands:
 
