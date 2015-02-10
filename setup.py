@@ -19,7 +19,7 @@ config = {
     'author_email'     : 'f.tomassetti@gmail.com',
     'version'          : __version__,
     'install_requires' : ['nose'],
-    'packages'         : ['lands'],
+    'packages'         : ['lands', 'lands.gui', 'lands.simulations', 'lands.gui', 'lands.protobuf'],
     'entry_points'     : {
         'console_scripts': ['lands=lands.generator:main', 'landsgui=lands.gui.main:main'],
     },

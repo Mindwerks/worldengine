@@ -12,10 +12,7 @@ from lands.drawing_functions import *
 from lands.world import *
 from lands.common import *
 from lands.step import Step
-
-with open("lands/version.py") as f:
-    code = compile(f.read(), "lands/version.py", 'exec')
-    exec(code)
+from lands.version import __version__
 
 if sys.version_info > (2,):
     xrange = range
