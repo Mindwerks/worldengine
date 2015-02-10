@@ -3,25 +3,11 @@ __author__ = 'Federico Tomassetti'
 from PIL import Image
 
 from lands.drawing_functions import *
+from lands.common import *
 
 import sys
 if sys.version_info > (2,):
     xrange = range
-
-
-def draw_land_profile(elevation, sea_level, filename):
-    WIDTH = len(elevation[0])
-    HEIGHT = len(elevation)
-
-    img = Image.new('RGBA', (WIDTH, HEIGHT))
-    pixels = img.load()
-    for y in range(0, HEIGHT):
-        for x in range(0, WIDTH):
-            if elevation[y][x] > sea_level:
-                pixels[x, y] = (0, 255, 0, 255)
-            else:
-                pixels[x, y] = (0, 0, 255, 255)
-    img.save(filename)
 
 
 def elevation_color(c, color_step = 1.5):
@@ -64,6 +50,7 @@ def elevation_color(c, color_step = 1.5):
                 c -= 2.0 * COLOR_STEP
             return (1, 1 - c / 4.0, 1)    
 
+
 def draw_simple_elevation_on_image(data, shadow, width, height):    
     img = Image.new('RGBA', (width, height))
     pixels = img.load()
@@ -75,19 +62,10 @@ def draw_simple_elevation_on_image(data, shadow, width, height):
             pixels[x, y] = (int(r * 255), int(g * 255), int(b * 255), 255)
     return img
 
+
 def draw_simple_elevation(data, filename, shadow, width, height):
     img = draw_simple_elevation_on_image(data, shadow, width, height)
     img.save(filename)
-
-
-def generate_riversmap(world_path, map_path):
-    import pickle
-
-    with open(world_path, 'r') as f:
-        w = pickle.load(f)
-
-    # Generate images
-    draw_riversmap(w, map_path)
 
 
 def draw_riversmap(world, filename):
@@ -145,33 +123,6 @@ def draw_grayscale_heightmap(world, filename):
     img.save(filename)
 
 
-def draw_bw_heightmap_for_a_biome(world, filename, biome):
-    img = Image.new('RGBA', (world.width, world.height))
-    pixels = img.load()
-
-    min_elev = None
-    max_elev = None
-    for y in xrange(world.height):
-        for x in xrange(world.width):
-            e = world.elevation['data'][y][x]
-            if min_elev is None or e < min_elev:
-                min_elev = e
-            if max_elev is None or e > max_elev:
-                max_elev = e
-    elev_delta = max_elev - min_elev
-
-    for y in xrange(world.height):
-        for x in xrange(world.width):
-            e = world.elevation['data'][y][x]
-            c = int(((e - min_elev) * 255) / elev_delta)
-            if not world.biome[y][x] == biome:
-                a = 0
-            else:
-                a = 255
-            pixels[x, y] = (c, c, c, a)
-    img.save(filename)
-
-
 def draw_elevation(world, filename, shadow=True):
     WIDTH = world.width
     HEIGHT = world.height
@@ -214,76 +165,6 @@ def draw_elevation(world, filename, shadow=True):
     img.save(filename)
 
 
-def draw_irrigation(world, filename):
-    WIDTH = world.width
-    HEIGHT = world.height
-
-    data = world.irrigation
-    ocean = world.ocean
-    img = Image.new('RGBA', (WIDTH, HEIGHT))
-    pixels = img.load()
-
-    min_elev = None
-    max_elev = None
-    for y in xrange(HEIGHT):
-        for x in xrange(WIDTH):
-            if not ocean[y][x]:
-                e = data[y][x]
-                if min_elev is None or e < min_elev:
-                    min_elev = e
-                if max_elev is None or e > max_elev:
-                    max_elev = e
-    elev_delta = max_elev - min_elev
-
-    for y in range(0, HEIGHT):
-        for x in range(0, WIDTH):
-            if ocean[y][x]:
-                pixels[x, y] = (0, 0, 255, 255)
-            else:
-                e = data[y][x]
-                c = int(((e - min_elev) * 255) / elev_delta)
-                pixels[x, y] = (0, 0, c, 255)
-    img.save(filename)
-
-
-def draw_humidity(world, filename):
-    WIDTH = world.width
-    HEIGHT = world.height
-
-    ocean = world.ocean
-    img = Image.new('RGBA', (WIDTH, HEIGHT))
-    pixels = img.load()
-
-    min_elev = None
-    max_elev = None
-    for y in xrange(HEIGHT):
-        for x in xrange(WIDTH):
-            if not ocean[y][x]:
-                e = world.humidity['data'][y][x]
-                if min_elev is None or e < min_elev:
-                    min_elev = e
-                if max_elev is None or e > max_elev:
-                    max_elev = e
-    elev_middle = world.humidity['quantiles']['50']
-    elev_delta_plus = max_elev - elev_middle
-    elev_delta_minus = elev_middle - min_elev
-
-    for y in range(0, HEIGHT):
-        for x in range(0, WIDTH):
-            if ocean[y][x]:
-                pixels[x, y] = (0, 0, 255, 255)
-            else:
-                e = world.humidity['data'][y][x]
-                if e < elev_middle:
-                    c = int(((elev_middle - e) * 255) / elev_delta_minus)
-                    pixels[x, y] = (c, 0, 0, 255)
-                else:
-                    c = int(((e - elev_middle) * 255) / elev_delta_plus)
-                    pixels[x, y] = (0, c, 0, 255)
-
-    img.save(filename)
-
-
 def draw_watermap(world, filename, th):
     # TODO use WatermapView
     WIDTH = world.width
@@ -322,26 +203,6 @@ def draw_watermap(world, filename, th):
     img.save(filename)
 
 
-def draw_land(elevation, ocean_map, hill_level, mountain_level, filename):
-    WIDTH = len(elevation[0])
-    HEIGHT = len(elevation)
-
-    img = Image.new('RGBA', (WIDTH, HEIGHT))
-    pixels = img.load()
-    for y in range(0, HEIGHT):
-        for x in range(0, WIDTH):
-            if ocean_map[y][x]:
-                pixels[x, y] = (0, 0, 255, 255)
-            elif elevation[y][x] > mountain_level:
-                pixels[x, y] = (255, 255, 255, 255)
-            elif elevation[y][x] > hill_level:
-                pixels[x, y] = (30, 140, 30, 255)
-            else:
-                pixels[x, y] = (0, 230, 0, 255)
-
-    img.save(filename)
-
-
 def draw_ocean(ocean, filename):
     WIDTH = len(ocean[0])
     HEIGHT = len(ocean)
@@ -354,19 +215,6 @@ def draw_ocean(ocean, filename):
                 pixels[x, y] = (0, 0, 255, 255)
             else:
                 pixels[x, y] = (0, 255, 255, 255)
-    img.save(filename)
-
-
-def draw_temp(temp, filename):
-    WIDTH = len(temp[0])
-    HEIGHT = len(temp)
-
-    img = Image.new('RGBA', (WIDTH, HEIGHT))
-    pixels = img.load()
-    for y in range(0, HEIGHT):
-        for x in range(0, WIDTH):
-            c = int(temp[y][x] * 255)
-            pixels[x, y] = (c, 0, 0, 255)
     img.save(filename)
 
 
