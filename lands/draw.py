@@ -26,7 +26,6 @@ def draw_land_profile(elevation, sea_level, filename):
                 pixels[x, y] = (0, 0, 255, 255)
     img.save(filename)
 
-
 def elevation_color(c, color_step = 1.5):
     COLOR_STEP = color_step
     if c < 0.5:
@@ -167,7 +166,7 @@ def draw_bw_heightmap_for_a_biome(world, filename, biome):
         for x in xrange(world.width):
             e = world.elevation['data'][y][x]
             c = int(((e - min_elev) * 255) / elev_delta)
-            if not world.biome[y][x] == biome:
+            if not world.biome[y][x] is biome:
                 a = 0
             else:
                 a = 255
@@ -419,7 +418,6 @@ def draw_sea(world, filename):
 
 
 class Counter(object):
-
     def __init__(self):
         self.c = {}
 
