@@ -460,13 +460,11 @@ def pseudo_random_land_pos(world, i):
         return pseudo_random_land_pos(world, (i % 123456789) * 17 + 11)
 
 
-def draw_oldmap_on_pixels(world, pixels, factor=1, sea_color=(142, 162, 179, 255), verbose=True):
+def draw_oldmap_on_pixels(world, pixels, factor=1, sea_color=(212, 198, 169, 255), verbose=True):
     # TODO use global verbose
     if verbose:
         start_time = time.time()
 
-    #sea_color = (212, 198, 169, 255)
-    #sea_color = (142, 162, 179, 255)
     land_color = (181, 166, 127, 255)           # TODO: Put this in the argument list too??
     borders = find_land_borders(world, factor)
     mountains_mask = find_mountains_mask(world, factor)
