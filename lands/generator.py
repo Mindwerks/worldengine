@@ -127,7 +127,7 @@ def operation_ancient_map(world, map_filename, resize_factor, sea_color):
 def main():
 
     parser = OptionParser(usage = "usage: %prog [options] ["+OPERATIONS+"]", version="%prog " +VERSION)
-    parser.add_option('-o', '--output_dir', dest='output_dir',
+    parser.add_option('-o', '--output-dir', dest='output_dir',
                       help="generate files in DIR [default = '%default']", metavar="DIR", default='.')
     parser.add_option('-n', '--worldname', dest='world_name',
                       help="set world name to STR. output is stored in a world file with the name format 'STR.world'. If a name is not provided, then seed_N.world, where N=SEED", metavar="STR")
@@ -150,8 +150,8 @@ def main():
                       help="N = number of plates [default = %default]", metavar="N", default='10')
     parser.add_option('--recursion_limit', dest='recursion_limit', type="int",
                       help="Set the recursion limit [default = %default]", metavar="N", default='2000')
-    parser.add_option('-V', '--no_verbose', dest='not_verbose', action="store_false",
-                      help="Disable verbose messages", default=True)
+    parser.add_option('-V', '--verbose', dest='verbose', action="store_true",
+                      help="Enable verbose messages", default=False)
 
     #-----------------------------------------------------
     g_generate = OptionGroup(parser, "Generate Options",
@@ -261,7 +261,7 @@ def main():
     if operation == 'world':
         world = generate_world(world_name, options.width, options.height,
                 seed, number_of_plates, options.output_dir,
-                step, options.ocean_level, world_format, not options.not_verbose)
+                step, options.ocean_level, world_format, options.verbose)
         if produce_grayscale_heightmap:
             generate_grayscale_heightmap(world, produce_grayscale_heightmap)
         if options.rivers_map:
