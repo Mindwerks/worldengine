@@ -418,9 +418,9 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
     world.sea_depth = sea_depth(world, ocean_level)
 
 
-def world_gen_precipitation(w):
+def world_gen_precipitation(w, seed):
     start_time = time.time()
-    p = precipitation(w.seed, w.width, w.height)
+    p = precipitation(seed, w.width, w.height)
     p_th = [
         ('low', find_threshold_f(p, 0.75, w.ocean)),
         ('med', find_threshold_f(p, 0.3, w.ocean)),
