@@ -779,3 +779,21 @@ class World(object):
 
     def has_precipitations(self):
         return hasattr(self, 'precipitation')
+
+    def has_watermap(self):
+        return hasattr(self, 'watermap')
+
+    def has_irrigation(self):
+        return hasattr(self, 'irrigation')
+
+    def has_humidity(self):
+        return hasattr(self, 'humidity')
+
+    def has_temperature(self):
+        return hasattr(self, 'temperature')
+
+    def has_permeability(self):
+        return hasattr(self, 'permeability')
+
+    def has_biome(self):
+        return hasattr(self, 'biome')
