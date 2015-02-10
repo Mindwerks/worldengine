@@ -10,13 +10,6 @@ You can generate worlds data (heighmap, biome, etc.) and images for your own wor
 For example:
 
 ```bash
-# before using lands: if you plan to change the code
-python setup.py develop 
-
-# before using lands: if you want just to install lands
-# on unix-ish system you could have to prepend sudo
-python setup.py install
-
 # Lands 0.5.1 or next
 lands world -s 1 -n seed1
 
@@ -54,6 +47,25 @@ Note: it requires to install QT (available here [http://qt-project.org/](http://
 Install
 =======
 
+### Using pip
+
+```
+pip install lands
+```
+
+### From source code
+
+```
+git clone or download the code
+
+# before using lands: if you plan to change the code
+python setup.py develop 
+
+# before using lands: if you want just to install lands
+# on unix-ish system you could have to prepend sudo
+python setup.py install
+```
+
 ### _On Windows_
 
 Executable file is available under [releases](https://github.com/ftomassetti/lands/releases)
@@ -64,14 +76,10 @@ If you want to build Lands on Windows you can read these [instructions](https://
 
 Note: the problem could crash after generating the files, it is a known problem but you should have anyway your nice maps generated! We are working on a fix for that
 
-### _On Linux or Mac_
+Dependencies
+============
 
-1. Install python 2.7
-2. Install pip
-3. Git clone / download the repository
-4. Run pip install -r requirements.txt
-5. Install Tk (on ubuntu ```sudo apt install python-tk python-imaging-tk```)
-6. You should be good to go!
+The gui is based on QT, so you will need to install them
 
 Output
 ======
