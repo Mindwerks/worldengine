@@ -265,6 +265,8 @@ I would like to thank you great people who helped me while working on Lands:
 
 * [stefan-feltmann](https://github.com/stefan-feltmann) made Lands depends on pillow instead that on PIL (which is deprecated). This could also help when moving to Python 3. Thanks a million!
 
+* [Russell Brinkmann](https://github.com/rbb) helped saving the generation parameters in the generated world (so that we can use it to generate the same world again, for example), improved the command line options and added tracing information (useful for understanding the performance of the various generation steps)
+
 License
 =======
 
