@@ -19,6 +19,11 @@ class TestBasicMapOperations(unittest.TestCase):
                 self.assertTrue(y >= 0,  "y is within boundaries")
                 self.assertTrue(y < 200, "y is within boundaries")
 
+    def test_distance(self):
+        self.assertAlmostEquals(22.360679774997898, distance((0, 0), (10, 20)))
+        self.assertAlmostEquals(22.360679774997898, distance((-1, -1), (9, 19)))
+        self.assertAlmostEquals(22.360679774997898, distance((-1, 9), (9, 29)))
+        self.assertAlmostEquals(22.360679774997898, distance((9, -1), (19, 19)))
 
 if __name__ == '__main__':
     unittest.main()
