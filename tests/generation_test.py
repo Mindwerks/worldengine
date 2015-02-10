@@ -10,7 +10,7 @@ class TestGeneration(unittest.TestCase):
         pass
 
     def test_can_generate(self):
-        w = world_gen("Dummy", 1, False, 32, 16, Step.get_by_name("full"))
+        w = world_gen("Dummy", 32, 16, 1, step=Step.get_by_name("full"))
 
 
 if __name__ == '__main__':

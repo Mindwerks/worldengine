@@ -73,7 +73,7 @@ def hsi_to_rgb(hue, saturation, intensity):
 def draw_plates_on_screen(world, canvas):
     width = world.width
     height = world.height
-    n_plates = world.n_plates()
+    n_plates = world.n_actual_plates()
     for y in range(0, height):
         for x in range(0, width):
             h = world.plates[y][x]*(360/n_plates)
@@ -87,7 +87,7 @@ def draw_plates_on_screen(world, canvas):
 def draw_plates_and_elevation_on_screen(world, canvas):
     width = world.width
     height = world.height
-    n_plates = world.n_plates()
+    n_plates = world.n_actual_plates()
     max_el = world.max_elevation()
     min_el = world.min_elevation()
     delta_el = max_el - min_el

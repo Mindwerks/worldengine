@@ -29,3 +29,9 @@ Version 0.5.1
 Version 0.5.2
 
 * Basic GUI implemented, supporting all views and simulations
+
+Version 0.5.3
+
+* Saving generation parameters in world file
+* Revising command line options
+* Adding tracing statements about performance

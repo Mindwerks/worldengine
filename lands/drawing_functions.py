@@ -9,6 +9,7 @@ __author__ = 'Federico Tomassetti'
 import random
 import math
 import sys
+import time
 
 if sys.version_info > (2,):
     xrange = range
@@ -459,9 +460,12 @@ def pseudo_random_land_pos(world, i):
         return pseudo_random_land_pos(world, (i % 123456789) * 17 + 11)
 
 
-def draw_oldmap_on_pixels(world, pixels, factor=1):
-    sea_color = (212, 198, 169, 255)
-    land_color = (181, 166, 127, 255)
+def draw_oldmap_on_pixels(world, pixels, factor=1, sea_color=(212, 198, 169, 255), verbose=True):
+    # TODO use global verbose
+    if verbose:
+        start_time = time.time()
+
+    land_color = (181, 166, 127, 255)           # TODO: Put this in the argument list too??
     borders = find_land_borders(world, factor)
     mountains_mask = find_mountains_mask(world, factor)
     boreal_forest_mask = find_boreal_forest_mask(world, factor)
@@ -536,7 +540,13 @@ def draw_oldmap_on_pixels(world, pixels, factor=1):
     def on_border(pos):
         x, y = pos
         return borders[y][x]
+    if verbose:
+        elapsed_time = time.time() - start_time
+        print("...drawing_functions.draw_oldmap_on_pixel: init Elapsed time " + str(elapsed_time) + " seconds.")
+        sys.stdout.flush()
 
+    if verbose:
+        start_time = time.time()
     min_elev = None
     max_elev = None
     for y in xrange(world.height):
@@ -547,20 +557,28 @@ def draw_oldmap_on_pixels(world, pixels, factor=1):
             if max_elev is None or e > max_elev:
                 max_elev = e
     elev_delta = max_elev - min_elev
+    if verbose:
+        elapsed_time = time.time() - start_time
+        print("...drawing_functions.draw_oldmap_on_pixel: max, min elevation Elapsed time " + str(elapsed_time) +"  seconds.")
 
+    if verbose:
+        start_time = time.time()
     for y in xrange(factor*world.height):
         for x in xrange(factor*world.width):
             xf = int(x/factor)
             yf = int(y/factor)
-            e = world.elevation['data'][yf][xf]
-            c = int(((e - min_elev) * 255) / elev_delta)
             if borders[y][x]:
                 pixels[x, y] = (0, 0, 0, 255)
             elif world.ocean[yf][xf]:
                 pixels[x, y] = sea_color
             else:
                 pixels[x, y] = land_color
+    if verbose:
+        elapsed_time = time.time() - start_time
+        print("...drawing_functions.draw_oldmap_on_pixel: color ocean Elapsed time " +str(elapsed_time) +" seconds.")
 
+    if verbose:
+        start_time = time.time()
     def antialias(steps):
 
         def _antialias_step():
@@ -592,18 +610,31 @@ def draw_oldmap_on_pixels(world, pixels, factor=1):
             _antialias_step()
 
     antialias(1)
+    if verbose:
+        elapsed_time = time.time() - start_time
+        print("...drawing_functions.draw_oldmap_on_pixel: anti alias Elapsed time " +str(elapsed_time) +" seconds.")
 
     # Draw glacier
+    if verbose:
+        start_time = time.time()
     for y in xrange(factor*world.height):
         for x in xrange(factor*world.width):
             if not borders[y][x] and world.is_iceland((int(x/factor), int(y/factor))):
                 draw_glacier(pixels, x, y)
+    if verbose:
+        elapsed_time = time.time() - start_time
+        print("...drawing_functions.draw_oldmap_on_pixel: draw glacier Elapsed time " +str(elapsed_time) +" seconds.")
 
     # Draw tundra
+    if verbose:
+        start_time = time.time()
     for y in xrange(factor*world.height):
         for x in xrange(factor*world.width):
             if tundra_mask[y][x]:
                 draw_tundra(pixels, x, y)
+    if verbose:
+        elapsed_time = time.time() - start_time
+        print("...drawing_functions.draw_oldmap_on_pixel: draw tundra Elapsed time " +str(elapsed_time) +" seconds.")
 
     # Draw cold parklands
     for y in xrange(factor*world.height):
@@ -712,6 +743,8 @@ def draw_oldmap_on_pixels(world, pixels, factor=1):
     draw_riversmap_on_image(world, pixels, factor)
 
     # Draw mountains
+    if verbose:
+        start_time = time.time()
     for y in xrange(factor*world.height):
         for x in xrange(factor*world.width):
             if mountains_mask[y][x]:
@@ -721,6 +754,10 @@ def draw_oldmap_on_pixels(world, pixels, factor=1):
                 if len(world.tiles_around_factor(factor, (x, y), radius=r, predicate=on_border)) <= 2:
                     draw_a_mountain(pixels, x, y, w=w, h=h)
                     world.on_tiles_around_factor(factor, (x, y), radius=r, action=unset_mask)
+    if verbose:
+        elapsed_time = time.time() - start_time
+        print("...drawing_functions.draw_oldmap_on_pixel: draw mountains Elapsed time " +str(elapsed_time) +" seconds.")
+
 
     return pixels
 
