@@ -398,37 +398,6 @@ def draw_precipitation(world, filename):
     img.save(filename)
 
 
-def draw_sea(world, filename):
-    WIDTH = world.width
-    HEIGHT = world.height
-
-    img = Image.new('RGBA', (WIDTH, HEIGHT))
-
-    pixels = img.load()
-    for y in range(0, HEIGHT):
-        for x in range(0, WIDTH):
-            if world.is_land((x, y)):
-                pixels[x, y] = (255, 255, 255, 255)
-            else:
-                c = int(world.sea_depth[y][x] * 200 + 50)
-                pixels[x, y] = (0, 0, 255 - c, 255)
-    img.save(filename)
-
-
-class Counter(object):
-
-    def __init__(self):
-        self.c = {}
-
-    def count(self, what):
-        if what not in self.c:
-            self.c[what] = 0
-        self.c[what] += 1
-
-    def printself(self):
-        for w in self.c.keys():
-            print("%s : %i" % (w, self.c[w]))
-
 def draw_world(world, filename):
     WIDTH = world.width
     HEIGHT = world.height
