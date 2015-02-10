@@ -5,7 +5,7 @@ def get_verbose():
     if not 'verbose' in globals():
         return False
     else:
-        return True
+        return verbose
 
 def set_verbose(value):
     global verbose
