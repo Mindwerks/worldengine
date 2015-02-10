@@ -152,7 +152,7 @@ def main():
                       help="N = number of plates [default = %default]", metavar="N", default='10')
     parser.add_option('--recursion_limit', dest='recursion_limit', type="int",
                       help="Set the recursion limit [default = %default]", metavar="N", default='2000')
-    parser.add_option('-V', '--no_verbose', dest='verbose', action="store_false",
+    parser.add_option('-V', '--no_verbose', dest='not_verbose', action="store_false",
                       help="Disable verbose messages", default=True)
 
     #-----------------------------------------------------
@@ -264,7 +264,7 @@ def main():
     if operation == 'world':
         world = generate_world(world_name, options.width, options.height,
                 seed, number_of_plates, options.output_dir,
-                step, options.ocean_level, world_format, options.recursion_limit, options.verbose)
+                step, options.ocean_level, world_format, not options.not_verbose)
         if produce_grayscale_heightmap:
             generate_grayscale_heightmap(world, produce_grayscale_heightmap)
         if options.rivers_map:
