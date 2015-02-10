@@ -26,7 +26,7 @@ class TestBasicMapOperations(unittest.TestCase):
         self.assertAlmostEquals(22.360679774997898, distance((9, -1), (19, 19)))
 
     def test_index_of_nearest(self):
-        self.assertIsNone(index_of_nearest((0, 0), []))
+        self.assertTrue(index_of_nearest((0, 0), []) is None)
         self.assertEqual(0, index_of_nearest((0, 0), [(0, 0), (10, 10), (7, 7), (-5, -5), (-2, 7)]))
         self.assertEqual(3, index_of_nearest((-4, -4), [(0, 0), (10, 10), (7, 7), (-5, -5), (-2, 7)]))
         self.assertEqual(3, index_of_nearest((-100, -100), [(0, 0), (10, 10), (7, 7), (-5, -5), (-2, 7)]))
