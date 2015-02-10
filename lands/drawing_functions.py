@@ -543,7 +543,7 @@ def draw_oldmap_on_pixels(world, pixels, factor=1, sea_color=(142, 162, 179, 255
         return borders[y][x]
     if verbose:
         elapsed_time = time.time() - start_time
-        print("...drawing_functions.draw_oldmap_on_pixel: init Elapsed time " +str(elapsed_time) +" seconds.")
+        print("...drawing_functions.draw_oldmap_on_pixel: init Elapsed time " + str(elapsed_time) + " seconds.")
         sys.stdout.flush()
 
     if verbose:
@@ -553,14 +553,14 @@ def draw_oldmap_on_pixels(world, pixels, factor=1, sea_color=(142, 162, 179, 255
     for y in xrange(world.height):
         for x in xrange(world.width):
             e = world.elevation['data'][y][x]
-            if min_elev == None or e < min_elev:
+            if min_elev is None or e < min_elev:
                 min_elev = e
-            if max_elev == None or e > max_elev:
+            if max_elev is None or e > max_elev:
                 max_elev = e
     elev_delta = max_elev - min_elev
     if verbose:
         elapsed_time = time.time() - start_time
-        print("...drawing_functions.draw_oldmap_on_pixel: max, min elevation Elapsed time " +str(elapsed_time) +" seconds.")
+        print("...drawing_functions.draw_oldmap_on_pixel: max, min elevation Elapsed time " + str(elapsed_time) +"  seconds.")
 
     if verbose:
         start_time = time.time()
@@ -568,8 +568,6 @@ def draw_oldmap_on_pixels(world, pixels, factor=1, sea_color=(142, 162, 179, 255
         for x in xrange(factor*world.width):
             xf = int(x/factor)
             yf = int(y/factor)
-            e = world.elevation['data'][yf][xf]
-            #c = int(((e - min_elev) * 255) / elev_delta)
             if borders[y][x]:
                 pixels[x, y] = (0, 0, 0, 255)
             elif world.ocean[yf][xf]:
@@ -776,7 +774,7 @@ def draw_riversmap_on_image(world, pixels, factor=1):
         for c in candidates:
             cx, cy = c
             wl = world.humidity['data'][cy][cx] * world.precipitation['data'][cy][cx] * world.elevation['data'][cy][cx]
-            if max == None or wl > max:
+            if max is None or wl > max:
                 max = wl
                 cc = c
         draw_river(world, pixels, cc, factor)
