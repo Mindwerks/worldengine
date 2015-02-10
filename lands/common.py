@@ -17,3 +17,18 @@ def set_verbose(value):
     """
     global verbose
     verbose = value
+
+
+class Counter(object):
+
+    def __init__(self):
+        self.c = {}
+
+    def count(self, what):
+        if what not in self.c:
+            self.c[what] = 0
+        self.c[what] += 1
+
+    def printself(self):
+        for w in self.c.keys():
+            print("%s : %i" % (w, self.c[w]))
