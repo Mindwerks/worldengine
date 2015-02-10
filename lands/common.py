@@ -1,4 +1,4 @@
-__author__ = 'ftomassetti'
+__author__ = 'Federico Tomassetti'
 
 def get_verbose():
     global verbose
