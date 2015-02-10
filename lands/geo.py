@@ -11,6 +11,7 @@ from lands.simulations.PermeabilitySimulation import *
 from lands.simulations.ErosionSimulation import *
 from lands.simulations.BiomeSimulation import *
 from lands.simulations.basic import *
+from lands.common import *
 
 import sys
 if sys.version_info > (2,):
@@ -32,7 +33,7 @@ def center_land(world):
         if miny is None or sumy < miny:
             miny = sumy
             ymin = y
-    if world.verbose:
+    if get_verbose():
         print("geo.center_land: height complete");
 
     for x in xrange(world.width):
@@ -42,7 +43,7 @@ def center_land(world):
         if minx is None or sumx < minx:
             minx = sumx
             xmin = x
-    if world.verbose:
+    if get_verbose():
         print("geo.center_land: width complete");
 
     new_elevation_data = []
@@ -57,7 +58,7 @@ def center_land(world):
             new_plates[y].append( world.plates[srcy][srcx] )
     world.elevation['data'] = new_elevation_data
     world.plates = new_plates
-    if world.verbose:
+    if get_verbose():
         print("geo.center_land: width complete");
 
 
@@ -427,8 +428,8 @@ def world_gen_precipitation(w):
     ]
     w.set_precipitation(p, p_th)
     elapsed_time = time.time() - start_time
-    if w.verbose:
-        print("...precipitations calculated. Elapsed time " +str(elapsed_time) +" seconds.")
+    if get_verbose():
+        print("...precipitations calculated. Elapsed time %f  seconds." % elapsed_time)
     return [p, p_th]
 
 
@@ -438,6 +439,7 @@ def world_gen_from_elevation(w, step):
     e = w.elevation['data']
     ocean = w.ocean
     ml = w.start_mountain_th()
+    seed = w.seed
 
     if not step.include_precipitations:
         return w
@@ -448,7 +450,7 @@ def world_gen_from_elevation(w, step):
     if not step.include_erosion:
         return w
     ErosionSimulation().execute(w, seed)
-    if verbose:
+    if get_verbose():
         print("...erosion calculated")
 
     WatermapSimulation().execute(w, seed)
@@ -465,16 +467,16 @@ def world_gen_from_elevation(w, step):
     cm, biome_cm = BiomeSimulation().execute(w, seed)
     for cl in cm.keys():
         count = cm[cl]
-        if hasattr(w, 'verbose') and w.verbose:
+        if get_verbose():
             print("%s = %i" % (str(cl), count))
 
-    if hasattr(w, 'verbose') and w.verbose:
+    if get_verbose():
         print('')  # empty line
         print('Biome obtained:')
 
     for cl in biome_cm.keys():
         count = biome_cm[cl]
-        if w.verbose:
+        if get_verbose():
             print(" %30s = %7i" % (str(cl), count))
 
     return w
