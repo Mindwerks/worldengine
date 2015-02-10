@@ -10,6 +10,8 @@ from lands.plates import world_gen
 from lands.draw import *
 from lands.drawing_functions import *
 from lands.world import *
+from lands.common import *
+from lands.step import Step
 
 with open("lands/version.py") as f:
     code = compile(f.read(), "lands/version.py", 'exec')
@@ -102,31 +104,6 @@ def generate_plates(seed, world_name, output_dir, width, height, num_plates=10):
     filename = '%s/centered_plates_%s.png' % (output_dir, world_name)
     draw_simple_elevation(elevation, filename)
     print("+ centered plates image generated in '%s'" % filename)
-
-
-class Step(object):
-    def __init__(self, name):
-        self.name = name
-        self.include_plates = True
-        self.include_precipitations = False
-        self.include_erosion = False
-        self.include_biome = False
-
-    @staticmethod
-    def get_by_name(name):
-        step = None
-        if name == "plates":
-            step = Step(name)
-        elif name == "precipitations":
-            step = Step(name)
-            step.include_precipitations = True
-        elif name == "full":
-            step = Step(name)
-            step.include_precipitations = True
-            step.include_erosion = True
-            step.include_biome = True
-
-        return step
 
 
 def is_pow_of_two(num):
@@ -282,6 +259,7 @@ def main():
 
     print('')  # empty line
     print('starting (it could take a few minutes) ...')
+
 
     if operation == 'world':
         world = generate_world(world_name, options.width, options.height,

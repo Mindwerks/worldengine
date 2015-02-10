@@ -38,7 +38,14 @@ message World {
     message DoubleMatrixWithQuantiles {
         repeated DoubleQuantile quantiles = 1;
         repeated DoubleRow rows = 2;
-    }     
+    }
+
+    message GenerationData {
+        optional int32 seed          = 1;
+        optional int32 n_plates      = 2;
+        optional float ocean_level   = 3;
+        optional string step         = 4;
+    }
 
     required string name   = 1;
     required int32  width  = 2;
@@ -91,6 +98,9 @@ message World {
     optional double temperature_cool         = 26;
     optional double temperature_warm         = 27;
     optional double temperature_subtropical  = 28;
+
+    // Data about generation
+    optional GenerationData generationData = 31;
 
 }
 
