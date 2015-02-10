@@ -2,12 +2,9 @@ __author__ = 'Federico Tomassetti'
 
 import sys
 
-try:
-    from lands.geo import World, find_threshold, find_threshold_f
-    from lands.draw import draw_watermap
-except:
-    from geo import World, find_threshold, find_threshold_f
-    from draw import draw_watermap
+
+from lands.geo import World, find_threshold, find_threshold_f
+from lands.draw import draw_watermap
 
 
 def save(world, i):
