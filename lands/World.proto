@@ -99,7 +99,9 @@ message World {
     optional double temperature_warm         = 27;
     optional double temperature_subtropical  = 28;
 
-    // Data about generation
+    // Data about generation:
+    // introduced in v0.5.3
+    // this is optional for backward compatibility reasons
     optional GenerationData generationData = 31;
 
 }
