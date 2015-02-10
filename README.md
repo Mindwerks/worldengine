@@ -3,7 +3,7 @@ Lands - a world generator
 
 [![Build Status](https://travis-ci.org/ftomassetti/lands.svg?branch=master)](https://travis-ci.org/ftomassetti/lands)
 
-_Current version: 0.5.2_
+_Current version: 0.5.3_
 
 You can generate worlds data (heighmap, biome, etc.) and images for your own worlds.
 
