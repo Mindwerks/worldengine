@@ -1,29 +1,19 @@
 __author__ = 'Federico Tomassetti'
 
 import sys
+from PIL import Image
 from optparse import OptionParser, OptionGroup
 import os
 
-#try:
-#    from lands.plates import world_gen
-#    from lands.draw import *
-#    import lands.geo
-#    import lands.draw
-#    import lands.drawing_functions
-#    from lands.world import *
-#except:
-from plates import world_gen
-from draw import *
-import geo
-import draw
-import drawing_functions
-from world import *
+import lands.geo
+from lands.plates import world_gen
+from lands.draw import *
+from lands.drawing_functions import *
+from lands.world import *
 
 with open("lands/version.py") as f:
     code = compile(f.read(), "lands/version.py", 'exec')
     exec(code)
-
-from PIL import Image
 
 if sys.version_info > (2,):
     xrange = range
@@ -114,7 +104,7 @@ def generate_plates(seed, world_name, output_dir, width, height, num_plates=10):
     print("+ centered plates image generated in '%s'" % filename)
 
 
-class Step:
+class Step(object):
     def __init__(self, name):
         self.name = name
         self.include_plates = True
@@ -222,15 +212,6 @@ def main():
     # the limit is hit when drawing ancient maps
     sys.setrecursionlimit(options.recursion_limit)
 
-    #try:
-    #    plates_resolution = int(options.plates_resolution)
-    #    if plates_resolution < 128 or plates_resolution > 65536:
-    #        usage(error="Plates resolution should be a power of 2 in [128, 65536]")
-    #    if not is_pow_of_two(plates_resolution):
-    #        usage(error="Plates resolution should be a power of 2 in [128, 65536]")
-    #except:
-    #    usage(error="Plates resolution should be a number")
-
     try:
         number_of_plates = int(options.number_of_plates)
         if number_of_plates < 1 or number_of_plates > 100:
@@ -240,13 +221,12 @@ def main():
 
     if len(args) > 1:
         parser.print_help()
-        #sys.exit(' ')
         usage("Only 1 operation allowed ["+OPERATIONS+"]")
     if len(args) == 1:
         if args[0] in OPERATIONS:
             operation = args[0]
         else:
-            usage("Unknown operation: " +args[0])
+            usage("Unknown operation: %s" % args[0])
     else:
         operation = 'world'
 
@@ -267,8 +247,6 @@ def main():
         world_format = 'protobuf'
 
     generation_operation = (operation == 'world') or (operation == 'plates')
-
-    #resize_factor = int(options.resize_factor)
 
     produce_grayscale_heightmap = options.grayscale_heightmap
     if produce_grayscale_heightmap and not generation_operation:
