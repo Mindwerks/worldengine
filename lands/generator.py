@@ -146,8 +146,6 @@ def main():
     parser.add_option('-y', '--height', dest='height', type="int",
                       help="N = height of the world to be generated [default=%default]", metavar="N",
                       default='512')
-    #parser.add_option('-p', '--plates-resolution', dest='plates_resolution', type="int",
-    #                  help="plates resolution", metavar="PLATES_RESOLUTION", default='512')
     parser.add_option('-q', '--number-of-plates', dest='number_of_plates', type="int",
                       help="N = number of plates [default = %default]", metavar="N", default='10')
     parser.add_option('--recursion_limit', dest='recursion_limit', type="int",
@@ -240,7 +238,6 @@ def main():
         print(' name              : %s' % world_name)
         print(' width             : %i' % options.width)
         print(' height            : %i' % options.height)
-        #print(' plates resolution : %i' % plates_resolution)
         print(' number of plates  : %i' % number_of_plates)
         print(' world format      : %s' % world_format)
         print(' step              : %s' % step.name)
