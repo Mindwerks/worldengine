@@ -3,12 +3,8 @@ __author__ = 'Federico Tomassetti'
 import sys
 import random
 
-try:
-    from lands.geo import World, erode
-    from lands.draw import draw_elevation
-except:
-    from geo import World, erode
-    from draw import draw_elevation
+from lands.geo import World, erode
+from lands.draw import draw_elevation
 
 
 def save(world, i):
