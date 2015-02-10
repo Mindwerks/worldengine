@@ -35,9 +35,9 @@ def draw_oldmap(world, filename, resize_factor, sea_color, verbose=True):
 
 
 def generate_world(world_name, width, height, seed, num_plates, output_dir,
-        step, ocean_level, world_format='pickle', recursion_limit=2000, verbose=True):
+        step, ocean_level, world_format='pickle', verbose=True):
 
-    w = world_gen(world_name, width, height, seed, num_plates, ocean_level, step, recursion_limit, verbose )
+    w = world_gen(world_name, width, height, seed, num_plates, ocean_level, step, verbose=verbose )
 
     print('')  # empty line
     print('Producing ouput:')

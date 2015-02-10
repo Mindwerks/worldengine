@@ -39,8 +39,7 @@ def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_peri
     return hm, pm
 
 
-def world_gen(name, width, height, seed, num_plates=10, ocean_level=1.0, step="full", recursion_limit=2000, verbose=False ):
-    print("world_gen %i %i" % (width, height))
+def world_gen(name, width, height, seed, num_plates=10, ocean_level=1.0, step="full", verbose=False ):
     e_as_array, p_as_array = generate_plates_simulation(seed, width, height, num_plates=num_plates, verbose=verbose)
 
     if verbose:
