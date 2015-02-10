@@ -445,7 +445,7 @@ def world_gen_from_elevation(w, step):
         return w
 
     # Precipitation with thresholds
-    p, p_th = world_gen_precipitation(w)
+    p, p_th = world_gen_precipitation(w, seed)
 
     if not step.include_erosion:
         return w
