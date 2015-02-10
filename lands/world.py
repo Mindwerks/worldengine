@@ -1,9 +1,10 @@
 __author__ = 'Federico Tomassetti'
 
-from biome import *
-from basic_map_operations import *
 import pickle
-import protobuf.World_pb2 as Protobuf
+
+from lands.biome import *
+from lands.basic_map_operations import *
+import lands.protobuf.World_pb2 as Protobuf
 from lands.step import Step
 
 class World(object):
