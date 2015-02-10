@@ -707,7 +707,7 @@ class World(object):
     ### Plates
     ###
 
-    def n_plates(self):
+    def n_actual_plates(self):
         res = -1
         for row in self.plates:
             for cell in row:

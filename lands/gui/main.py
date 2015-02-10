@@ -181,6 +181,9 @@ class PlatesGeneration(object):
         self.name   = name
         self.width  = width
         self.height = height
+        self.seed = seed
+        self.n_plates = num_plates
+        self.ocean_level = sea_level
         self.p = platec.create(seed, width, height, sea_level, erosion_period, folding_ratio,
                                aggr_overlap_abs, aggr_overlap_rel, cycle_count, num_plates)
         self.steps = 0
@@ -194,7 +197,7 @@ class PlatesGeneration(object):
             return (True, self.steps)      
 
     def world(self):
-        world = World(self.name, self.width, self.height)
+        world = World(self.name, self.width, self.height, self.seed, self.n_plates, self.ocean_level, Step.get_by_name("plates"))
         hm = platec.get_heightmap(self.p)
         pm = platec.get_platesmap(self.p)
         world.set_elevation(array_to_matrix(hm, self.width, self.height), None)
@@ -297,7 +300,7 @@ class PrecipitationsOp(object):
         """
         seed = random.randint(0, 65536)
         ui.set_status("Precipitation: started (seed %i)" % seed)
-        world_gen_precipitation(world, seed, False)
+        world_gen_precipitation(world, seed)
         ui.set_status("Precipitation: done (seed %i)" % seed)
         ui.on_finish()
 
