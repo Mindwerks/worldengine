@@ -1,18 +1,23 @@
 __author__ = 'Federico Tomassetti'
 
-from lands.biome import *
-from lands.basic_map_operations import *
+from biome import *
+from basic_map_operations import *
 import pickle
-import lands.protobuf.World_pb2 as Protobuf
+import protobuf.World_pb2 as Protobuf
+from lands.step import Step
 
 class World(object):
     """A world composed by name, dimensions and all the characteristics of each cell.
     """
 
-    def __init__(self, name, width, height):
+    def __init__(self, name, width, height, seed, num_plates, ocean_level, step):
         self.name = name
         self.width = width
         self.height = height
+        self.seed = seed
+        self.n_plates = num_plates
+        self.ocean_level = ocean_level
+        self.step = step
 
     ###
     ### General methods
@@ -114,6 +119,11 @@ class World(object):
         p_world.width  = self.width
         p_world.height = self.height
 
+        p_world.generationData.seed = self.seed
+        p_world.generationData.n_plates = self.n_plates
+        p_world.generationData.ocean_level = self.ocean_level
+        p_world.generationData.step = self.step.name
+
         # Elevation
         self._to_protobuf_matrix(self.elevation['data'], p_world.heightMapData)
         p_world.heightMapTh_sea   = self.elevation['thresholds'][0][1];
@@ -167,7 +177,8 @@ class World(object):
 
     @classmethod
     def _from_protobuf_world(cls, p_world):
-        w = World(p_world.name, p_world.width, p_world.height)
+        w = World(p_world.name, p_world.width, p_world.height, p_world.generationData.seed,
+                p_world.generationData.n_plates, p_world.generationData.ocean_level, Step.get_by_name(p_world.generationData.step))
 
         # Elevation
         e = World._from_protobuf_matrix(p_world.heightMapData)
@@ -696,7 +707,7 @@ class World(object):
     ### Plates
     ###
 
-    def n_plates(self):
+    def n_actual_plates(self):
         res = -1
         for row in self.plates:
             for cell in row:
@@ -760,6 +771,7 @@ class World(object):
             raise Exception("Setting data with wrong width")
 
         self.permeability = {'data': data, 'thresholds': thresholds}
+
 
     def has_precipitations(self):
         return hasattr(self, 'precipitation')

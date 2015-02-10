@@ -27,6 +27,7 @@ def main():
     world = World.from_json_file(filename)
     print("+ data loaded from '%s'" % filename)
 
+    _watermap = None
     for i in xrange(20):
         filename = 'world_%s_%i_elevation.png' % (world_name, i)
         draw_elevation(world, filename)
