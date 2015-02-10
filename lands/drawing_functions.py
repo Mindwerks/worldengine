@@ -461,7 +461,8 @@ def pseudo_random_land_pos(world, i):
 
 
 def draw_oldmap_on_pixels(world, pixels, factor=1, sea_color=(142, 162, 179, 255), verbose=True):
-    if verbose:                  # TODO combine verbose with world.verbose ???
+    # TODO use global verbose
+    if verbose:
         start_time = time.time()
 
     #sea_color = (212, 198, 169, 255)
