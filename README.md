@@ -101,13 +101,13 @@ The program produces a binary format with all the data of the generated world an
 Usage
 =====
 
-| Short | Long | Description |
-|-------|------|-------------|
-| -o    | --output | generate files in OUTPUT |
-| -n    | --worldname | set WORLDNAME |
-| -b    | --protocol-buffer | save world using protocol buffer format (smaller file) |
-| -s    | --seed | use SEED to initialize the pseudo-random generation |
-| -t    | --step | use STEP to specify how far to proceed in the world generation process |
+| Short     | Long | Description |
+|-----------|------|-------------|
+| -o DIR    | --output-dir=DIR | generate files in DIR default = '.' |
+| -n STR    | --worldname=STR | set world name to STR |
+| -b        | --protocol-buffer | save world using protocol buffer format (smaller file) |
+| -s N      | --seed=N | use SEED to initialize the pseudo-random generation |
+| -t STR    | --step=STR | use STEP to specify how far to proceed in the world generation process. Valid values are plates|precipitations|full |
 | -x    | --width | WIDTH of the world to be generated |
 | -y    | --height | HEIGHT of the world to be generated |
 | -w    | --worldfile | WORLD_FILE to be loaded (for ancient_map operation) |
