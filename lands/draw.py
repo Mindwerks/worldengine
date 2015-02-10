@@ -2,10 +2,7 @@ __author__ = 'Federico Tomassetti'
 
 from PIL import Image
 
-try:
-    from lands.drawing_functions import *
-except:
-    from drawing_functions import *
+from lands.drawing_functions import *
 
 import sys
 if sys.version_info > (2,):
@@ -25,6 +22,7 @@ def draw_land_profile(elevation, sea_level, filename):
             else:
                 pixels[x, y] = (0, 0, 255, 255)
     img.save(filename)
+
 
 def elevation_color(c, color_step = 1.5):
     COLOR_STEP = color_step
@@ -166,7 +164,7 @@ def draw_bw_heightmap_for_a_biome(world, filename, biome):
         for x in xrange(world.width):
             e = world.elevation['data'][y][x]
             c = int(((e - min_elev) * 255) / elev_delta)
-            if not world.biome[y][x] is biome:
+            if not world.biome[y][x] == biome:
                 a = 0
             else:
                 a = 255
@@ -418,6 +416,7 @@ def draw_sea(world, filename):
 
 
 class Counter(object):
+
     def __init__(self):
         self.c = {}
 
