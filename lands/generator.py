@@ -150,7 +150,7 @@ def main():
                       help="N = number of plates [default = %default]", metavar="N", default='10')
     parser.add_option('--recursion_limit', dest='recursion_limit', type="int",
                       help="Set the recursion limit [default = %default]", metavar="N", default='2000')
-    parser.add_option('-V', '--verbose', dest='verbose', action="store_true",
+    parser.add_option('-v', '--verbose', dest='verbose', action="store_true",
                       help="Enable verbose messages", default=False)
 
     #-----------------------------------------------------
@@ -256,6 +256,8 @@ def main():
 
     print('')  # empty line
     print('starting (it could take a few minutes) ...')
+
+    set_verbose(options.verbose)
 
 
     if operation == 'world':
