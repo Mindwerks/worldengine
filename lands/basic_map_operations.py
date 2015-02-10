@@ -14,12 +14,6 @@ def distance(pa, pb):
     return math.sqrt((ax - bx) ** 2 + (ay - by) ** 2)
 
 
-def distance3(pa, pb):
-    ax, ay = pa
-    bx, by = pb
-    return (ax - bx) ** 3 + (ay - by) ** 3
-
-
 def nearest(p, hot_points, distance_f=distance):
     min_dist = None
     nearest_hp_i = None
