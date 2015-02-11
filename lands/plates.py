@@ -64,7 +64,7 @@ def world_gen(name, width, height, seed, num_plates=10, ocean_level=1.0, step="f
 
     if verbose:
         start_time = time.time()
-    place_oceans_at_map_borders_on_world(world)
+    place_oceans_at_map_borders(world)
     initialize_ocean_and_thresholds(world)
     if verbose:
         elapsed_time = time.time() - start_time
