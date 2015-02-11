@@ -1,6 +1,8 @@
 __author__ = 'Federico Tomassetti'
 
+
 class Step(object):
+
     def __init__(self, name):
         self.name = name
         self.include_plates = True
@@ -25,4 +27,4 @@ class Step(object):
         return step
 
     def __eq__(self, other):
-        return (isinstance(other, self.__class__) and self.__dict__ == other.__dict__)
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__

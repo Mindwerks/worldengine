@@ -119,9 +119,26 @@ def fill_ocean(elevation, sea_level):
     return ocean
 
 
-# ------------------
-# Initial generation
-# ------------------
+def initialize_ocean_and_thresholds(world, ocean_level=1.0):
+    """
+    Calculate the ocean, the sea depth and the elevation thresholds
+    :param world: a world having elevation but not thresholds
+    :param ocean_level: the elevation representing the ocean level
+    :return: nothing, the world will be changed
+    """
+    e = world.elevation['data']
+    ocean = fill_ocean(e, ocean_level)
+    hl = find_threshold_f(e, 0.10)
+    ml = find_threshold_f(e, 0.03)
+    e_th = [('sea', ocean_level), ('plain', hl), ('hill', ml), ('mountain', None)]
+    world.set_ocean(ocean)
+    world.set_elevation(e, e_th)
+    world.sea_depth = sea_depth(world, ocean_level)
+
+
+# -------
+# Scaling
+# -------
 
 def scale(original_map, target_width, target_height):
 
@@ -206,6 +223,10 @@ def rescale_value(original, prev_min, prev_max, min, max):
     return min + ((max - min) * f)
 
 
+# ----
+# Misc
+# ----
+
 def sea_depth(world, sea_level):
     sea_depth = [[sea_level - world.elevation['data'][y][x] for x in range(world.width)] for y in range(world.height)]
     for y in range(world.height):
@@ -263,23 +284,6 @@ def precipitation(seed, width, height):
             precipitations[y][x] = prec
 
     return precipitations
-
-
-def initialize_ocean_and_thresholds(world, ocean_level=1.0):
-    """
-    Calculate the ocean, the sea depth and the elevation thresholds
-    :param world: a world having elevation but not thresholds
-    :param ocean_level: the elevation representing the ocean level
-    :return: nothing, the world will be changed
-    """
-    e = world.elevation['data']
-    ocean = fill_ocean(e, ocean_level)
-    hl = find_threshold_f(e, 0.10)
-    ml = find_threshold_f(e, 0.03)
-    e_th = [('sea', ocean_level), ('plain', hl), ('hill', ml), ('mountain', None)]
-    world.set_ocean(ocean)
-    world.set_elevation(e, e_th)
-    world.sea_depth = sea_depth(world, ocean_level)
 
 
 def world_gen_precipitation(w, seed):

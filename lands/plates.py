@@ -61,7 +61,6 @@ def world_gen(name, width, height, seed, num_plates=10, ocean_level=1.0, step="f
         elapsed_time = time.time() - start_time
         print("...plates.world_gen: elevation noise added. Elapsed time " +str(elapsed_time) +" seconds.")
 
-
     if verbose:
         start_time = time.time()
     place_oceans_at_map_borders(world)
