@@ -3,223 +3,207 @@ This file contains all possible Biome as separate classes.
 """
 __author__ = 'Federico Tomassetti'
 
+import re
+
+
+def _uncamelize(name):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1 \2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1 \2', s1).lower()
+
+
+class BiomeMetaclass(type):
+
+    def __new__(cls, name, parents, dct):
+        if not hasattr(BiomeMetaclass, "biomes"):
+            BiomeMetaclass.biomes = {}
+        uncamelized_name = _uncamelize(name)
+        print("%s -> %s" % (name, uncamelized_name))
+        created_class = super(BiomeMetaclass, cls).__new__(cls, name, parents, dct)
+        if object not in parents:
+            BiomeMetaclass.biomes[uncamelized_name] = created_class
+        return created_class
+
 
 class Biome(object):
+
+    __metaclass__ = BiomeMetaclass
+
     @classmethod
     def by_name(cls, name):
-        return BIOMES[name]
+        if name not in BiomeMetaclass.biomes:
+            raise Exception("No biome named '%s'" % name)
+        return BiomeMetaclass.biomes[name]()
 
-    def name(self):
-        return str(type(self))
+    @classmethod
+    def name(cls):
+        return _uncamelize(cls.__name__)
 
 
 class Ocean(Biome):
-    def name(self):
-        return 'ocean'
+    pass
 
 
 class Sea(Biome):
-    def name(self):
-        return 'sea'
+    pass
 
 
 class PolarDesert(Biome):
-    def name(self):
-        return 'polar desert'
+    pass
 
 
 class Ice(Biome):
-    def name(self):
-        return 'ice'
+    pass
 
 
 class SubpolarDryTundra(Biome):
-    def name(self):
-        return 'subpolar dry tundra'
+    pass
 
 
 class SubpolarMoistTundra(Biome):
-    def name(self):
-        return 'subpolar moist tundra'
+    pass
 
 
 class SubpolarWetTundra(Biome):
-    def name(self):
-        return 'subpolar wet tundra'
+    pass
 
 
 class SubpolarRainTundra(Biome):
-    def name(self):
-        return 'subpolar rain tundra'
+    pass
 
 
 class BorealDesert(Biome):
-    def name(self):
-        return 'boreal desert'
+    pass
 
 
 class BorealDryScrub(Biome):
-    def name(self):
-        return 'boreal dry scrub'
+    pass
 
 
 class BorealMoistForest(Biome):
-    def name(self):
-        return 'boreal moist forest'
+    pass
 
 
 class BorealWetForest(Biome):
-    def name(self):
-        return 'boreal wet forest'
+    pass
 
 
 class BorealRainForest(Biome):
-    def name(self):
-        return 'boreal rain forest'
-
+    pass
 
 class CoolTemperateDesert(Biome):
-    def name(self):
-        return 'cool temperate desert'
+    pass
 
 
 class CoolTemperateDesertScrub(Biome):
-    def name(self):
-        return 'cool temperate desert scrub'
+    pass
 
 
 class CoolTemperateSteppe(Biome):
-    def name(self):
-        return 'cool temperate steepe'
+    pass
 
 
 class CoolTemperateMoistForest(Biome):
-    def name(self):
-        return 'cool temperate moist forest'
+    pass
 
 
 class CoolTemperateWetForest(Biome):
-    def name(self):
-        return 'cool temperate wet forest'
+    pass
 
 
 class CoolTemperateRainForest(Biome):
-    def name(self):
-        return 'cool temperate rain forest'
+    pass
 
 
 class WarmTemperateDesert(Biome):
-    def name(self):
-        return 'warm temperate desert'
+    pass
 
 
 class WarmTemperateDesertScrub(Biome):
-    def name(self):
-        return 'warm temperate desert scrub'
+    pass
 
 
 class WarmTemperateThornScrub(Biome):
-    def name(self):
-        return 'warm temperate thorn scrub'
+    pass
 
 
 class WarmTemperateDryForest(Biome):
-    def name(self):
-        return 'warm temperate dry forest'
+    pass
 
 
 class WarmTemperateMoistForest(Biome):
-    def name(self):
-        return 'warm temperate moist forest'
+    pass
 
 
 class WarmTemperateWetForest(Biome):
-    def name(self):
-        return 'warm temperate wet forest'
+    pass
 
 
 class WarmTemperateRainForest(Biome):
-    def name(self):
-        return 'warm temperate rain forest'
+    pass
 
 
 class SubtropicalDesert(Biome):
-    def name(self):
-        return 'subtropical desert'
+    pass
 
 
 class SubtropicalDesertScrub(Biome):
-    def name(self):
-        return 'subtropical desert scrub'
+    pass
 
 
 class SubtropicalThornWoodland(Biome):
-    def name(self):
-        return 'subtropical thorn woodland'
+    pass
 
 
 class SubtropicalDryForest(Biome):
-    def name(self):
-        return 'subtropical dry forest'
+    pass
 
 
 class SubtropicalMoistForest(Biome):
-    def name(self):
-        return 'subtropical moist forest'
+    pass
 
 
 class SubtropicalWetForest(Biome):
-    def name(self):
-        return 'subtropical wet forest'
+    pass
 
 
 class SubtropicalRainForest(Biome):
-    def name(self):
-        return 'subtropical rain forest'
+    pass
 
 
 class TropicalDesert(Biome):
-    def name(self):
-        return 'tropical desert'
+    pass
 
 
 class TropicalDesertScrub(Biome):
-    def name(self):
-        return 'tropical desert scrub'
+    pass
 
 
 class TropicalThornWoodland(Biome):
-    def name(self):
-        return 'tropical thorn woodland'
+    pass
 
 
 class TropicalVeryDryForest(Biome):
-    def name(self):
-        return 'tropical very dry forest'
+    pass
 
 
 class TropicalDryForest(Biome):
-    def name(self):
-        return 'tropical dry forest'
+    pass
 
 
 class TropicalMoistForest(Biome):
-    def name(self):
-        return 'tropical moist forest'
+    pass
 
 
 class TropicalWetForest(Biome):
-    def name(self):
-        return 'tropical wet forest'
+    pass
 
 
 class TropicalRainForest(Biome):
-    def name(self):
-        return 'tropical rain forest'
+    pass
 
 
 def biome_name_to_index(biome_name):
-    names = BIOMES.keys()
+    names = BiomeMetaclass.biomes.keys()
     names.sort()
     for i in xrange(len(names)):
         if names[i] == biome_name:
@@ -228,49 +212,6 @@ def biome_name_to_index(biome_name):
 
 
 def biome_index_to_name(biome_index):
-    names = BIOMES.keys()
+    names = BiomeMetaclass.biomes.keys()
     names.sort()
     return names[biome_index]
-
-BIOMES = {
-    'ocean': Ocean(),
-    'polar desert': PolarDesert(),
-    'ice': Ice(),
-    'subpolar dry tundra': SubpolarDryTundra(),
-    'subpolar moist tundra': SubpolarMoistTundra(),
-    'subpolar wet tundra': SubpolarWetTundra(),
-    'subpolar rain tundra': SubpolarRainTundra(),
-    'boreal desert': BorealDesert(),
-    'boreal dry scrub': BorealDryScrub(),
-    'boreal moist forest': BorealMoistForest(),
-    'boreal wet forest': BorealWetForest(),
-    'boreal rain forest': BorealRainForest(),
-    'cool temperate desert': CoolTemperateDesert(),
-    'cool temperate desert scrub': CoolTemperateDesertScrub(),
-    'cool temperate steppe': CoolTemperateSteppe(),
-    'cool temperate moist forest': CoolTemperateMoistForest(),
-    'cool temperate wet forest': CoolTemperateWetForest(),
-    'cool temperate rain forest': CoolTemperateRainForest(),
-    'warm temperate desert': WarmTemperateDesert(),
-    'warm temperate desert scrub': WarmTemperateDesertScrub(),
-    'warm temperate thorn scrub': WarmTemperateThornScrub(),
-    'warm temperate dry forest': WarmTemperateDryForest(),
-    'warm temperate moist forest': WarmTemperateMoistForest(),
-    'warm temperate wet forest': WarmTemperateWetForest(),
-    'warm temperate rain forest': WarmTemperateRainForest(),
-    'subtropical desert': SubtropicalDesert(),
-    'subtropical desert scrub': SubtropicalDesertScrub(),
-    'subtropical thorn woodland': SubtropicalThornWoodland(),
-    'subtropical dry forest': SubtropicalDryForest(),
-    'subtropical moist forest': SubtropicalMoistForest(),
-    'subtropical wet forest': SubtropicalWetForest(),
-    'subtropical rain forest': SubtropicalRainForest(),
-    'tropical desert': TropicalDesert(),
-    'tropical desert scrub': TropicalDesertScrub(),
-    'tropical thorn woodland': TropicalThornWoodland(),
-    'tropical very dry forest': TropicalVeryDryForest(),
-    'tropical dry forest': TropicalDryForest(),
-    'tropical moist forest': TropicalMoistForest(),
-    'tropical wet forest': TropicalWetForest(),
-    'tropical rain forest': TropicalRainForest(),
-}
