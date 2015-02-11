@@ -128,8 +128,10 @@ def elevation_color(elevation, color_step=1.5):
 # Draw on images
 # --------------
 
-
+# TODO avoid using this when we know the ocean level
 def draw_simple_elevation_on_image(data, width, height):
+    """This function assume the level of the sea is placed at 1.0
+    """
     img = Image.new('RGBA', (width, height))
     pixels = img.load()
 
@@ -139,6 +141,7 @@ def draw_simple_elevation_on_image(data, width, height):
             r, g, b = elevation_color(e)
             pixels[x, y] = (int(r * 255), int(g * 255), int(b * 255), 255)
     return img
+
 
 # -------------
 # Draw on files
@@ -377,15 +380,15 @@ def draw_temperature_levels(world, filename):
     img.save(filename)
 
 
-def draw_biome(temp, filename):
-    width = len(temp[0])
-    height = len(temp)
+def draw_biome(biome, filename):
+    width = len(biome[0])
+    height = len(biome)
 
     img = Image.new('RGBA', (width, height))
     pixels = img.load()
 
     for y in range(height):
         for x in range(width):
-            v = temp[y][x]
+            v = biome[y][x]
             pixels[x, y] = _biome_colors[v]
     img.save(filename)  
