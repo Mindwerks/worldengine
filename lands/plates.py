@@ -3,9 +3,10 @@ __author__ = 'Federico Tomassetti'
 # Every reference to platec has to be kept separated because it is a C extension
 # which is not available when using this project from jython
 
-from lands.geo import *
-import platec
 import time
+import platec
+
+from lands.geo import *
 
 
 def array_to_matrix(array, width, height):
@@ -55,7 +56,7 @@ def world_gen(name, width, height, seed, num_plates=10, ocean_level=1.0, step="f
 
     if verbose:
         start_time = time.time()
-    elevnoise_on_world(world, random.randint(0, 4096))
+    add_noise_to_elevation(world, random.randint(0, 4096))
     if verbose:
         elapsed_time = time.time() - start_time
         print("...plates.world_gen: elevation noise added. Elapsed time " +str(elapsed_time) +" seconds.")

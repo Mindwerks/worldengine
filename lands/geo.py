@@ -14,6 +14,10 @@ from lands.simulations.basic import *
 from lands.common import *
 
 
+# ------------------
+# Initial generation
+# ------------------
+
 def center_land(world):
     """Translate the map horizontally and vertically to put as much ocean as possible at the borders.
        It operates on elevation and plates map"""
@@ -240,26 +244,13 @@ def precipitation(seed, width, height):
     return precipitations
 
 
-def elevnoise_on_world(world, seed):
+def add_noise_to_elevation(world, seed):
     octaves = 6
     freq = 16.0 * octaves
     for y in range(world.height):
         for x in range(world.width):
             n = snoise2(x / freq * 2, y / freq * 2, octaves, base=seed)
             world.elevation['data'][y][x] += n
-
-
-def elevnoise(elevation, seed):
-    # FIXME use elevnoise_on_world instead
-    width = len(elevation[0])
-    height = len(elevation)
-
-    octaves = 6
-    freq = 16.0 * octaves
-    for y in range(height):
-        for x in range(width):
-            n = int(snoise2(x / freq * 2, y / freq * 2, octaves, base=seed))
-            elevation[y][x] += n
 
 
 def place_oceans_at_map_borders_on_world(world):

@@ -162,7 +162,7 @@ class GenerationThread(threading.Thread):
         self.ui.set_status('Plate simulation: center land')
         center_land(w)
         self.ui.set_status('Plate simulation: adding noise')
-        elevnoise_on_world(w, random.randint(0, 4096))
+        add_noise_to_elevation(w, random.randint(0, 4096))
         self.ui.set_status('Plate simulation: forcing oceans at borders')
         place_oceans_at_map_borders_on_world(w)
         self.ui.set_status('Plate simulation: finalization (can take a while)')
