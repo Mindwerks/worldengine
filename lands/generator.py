@@ -5,8 +5,8 @@ from PIL import Image
 from optparse import OptionParser, OptionGroup
 import os
 
-import lands.geo
-from lands.plates import world_gen
+import lands.geo as geo
+from lands.plates import world_gen, generate_plates_simulation, array_to_matrix
 from lands.draw import *
 from lands.drawing_functions import *
 from lands.world import *
@@ -71,11 +71,7 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
         print("* biome image generated in '%s'" % filename)
 
     filename = '%s/%s_elevation.png' % (output_dir, world_name)
-    e_as_array = []
-    for y in xrange(height):
-        for x in xrange(width):
-            e_as_array.append(w.elevation['data'][y][x])
-    draw_simple_elevation(e_as_array, filename, shadow=True, width=width, height=height)
+    draw_simple_elevation(w.elevation['data'], filename, shadow=True, width=width, height=height)
     print("* elevation image generated in '%s'" % filename)
     return w
 
@@ -91,15 +87,30 @@ def generate_rivers_map(world, filename):
 
 
 def generate_plates(seed, world_name, output_dir, width, height, num_plates=10):
+    """
+    Eventually this method should be invoked when generation is called at asked to stop
+    at step "plates", it should not be a different operation
+    :param seed:
+    :param world_name:
+    :param output_dir:
+    :param width:
+    :param height:
+    :param num_plates:
+    :return:
+    """
     elevation, plates = generate_plates_simulation(seed, width, height, num_plates=num_plates)
+
+    world = World(world_name, width, height, seed, num_plates, -1.0, "plates")
+    world.set_elevation(array_to_matrix(elevation, width, height), None)
+    world.set_plates(array_to_matrix(plates, width, height))
 
     # Generate images
     filename = '%s/plates_%s.png' % (output_dir, world_name)
-    draw_simple_elevation(elevation, filename)
+    draw_simple_elevation(world.elevation['data'], filename, False, width, height)
     print("+ plates image generated in '%s'" % filename)
-    plates = geo.center_elevation_map(elevation, width, height)
+    geo.center_land(world)
     filename = '%s/centered_plates_%s.png' % (output_dir, world_name)
-    draw_simple_elevation(elevation, filename)
+    draw_simple_elevation(world.elevation['data'], filename, False, width, height)
     print("+ centered plates image generated in '%s'" % filename)
 
 
@@ -109,7 +120,7 @@ def is_pow_of_two(num):
 
 def check_step(step_name):
     step = Step.get_by_name(step_name)
-    if step == None:
+    if step is None:
         print("ERROR: unknown step name, using default 'full'")
         return Step.get_by_name("full")
     else:
@@ -246,7 +257,7 @@ def main():
             print(' + rivers map in "%s"' % options.rivers_map)
         else:
             print(' (no rivers map)')
-    if operation=='ancient_map':
+    if operation == 'ancient_map':
         print(' resize factor     : %i' % options.resize_factor)
         print(' world file        : %s' % options.world_file)
         print(' sea color         : %s' % options.sea_color)
@@ -255,7 +266,6 @@ def main():
     print('starting (it could take a few minutes) ...')
 
     set_verbose(options.verbose)
-
 
     if operation == 'world':
         world = generate_world(world_name, options.width, options.height,

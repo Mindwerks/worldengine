@@ -113,7 +113,7 @@ def draw_simple_elevation_on_image(data, width, height):
 
     for y in range(height):
         for x in range(width):
-            e = data[y * width + x]
+            e = data[y][x]
             r, g, b = elevation_color(e)
             pixels[x, y] = (int(r * 255), int(g * 255), int(b * 255), 255)
     return img

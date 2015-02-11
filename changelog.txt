@@ -39,4 +39,5 @@ Version 0.5.3
 Version 0.5.4
 
 * Fix bug in sea representation for elevation map
+* Fix plates operation
 * [Technical] Increase test coverage
