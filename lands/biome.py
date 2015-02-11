@@ -34,6 +34,10 @@ class Biome(object):
         return _BiomeMetaclass.biomes[name]()
 
     @classmethod
+    def all_names(cls):
+        return _BiomeMetaclass.biomes.keys().sort()
+
+    @classmethod
     def name(cls):
         return _uncamelize(cls.__name__)
 
