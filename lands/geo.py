@@ -62,41 +62,6 @@ def center_land(world):
         print("geo.center_land: width complete");
 
 
-def center_elevation_map(elevation, width, height):
-    """Translate the map horizontally and vertically to put as much ocean as possible at the borders."""
-    # FIXME this is bad because plates are not translated
-    miny = None
-    ymin = None
-    minx = None
-    xmin = None
-
-    for y in xrange(height):
-        sumy = 0
-        for x in xrange(width):
-            sumy += elevation[y * width + x]
-        if miny is None or sumy < miny:
-            miny = sumy
-            ymin = y
-
-    for x in xrange(width):
-        sumx = 0
-        for y in xrange(height):
-            sumx += elevation[y * width + x]
-        if minx is None or sumx < minx:
-            minx = sumx
-            xmin = x
-
-    new_elevation = [0] * (width * height)
-    for y in xrange(height):
-        srcy = (ymin + y) % height
-        for x in xrange(width):
-            srcx = (xmin + x) % width
-            new_elevation[y * width + x] = elevation[srcy * width + srcx]
-    elevation = new_elevation
-
-    return elevation
-
-
 def get_interleave_value(original_map, x, y):
     """x and y can be float value"""
     weight_next_x, base_x = math.modf(x)
