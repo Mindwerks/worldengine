@@ -11,7 +11,7 @@ class TestBiome(unittest.TestCase):
 
     def test_biome_by_name(self):
         self.assertRaises(Exception, Biome.by_name, "unexisting biome")
-        self.assertIsInstance(Biome.by_name("ocean"), Ocean)
+        self.assertTrue(isinstance(Biome.by_name("ocean"), Ocean))
 
     def test_name(self):
         self.assertEqual("ocean", Ocean().name())
