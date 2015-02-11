@@ -9,6 +9,7 @@ from lands.simulations.HumiditySimulation import *
 from lands.simulations.TemperatureSimulation import *
 from lands.simulations.PermeabilitySimulation import *
 from lands.simulations.ErosionSimulation import *
+from lands.simulations.PrecipitationSimulation import *
 from lands.simulations.BiomeSimulation import *
 from lands.simulations.basic import *
 from lands.common import *
@@ -223,7 +224,7 @@ def rescale_value(original, prev_min, prev_max, min, max):
     return min + ((max - min) * f)
 
 
-# ----
+# -------
 # Misc
 # ----
 
@@ -260,47 +261,6 @@ def _around(x, y, width, height):
     return ps
 
 
-def precipitation(seed, width, height):
-    """"Precipitation is a value in [-1,1]"""
-    border = width / 4 
-    random.seed(seed * 13)
-    base = random.randint(0, 4096)
-    precipitations = [[0 for x in range(width)] for y in range(height)]
-
-    octaves = 6
-    freq = 64.0 * octaves
-
-    for y in range(height):
-        yscaled = float(y) / height
-        latitude_factor = 1.0 - (abs(yscaled - 0.5) * 2)
-        for x in range(width):
-            n = snoise2(x / freq, y / freq, octaves, base=base)
-
-            # Added to allow noise pattern to wrap around right and left.
-            if x < border: 
-                n = (snoise2(x / freq, y / freq, octaves, base=base) * x / border) + (snoise2((x+width) / freq, y / freq, octaves, base=base) * (border-x)/border)
-
-            prec = (latitude_factor + n * 4) / 5.0
-            precipitations[y][x] = prec
-
-    return precipitations
-
-
-def world_gen_precipitation(w, seed):
-    start_time = time.time()
-    p = precipitation(seed, w.width, w.height)
-    p_th = [
-        ('low', find_threshold_f(p, 0.75, w.ocean)),
-        ('med', find_threshold_f(p, 0.3, w.ocean)),
-        ('hig', None)
-    ]
-    w.set_precipitation(p, p_th)
-    elapsed_time = time.time() - start_time
-    if get_verbose():
-        print("...precipitations calculated. Elapsed time %f  seconds." % elapsed_time)
-    return [p, p_th]
-
-
 def world_gen_from_elevation(w, step):
     if isinstance(step, str):
         step = Step.get_by_name(step)
@@ -310,7 +270,7 @@ def world_gen_from_elevation(w, step):
         return w
 
     # Precipitation with thresholds
-    world_gen_precipitation(w, seed)
+    PrecipitationSimulation().execute(w, seed)
 
     if not step.include_erosion:
         return w
