@@ -109,48 +109,9 @@ def scale(original_map, target_width, target_height):
         original_y = y_factor * scaled_y
         for scaled_x in range(target_width):
             original_x = x_factor * scaled_x
-            scaled_map[scaled_y][scaled_x] = get_interleave_value(original_map, original_x, original_y)
+            scaled_map[scaled_y][scaled_x] = _get_interleave_value(original_map, original_x, original_y)
 
     return scaled_map
-
-
-def matrix_extremes(matrix):
-    min = None
-    max = None
-    for row in matrix:
-        for el in row:
-            val = el
-            if min is None or val < min:
-                min = val
-            if max is None or val > max:
-                max = val
-    return (min, max)
-
-
-def rescale_value(original, prev_min, prev_max, min, max):
-    f = float(original - prev_min) / (prev_max - prev_min)
-    return min + ((max - min) * f)
-
-
-def sea_depth(world, sea_level):
-    sea_depth = [[sea_level - world.elevation['data'][y][x] for x in range(world.width)] for y in range(world.height)]
-    for y in range(world.height):
-        for x in range(world.width):
-            if world.tiles_around((x, y), radius=1, predicate=world.is_land):
-                sea_depth[y][x] = 0
-            elif world.tiles_around((x, y), radius=2, predicate=world.is_land):
-                sea_depth[y][x] *= 0.3
-            elif world.tiles_around((x, y), radius=3, predicate=world.is_land):
-                sea_depth[y][x] *= 0.5
-            elif world.tiles_around((x, y), radius=4, predicate=world.is_land):
-                sea_depth[y][x] *= 0.7
-            elif world.tiles_around((x, y), radius=5, predicate=world.is_land):
-                sea_depth[y][x] *= 0.9
-    antialias(sea_depth, 10)
-    min_depth, max_depth = matrix_extremes(sea_depth)
-    sea_depth = [[rescale_value(sea_depth[y][x], min_depth, max_depth, 0.0, 1.0) for x in range(world.width)] for y in
-                 range(world.height)]
-    return sea_depth
 
 
 def antialias(elevation, steps):
@@ -177,6 +138,32 @@ def antialias(elevation, steps):
 
     for i in range(steps):
         _antialias_step()
+
+
+def rescale_value(original, prev_min, prev_max, min, max):
+    f = float(original - prev_min) / (prev_max - prev_min)
+    return min + ((max - min) * f)
+
+
+def sea_depth(world, sea_level):
+    sea_depth = [[sea_level - world.elevation['data'][y][x] for x in range(world.width)] for y in range(world.height)]
+    for y in range(world.height):
+        for x in range(world.width):
+            if world.tiles_around((x, y), radius=1, predicate=world.is_land):
+                sea_depth[y][x] = 0
+            elif world.tiles_around((x, y), radius=2, predicate=world.is_land):
+                sea_depth[y][x] *= 0.3
+            elif world.tiles_around((x, y), radius=3, predicate=world.is_land):
+                sea_depth[y][x] *= 0.5
+            elif world.tiles_around((x, y), radius=4, predicate=world.is_land):
+                sea_depth[y][x] *= 0.7
+            elif world.tiles_around((x, y), radius=5, predicate=world.is_land):
+                sea_depth[y][x] *= 0.9
+    antialias(sea_depth, 10)
+    min_depth, max_depth = matrix_min_and_max(sea_depth)
+    sea_depth = [[rescale_value(sea_depth[y][x], min_depth, max_depth, 0.0, 1.0) for x in range(world.width)] for y in
+                 range(world.height)]
+    return sea_depth
 
 
 def _around(x, y, width, height):

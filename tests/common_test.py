@@ -16,5 +16,19 @@ class TestCommon(unittest.TestCase):
         set_verbose(False)
         self.assertEqual(False, get_verbose())
 
+    def test_matrix_min_and_max(self):
+        m1 = [
+            [-0.8, -0.5, 1.0, 2.6],
+            [-0.8, -1.5, 8.8, 2.7]
+        ]
+        m2 = []
+        m3 = [[], []]
+        m4 = [[0.0]]
+        self.assertEqual((-1.5, 8.8), matrix_min_and_max(m1))
+        self.assertEqual((None, None), matrix_min_and_max(m2))
+        self.assertEqual((None, None), matrix_min_and_max(m3))
+        self.assertEqual((0.0, 0.0), matrix_min_and_max(m4))
+
+
 if __name__ == '__main__':
     unittest.main()
