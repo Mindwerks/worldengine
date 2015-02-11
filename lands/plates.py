@@ -9,7 +9,7 @@ import time
 
 
 def array_to_matrix(array, width, height):
-    if (len(array) != (width * height)):
+    if len(array) != (width * height):
         raise Exception("Array as not expected length")
     matrix = []
     for y in xrange(height):
@@ -29,7 +29,7 @@ def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_peri
                       aggr_overlap_abs, aggr_overlap_rel, cycle_count, num_plates)
 
     while platec.is_finished(p) == 0:
-        #TODO: add a if verbose: message here?
+        # TODO: add a if verbose: message here?
         platec.step(p)
     hm = platec.get_heightmap(p)
     pm = platec.get_platesmap(p)
