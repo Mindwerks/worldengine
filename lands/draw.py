@@ -324,7 +324,7 @@ def draw_world(world, filename):
                 c = int(world.sea_depth[y][x] * 200 + 50)
                 pixels[x, y] = (0, 0, 255 - c, 255)
 
-    counter.printself()
+    counter.print_self()
     img.save(filename)
 
 

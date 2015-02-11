@@ -1,6 +1,7 @@
 __author__ = 'Federico Tomassetti'
 
 import math
+import sys
 
 # ----------------
 # Global variables
@@ -41,9 +42,18 @@ class Counter(object):
             self.c[what] = 0
         self.c[what] += 1
 
-    def printself(self):
-        for w in self.c.keys():
-            print("%s : %i" % (w, self.c[w]))
+    def to_str(self):
+        str = ""
+        keys = self.c.keys()
+        keys.sort()
+        for w in keys:
+            str += "%s : %i" % (w, self.c[w])
+            str += "\n"
+        return str
+
+    def print_self(self):
+        # print without the new line
+        sys.stdout.write(self.to_str)
 
 
 def matrix_min_and_max(matrix):
