@@ -268,6 +268,9 @@ class World(object):
         x, y = pos
         return self.ocean[y][x]
 
+    def sea_level(self):
+        return self.elevation['thresholds'][0][1]
+
     ###
     ### Tiles around
     ###
