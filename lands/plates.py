@@ -69,4 +69,4 @@ def world_gen(name, width, height, seed, num_plates=10, ocean_level=1.0, step="f
         elapsed_time = time.time() - start_time
         print("...plates.world_gen: oceans initialized. Elapsed time " +str(elapsed_time) +" seconds.")
 
-    return world_gen_from_elevation(world, step)
+    return generate_world(world, step)
