@@ -56,51 +56,58 @@ _biome_colors = {
 # Helper functions
 # ----------------
 
-def elevation_color(c, color_step = 1.5):
-    if c < 0.5:
-        return 0.0, 0.0, 0.25 + 1.5 * c
-    elif c < 1.0:
-        return 0.0, 2 * (c - 0.5), 1.0
+
+def elevation_color(elevation, color_step=1.5):
+    """
+    Calculate color based on elevation
+    :param elevation:
+    :param color_step:
+    :return:
+    """
+    if elevation < 0.5:
+        return 0.0, 0.0, 0.75 + 0.5 * elevation
+    elif elevation < 1.0:
+        return 0.0, 2 * (elevation - 0.5), 1.0
     else:
-        c -= 1.0
-        if c < 1.0 * color_step:
+        elevation -= 1.0
+        if elevation < 1.0 * color_step:
             return (0.0, 0.5 +
-                    0.5 * c / color_step, 0.0)
-        elif c < 1.5 * color_step:
-            return 2 * (c - 1.0 * color_step) / color_step, 1.0, 0.0
-        elif c < 2.0 * color_step:
-            return 1.0, 1.0 - (c - 1.5 * color_step) / color_step, 0
-        elif c < 3.0 * color_step:
-            return (1.0 - 0.5 * (c - 2.0 *
+                    0.5 * elevation / color_step, 0.0)
+        elif elevation < 1.5 * color_step:
+            return 2 * (elevation - 1.0 * color_step) / color_step, 1.0, 0.0
+        elif elevation < 2.0 * color_step:
+            return 1.0, 1.0 - (elevation - 1.5 * color_step) / color_step, 0
+        elif elevation < 3.0 * color_step:
+            return (1.0 - 0.5 * (elevation - 2.0 *
                                  color_step) / color_step,
-                    0.5 - 0.25 * (c - 2.0 *
+                    0.5 - 0.25 * (elevation - 2.0 *
                                   color_step) / color_step, 0)
-        elif c < 5.0 * color_step:
-            return (0.5 - 0.125 * (c - 3.0 *
+        elif elevation < 5.0 * color_step:
+            return (0.5 - 0.125 * (elevation - 3.0 *
                                    color_step) / (2 * color_step),
-                    0.25 + 0.125 * (c - 3.0 *
+                    0.25 + 0.125 * (elevation - 3.0 *
                                     color_step) / (2 * color_step),
-                    0.375 * (c - 3.0 *
+                    0.375 * (elevation - 3.0 *
                              color_step) / (2 * color_step))
-        elif c < 8.0 * color_step:
-            return (0.375 + 0.625 * (c - 5.0 *
+        elif elevation < 8.0 * color_step:
+            return (0.375 + 0.625 * (elevation - 5.0 *
                                      color_step) / (3 * color_step),
-                    0.375 + 0.625 * (c - 5.0 *
+                    0.375 + 0.625 * (elevation - 5.0 *
                                      color_step) / (3 * color_step),
-                    0.375 + 0.625 * (c - 5.0 *
+                    0.375 + 0.625 * (elevation - 5.0 *
                                      color_step) / (3 * color_step))
         else:
-            c -= 8.0 * color_step
-            while c > 2.0 * color_step:
-                c -= 2.0 * color_step
-            return 1, 1 - c / 4.0, 1
+            elevation -= 8.0 * color_step
+            while elevation > 2.0 * color_step:
+                elevation -= 2.0 * color_step
+            return 1, 1 - elevation / 4.0, 1
 
 # --------------
 # Draw on images
 # --------------
 
 
-def draw_simple_elevation_on_image(data, shadow, width, height):    
+def draw_simple_elevation_on_image(data, width, height):
     img = Image.new('RGBA', (width, height))
     pixels = img.load()
 
@@ -115,8 +122,9 @@ def draw_simple_elevation_on_image(data, shadow, width, height):
 # Draw on files
 # -------------
 
+
 def draw_simple_elevation(data, filename, shadow, width, height):
-    img = draw_simple_elevation_on_image(data, shadow, width, height)
+    img = draw_simple_elevation_on_image(data, width, height)
     img.save(filename)
 
 
