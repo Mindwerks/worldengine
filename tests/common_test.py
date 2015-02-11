@@ -29,6 +29,17 @@ class TestCommon(unittest.TestCase):
         self.assertEqual((None, None), matrix_min_and_max(m3))
         self.assertEqual((0.0, 0.0), matrix_min_and_max(m4))
 
+    def test_counter(self):
+        c = Counter()
+        self.assertEqual("", c.to_str())
+        c.count("b")
+        self.assertEqual("b : 1\n", c.to_str())
+        c.count("b")
+        c.count("b")
+        self.assertEqual("b : 3\n", c.to_str())
+        c.count("a")
+        self.assertEqual("a : 1\nb : 3\n", c.to_str())
+
 
 if __name__ == '__main__':
     unittest.main()
