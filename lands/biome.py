@@ -11,28 +11,27 @@ def _uncamelize(name):
     return re.sub('([a-z0-9])([A-Z])', r'\1 \2', s1).lower()
 
 
-class BiomeMetaclass(type):
+class _BiomeMetaclass(type):
 
     def __new__(cls, name, parents, dct):
-        if not hasattr(BiomeMetaclass, "biomes"):
-            BiomeMetaclass.biomes = {}
+        if not hasattr(_BiomeMetaclass, "biomes"):
+            _BiomeMetaclass.biomes = {}
         uncamelized_name = _uncamelize(name)
-        print("%s -> %s" % (name, uncamelized_name))
-        created_class = super(BiomeMetaclass, cls).__new__(cls, name, parents, dct)
+        created_class = super(_BiomeMetaclass, cls).__new__(cls, name, parents, dct)
         if object not in parents:
-            BiomeMetaclass.biomes[uncamelized_name] = created_class
+            _BiomeMetaclass.biomes[uncamelized_name] = created_class
         return created_class
 
 
 class Biome(object):
 
-    __metaclass__ = BiomeMetaclass
+    __metaclass__ = _BiomeMetaclass
 
     @classmethod
     def by_name(cls, name):
-        if name not in BiomeMetaclass.biomes:
+        if name not in _BiomeMetaclass.biomes:
             raise Exception("No biome named '%s'" % name)
-        return BiomeMetaclass.biomes[name]()
+        return _BiomeMetaclass.biomes[name]()
 
     @classmethod
     def name(cls):
@@ -202,16 +201,22 @@ class TropicalRainForest(Biome):
     pass
 
 
+# -------------
+# Serialization
+# -------------
+
 def biome_name_to_index(biome_name):
-    names = BiomeMetaclass.biomes.keys()
+    names = _BiomeMetaclass.biomes.keys()
     names.sort()
-    for i in xrange(len(names)):
+    for i in range(len(names)):
         if names[i] == biome_name:
             return i
     raise Exception("Not found")
 
 
 def biome_index_to_name(biome_index):
-    names = BiomeMetaclass.biomes.keys()
+    names = _BiomeMetaclass.biomes.keys()
     names.sort()
+    if biome_index < 0 or biome_index >= len(names):
+        raise Exception("Not found")
     return names[biome_index]
