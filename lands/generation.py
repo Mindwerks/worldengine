@@ -137,7 +137,7 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
     world.sea_depth = sea_depth(world, ocean_level)
 
 
-# -------
+# ----
 # Misc
 # ----
 

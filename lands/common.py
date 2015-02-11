@@ -74,58 +74,6 @@ def matrix_min_and_max(matrix):
 # -------
 
 
-def scale(original_map, target_width, target_height):
-
-    def _get_interleave_value(original_map, x, y):
-        """x and y can be float value"""
-
-        weight_next_x, base_x = math.modf(x)
-        weight_preceding_x = 1.0 - weight_next_x
-        weight_next_y, base_y = math.modf(y)
-        weight_preceding_y = 1.0 - weight_next_y
-
-        base_x = int(base_x)
-        base_y = int(base_y)
-
-        sum = 0.0
-
-        # In case the point is right on the border, the weight
-        # of the next point will be zero and we will not access
-        # it
-        combined_weight = weight_preceding_x * weight_preceding_y
-        if combined_weight > 0.0:
-            sum += combined_weight * original_map[base_y][base_x]
-
-        combined_weight = weight_preceding_x * weight_next_y
-        if combined_weight > 0.0:
-            sum += combined_weight * original_map[base_y + 1][base_x]
-
-        combined_weight = weight_next_x * weight_preceding_y
-        if combined_weight > 0.0:
-            sum += combined_weight * original_map[base_y][base_x + 1]
-
-        combined_weight = weight_next_x * weight_next_y
-        if combined_weight > 0.0:
-            sum += combined_weight * original_map[base_y + 1][base_x + 1]
-
-        return sum
-
-    original_width = len(original_map[0])
-    original_height = len(original_map)
-
-    y_factor = float(original_height - 1) / (target_height - 1)
-    x_factor = float(original_width - 1) / (target_width - 1)
-
-    scaled_map = [[0 for x in range(target_width)] for y in range(target_height)]
-    for scaled_y in range(target_height):
-        original_y = y_factor * scaled_y
-        for scaled_x in range(target_width):
-            original_x = x_factor * scaled_x
-            scaled_map[scaled_y][scaled_x] = _get_interleave_value(original_map, original_x, original_y)
-
-    return scaled_map
-
-
 def antialias(elevation, steps):
     width = len(elevation[0])
     height = len(elevation)
@@ -153,5 +101,9 @@ def antialias(elevation, steps):
 
 
 def rescale_value(original, prev_min, prev_max, min, max):
+    """Rescale a given value.
+    Given the value, the current min and max and the new min and max
+    produce the rescaled value
+    """
     f = float(original - prev_min) / (prev_max - prev_min)
     return min + ((max - min) * f)
