@@ -14,9 +14,6 @@ from lands.common import *
 from lands.step import Step
 from lands.version import __version__
 
-if sys.version_info > (2,):
-    xrange = range
-
 VERSION = __version__
 
 OPERATIONS = 'world|plates|ancient_map'
@@ -25,7 +22,7 @@ STEPS      = 'plates|precipitations|full'
 
 
 def draw_oldmap(world, filename, resize_factor, sea_color, verbose=True):
-    img = Image.new('RGBA', (world.width*resize_factor, world.height*resize_factor))
+    img = Image.new('RGBA', (world.width*resize_factor, world.height * resize_factor))
     pixels = img.load()
     draw_oldmap_on_pixels(world, pixels, resize_factor, sea_color, verbose)
     img.save(filename)
@@ -34,7 +31,7 @@ def draw_oldmap(world, filename, resize_factor, sea_color, verbose=True):
 def generate_world(world_name, width, height, seed, num_plates, output_dir,
         step, ocean_level, world_format='pickle', verbose=True):
 
-    w = world_gen(world_name, width, height, seed, num_plates, ocean_level, step, verbose=verbose )
+    w = world_gen(world_name, width, height, seed, num_plates, ocean_level, step, verbose=verbose)
 
     print('')  # empty line
     print('Producing ouput:')
@@ -157,7 +154,7 @@ def main():
     parser.add_option('-v', '--verbose', dest='verbose', action="store_true",
                       help="Enable verbose messages", default=False)
 
-    #-----------------------------------------------------
+    # -----------------------------------------------------
     g_generate = OptionGroup(parser, "Generate Options",
                     "These options are only useful in plate and world modes")
     g_generate.add_option('-r', '--rivers', dest='rivers_map',
@@ -168,7 +165,7 @@ def main():
                       help='elevation cut off for sea level [default = %default]', metavar="N", default=1.0)
     parser.add_option_group(g_generate)
 
-    #-----------------------------------------------------
+    # -----------------------------------------------------
     g_ancient_map = OptionGroup(parser, "Ancient Map Options",
                     "These options are only useful in ancient_map mode")
     g_ancient_map.add_option('-w', '--worldfile', dest='world_file',
