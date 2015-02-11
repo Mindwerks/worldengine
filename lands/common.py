@@ -2,6 +2,7 @@ __author__ = 'Federico Tomassetti'
 
 import math
 import sys
+import copy
 
 # ----------------
 # Global variables
@@ -75,29 +76,34 @@ def matrix_min_and_max(matrix):
 
 
 def antialias(elevation, steps):
+    """
+    Execute the antialias operation steps times on the given elevation map
+    """
     width = len(elevation[0])
     height = len(elevation)
 
-    def _antialias_step():
+    def _antialias_step(original):
+        antialiased = copy.deepcopy(original)
         for y in range(height):
             for x in range(width):
-                antialias_point(x, y)
+                antialiased[y][x] = antialias_point(original, x, y)
+        return antialiased
 
-    def antialias_point(x, y):
+    def antialias_point(original, x, y):
         n = 2
         tot = elevation[y][x] * 2
         for dy in range(-1, +2):
-            py = y + dy
-            if py > 0 and py < height:
-                for dx in range(-1, +2):
-                    px = x + dx
-                    if px > 0 and px < width:
-                        n += 1
-                        tot += elevation[py][px]
+            py = (y + dy) % height
+            for dx in range(-1, +2):
+                px = (x + dx) % width
+                n += 1
+                tot += original[py][px]
         return tot / n
 
+    current = elevation
     for i in range(steps):
-        _antialias_step()
+        current = _antialias_step(current)
+    return current
 
 
 def rescale_value(original, prev_min, prev_max, min, max):
