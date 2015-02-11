@@ -35,3 +35,8 @@ Version 0.5.3
 * Saving generation parameters in world file
 * Revising command line options
 * Adding tracing statements about performance
+
+Version 0.5.4
+
+* Fix bug in sea representation for elevation map
+* [Technical] Increase test coverage
