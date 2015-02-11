@@ -7,43 +7,42 @@ from lands.common import *
 
 
 def elevation_color(c, color_step = 1.5):
-    COLOR_STEP = color_step
     if c < 0.5:
         return (0.0, 0.0, 0.25 + 1.5 * c)
     elif c < 1.0:
         return (0.0, 2 * (c - 0.5), 1.0)
     else:
         c -= 1.0;
-        if c < 1.0 * COLOR_STEP:
+        if c < 1.0 * color_step:
             return (0.0, 0.5 +
-                    0.5 * c / COLOR_STEP, 0.0)
-        elif (c < 1.5 * COLOR_STEP):
-            return (2 * (c - 1.0 * COLOR_STEP) / COLOR_STEP, 1.0, 0.0)
-        elif (c < 2.0 * COLOR_STEP):
-            return (1.0, 1.0 - (c - 1.5 * COLOR_STEP) / COLOR_STEP, 0)
-        elif (c < 3.0 * COLOR_STEP):
+                    0.5 * c / color_step, 0.0)
+        elif (c < 1.5 * color_step):
+            return (2 * (c - 1.0 * color_step) / color_step, 1.0, 0.0)
+        elif (c < 2.0 * color_step):
+            return (1.0, 1.0 - (c - 1.5 * color_step) / color_step, 0)
+        elif (c < 3.0 * color_step):
             return (1.0 - 0.5 * (c - 2.0 *
-                                 COLOR_STEP) / COLOR_STEP,
+                                 color_step) / color_step,
                     0.5 - 0.25 * (c - 2.0 *
-                                  COLOR_STEP) / COLOR_STEP, 0)
-        elif (c < 5.0 * COLOR_STEP):
+                                  color_step) / color_step, 0)
+        elif (c < 5.0 * color_step):
             return (0.5 - 0.125 * (c - 3.0 *
-                                   COLOR_STEP) / (2 * COLOR_STEP),
+                                   color_step) / (2 * color_step),
                     0.25 + 0.125 * (c - 3.0 *
-                                    COLOR_STEP) / (2 * COLOR_STEP),
+                                    color_step) / (2 * color_step),
                     0.375 * (c - 3.0 *
-                             COLOR_STEP) / (2 * COLOR_STEP))
-        elif (c < 8.0 * COLOR_STEP):
+                             color_step) / (2 * color_step))
+        elif (c < 8.0 * color_step):
             return (0.375 + 0.625 * (c - 5.0 *
-                                     COLOR_STEP) / (3 * COLOR_STEP),
+                                     color_step) / (3 * color_step),
                     0.375 + 0.625 * (c - 5.0 *
-                                     COLOR_STEP) / (3 * COLOR_STEP),
+                                     color_step) / (3 * color_step),
                     0.375 + 0.625 * (c - 5.0 *
-                                     COLOR_STEP) / (3 * COLOR_STEP))
+                                     color_step) / (3 * color_step))
         else:
-            c -= 8.0 * COLOR_STEP
-            while (c > 2.0 * COLOR_STEP):
-                c -= 2.0 * COLOR_STEP
+            c -= 8.0 * color_step
+            while (c > 2.0 * color_step):
+                c -= 2.0 * color_step
             return (1, 1 - c / 4.0, 1)    
 
 
@@ -120,18 +119,18 @@ def draw_grayscale_heightmap(world, filename):
 
 
 def draw_elevation(world, filename, shadow=True):
-    WIDTH = world.width
-    HEIGHT = world.height
+    width = world.width
+    height = world.height
 
     data = world.elevation['data']
     ocean = world.ocean
-    img = Image.new('RGBA', (WIDTH, HEIGHT))
+    img = Image.new('RGBA', (width, height))
     pixels = img.load()
 
     min_elev = None
     max_elev = None
-    for y in range(HEIGHT):
-        for x in range(WIDTH):
+    for y in range(height):
+        for x in range(width):
             if not ocean[y][x]:
                 e = data[y][x]
                 if min_elev is None or e < min_elev:
@@ -140,8 +139,8 @@ def draw_elevation(world, filename, shadow=True):
                     max_elev = e
     elev_delta = max_elev - min_elev
 
-    for y in range(HEIGHT):
-        for x in range(WIDTH):
+    for y in range(height):
+        for x in range(width):
             if ocean[y][x]:
                 pixels[x, y] = (0, 0, 255, 255)
             else:
@@ -163,17 +162,17 @@ def draw_elevation(world, filename, shadow=True):
 
 def draw_watermap(world, filename, th):
     # TODO use WatermapView
-    WIDTH = world.width
-    HEIGHT = world.height
+    width = world.width
+    height = world.height
 
     ocean = world.ocean
-    img = Image.new('RGBA', (WIDTH, HEIGHT))
+    img = Image.new('RGBA', (width, height))
     pixels = img.load()
 
     # min_elev = None 	
     # max_elev = None 	
-    # for y in xrange(HEIGHT): 	
-    # for x in xrange(WIDTH): 	
+    # for y in xrange(height):
+    # for x in xrange(width):
     # if not ocean[y][x]: 	
     # e = _watermap[y][x]**1.5 	
     # if min_elev==None or e<min_elev: 	
@@ -184,8 +183,8 @@ def draw_watermap(world, filename, th):
     # if elev_delta<1: 	
     # elev_delta=1 	
 
-    for y in range(HEIGHT):
-        for x in range(WIDTH):
+    for y in range(height):
+        for x in range(width):
             if ocean[y][x]:
                 pixels[x, y] = (0, 0, 255, 255)
             else:
@@ -200,13 +199,13 @@ def draw_watermap(world, filename, th):
 
 
 def draw_ocean(ocean, filename):
-    WIDTH = len(ocean[0])
-    HEIGHT = len(ocean)
+    width = len(ocean[0])
+    height = len(ocean)
 
-    img = Image.new('RGBA', (WIDTH, HEIGHT))
+    img = Image.new('RGBA', (width, height))
     pixels = img.load()
-    for y in range(HEIGHT):
-        for x in range(WIDTH):
+    for y in range(height):
+        for x in range(width):
             if ocean[y][x]:
                 pixels[x, y] = (0, 0, 255, 255)
             else:
@@ -216,13 +215,13 @@ def draw_ocean(ocean, filename):
 
 def draw_precipitation(world, filename):
     # FIXME we are drawing humidity, not precipitations
-    WIDTH = world.width
-    HEIGHT = world.height
+    width = world.width
+    height = world.height
 
-    img = Image.new('RGBA', (WIDTH, HEIGHT))
+    img = Image.new('RGBA', (width, height))
     pixels = img.load()
-    for y in range(HEIGHT):
-        for x in range(WIDTH):
+    for y in range(height):
+        for x in range(width):
             if world.is_humidity_superarid((x, y)):
                 pixels[x, y] = (0, 32, 32, 255)
             elif world.is_humidity_perarid((x, y)):
@@ -243,16 +242,16 @@ def draw_precipitation(world, filename):
 
 
 def draw_world(world, filename):
-    WIDTH = world.width
-    HEIGHT = world.height
+    width = world.width
+    height = world.height
 
-    img = Image.new('RGBA', (WIDTH, HEIGHT))
+    img = Image.new('RGBA', (width, height))
 
     counter = Counter()
 
     pixels = img.load()
-    for y in range(HEIGHT):
-        for x in range(WIDTH):
+    for y in range(height):
+        for x in range(width):
             if world.is_land((x, y)):
                 biome = world.biome_at((x, y))
                 pixels[x, y] = biome_colors[biome]
@@ -265,14 +264,14 @@ def draw_world(world, filename):
 
 
 def draw_temperature_levels(world, filename):
-    WIDTH = world.width
-    HEIGHT = world.height
+    width = world.width
+    height = world.height
 
-    img = Image.new('RGBA', (WIDTH, HEIGHT))
+    img = Image.new('RGBA', (width, height))
 
     pixels = img.load()
-    for y in range(HEIGHT):
-        for x in range(WIDTH):
+    for y in range(height):
+        for x in range(width):
             if world.is_temperature_polar((x, y)):
                 pixels[x, y] = (0, 0, 255, 255)
             elif world.is_temperature_alpine((x, y)):
@@ -336,14 +335,14 @@ biome_colors = {
 
 
 def draw_biome(temp, filename):
-    WIDTH = len(temp[0])
-    HEIGHT = len(temp)
+    width = len(temp[0])
+    height = len(temp)
 
-    img = Image.new('RGBA', (WIDTH, HEIGHT))
+    img = Image.new('RGBA', (width, height))
     pixels = img.load()
 
-    for y in range(HEIGHT):
-        for x in range(WIDTH):
+    for y in range(height):
+        for x in range(width):
             v = temp[y][x]
             pixels[x, y] = biome_colors[v]
     img.save(filename)  
