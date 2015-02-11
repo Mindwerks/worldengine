@@ -5,7 +5,7 @@ from PIL import Image
 from optparse import OptionParser, OptionGroup
 import os
 
-import lands.geo as geo
+import lands.generation as geo
 from lands.plates import world_gen, generate_plates_simulation, array_to_matrix
 from lands.draw import *
 from lands.drawing_functions import *

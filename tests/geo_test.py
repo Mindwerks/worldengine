@@ -1,5 +1,5 @@
 import unittest
-from lands.geo import *
+from lands.generation import *
 
 class TestGeo(unittest.TestCase):
 

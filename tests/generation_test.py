@@ -1,7 +1,6 @@
 import unittest
-from lands.geo import *
+from lands.generation import *
 from lands.plates import *
-from lands.generator import *
 import tempfile
 
 class TestGeneration(unittest.TestCase):

@@ -6,7 +6,7 @@ __author__ = 'Federico Tomassetti'
 import time
 import platec
 
-from lands.geo import *
+from lands.generation import *
 
 
 def array_to_matrix(array, width, height):
