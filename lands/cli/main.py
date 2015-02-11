@@ -68,7 +68,8 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
         print("* biome image generated in '%s'" % filename)
 
     filename = '%s/%s_elevation.png' % (output_dir, world_name)
-    draw_simple_elevation(w.elevation['data'], filename, shadow=True, width=width, height=height)
+    sea_level = w.sea_level()
+    draw_simple_elevation(w.elevation['data'], filename, width=width, height=height, sea_level=sea_level)
     print("* elevation image generated in '%s'" % filename)
     return w
 
@@ -103,11 +104,13 @@ def generate_plates(seed, world_name, output_dir, width, height, num_plates=10):
 
     # Generate images
     filename = '%s/plates_%s.png' % (output_dir, world_name)
-    draw_simple_elevation(world.elevation['data'], filename, False, width, height)
+    # TODO calculate appropriate sea_level
+    sea_level = 1.0
+    draw_simple_elevation(world.elevation['data'], filename, width, height, sea_level)
     print("+ plates image generated in '%s'" % filename)
     geo.center_land(world)
     filename = '%s/centered_plates_%s.png' % (output_dir, world_name)
-    draw_simple_elevation(world.elevation['data'], filename, False, width, height)
+    draw_simple_elevation(world.elevation['data'], filename, width, height, sea_level)
     print("+ centered plates image generated in '%s'" % filename)
 
 

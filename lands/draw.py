@@ -57,19 +57,21 @@ _biome_colors = {
 # ----------------
 
 
-def _elevation_color(elevation, color_step=1.5):
+def _elevation_color(elevation, sea_level=1.0):
     """
     Calculate color based on elevation
     :param elevation:
-    :param color_step:
     :return:
     """
-    if elevation < 0.5:
+    color_step = 1.5
+    if elevation < sea_level/2:
+        elevation /= sea_level
         return 0.0, 0.0, 0.75 + 0.5 * elevation
-    elif elevation < 1.0:
+    elif elevation < sea_level:
+        elevation /= sea_level
         return 0.0, 2 * (elevation - 0.5), 1.0
     else:
-        elevation -= 1.0
+        elevation -= sea_level
         if elevation < 1.0 * color_step:
             return (0.0, 0.5 +
                     0.5 * elevation / color_step, 0.0)
@@ -120,8 +122,8 @@ def _sature_color(color):
     return r, g, b
 
 
-def elevation_color(elevation, color_step=1.5):
-    return _sature_color(_elevation_color(elevation, color_step))
+def elevation_color(elevation, sea_level=1.0):
+    return _sature_color(_elevation_color(elevation, sea_level))
 
 
 # --------------
@@ -129,7 +131,7 @@ def elevation_color(elevation, color_step=1.5):
 # --------------
 
 # TODO avoid using this when we know the ocean level
-def draw_simple_elevation_on_image(data, width, height):
+def draw_simple_elevation_on_image(data, width, height, sea_level):
     """This function assume the level of the sea is placed at 1.0
     """
     img = Image.new('RGBA', (width, height))
@@ -138,7 +140,7 @@ def draw_simple_elevation_on_image(data, width, height):
     for y in range(height):
         for x in range(width):
             e = data[y][x]
-            r, g, b = elevation_color(e)
+            r, g, b = elevation_color(e, sea_level)
             pixels[x, y] = (int(r * 255), int(g * 255), int(b * 255), 255)
     return img
 
@@ -148,8 +150,8 @@ def draw_simple_elevation_on_image(data, width, height):
 # -------------
 
 
-def draw_simple_elevation(data, filename, shadow, width, height):
-    img = draw_simple_elevation_on_image(data, width, height)
+def draw_simple_elevation(data, filename, width, height, sea_level):
+    img = draw_simple_elevation_on_image(data, width, height, sea_level)
     img.save(filename)
 
 
