@@ -11,12 +11,12 @@ from lands.common import *
 
 _biome_colors = {
     'ocean': (23, 94, 145),
-    'ice' : (255, 255, 255),
+    'ice': (255, 255, 255),
     'subpolar dry tundra': (128, 128, 128),
     'subpolar moist tundra': (96, 128, 128),
     'subpolar wet tundra': (64, 128, 128),
     'subpolar rain tundra': (32, 128, 192),
-    'polar desert' : (192, 192, 192),
+    'polar desert': (192, 192, 192),
     'boreal desert': (160, 160, 128),
     'cool temperate desert': (192, 192, 128),
     'warm temperate desert': (224, 224, 128),

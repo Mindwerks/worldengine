@@ -70,9 +70,13 @@ def matrix_min_and_max(matrix):
     return _min, _max
 
 
-# -------
-# Scaling
-# -------
+def rescale_value(original, prev_min, prev_max, min, max):
+    """Rescale a given value.
+    Given the value, the current min and max and the new min and max
+    produce the rescaled value
+    """
+    f = float(original - prev_min) / (prev_max - prev_min)
+    return min + ((max - min) * f)
 
 
 def antialias(elevation, steps):
@@ -105,11 +109,3 @@ def antialias(elevation, steps):
         current = _antialias_step(current)
     return current
 
-
-def rescale_value(original, prev_min, prev_max, min, max):
-    """Rescale a given value.
-    Given the value, the current min and max and the new min and max
-    produce the rescaled value
-    """
-    f = float(original - prev_min) / (prev_max - prev_min)
-    return min + ((max - min) * f)
