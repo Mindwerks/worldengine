@@ -34,7 +34,7 @@ def center_land(world):
             miny = sumy
             ymin = y
     if get_verbose():
-        print("geo.center_land: height complete");
+        print("geo.center_land: height complete")
 
     for x in range(world.width):
         sumx = 0
@@ -44,7 +44,7 @@ def center_land(world):
             minx = sumx
             xmin = x
     if get_verbose():
-        print("geo.center_land: width complete");
+        print("geo.center_land: width complete")
 
     new_elevation_data = []
     new_plates         = []
@@ -59,45 +59,106 @@ def center_land(world):
     world.elevation['data'] = new_elevation_data
     world.plates = new_plates
     if get_verbose():
-        print("geo.center_land: width complete");
+        print("geo.center_land: width complete")
 
 
-def get_interleave_value(original_map, x, y):
-    """x and y can be float value"""
+def place_oceans_at_map_borders(world):
+    """
+    Lower the elevation near the border of the map
+    """
 
-    weight_next_x, base_x = math.modf(x)
-    weight_preceding_x = 1.0 - weight_next_x
-    weight_next_y, base_y = math.modf(y)
-    weight_preceding_y = 1.0 - weight_next_y
+    ocean_border = int(min(30, max(world.width / 5, world.height / 5)))
 
-    base_x = int(base_x)
-    base_y = int(base_y)
+    def place_ocean(x, y, i):
+        world.elevation['data'][y][x] = (world.elevation['data'][y][x] * i) / ocean_border
 
-    sum = 0.0
+    for x in range(world.width):
+        for i in range(ocean_border):
+            place_ocean(x, i, i)
+            place_ocean(x, world.height - i - 1, i)
 
-    # In case the point is right on the border, the weight
-    # of the next point will be zero and we will not access
-    # it
-    combined_weight = weight_preceding_x * weight_preceding_y
-    if combined_weight > 0.0:
-        sum += combined_weight * original_map[base_y][base_x]
+    for y in range(world.height):
+        for i in range(ocean_border):
+            place_ocean(i, y, i)
+            place_ocean(world.width - i - 1, y, i)
 
-    combined_weight = weight_preceding_x * weight_next_y
-    if combined_weight > 0.0:
-        sum += combined_weight * original_map[base_y + 1][base_x]
 
-    combined_weight = weight_next_x * weight_preceding_y
-    if combined_weight > 0.0:
-        sum += combined_weight * original_map[base_y][base_x + 1]
+def add_noise_to_elevation(world, seed):
+    octaves = 6
+    freq = 16.0 * octaves
+    for y in range(world.height):
+        for x in range(world.width):
+            n = snoise2(x / freq * 2, y / freq * 2, octaves, base=seed)
+            world.elevation['data'][y][x] += n
 
-    combined_weight = weight_next_x * weight_next_y
-    if combined_weight > 0.0:
-        sum += combined_weight * original_map[base_y + 1][base_x + 1]
 
-    return sum
+def fill_ocean(elevation, sea_level):
+    width = len(elevation[0])
+    height = len(elevation)
 
+    ocean = [[False for x in range(width)] for y in range(height)]
+    to_expand = []
+    for x in range(width):
+        if elevation[0][x] <= sea_level:
+            to_expand.append((x, 0))
+        if elevation[height -1][x] <= sea_level:
+            to_expand.append((x, height - 1))
+    for y in range(height):
+        if elevation[y][0] <= sea_level:
+            to_expand.append((0, y))
+        if elevation[y][width - 1] <= sea_level:
+            to_expand.append((width - 1, y))
+    for t in to_expand:
+        tx, ty = t
+        if not ocean[ty][tx]:
+            ocean[ty][tx] = True
+            for px, py in _around(tx, ty, width, height):
+                if not ocean[py][px] and elevation[py][px] <= sea_level:
+                    to_expand.append((px, py))
+
+    return ocean
+
+
+# ------------------
+# Initial generation
+# ------------------
 
 def scale(original_map, target_width, target_height):
+
+    def _get_interleave_value(original_map, x, y):
+        """x and y can be float value"""
+
+        weight_next_x, base_x = math.modf(x)
+        weight_preceding_x = 1.0 - weight_next_x
+        weight_next_y, base_y = math.modf(y)
+        weight_preceding_y = 1.0 - weight_next_y
+
+        base_x = int(base_x)
+        base_y = int(base_y)
+
+        sum = 0.0
+
+        # In case the point is right on the border, the weight
+        # of the next point will be zero and we will not access
+        # it
+        combined_weight = weight_preceding_x * weight_preceding_y
+        if combined_weight > 0.0:
+            sum += combined_weight * original_map[base_y][base_x]
+
+        combined_weight = weight_preceding_x * weight_next_y
+        if combined_weight > 0.0:
+            sum += combined_weight * original_map[base_y + 1][base_x]
+
+        combined_weight = weight_next_x * weight_preceding_y
+        if combined_weight > 0.0:
+            sum += combined_weight * original_map[base_y][base_x + 1]
+
+        combined_weight = weight_next_x * weight_next_y
+        if combined_weight > 0.0:
+            sum += combined_weight * original_map[base_y + 1][base_x + 1]
+
+        return sum
+
     original_width = len(original_map[0])
     original_height = len(original_map)
 
@@ -178,33 +239,6 @@ def _around(x, y, width, height):
     return ps
 
 
-def fill_ocean(elevation, sea_level):
-    width = len(elevation[0])
-    height = len(elevation)
-
-    ocean = [[False for x in range(width)] for y in range(height)]
-    to_expand = []
-    for x in range(width):
-        if elevation[0][x] <= sea_level:
-            to_expand.append((x, 0))
-        if elevation[height -1][x] <= sea_level:
-            to_expand.append((x, height - 1))
-    for y in range(height):
-        if elevation[y][0] <= sea_level:
-            to_expand.append((0, y))
-        if elevation[y][width - 1] <= sea_level:
-            to_expand.append((width - 1, y))
-    for t in to_expand:
-        tx, ty = t
-        if not ocean[ty][tx]:
-            ocean[ty][tx] = True
-            for px, py in _around(tx, ty, width, height):
-                if not ocean[py][px] and elevation[py][px] <= sea_level:
-                    to_expand.append((px, py))
-
-    return ocean
-
-
 def precipitation(seed, width, height):
     """"Precipitation is a value in [-1,1]"""
     border = width / 4 
@@ -229,36 +263,6 @@ def precipitation(seed, width, height):
             precipitations[y][x] = prec
 
     return precipitations
-
-
-def add_noise_to_elevation(world, seed):
-    octaves = 6
-    freq = 16.0 * octaves
-    for y in range(world.height):
-        for x in range(world.width):
-            n = snoise2(x / freq * 2, y / freq * 2, octaves, base=seed)
-            world.elevation['data'][y][x] += n
-
-
-def place_oceans_at_map_borders(world):
-    """
-    Lower the elevation near the border of the map
-    """
-
-    ocean_border = int(min(30, max(world.width / 5, world.height / 5)))
-
-    def place_ocean(x, y, i):
-        world.elevation['data'][y][x] = (world.elevation['data'][y][x] * i) / ocean_border
-
-    for x in range(world.width):
-        for i in range(ocean_border):
-            place_ocean(x, i, i)
-            place_ocean(x, world.height - i - 1, i)
-
-    for y in range(world.height):
-        for i in range(ocean_border):
-            place_ocean(i, y, i)
-            place_ocean(world.width - i - 1, y, i)
 
 
 def initialize_ocean_and_thresholds(world, ocean_level=1.0):
