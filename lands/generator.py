@@ -114,10 +114,6 @@ def generate_plates(seed, world_name, output_dir, width, height, num_plates=10):
     print("+ centered plates image generated in '%s'" % filename)
 
 
-def is_pow_of_two(num):
-    return ((num & (num - 1)) == 0) and num != 0
-
-
 def check_step(step_name):
     step = Step.get_by_name(step_name)
     if step is None:

@@ -19,6 +19,10 @@ def set_verbose(value):
     verbose = value
 
 
+def is_pow_of_two(num):
+    return ((num & (num - 1)) == 0) and num != 0
+
+
 class Counter(object):
 
     def __init__(self):
