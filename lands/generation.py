@@ -155,7 +155,7 @@ def sea_depth(world, sea_level):
                 sea_depth[y][x] *= 0.7
             elif world.tiles_around((x, y), radius=5, predicate=world.is_land):
                 sea_depth[y][x] *= 0.9
-    antialias(sea_depth, 10)
+    sea_depth = antialias(sea_depth, 10)
     min_depth, max_depth = matrix_min_and_max(sea_depth)
     sea_depth = [[rescale_value(sea_depth[y][x], min_depth, max_depth, 0.0, 1.0) for x in range(world.width)] for y in
                  range(world.height)]

@@ -59,6 +59,13 @@ class TestCommon(unittest.TestCase):
         self.assertAlmostEqual(5.0, rescale_value(0.75, 0.0, 1.0, -10.0, 10.0))
         self.assertAlmostEqual(10.0, rescale_value(1.0,  0.0, 1.0, -10.0, 10.0))
 
+    def test_antialias(self):
+        original = [[0.5, 0.12, 0.7, 0.15, 0.0],
+                    [0.0, 0.12, 0.7, 0.7, 8.0],
+                    [0.2, 0.12, 0.7, 0.7, 4.0]]
+        antialiased = antialias(original, 1)
+        self.assertAlmostEquals(1.2781818181818183, antialiased[0][0])
+        self.assertAlmostEquals(0.4918181818181818, antialiased[1][2])
 
 if __name__ == '__main__':
     unittest.main()
