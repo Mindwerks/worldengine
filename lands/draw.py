@@ -57,7 +57,7 @@ _biome_colors = {
 # ----------------
 
 
-def elevation_color(elevation, color_step=1.5):
+def _elevation_color(elevation, color_step=1.5):
     """
     Calculate color based on elevation
     :param elevation:
@@ -101,6 +101,28 @@ def elevation_color(elevation, color_step=1.5):
             while elevation > 2.0 * color_step:
                 elevation -= 2.0 * color_step
             return 1, 1 - elevation / 4.0, 1
+
+
+def _sature_color(color):
+    r, g, b = color
+    if r < 0:
+        r = 0.0
+    if r > 1.0:
+        r = 1.0
+    if g < 0:
+        g = 0.0
+    if g > 1.0:
+        g = 1.0
+    if b < 0:
+        b = 0.0
+    if b > 1.0:
+        b = 1.0
+    return r, g, b
+
+
+def elevation_color(elevation, color_step=1.5):
+    return _sature_color(_elevation_color(elevation, color_step))
+
 
 # --------------
 # Draw on images
