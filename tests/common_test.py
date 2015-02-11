@@ -67,5 +67,9 @@ class TestCommon(unittest.TestCase):
         self.assertAlmostEquals(1.2781818181818183, antialiased[0][0])
         self.assertAlmostEquals(0.4918181818181818, antialiased[1][2])
 
+        original = [[0.8]]
+        antialiased = antialias(original, 10)
+        self.assertAlmostEquals(0.8, antialiased[0][0])
+
 if __name__ == '__main__':
     unittest.main()
