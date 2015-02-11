@@ -13,10 +13,6 @@ from lands.simulations.BiomeSimulation import *
 from lands.simulations.basic import *
 from lands.common import *
 
-import sys
-if sys.version_info > (2,):
-    xrange = range
-
 
 def center_land(world):
     """Translate the map horizontally and vertically to put as much ocean as possible at the borders.
@@ -64,6 +60,7 @@ def center_land(world):
 
 def get_interleave_value(original_map, x, y):
     """x and y can be float value"""
+
     weight_next_x, base_x = math.modf(x)
     weight_preceding_x = 1.0 - weight_next_x
     weight_next_y, base_y = math.modf(y)
@@ -156,7 +153,7 @@ def antialias(elevation, steps):
     width = len(elevation[0])
     height = len(elevation)
 
-    def antialias():
+    def _antialias_step():
         for y in range(height):
             for x in range(width):
                 antialias_point(x, y)
@@ -175,7 +172,7 @@ def antialias(elevation, steps):
         return tot / n
 
     for i in range(steps):
-        antialias()
+        _antialias_step()
 
 
 def _around(x, y, width, height):
@@ -270,18 +267,18 @@ def place_oceans_at_map_borders_on_world(world):
     Lower the elevation near the border of the map
     """
 
-    OCEAN_BORDER = int(min(30, max(world.width / 5, world.height / 5)))
+    ocean_border = int(min(30, max(world.width / 5, world.height / 5)))
 
     def place_ocean(x, y, i):
-        world.elevation['data'][y][x] = (world.elevation['data'][y][x] * i) / OCEAN_BORDER
+        world.elevation['data'][y][x] = (world.elevation['data'][y][x] * i) / ocean_border
 
     for x in range(world.width):
-        for i in range(OCEAN_BORDER):
+        for i in range(ocean_border):
             place_ocean(x, i, i)
             place_ocean(x, world.height - i - 1, i)
 
     for y in range(world.height):
-        for i in range(OCEAN_BORDER):
+        for i in range(ocean_border):
             place_ocean(i, y, i)
             place_ocean(world.width - i - 1, y, i)
 
@@ -296,13 +293,13 @@ def place_oceans_at_map_borders(elevation):
     width = len(elevation[0])
     height = len(elevation)
 
-    OCEAN_BORDER = int(min(30, max(width / 5, height / 5)))
+    ocean_border = int(min(30, max(width / 5, height / 5)))
 
     def place_ocean(x, y, i):
-        elevation[y][x] = (elevation[y][x] * i) / OCEAN_BORDER
+        elevation[y][x] = (elevation[y][x] * i) / ocean_border
     
     for x in range(width):
-        for i in range(OCEAN_BORDER):
+        for i in range(ocean_border):
             place_ocean(x, i, i)
             place_ocean(x, height - i - 1, i)
 
@@ -365,8 +362,6 @@ def world_gen_from_elevation(w, step):
     TemperatureSimulation().execute(w, seed)
     PermeabilitySimulation().execute(w, seed)
 
-
-
     cm, biome_cm = BiomeSimulation().execute(w, seed)
     for cl in cm.keys():
         count = cm[cl]
@@ -383,5 +378,3 @@ def world_gen_from_elevation(w, step):
             print(" %30s = %7i" % (str(cl), count))
 
     return w
-
-
