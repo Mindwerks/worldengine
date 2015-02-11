@@ -5,10 +5,6 @@ from PIL import Image
 from lands.drawing_functions import *
 from lands.common import *
 
-import sys
-if sys.version_info > (2,):
-    xrange = range
-
 
 def elevation_color(c, color_step = 1.5):
     COLOR_STEP = color_step
@@ -55,8 +51,8 @@ def draw_simple_elevation_on_image(data, shadow, width, height):
     img = Image.new('RGBA', (width, height))
     pixels = img.load()
 
-    for y in range(0, height):
-        for x in range(0, width):
+    for y in range(height):
+        for x in range(width):
             e = data[y * width + x]
             r, g, b = elevation_color(e)
             pixels[x, y] = (int(r * 255), int(g * 255), int(b * 255), 255)
@@ -75,8 +71,8 @@ def draw_riversmap(world, filename):
     sea_color = (255, 255, 255, 255)
     land_color = (0, 0, 0, 255)
 
-    for y in xrange(world.height):
-        for x in xrange(world.width):
+    for y in range(world.height):
+        for x in range(world.width):
             if world.ocean[y][x]:
                 pixels[x, y] = sea_color
             else:
@@ -95,8 +91,8 @@ def draw_grayscale_heightmap(world, filename):
     max_elev_sea = None
     min_elev_land = None
     max_elev_land = None
-    for y in xrange(world.height):
-        for x in xrange(world.width):
+    for y in range(world.height):
+        for x in range(world.width):
             e = world.elevation['data'][y][x]
             if world.is_land((x,y)):
                 if min_elev_land is None or e < min_elev_land:
@@ -112,8 +108,8 @@ def draw_grayscale_heightmap(world, filename):
     elev_delta_land = max_elev_land - min_elev_land
     elev_delta_sea = max_elev_sea - min_elev_sea
 
-    for y in xrange(world.height):
-        for x in xrange(world.width):
+    for y in range(world.height):
+        for x in range(world.width):
             e = world.elevation['data'][y][x]
             if world.is_land((x,y)):
                 c = int(((e - min_elev_land) * 127) / elev_delta_land)+128
@@ -134,8 +130,8 @@ def draw_elevation(world, filename, shadow=True):
 
     min_elev = None
     max_elev = None
-    for y in xrange(HEIGHT):
-        for x in xrange(WIDTH):
+    for y in range(HEIGHT):
+        for x in range(WIDTH):
             if not ocean[y][x]:
                 e = data[y][x]
                 if min_elev is None or e < min_elev:
@@ -144,8 +140,8 @@ def draw_elevation(world, filename, shadow=True):
                     max_elev = e
     elev_delta = max_elev - min_elev
 
-    for y in range(0, HEIGHT):
-        for x in range(0, WIDTH):
+    for y in range(HEIGHT):
+        for x in range(WIDTH):
             if ocean[y][x]:
                 pixels[x, y] = (0, 0, 255, 255)
             else:
@@ -188,8 +184,8 @@ def draw_watermap(world, filename, th):
     # if elev_delta<1: 	
     # elev_delta=1 	
 
-    for y in range(0, HEIGHT):
-        for x in range(0, WIDTH):
+    for y in range(HEIGHT):
+        for x in range(WIDTH):
             if ocean[y][x]:
                 pixels[x, y] = (0, 0, 255, 255)
             else:
@@ -209,8 +205,8 @@ def draw_ocean(ocean, filename):
 
     img = Image.new('RGBA', (WIDTH, HEIGHT))
     pixels = img.load()
-    for y in range(0, HEIGHT):
-        for x in range(0, WIDTH):
+    for y in range(HEIGHT):
+        for x in range(WIDTH):
             if ocean[y][x]:
                 pixels[x, y] = (0, 0, 255, 255)
             else:
@@ -225,8 +221,8 @@ def draw_precipitation(world, filename):
 
     img = Image.new('RGBA', (WIDTH, HEIGHT))
     pixels = img.load()
-    for y in range(0, HEIGHT):
-        for x in range(0, WIDTH):
+    for y in range(HEIGHT):
+        for x in range(WIDTH):
             if world.is_humidity_superarid((x, y)):
                 pixels[x, y] = (0, 32, 32, 255)
             elif world.is_humidity_perarid((x, y)):
@@ -255,8 +251,8 @@ def draw_world(world, filename):
     counter = Counter()
 
     pixels = img.load()
-    for y in range(0, HEIGHT):
-        for x in range(0, WIDTH):
+    for y in range(HEIGHT):
+        for x in range(WIDTH):
             if world.is_land((x, y)):
                 biome = world.biome_at((x, y))
                 pixels[x, y] = biome_colors[biome]
@@ -275,8 +271,8 @@ def draw_temperature_levels(world, filename):
     img = Image.new('RGBA', (WIDTH, HEIGHT))
 
     pixels = img.load()
-    for y in range(0, HEIGHT):
-        for x in range(0, WIDTH):
+    for y in range(HEIGHT):
+        for x in range(WIDTH):
             if world.is_temperature_polar((x, y)):
                 pixels[x, y] = (0, 0, 255, 255)
             elif world.is_temperature_alpine((x, y)):
@@ -346,8 +342,8 @@ def draw_biome(temp, filename):
     img = Image.new('RGBA', (WIDTH, HEIGHT))
     pixels = img.load()
 
-    for y in range(0, HEIGHT):
-        for x in range(0, WIDTH):
+    for y in range(HEIGHT):
+        for x in range(WIDTH):
             v = temp[y][x]
             pixels[x, y] = biome_colors[v]
     img.save(filename)  
