@@ -5,6 +5,56 @@ from PIL import Image
 from lands.drawing_functions import *
 from lands.common import *
 
+# -------------
+# Helper values
+# -------------
+
+_biome_colors = {
+    'ocean': (23, 94, 145),
+    'ice' : (255, 255, 255),
+    'subpolar dry tundra': (128, 128, 128),
+    'subpolar moist tundra': (96, 128, 128),
+    'subpolar wet tundra': (64, 128, 128),
+    'subpolar rain tundra': (32, 128, 192),
+    'polar desert' : (192, 192, 192),
+    'boreal desert': (160, 160, 128),
+    'cool temperate desert': (192, 192, 128),
+    'warm temperate desert': (224, 224, 128),
+    'subtropical desert': (240, 240, 128),
+    'tropical desert': (255, 255, 128),
+    'boreal rain forest': (32, 160, 192),
+    'cool temperate rain forest': (32, 192, 192),
+    'warm temperate rain forest': (32, 224, 192),
+    'subtropical rain forest': (32, 240, 176),
+    'tropical rain forest': (32, 255, 160),
+    'boreal wet forest': (64, 160, 144),
+    'cool temperate wet forest': (64, 192, 144),
+    'warm temperate wet forest': (64, 224, 144),
+    'subtropical wet forest': (64, 240, 144),
+    'tropical wet forest': (64, 255, 144),
+    'boreal moist forest': (96, 160, 128),
+    'cool temperate moist forest': (96, 192, 128),
+    'warm temperate moist forest': (96, 224, 128),
+    'subtropical moist forest': (96, 240, 128),
+    'tropical moist forest': (96, 255, 128),
+    'warm temperate dry forest': (128, 224, 128),
+    'subtropical dry forest': (128, 240, 128),
+    'tropical dry forest': (128, 255, 128),
+    'boreal dry scrub': (128, 160, 128),
+    'cool temperate desert scrub': (160, 192, 128),
+    'warm temperate desert scrub': (192, 224, 128),
+    'subtropical desert scrub': (208, 240, 128),
+    'tropical desert scrub': (224, 255, 128),
+    'cool temperate steppe': (128, 192, 128),
+    'warm temperate thorn scrub': (160, 224, 128),
+    'subtropical thorn woodland': (176, 240, 128),
+    'tropical thorn woodland': (192, 255, 128),
+    'tropical very dry forest': (160, 255, 128),
+}
+
+# ----------------
+# Helper functions
+# ----------------
 
 def elevation_color(c, color_step = 1.5):
     if c < 0.5:
@@ -12,7 +62,7 @@ def elevation_color(c, color_step = 1.5):
     elif c < 1.0:
         return 0.0, 2 * (c - 0.5), 1.0
     else:
-        c -= 1.0;
+        c -= 1.0
         if c < 1.0 * color_step:
             return (0.0, 0.5 +
                     0.5 * c / color_step, 0.0)
@@ -45,6 +95,10 @@ def elevation_color(c, color_step = 1.5):
                 c -= 2.0 * color_step
             return 1, 1 - c / 4.0, 1
 
+# --------------
+# Draw on images
+# --------------
+
 
 def draw_simple_elevation_on_image(data, shadow, width, height):    
     img = Image.new('RGBA', (width, height))
@@ -57,6 +111,9 @@ def draw_simple_elevation_on_image(data, shadow, width, height):
             pixels[x, y] = (int(r * 255), int(g * 255), int(b * 255), 255)
     return img
 
+# -------------
+# Draw on files
+# -------------
 
 def draw_simple_elevation(data, filename, shadow, width, height):
     img = draw_simple_elevation_on_image(data, shadow, width, height)
@@ -254,7 +311,7 @@ def draw_world(world, filename):
         for x in range(width):
             if world.is_land((x, y)):
                 biome = world.biome_at((x, y))
-                pixels[x, y] = biome_colors[biome]
+                pixels[x, y] = _biome_colors[biome]
             else:
                 c = int(world.sea_depth[y][x] * 200 + 50)
                 pixels[x, y] = (0, 0, 255 - c, 255)
@@ -290,50 +347,6 @@ def draw_temperature_levels(world, filename):
     img.save(filename)
 
 
-biome_colors = {
-    'ocean': (23, 94, 145),
-    'ice' : (255, 255, 255),
-    'subpolar dry tundra': (128, 128, 128),
-    'subpolar moist tundra': (96, 128, 128),
-    'subpolar wet tundra': (64, 128, 128),
-    'subpolar rain tundra': (32, 128, 192),
-    'polar desert' : (192, 192, 192),
-    'boreal desert': (160, 160, 128),
-    'cool temperate desert': (192, 192, 128),
-    'warm temperate desert': (224, 224, 128),
-    'subtropical desert': (240, 240, 128),
-    'tropical desert': (255, 255, 128),
-    'boreal rain forest': (32, 160, 192),
-    'cool temperate rain forest': (32, 192, 192),
-    'warm temperate rain forest': (32, 224, 192),
-    'subtropical rain forest': (32, 240, 176),
-    'tropical rain forest': (32, 255, 160),
-    'boreal wet forest': (64, 160, 144),
-    'cool temperate wet forest': (64, 192, 144),
-    'warm temperate wet forest': (64, 224, 144),
-    'subtropical wet forest': (64, 240, 144),
-    'tropical wet forest': (64, 255, 144),
-    'boreal moist forest': (96, 160, 128),
-    'cool temperate moist forest': (96, 192, 128),
-    'warm temperate moist forest': (96, 224, 128),
-    'subtropical moist forest': (96, 240, 128),
-    'tropical moist forest': (96, 255, 128),
-    'warm temperate dry forest': (128, 224, 128),
-    'subtropical dry forest': (128, 240, 128),
-    'tropical dry forest': (128, 255, 128),
-    'boreal dry scrub': (128, 160, 128),
-    'cool temperate desert scrub': (160, 192, 128),
-    'warm temperate desert scrub': (192, 224, 128),
-    'subtropical desert scrub': (208, 240, 128),
-    'tropical desert scrub': (224, 255, 128),
-    'cool temperate steppe': (128, 192, 128),
-    'warm temperate thorn scrub': (160, 224, 128),
-    'subtropical thorn woodland': (176, 240, 128),
-    'tropical thorn woodland': (192, 255, 128),
-    'tropical very dry forest': (160, 255, 128),
-}
-
-
 def draw_biome(temp, filename):
     width = len(temp[0])
     height = len(temp)
@@ -344,5 +357,5 @@ def draw_biome(temp, filename):
     for y in range(height):
         for x in range(width):
             v = temp[y][x]
-            pixels[x, y] = biome_colors[v]
+            pixels[x, y] = _biome_colors[v]
     img.save(filename)  
