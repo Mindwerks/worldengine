@@ -36,3 +36,16 @@ class Counter(object):
     def printself(self):
         for w in self.c.keys():
             print("%s : %i" % (w, self.c[w]))
+
+
+def matrix_min_and_max(matrix):
+    _min = None
+    _max = None
+    for row in matrix:
+        for el in row:
+            val = el
+            if _min is None or val < _min:
+                _min = val
+            if _max is None or val > _max:
+                _max = val
+    return _min, _max
