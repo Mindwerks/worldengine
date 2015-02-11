@@ -32,9 +32,9 @@ Version 0.5.2
 
 Version 0.5.3
 
-* Saving generation parameters in world file
-* Revising command line options
-* Adding tracing statements about performance
+* Saving generation parameters in world file (Russell Brinkmann)
+* Revising command line options (Russell Brinkmann)
+* Adding tracing statements about performance (Russell Brinkmann)
 
 Version 0.5.4
 
