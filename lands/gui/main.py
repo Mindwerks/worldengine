@@ -21,6 +21,7 @@ from lands.simulations.HumiditySimulation import *
 from lands.simulations.TemperatureSimulation import *
 from lands.simulations.PermeabilitySimulation import *
 from lands.simulations.BiomeSimulation import *
+from lands.simulations.PrecipitationSimulation import *
 
 from lands.views.PrecipitationsView import *
 from lands.views.WatermapView import *
@@ -273,6 +274,7 @@ class OperationDialog(QtGui.QDialog):
     def set_status(self, message):
         self.status.setText(message)
 
+
 class OperationThread(threading.Thread):
 
     def __init__(self, world, operation, ui):
@@ -283,26 +285,6 @@ class OperationThread(threading.Thread):
 
     def run(self):
         self.operation.execute(self.world, self.ui)
-
-class PrecipitationsOp(object):
-
-    def __init__(self):
-        pass
-
-    def title(self):
-        return "Simulation precipitations"
-
-    def execute(self, world, ui):
-        """
-
-        :param ui: the dialog with the set_status and on_finish methods
-        :return:
-        """
-        seed = random.randint(0, 65536)
-        ui.set_status("Precipitation: started (seed %i)" % seed)
-        world_gen_precipitation(world, seed)
-        ui.set_status("Precipitation: done (seed %i)" % seed)
-        ui.on_finish()
 
 
 class SimulationOp(object):
@@ -528,7 +510,7 @@ class LandsGui(QtGui.QMainWindow):
         self.set_world(world)
 
     def _on_precipitations(self):
-        dialog = OperationDialog(self, self.world, PrecipitationsOp())
+        dialog = OperationDialog(self, self.world, SimulationOp("Simulating precipitations", PrecipitationSimulation()))
         ok = dialog.exec_()
         if ok:
             # just to refresh things to enable

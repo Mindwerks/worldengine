@@ -23,7 +23,6 @@ class Step(object):
             step.include_precipitations = True
             step.include_erosion = True
             step.include_biome = True
-
         return step
 
     def __eq__(self, other):
