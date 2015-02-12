@@ -240,6 +240,18 @@ def draw_elevation(world, shadow, target):
                 target.set_pixel(x, y, (c, c, c, 255))
 
 
+def draw_ocean(ocean, target):
+    width = len(ocean[0])
+    height = len(ocean)
+
+    for y in range(height):
+        for x in range(width):
+            if ocean[y][x]:
+                target.set_pixel(x, y, (0, 0, 255, 255))
+            else:
+                target.set_pixel(x, y, (0, 255, 255, 255))
+
+
 # -------------
 # Draw on files
 # -------------
@@ -269,19 +281,12 @@ def draw_elevation_on_file(world, filename, shadow=True):
     img.complete()
 
 
-def draw_ocean(ocean, filename):
+def draw_ocean_on_file(ocean, filename):
     width = len(ocean[0])
     height = len(ocean)
-
-    img = Image.new('RGBA', (width, height))
-    pixels = img.load()
-    for y in range(height):
-        for x in range(width):
-            if ocean[y][x]:
-                pixels[x, y] = (0, 0, 255, 255)
-            else:
-                pixels[x, y] = (0, 255, 255, 255)
-    img.save(filename)
+    img = ImagePixelSetter(width, height, filename)
+    draw_ocean(ocean, img)
+    img.complete()
 
 
 def draw_precipitation(world, filename):

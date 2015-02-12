@@ -107,5 +107,11 @@ class TestDraw(unittest.TestCase):
         draw_grayscale_heightmap(w, target)
         self._assert_img_equal("grayscale_heightmap_28070", target)
 
+    def test_draw_ocean(self):
+        w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        target = PixelCollector(w.width, w.height)
+        draw_ocean(w.ocean, target)
+        self._assert_img_equal("ocean_28070", target)
+
 if __name__ == '__main__':
     unittest.main()
