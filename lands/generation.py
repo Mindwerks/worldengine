@@ -1,7 +1,5 @@
 __author__ = 'Federico Tomassetti'
 
-import time
-from noise import snoise2
 from lands.world import *
 from lands.simulations.WatermapSimulation import *
 from lands.simulations.IrrigationSimulation import *
@@ -102,7 +100,7 @@ def fill_ocean(elevation, sea_level):
     for x in range(width):
         if elevation[0][x] <= sea_level:
             to_expand.append((x, 0))
-        if elevation[height -1][x] <= sea_level:
+        if elevation[height - 1][x] <= sea_level:
             to_expand.append((x, height - 1))
     for y in range(height):
         if elevation[y][0] <= sea_level:
