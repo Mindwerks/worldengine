@@ -323,19 +323,16 @@ def draw_world_on_file(world, filename):
 
     img = Image.new('RGBA', (width, height))
 
-    counter = Counter()
-
     pixels = img.load()
     for y in range(height):
         for x in range(width):
             if world.is_land((x, y)):
                 biome = world.biome_at((x, y))
-                pixels[x, y] = _biome_colors[biome]
+                pixels[x, y] = _biome_colors[biome.name()]
             else:
                 c = int(world.sea_depth[y][x] * 200 + 50)
                 pixels[x, y] = (0, 0, 255 - c, 255)
 
-    counter.print_self()
     img.save(filename)
 
 

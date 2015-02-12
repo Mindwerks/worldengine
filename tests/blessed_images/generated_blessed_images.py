@@ -15,6 +15,10 @@ def main(blessed_images_dir, tests_data_dir):
     draw_riversmap_on_file(w, "%s/riversmap_28070.png" % blessed_images_dir)
     draw_grayscale_heightmap_on_file(w, "%s/grayscale_heightmap_28070.png" % blessed_images_dir)
     draw_ocean_on_file(w.ocean, "%s/ocean_28070.png" % blessed_images_dir)
+    draw_precipitation_on_file(w, "%s/precipitation_28070.png" % blessed_images_dir)
+    draw_world_on_file(w, "%s/world_28070.png" % blessed_images_dir)
+    draw_temperature_levels_on_file(w, "%s/temperature_28070.png" % blessed_images_dir)
+    draw_biome_on_file(w.biome, "%s/biome_28070.png" % blessed_images_dir)
 
 
 if __name__ == '__main__':
