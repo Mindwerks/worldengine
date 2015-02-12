@@ -240,26 +240,6 @@ def draw_elevation(world, shadow, target):
                 target.set_pixel(x, y, (c, c, c, 255))
 
 
-def draw_watermap(world, th, target):
-    # TODO use WatermapView
-    width = world.width
-    height = world.height
-
-    ocean = world.ocean
-
-    for y in range(height):
-        for x in range(width):
-            if ocean[y][x]:
-                target.set_pixel(x, y, (0, 0, 255, 255))
-            else:
-                e = world.watermap[y][x]
-                if e > th:
-                    c = 255
-                else:
-                    c = 0
-                target.set_pixel(x, y, (c, 0, 0, 255))
-
-
 # -------------
 # Draw on files
 # -------------
@@ -286,12 +266,6 @@ def draw_grayscale_heightmap_on_file(world, filename):
 def draw_elevation_on_file(world, filename, shadow=True):
     img = ImagePixelSetter(world.width, world.height, filename)
     draw_elevation(world, shadow, img)
-    img.complete()
-
-
-def draw_watermap_on_file(world, filename, th):
-    img = ImagePixelSetter(world.width, world.height, filename)
-    draw_watermap(world, th, img)
     img.complete()
 
 

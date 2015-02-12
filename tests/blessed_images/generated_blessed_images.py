@@ -14,7 +14,6 @@ def main(blessed_images_dir, tests_data_dir):
     draw_elevation_on_file(w, "%s/elevation_28070_no_shadow.png" % blessed_images_dir, shadow=False)
     draw_riversmap_on_file(w, "%s/riversmap_28070.png" % blessed_images_dir)
     draw_grayscale_heightmap_on_file(w, "%s/grayscale_heightmap_28070.png" % blessed_images_dir)
-    draw_watermap_on_file(w, "%s/watermap_28070_th05.png" % blessed_images_dir, 0.5)
 
 
 if __name__ == '__main__':
