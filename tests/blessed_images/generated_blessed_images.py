@@ -24,6 +24,10 @@ def main(blessed_images_dir, tests_data_dir):
     draw_ancientmap_on_file(w, "%s/ancientmap_28070_factor3.png" % blessed_images_dir, resize_factor=3)
     draw_ancientmap_on_file(w_large, "%s/ancientmap_48956.png" % blessed_images_dir, resize_factor=1)
 
+    img = ImagePixelSetter(w.width * 2, w.height * 2, "%s/rivers_28070_factor2.png" % blessed_images_dir)
+    draw_rivers_on_image(w, img, factor=2)
+    img.complete()
+
 if __name__ == '__main__':
     blessed_images_dir = os.path.dirname(os.path.realpath(__file__))
     tests_data_dir = os.path.abspath(os.path.join(blessed_images_dir, '../data'))
