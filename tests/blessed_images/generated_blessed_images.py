@@ -20,6 +20,9 @@ def main(blessed_images_dir, tests_data_dir):
     draw_temperature_levels_on_file(w, "%s/temperature_28070.png" % blessed_images_dir)
     draw_biome_on_file(w, "%s/biome_28070.png" % blessed_images_dir)
 
+    w_large = World.from_pickle_file("%s/seed_48956.world" % tests_data_dir)
+    draw_ancientmap()
+
 
 if __name__ == '__main__':
     blessed_images_dir = os.path.dirname(os.path.realpath(__file__))

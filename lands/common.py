@@ -33,6 +33,11 @@ def set_verbose(value):
     verbose = value
 
 
+def print_verbose(msg):
+    if get_verbose():
+        print(msg)
+
+
 class Counter(object):
 
     def __init__(self):

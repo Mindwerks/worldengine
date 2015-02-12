@@ -21,7 +21,7 @@ class PixelWrapper(object):
         self.pixels[x, y] = color
 
 
-def find_land_borders(world, factor):
+def _find_land_borders(world, factor):
     _ocean   = [[False for x in range(factor*world.width)] for y in range(factor*world.height)]
     _borders = [[False for x in range(factor*world.width)] for y in range(factor*world.height)]
     for y in range(world.height*factor):
@@ -40,7 +40,7 @@ def find_land_borders(world, factor):
     return _borders
 
 
-def find_mountains_mask(world, factor):
+def _find_mountains_mask(world, factor):
     _mask = [[False for x in range(factor*world.width)] for y in range(factor*world.height)]
     for y in range(factor*world.height):
         for x in range(factor*world.width):
@@ -51,7 +51,7 @@ def find_mountains_mask(world, factor):
     return _mask
 
 
-def mask(world, predicate, factor):
+def _mask(world, predicate, factor):
     _mask = [[False for x in range(factor*world.width)] for y in range(factor*world.height)]
     for y in range(factor*world.height):
         for x in range(factor*world.width):
@@ -65,19 +65,19 @@ def mask(world, predicate, factor):
 
 
 def find_boreal_forest_mask(world, factor):
-    return mask(world, predicate=world.is_boreal_forest, factor=factor)
+    return _mask(world, predicate=world.is_boreal_forest, factor=factor)
 
 
 def find_temperate_forest_mask(world, factor):
-    return mask(world, predicate=world.is_temperate_forest, factor=factor)
+    return _mask(world, predicate=world.is_temperate_forest, factor=factor)
 
 
 def find_warm_temperate_forest_mask(world, factor):
-    return mask(world, predicate=world.is_warm_temperate_forest, factor=factor)
+    return _mask(world, predicate=world.is_warm_temperate_forest, factor=factor)
 
 
 def find_tropical_dry_forest_mask(world, factor):
-    return mask(world, predicate=world.is_tropical_dry_forest, factor=factor)
+    return _mask(world, predicate=world.is_tropical_dry_forest, factor=factor)
 
 
 def gradient(value, low, high, low_color, high_color):
@@ -486,26 +486,26 @@ def pseudo_random_land_pos(world, i):
         return pseudo_random_land_pos(world, (i % 123456789) * 17 + 11)
 
 
-def draw_oldmap_on_pixels(world, pixels, factor=1, sea_color=(212, 198, 169, 255), verbose=True):
+def draw_ancientmap(world, pixels, factor=1, sea_color=(212, 198, 169, 255), verbose=False):
     # TODO use global verbose
     if verbose:
         start_time = time.time()
 
     land_color = (181, 166, 127, 255)           # TODO: Put this in the argument list too??
-    borders = find_land_borders(world, factor)
-    mountains_mask = find_mountains_mask(world, factor)
+    borders = _find_land_borders(world, factor)
+    mountains_mask = _find_mountains_mask(world, factor)
     boreal_forest_mask = find_boreal_forest_mask(world, factor)
     temperate_forest_mask = find_temperate_forest_mask(world, factor)
     warm_temperate_forest_mask = find_warm_temperate_forest_mask(world, factor)
     tropical_dry_forest_mask = find_tropical_dry_forest_mask(world, factor)
-    jungle_mask = mask(world, world.is_jungle, factor) #jungle is actually Tropical Rain Forest and Tropical Seasonal Forest
-    tundra_mask = mask(world, world.is_tundra, factor)
-    savanna_mask = mask(world, world.is_savanna, factor) #savanna is actually Tropical semi-arid
-    cold_parklands_mask = mask(world, world.is_cold_parklands, factor)
-    steppe_mask = mask(world, world.is_steppe, factor)
-    cool_desert_mask = mask(world, world.is_cool_desert, factor)
-    chaparral_mask = mask(world, world.is_chaparral, factor)
-    hot_desert_mask = mask(world, world.is_hot_desert, factor)
+    jungle_mask = _mask(world, world.is_jungle, factor) #jungle is actually Tropical Rain Forest and Tropical Seasonal Forest
+    tundra_mask = _mask(world, world.is_tundra, factor)
+    savanna_mask = _mask(world, world.is_savanna, factor) #savanna is actually Tropical semi-arid
+    cold_parklands_mask = _mask(world, world.is_cold_parklands, factor)
+    steppe_mask = _mask(world, world.is_steppe, factor)
+    cool_desert_mask = _mask(world, world.is_cool_desert, factor)
+    chaparral_mask = _mask(world, world.is_chaparral, factor)
+    hot_desert_mask = _mask(world, world.is_hot_desert, factor)
 
     def unset_mask(pos):
         x, y = pos
@@ -585,7 +585,7 @@ def draw_oldmap_on_pixels(world, pixels, factor=1, sea_color=(212, 198, 169, 255
     elev_delta = max_elev - min_elev
     if verbose:
         elapsed_time = time.time() - start_time
-        print("...drawing_functions.draw_oldmap_on_pixel: max, min elevation Elapsed time " + str(elapsed_time) +"  seconds.")
+        print("...drawing_functions.draw_oldmap_on_pixel: max, min elevation Elapsed time " + str(elapsed_time) + "  seconds.")
 
     if verbose:
         start_time = time.time()
@@ -601,7 +601,7 @@ def draw_oldmap_on_pixels(world, pixels, factor=1, sea_color=(212, 198, 169, 255
                 pixels[x, y] = land_color
     if verbose:
         elapsed_time = time.time() - start_time
-        print("...drawing_functions.draw_oldmap_on_pixel: color ocean Elapsed time " +str(elapsed_time) +" seconds.")
+        print("...drawing_functions.draw_oldmap_on_pixel: color ocean Elapsed time " + str(elapsed_time) + " seconds.")
 
     if verbose:
         start_time = time.time()
