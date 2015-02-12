@@ -201,6 +201,45 @@ def draw_grayscale_heightmap(world, target):
             target.set_pixel(x, y, (c, c, c, 255))
 
 
+def draw_elevation(world, shadow, target):
+    width = world.width
+    height = world.height
+
+    data = world.elevation['data']
+    ocean = world.ocean
+
+    min_elev = None
+    max_elev = None
+    for y in range(height):
+        for x in range(width):
+            if not ocean[y][x]:
+                e = data[y][x]
+                if min_elev is None or e < min_elev:
+                    min_elev = e
+                if max_elev is None or e > max_elev:
+                    max_elev = e
+    elev_delta = max_elev - min_elev
+
+    for y in range(height):
+        for x in range(width):
+            if ocean[y][x]:
+                target.set_pixel(x, y, (0, 0, 255, 255))
+            else:
+                e = data[y][x]
+                c = 255 - int(((e - min_elev) * 255) / elev_delta)
+                if shadow and y > 2 and x > 2:
+                    if data[y - 1][x - 1] > e:
+                        c -= 15
+                    if data[y - 2][x - 2] > e and data[y - 2][x - 2] > data[y - 1][x - 1]:
+                        c -= 10
+                    if data[y - 3][x - 3] > e and data[y - 3][x - 3] > data[y - 1][x - 1] and data[y - 3][x - 3] > \
+                            data[y - 2][x - 2]:
+                        c -= 5
+                    if c < 0:
+                        c = 0
+                target.set_pixel(x, y, (c, c, c, 255))
+
+
 # -------------
 # Draw on files
 # -------------
@@ -224,46 +263,10 @@ def draw_grayscale_heightmap_on_file(world, filename):
     img.complete()
 
 
-def draw_elevation(world, filename, shadow=True):
-    width = world.width
-    height = world.height
-
-    data = world.elevation['data']
-    ocean = world.ocean
-    img = Image.new('RGBA', (width, height))
-    pixels = img.load()
-
-    min_elev = None
-    max_elev = None
-    for y in range(height):
-        for x in range(width):
-            if not ocean[y][x]:
-                e = data[y][x]
-                if min_elev is None or e < min_elev:
-                    min_elev = e
-                if max_elev is None or e > max_elev:
-                    max_elev = e
-    elev_delta = max_elev - min_elev
-
-    for y in range(height):
-        for x in range(width):
-            if ocean[y][x]:
-                pixels[x, y] = (0, 0, 255, 255)
-            else:
-                e = data[y][x]
-                c = 255 - int(((e - min_elev) * 255) / elev_delta)
-                if shadow and y > 2 and x > 2:
-                    if data[y - 1][x - 1] > e:
-                        c -= 15
-                    if data[y - 2][x - 2] > e and data[y - 2][x - 2] > data[y - 1][x - 1]:
-                        c -= 10
-                    if data[y - 3][x - 3] > e and data[y - 3][x - 3] > data[y - 1][x - 1] and data[y - 3][x - 3] > \
-                            data[y - 2][x - 2]:
-                        c -= 5
-                    if c < 0:
-                        c = 0
-                pixels[x, y] = (c, c, c, 255)
-    img.save(filename)
+def draw_elevation_on_file(world, filename, shadow=True):
+    img = ImagePixelSetter(world.width, world.height, filename)
+    draw_elevation(world, shadow, img)
+    img.complete()
 
 
 def draw_watermap(world, filename, th):

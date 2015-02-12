@@ -3,7 +3,8 @@ __author__ = 'Federico Tomassetti'
 import unittest
 import os
 from PIL import Image
-from lands.draw import _biome_colors, elevation_color, draw_simple_elevation, draw_riversmap, draw_grayscale_heightmap
+from lands.draw import *
+from lands.draw import _biome_colors # need to be explicitly imported
 from lands.world import *
 
 class PixelCollector:
@@ -78,7 +79,21 @@ class TestDraw(unittest.TestCase):
         data = w.elevation['data']
         target = PixelCollector(w.width, w.height)
         draw_simple_elevation(data, w.width, w.height, w.sea_level(), target)
-        self._assert_img_equal("elevation_28070", target)
+        self._assert_img_equal("simple_elevation_28070", target)
+
+    def test_draw_elevation_shadow(self):
+        w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        data = w.elevation['data']
+        target = PixelCollector(w.width, w.height)
+        draw_elevation(w, True, target)
+        self._assert_img_equal("elevation_28070_shadow", target)
+
+    def test_draw_elevation_no_shadow(self):
+        w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        data = w.elevation['data']
+        target = PixelCollector(w.width, w.height)
+        draw_elevation(w, False, target)
+        self._assert_img_equal("elevation_28070_no_shadow", target)
 
     def test_draw_riversmap(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
