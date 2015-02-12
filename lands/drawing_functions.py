@@ -12,6 +12,15 @@ import sys
 import time
 
 
+class PixelWrapper(object):
+
+    def __init__(self, pxiels):
+        self.pixels = pixels
+
+    def set_pixel(self, x, y, color):
+        self.pixels[x, y] = color
+
+
 def find_land_borders(world, factor):
     _ocean   = [[False for x in range(factor*world.width)] for y in range(factor*world.height)]
     _borders = [[False for x in range(factor*world.width)] for y in range(factor*world.height)]
@@ -757,7 +766,8 @@ def draw_oldmap_on_pixels(world, pixels, factor=1, sea_color=(212, 198, 169, 255
                     draw_jungle(pixels, x, y, w=w, h=h)
                     world.on_tiles_around_factor(factor, (x, y), radius=r, action=unset_jungle_mask)
 
-    draw_riversmap_on_image(world, pixels, factor)
+    target = PixelWrapper(pixels)
+    draw_rivers_on_image(world, target, factor)
 
     # Draw mountains
     if verbose:
@@ -778,7 +788,19 @@ def draw_oldmap_on_pixels(world, pixels, factor=1, sea_color=(212, 198, 169, 255
     return pixels
 
 
-def draw_riversmap_on_image(world, pixels, factor=1):
+def draw_rivers_on_image(world, target, factor=1):
+    """Draw only the rivers, it expect the background to be in place
+    """
+
+    def _draw_river(world, target, pos, factor):
+        if world.is_ocean(pos):
+            return
+        x, y = pos
+        for dx in range(factor):
+            for dy in range(factor):
+                target.set_pixel(x*factor+dx, y*factor+dy, (0, 0, 128, 255))
+        _draw_river(world, target, lowest_neighbour(world, pos), factor)
+
     n_rivers = int(math.sqrt(world.width * world.height))
     for i in range(1, n_rivers):
         candidates = []
@@ -792,17 +814,7 @@ def draw_riversmap_on_image(world, pixels, factor=1):
             if max is None or wl > max:
                 max = wl
                 cc = c
-        draw_river(world, pixels, cc, factor)
-
-
-def draw_river(world, pixels, pos, factor):
-    if world.is_ocean(pos):
-        return
-    x, y = pos
-    for dx in range(factor):
-        for dy in range(factor):
-            pixels[x*factor+dx, y*factor+dy] = (0, 0, 128, 255)
-    draw_river(world, pixels, lowest_neighbour(world, pos), factor)
+        _draw_river(world, target, cc, factor)
 
 
 def lowest_neighbour(world, pos):
