@@ -240,6 +240,26 @@ def draw_elevation(world, shadow, target):
                 target.set_pixel(x, y, (c, c, c, 255))
 
 
+def draw_watermap(world, th, target):
+    # TODO use WatermapView
+    width = world.width
+    height = world.height
+
+    ocean = world.ocean
+
+    for y in range(height):
+        for x in range(width):
+            if ocean[y][x]:
+                target.set_pixel(x, y, (0, 0, 255, 255))
+            else:
+                e = world.watermap[y][x]
+                if e > th:
+                    c = 255
+                else:
+                    c = 0
+                target.set_pixel(x, y, (c, 0, 0, 255))
+
+
 # -------------
 # Draw on files
 # -------------
@@ -269,42 +289,10 @@ def draw_elevation_on_file(world, filename, shadow=True):
     img.complete()
 
 
-def draw_watermap(world, filename, th):
-    # TODO use WatermapView
-    width = world.width
-    height = world.height
-
-    ocean = world.ocean
-    img = Image.new('RGBA', (width, height))
-    pixels = img.load()
-
-    # min_elev = None 	
-    # max_elev = None 	
-    # for y in xrange(height):
-    # for x in xrange(width):
-    # if not ocean[y][x]: 	
-    # e = _watermap[y][x]**1.5 	
-    # if min_elev==None or e<min_elev: 	
-    # min_elev=e 	
-    # if max_elev==None or e>max_elev: 	
-    # max_elev=e 	
-    # elev_delta = max_elev-min_elev 	
-    # if elev_delta<1: 	
-    # elev_delta=1 	
-
-    for y in range(height):
-        for x in range(width):
-            if ocean[y][x]:
-                pixels[x, y] = (0, 0, 255, 255)
-            else:
-                e = world.watermap[y][x]
-                if e > th:
-                    c = 255
-                else:
-                    c = 0
-                    #c = int(((e-min_elev)*255)/elev_delta)
-                pixels[x, y] = (c, 0, 0, 255)
-    img.save(filename)
+def draw_watermap_on_file(world, filename, th):
+    img = ImagePixelSetter(world.width, world.height, filename)
+    draw_watermap(world, th, img)
+    img.complete()
 
 
 def draw_ocean(ocean, filename):
