@@ -130,7 +130,16 @@ def elevation_color(elevation, sea_level=1.0):
 # Draw on images
 # --------------
 
-# TODO avoid using this when we know the ocean level
+
+class ImagePixelSetter(object):
+
+    def __init__(self, pixels):
+        self.pixels = pixels
+
+    def set_pixel(self, x, y, color):
+        self.pixels[x, y] = color
+
+
 def draw_simple_elevation_on_image(data, width, height, sea_level):
     """This function assume the level of the sea is placed at 1.0
     """
