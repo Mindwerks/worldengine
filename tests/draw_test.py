@@ -14,6 +14,9 @@ class PixelCollector:
         self.pixels = {}
         self.width = width
         self.height = height
+        for y in range(height):
+            for x in range(width):
+                self.pixels[x, y] = (0, 0, 0, 0)
 
     def set_pixel(self, x, y, color):
         if len(color) == 3:
