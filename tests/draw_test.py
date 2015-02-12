@@ -23,16 +23,16 @@ class PixelCollector:
     def __getitem__(self, item):
         return self.pixels[item]
 
+    def __setitem__(self, key, value):
+        self.pixels[key] = value
 
-class TestDraw(unittest.TestCase):
+
+class TestBase(unittest.TestCase):
 
     def setUp(self):
         tests_dir = os.path.dirname(os.path.realpath(__file__))
         self.tests_data_dir = os.path.abspath(os.path.join(tests_dir, './data'))
         self.tests_blessed_images_dir = os.path.abspath(os.path.join(tests_dir, './blessed_images'))
-
-    def test_biome_colors(self):
-        self.assertEqual(Biome.all_names(), _biome_colors.keys().sort())
 
     def _assert_is_valid_color(self, color, color_name):
         r, g, b = color
@@ -54,6 +54,15 @@ class TestDraw(unittest.TestCase):
                 self.assertEqual(blessed_pixel, drawn_pixel,
                                  "Pixels at %i, %i are different. Blessed %s, drawn %s"
                                  % (x, y, blessed_pixel, drawn_pixel))
+
+
+class TestDraw(TestBase):
+
+    def setUp(self):
+        super(TestDraw, self).setUp()
+
+    def test_biome_colors(self):
+        self.assertEqual(Biome.all_names(), _biome_colors.keys().sort())
 
     def test_elevation_color(self):
         for i in range(0, 20):
