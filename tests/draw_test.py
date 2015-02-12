@@ -1,14 +1,18 @@
 __author__ = 'Federico Tomassetti'
 
 import unittest
-from lands.biome import *
-from lands.draw import _biome_colors, elevation_color
-
+import os
+from PIL import Image
+from lands.draw import _biome_colors, elevation_color, draw_simple_elevation_on_image
+from lands.world import *
 
 class TestDraw(unittest.TestCase):
 
     def setUp(self):
-        pass
+        tests_dir = os.path.dirname(os.path.realpath(__file__))
+        self.tests_data_dir = os.path.abspath(os.path.join(tests_dir, './data'))
+        self.tests_blessed_images_dir = os.path.abspath(os.path.join(tests_dir, './blessed_images'))
+
 
     def test_biome_colors(self):
         self.assertEqual(Biome.all_names(), _biome_colors.keys().sort())
@@ -41,7 +45,17 @@ class TestDraw(unittest.TestCase):
             #self.assertAlmostEqual(ba, bb, 5, "value %f, blue, low, from %f to %f" % (v, ba, bb))
             #self.assertAlmostEqual(ba, bc, 5, "value %f, blue, high, from %f to %f" % (v, ba, bc))
 
+    def test_draw_simple_elevation_on_image(self):
+        w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        data = w.elevation['data']
+        drawn_img_pixels = draw_simple_elevation_on_image(data, w.width, w.height, w.sea_level()).load()
+        blessed_img_pixels = Image.open("%s/elevation_28070.png" % self.tests_blessed_images_dir).load()
 
+        for y in range(w.height):
+            for x in range(w.width):
+                blessed_pixel = blessed_img_pixels[x, y]
+                drawn_pixel =  drawn_img_pixels[x, y]
+                self.assertEqual(blessed_pixel, drawn_pixel, "Pixels at %i, %i are different. Blessed %s, drawn %s" % (x, y, blessed_pixel, drawn_pixel))
 
 if __name__ == '__main__':
     unittest.main()
