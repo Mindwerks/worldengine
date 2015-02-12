@@ -252,6 +252,79 @@ def draw_ocean(ocean, target):
                 target.set_pixel(x, y, (0, 255, 255, 255))
 
 
+def draw_precipitation(world, target):
+    # FIXME we are drawing humidity, not precipitations
+    width = world.width
+    height = world.height
+
+    for y in range(height):
+        for x in range(width):
+            if world.is_humidity_superarid((x, y)):
+                target.set_pixel(x, y, (0, 32, 32, 255))
+            elif world.is_humidity_perarid((x, y)):
+                target.set_pixel(x, y, (0, 64, 64, 255))
+            elif world.is_humidity_arid((x, y)):
+                target.set_pixel(x, y, (0, 96, 96, 255))
+            elif world.is_humidity_semiarid((x, y)):
+                target.set_pixel(x, y, (0, 128, 128, 255))
+            elif world.is_humidity_subhumid((x, y)):
+                target.set_pixel(x, y, (0, 160, 160, 255))
+            elif world.is_humidity_humid((x, y)):
+                target.set_pixel(x, y, (0, 192, 192, 255))
+            elif world.is_humidity_perhumid((x, y)):
+                target.set_pixel(x, y, (0, 224, 224, 255))
+            elif world.is_humidity_superhumid((x, y)):
+                target.set_pixel(x, y, (0, 255, 255, 255))
+
+
+def draw_world(world, target):
+    width = world.width
+    height = world.height
+
+    for y in range(height):
+        for x in range(width):
+            if world.is_land((x, y)):
+                biome = world.biome_at((x, y))
+                target.set_pixel(x, y, _biome_colors[biome.name()])
+            else:
+                c = int(world.sea_depth[y][x] * 200 + 50)
+                target.set_pixel(x, y, (0, 0, 255 - c, 255))
+
+
+def draw_temperature_levels(world, target):
+    width = world.width
+    height = world.height
+
+    for y in range(height):
+        for x in range(width):
+            if world.is_temperature_polar((x, y)):
+                target.set_pixel(x, y, (0, 0, 255, 255))
+            elif world.is_temperature_alpine((x, y)):
+                target.set_pixel(x, y, (42, 0, 213, 255))
+            elif world.is_temperature_boreal((x, y)):
+                target.set_pixel(x, y, (85, 0, 170, 255))
+            elif world.is_temperature_cool((x, y)):
+                target.set_pixel(x, y, (128, 0, 128, 255))
+            elif world.is_temperature_warm((x, y)):
+                target.set_pixel(x, y, (170, 0, 85, 255))
+            elif world.is_temperature_subtropical((x, y)):
+                target.set_pixel(x, y, (213, 0, 42, 255))
+            elif world.is_temperature_tropical((x, y)):
+                target.set_pixel(x, y, (255, 0, 0, 255))
+
+
+def draw_biome(world, target):
+    width = world.width
+    height = world.height
+
+    biome = world.biome
+
+    for y in range(height):
+        for x in range(width):
+            v = biome[y][x]
+            target.set_pixel(x, y, _biome_colors[v])
+
+
 # -------------
 # Draw on files
 # -------------
@@ -290,88 +363,24 @@ def draw_ocean_on_file(ocean, filename):
 
 
 def draw_precipitation_on_file(world, filename):
-    # FIXME we are drawing humidity, not precipitations
-    width = world.width
-    height = world.height
-
-    img = Image.new('RGBA', (width, height))
-    pixels = img.load()
-    for y in range(height):
-        for x in range(width):
-            if world.is_humidity_superarid((x, y)):
-                pixels[x, y] = (0, 32, 32, 255)
-            elif world.is_humidity_perarid((x, y)):
-                pixels[x, y] = (0, 64, 64, 255)
-            elif world.is_humidity_arid((x, y)):
-                pixels[x, y] = (0, 96, 96, 255)
-            elif world.is_humidity_semiarid((x, y)):
-                pixels[x, y] = (0, 128, 128, 255)
-            elif world.is_humidity_subhumid((x, y)):
-                pixels[x, y] = (0, 160, 160, 255)
-            elif world.is_humidity_humid((x, y)):
-                pixels[x, y] = (0, 192, 192, 255)
-            elif world.is_humidity_perhumid((x, y)):
-                pixels[x, y] = (0, 224, 224, 255)
-            elif world.is_humidity_superhumid((x, y)):
-                pixels[x, y] = (0, 255, 255, 255)
-    img.save(filename)
+    img = ImagePixelSetter(world.width, world.height, filename)
+    draw_precipitation(world, img)
+    img.complete()
 
 
 def draw_world_on_file(world, filename):
-    width = world.width
-    height = world.height
-
-    img = Image.new('RGBA', (width, height))
-
-    pixels = img.load()
-    for y in range(height):
-        for x in range(width):
-            if world.is_land((x, y)):
-                biome = world.biome_at((x, y))
-                pixels[x, y] = _biome_colors[biome.name()]
-            else:
-                c = int(world.sea_depth[y][x] * 200 + 50)
-                pixels[x, y] = (0, 0, 255 - c, 255)
-
-    img.save(filename)
+    img = ImagePixelSetter(world.width, world.height, filename)
+    draw_world(world, img)
+    img.complete()
 
 
 def draw_temperature_levels_on_file(world, filename):
-    width = world.width
-    height = world.height
-
-    img = Image.new('RGBA', (width, height))
-
-    pixels = img.load()
-    for y in range(height):
-        for x in range(width):
-            if world.is_temperature_polar((x, y)):
-                pixels[x, y] = (0, 0, 255, 255)
-            elif world.is_temperature_alpine((x, y)):
-                pixels[x, y] = (42, 0, 213, 255)
-            elif world.is_temperature_boreal((x, y)):
-                pixels[x, y] = (85, 0, 170, 255)
-            elif world.is_temperature_cool((x, y)):
-                pixels[x, y] = (128, 0, 128, 255)
-            elif world.is_temperature_warm((x, y)):
-                pixels[x, y] = (170, 0, 85, 255)
-            elif world.is_temperature_subtropical((x, y)):
-                pixels[x, y] = (213, 0, 42, 255)
-            elif world.is_temperature_tropical((x, y)):
-                pixels[x, y] = (255, 0, 0, 255)
-
-    img.save(filename)
+    img = ImagePixelSetter(world.width, world.height, filename)
+    draw_temperature_levels(world, img)
+    img.complete()
 
 
-def draw_biome_on_file(biome, filename):
-    width = len(biome[0])
-    height = len(biome)
-
-    img = Image.new('RGBA', (width, height))
-    pixels = img.load()
-
-    for y in range(height):
-        for x in range(width):
-            v = biome[y][x]
-            pixels[x, y] = _biome_colors[v]
-    img.save(filename)  
+def draw_biome_on_file(world, filename):
+    img = ImagePixelSetter(world.width, world.height, filename)
+    draw_biome(world, img)
+    img.complete()

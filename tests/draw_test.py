@@ -15,6 +15,8 @@ class PixelCollector:
         self.height = height
 
     def set_pixel(self, x, y, color):
+        if len(color) == 3:
+            color = color + (255,)
         self.pixels[(x, y)] = color
 
     def __getitem__(self, item):
@@ -112,6 +114,30 @@ class TestDraw(unittest.TestCase):
         target = PixelCollector(w.width, w.height)
         draw_ocean(w.ocean, target)
         self._assert_img_equal("ocean_28070", target)
+
+    def test_draw_precipitation(self):
+        w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        target = PixelCollector(w.width, w.height)
+        draw_precipitation(w, target)
+        self._assert_img_equal("precipitation_28070", target)
+
+    def test_draw_world(self):
+        w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        target = PixelCollector(w.width, w.height)
+        draw_world(w, target)
+        self._assert_img_equal("world_28070", target)
+
+    def test_draw_temperature_levels(self):
+        w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        target = PixelCollector(w.width, w.height)
+        draw_temperature_levels(w, target)
+        self._assert_img_equal("temperature_28070", target)
+
+    def test_draw_biome(self):
+        w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        target = PixelCollector(w.width, w.height)
+        draw_biome(w, target)
+        self._assert_img_equal("biome_28070", target)
 
 if __name__ == '__main__':
     unittest.main()
