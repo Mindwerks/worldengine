@@ -21,8 +21,8 @@ def main(blessed_images_dir, tests_data_dir):
     draw_biome_on_file(w, "%s/biome_28070.png" % blessed_images_dir)
 
     w_large = World.from_pickle_file("%s/seed_48956.world" % tests_data_dir)
-    draw_ancientmap()
-
+    draw_ancientmap_on_file(w, "%s/ancientmap_28070_factor3.png" % blessed_images_dir, resize_factor=3)
+    draw_ancientmap_on_file(w_large, "%s/ancientmap_48956.png" % blessed_images_dir, resize_factor=1)
 
 if __name__ == '__main__':
     blessed_images_dir = os.path.dirname(os.path.realpath(__file__))

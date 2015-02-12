@@ -144,6 +144,12 @@ class ImagePixelSetter(object):
     def complete(self):
         self.img.save(self.filename)
 
+    def __getitem__(self, item):
+        return self.pixels[item]
+
+    def __setitem__(self, item, value):
+        self.pixels[item] = value
+
 
 def draw_simple_elevation(data, width, height, sea_level, target):
     """ This function can be used on a generic canvas (either an image to save on disk or a canvas part of a GUI)
@@ -386,8 +392,7 @@ def draw_biome_on_file(world, filename):
     img.complete()
 
 
-def draw_ancientmap_on_file(world, filename, resize_factor, sea_color, verbose=True):
-    img = Image.new('RGBA', (world.width*resize_factor, world.height * resize_factor))
-    pixels = img.load()
-    draw_ancientmap(world, pixels, resize_factor, sea_color, verbose)
-    img.save(filename)
+def draw_ancientmap_on_file(world, filename, resize_factor=1, sea_color=(212, 198, 169, 255), verbose=False):
+    img = ImagePixelSetter(world.width * resize_factor, world.height * resize_factor, filename)
+    draw_ancientmap(world, img, resize_factor, sea_color, verbose)
+    img.complete()
