@@ -56,15 +56,15 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
 
     if step.include_precipitations:
         filename = '%s/%s_precipitation.png' % (output_dir, world_name)
-        draw_precipitation(w, filename)
+        draw_precipitation_on_file(w, filename)
         print("* precipitation image generated in '%s'" % filename)
         filename = '%s/%s_temperature.png' % (output_dir, world_name)
-        draw_temperature_levels(w, filename)
+        draw_temperature_levels_on_file(w, filename)
         print("* temperature image generated in '%s'" % filename)
 
     if step.include_biome:
         filename = '%s/%s_biome.png' % (output_dir, world_name)
-        draw_biome(w.biome, filename)
+        draw_biome_on_file(w.biome, filename)
         print("* biome image generated in '%s'" % filename)
 
     filename = '%s/%s_elevation.png' % (output_dir, world_name)

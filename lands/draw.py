@@ -289,7 +289,7 @@ def draw_ocean_on_file(ocean, filename):
     img.complete()
 
 
-def draw_precipitation(world, filename):
+def draw_precipitation_on_file(world, filename):
     # FIXME we are drawing humidity, not precipitations
     width = world.width
     height = world.height
@@ -317,7 +317,7 @@ def draw_precipitation(world, filename):
     img.save(filename)
 
 
-def draw_world(world, filename):
+def draw_world_on_file(world, filename):
     width = world.width
     height = world.height
 
@@ -339,7 +339,7 @@ def draw_world(world, filename):
     img.save(filename)
 
 
-def draw_temperature_levels(world, filename):
+def draw_temperature_levels_on_file(world, filename):
     width = world.width
     height = world.height
 
@@ -366,7 +366,7 @@ def draw_temperature_levels(world, filename):
     img.save(filename)
 
 
-def draw_biome(biome, filename):
+def draw_biome_on_file(biome, filename):
     width = len(biome[0])
     height = len(biome)
 
