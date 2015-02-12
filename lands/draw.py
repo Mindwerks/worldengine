@@ -133,25 +133,26 @@ def elevation_color(elevation, sea_level=1.0):
 
 class ImagePixelSetter(object):
 
-    def __init__(self, pixels):
-        self.pixels = pixels
+    def __init__(self, width, height, filename):
+        self.img = Image.new('RGBA', (width, height))
+        self.pixels = self.img.load()
+        self.filename = filename
 
     def set_pixel(self, x, y, color):
         self.pixels[x, y] = color
 
+    def complete(self):
+        self.img.save(self.filename)
 
-def draw_simple_elevation_on_image(data, width, height, sea_level):
-    """This function assume the level of the sea is placed at 1.0
+
+def draw_simple_elevation(data, width, height, sea_level, target):
+    """ This function can be used on a generic canvas (either an image to save on disk or a canvas part of a GUI)
     """
-    img = Image.new('RGBA', (width, height))
-    pixels = img.load()
-
     for y in range(height):
         for x in range(width):
             e = data[y][x]
             r, g, b = elevation_color(e, sea_level)
-            pixels[x, y] = (int(r * 255), int(g * 255), int(b * 255), 255)
-    return img
+            target.set_pixel(x, y, (int(r * 255), int(g * 255), int(b * 255), 255))
 
 
 # -------------
@@ -159,9 +160,10 @@ def draw_simple_elevation_on_image(data, width, height, sea_level):
 # -------------
 
 
-def draw_simple_elevation(data, filename, width, height, sea_level):
-    img = draw_simple_elevation_on_image(data, width, height, sea_level)
-    img.save(filename)
+def draw_simple_elevation_on_file(data, filename, width, height, sea_level):
+    img = ImagePixelSetter(width, height, filename)
+    draw_simple_elevation(data, width, height, sea_level, img)
+    img.complete()
 
 
 def draw_riversmap(world, filename):

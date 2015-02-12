@@ -3,8 +3,19 @@ __author__ = 'Federico Tomassetti'
 import unittest
 import os
 from PIL import Image
-from lands.draw import _biome_colors, elevation_color, draw_simple_elevation_on_image
+from lands.draw import _biome_colors, elevation_color, draw_simple_elevation
 from lands.world import *
+
+class PixelCollector:
+
+    def __init__(self):
+        self.pixels = {}
+
+    def set_pixel(self, x, y, color):
+        self.pixels[(x, y)] = color
+
+    def __getitem__(self, item):
+        return self.pixels[item]
 
 class TestDraw(unittest.TestCase):
 
@@ -48,13 +59,14 @@ class TestDraw(unittest.TestCase):
     def test_draw_simple_elevation_on_image(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
         data = w.elevation['data']
-        drawn_img_pixels = draw_simple_elevation_on_image(data, w.width, w.height, w.sea_level()).load()
+        target = PixelCollector()
+        draw_simple_elevation(data, w.width, w.height, w.sea_level(), target)
         blessed_img_pixels = Image.open("%s/elevation_28070.png" % self.tests_blessed_images_dir).load()
 
         for y in range(w.height):
             for x in range(w.width):
                 blessed_pixel = blessed_img_pixels[x, y]
-                drawn_pixel =  drawn_img_pixels[x, y]
+                drawn_pixel = target[x, y]
                 self.assertEqual(blessed_pixel, drawn_pixel, "Pixels at %i, %i are different. Blessed %s, drawn %s" % (x, y, blessed_pixel, drawn_pixel))
 
 if __name__ == '__main__':
