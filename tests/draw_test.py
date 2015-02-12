@@ -7,6 +7,7 @@ from lands.draw import *
 from lands.draw import _biome_colors # need to be explicitly imported
 from lands.world import *
 
+
 class PixelCollector:
 
     def __init__(self, width, height):
@@ -22,13 +23,13 @@ class PixelCollector:
     def __getitem__(self, item):
         return self.pixels[item]
 
+
 class TestDraw(unittest.TestCase):
 
     def setUp(self):
         tests_dir = os.path.dirname(os.path.realpath(__file__))
         self.tests_data_dir = os.path.abspath(os.path.join(tests_dir, './data'))
         self.tests_blessed_images_dir = os.path.abspath(os.path.join(tests_dir, './blessed_images'))
-
 
     def test_biome_colors(self):
         self.assertEqual(Biome.all_names(), _biome_colors.keys().sort())
