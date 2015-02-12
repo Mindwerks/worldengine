@@ -80,7 +80,7 @@ def generate_grayscale_heightmap(world, filename):
 
 
 def generate_rivers_map(world, filename):
-    draw_riversmap(world, filename)
+    draw_riversmap_on_file(world, filename)
     print("+ rivers map generated in '%s'" % filename)
 
 

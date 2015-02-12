@@ -3,13 +3,15 @@ __author__ = 'Federico Tomassetti'
 import unittest
 import os
 from PIL import Image
-from lands.draw import _biome_colors, elevation_color, draw_simple_elevation
+from lands.draw import _biome_colors, elevation_color, draw_simple_elevation, draw_riversmap
 from lands.world import *
 
 class PixelCollector:
 
-    def __init__(self):
+    def __init__(self, width, height):
         self.pixels = {}
+        self.width = width
+        self.height = height
 
     def set_pixel(self, x, y, color):
         self.pixels[(x, y)] = color
@@ -34,6 +36,21 @@ class TestDraw(unittest.TestCase):
         self.assertTrue(0.0 <= g <= 1.0, "green component %s is not in [0,1]: %f" % (color_name, g))
         self.assertTrue(0.0 <= b <= 1.0, "blue component %s is not in [0,1]: %f" % (color_name, b))
 
+    def _assert_img_equal(self, blessed_image_name, drawn_image):
+        blessed_img = Image.open("%s/%s.png" % (self.tests_blessed_images_dir, blessed_image_name))
+        blessed_img_pixels = blessed_img.load()
+
+        blessed_img_width, blessed_img_height = blessed_img.size
+        self.assertEqual(blessed_img_width, drawn_image.width)
+        self.assertEqual(blessed_img_height, drawn_image.height)
+        for y in range(blessed_img_height):
+            for x in range(blessed_img_width):
+                blessed_pixel = blessed_img_pixels[x, y]
+                drawn_pixel = drawn_image[x, y]
+                self.assertEqual(blessed_pixel, drawn_pixel,
+                                 "Pixels at %i, %i are different. Blessed %s, drawn %s"
+                                 % (x, y, blessed_pixel, drawn_pixel))
+
     def test_elevation_color(self):
         for i in range(0, 20):
             v = i / 2.0
@@ -56,18 +73,18 @@ class TestDraw(unittest.TestCase):
             #self.assertAlmostEqual(ba, bb, 5, "value %f, blue, low, from %f to %f" % (v, ba, bb))
             #self.assertAlmostEqual(ba, bc, 5, "value %f, blue, high, from %f to %f" % (v, ba, bc))
 
-    def test_draw_simple_elevation_on_image(self):
+    def test_draw_simple_elevation(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
         data = w.elevation['data']
-        target = PixelCollector()
+        target = PixelCollector(w.width, w.height)
         draw_simple_elevation(data, w.width, w.height, w.sea_level(), target)
-        blessed_img_pixels = Image.open("%s/elevation_28070.png" % self.tests_blessed_images_dir).load()
+        self._assert_img_equal("elevation_28070", target)
 
-        for y in range(w.height):
-            for x in range(w.width):
-                blessed_pixel = blessed_img_pixels[x, y]
-                drawn_pixel = target[x, y]
-                self.assertEqual(blessed_pixel, drawn_pixel, "Pixels at %i, %i are different. Blessed %s, drawn %s" % (x, y, blessed_pixel, drawn_pixel))
+    def test_draw_riversmap(self):
+        w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        target = PixelCollector(w.width, w.height)
+        draw_riversmap(w, target)
+        self._assert_img_equal("riversmap_28070", target)
 
 if __name__ == '__main__':
     unittest.main()

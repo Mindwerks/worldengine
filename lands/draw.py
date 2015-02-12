@@ -155,6 +155,20 @@ def draw_simple_elevation(data, width, height, sea_level, target):
             target.set_pixel(x, y, (int(r * 255), int(g * 255), int(b * 255), 255))
 
 
+def draw_riversmap(world, target):
+    sea_color = (255, 255, 255, 255)
+    land_color = (0, 0, 0, 255)
+
+    for y in range(world.height):
+        for x in range(world.width):
+            if world.ocean[y][x]:
+                target.set_pixel(x, y, sea_color)
+            else:
+                target.set_pixel(x, y, land_color)
+
+    draw_rivers_on_image(world, target, factor=1)
+
+
 # -------------
 # Draw on files
 # -------------
@@ -166,23 +180,10 @@ def draw_simple_elevation_on_file(data, filename, width, height, sea_level):
     img.complete()
 
 
-def draw_riversmap(world, filename):
-    img = Image.new('RGBA', (world.width, world.height))
-    pixels = img.load()
-
-    sea_color = (255, 255, 255, 255)
-    land_color = (0, 0, 0, 255)
-
-    for y in range(world.height):
-        for x in range(world.width):
-            if world.ocean[y][x]:
-                pixels[x, y] = sea_color
-            else:
-                pixels[x, y] = land_color
-
-    draw_riversmap_on_image(world, pixels, 1)
-
-    img.save(filename)
+def draw_riversmap_on_file(world, filename):
+    img = ImagePixelSetter(world.width, world.height, filename)
+    draw_riversmap(world, img)
+    img.complete()
 
 
 def draw_grayscale_heightmap(world, filename):
