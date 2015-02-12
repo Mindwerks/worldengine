@@ -11,6 +11,7 @@ def main(blessed_images_dir, tests_data_dir):
     w = World.open_protobuf("%s/seed_28070.world" % tests_data_dir)
     draw_simple_elevation_on_file(w.elevation['data'], "%s/elevation_28070.png" % blessed_images_dir, w.width, w.height, w.sea_level())
     draw_riversmap_on_file(w, "%s/riversmap_28070.png" % blessed_images_dir)
+    draw_grayscale_heightmap_on_file(w, "%s/grayscale_heightmap_28070.png" % blessed_images_dir)
 
 
 if __name__ == '__main__':
