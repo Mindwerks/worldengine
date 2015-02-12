@@ -51,7 +51,7 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
 
     # Generate images
     filename = '%s/%s_ocean.png' % (output_dir, world_name)
-    draw_ocean(w.ocean, filename)
+    draw_ocean_on_file(w.ocean, filename)
     print("* ocean image generated in '%s'" % filename)
 
     if step.include_precipitations:
