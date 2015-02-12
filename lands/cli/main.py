@@ -21,13 +21,6 @@ SEA_COLORS = 'blue|brown'
 STEPS      = 'plates|precipitations|full'
 
 
-def draw_oldmap(world, filename, resize_factor, sea_color, verbose=True):
-    img = Image.new('RGBA', (world.width*resize_factor, world.height * resize_factor))
-    pixels = img.load()
-    draw_oldmap_on_pixels(world, pixels, resize_factor, sea_color, verbose)
-    img.save(filename)
-
-
 def generate_world(world_name, width, height, seed, num_plates, output_dir,
         step, ocean_level, world_format='pickle', verbose=True):
 
@@ -124,7 +117,7 @@ def check_step(step_name):
 
 
 def operation_ancient_map(world, map_filename, resize_factor, sea_color):
-    draw_oldmap(world, map_filename, resize_factor, sea_color)
+    draw_ancientmap_on_file(world, map_filename, resize_factor, sea_color)
     print("+ ancient map generated in '%s'" % map_filename)
 
 
@@ -277,15 +270,17 @@ def main():
 
     elif operation == 'ancient_map':
         # First, some error checking
-        if (options.sea_color == "blue"):
+        if options.sea_color == "blue":
             sea_color = (142, 162, 179, 255)
-        elif (options.sea_color == "brown"):
+        elif options.sea_color == "brown":
             sea_color = (212, 198, 169, 255)
         else:
-            usage("Unknown sea color: " +args[0] +"  Select from [" +SEA_COLORS +"]")
+            usage("Unknown sea color: " + args[0] + "  Select from [" + SEA_COLORS + "]")
         if not options.world_file:
             usage("For generating an ancient map is necessary to specify the world to be used (-w option)")
         world = World.from_pickle_file(options.world_file)
+
+        print_verbose(" * world loaded")
 
         if not options.generated_file:
             options.generated_file = "ancient_map_%s.png" % world.name

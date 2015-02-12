@@ -384,3 +384,10 @@ def draw_biome_on_file(world, filename):
     img = ImagePixelSetter(world.width, world.height, filename)
     draw_biome(world, img)
     img.complete()
+
+
+def draw_ancientmap_on_file(world, filename, resize_factor, sea_color, verbose=True):
+    img = Image.new('RGBA', (world.width*resize_factor, world.height * resize_factor))
+    pixels = img.load()
+    draw_ancientmap(world, pixels, resize_factor, sea_color, verbose)
+    img.save(filename)
