@@ -14,7 +14,7 @@ import time
 
 class PixelWrapper(object):
 
-    def __init__(self, pxiels):
+    def __init__(self, pixels):
         self.pixels = pixels
 
     def set_pixel(self, x, y, color):
