@@ -126,9 +126,9 @@ def elevation_color(elevation, sea_level=1.0):
     return _sature_color(_elevation_color(elevation, sea_level))
 
 
-# --------------
-# Draw on images
-# --------------
+# ----------------------
+# Draw on generic target
+# ----------------------
 
 
 class ImagePixelSetter(object):
@@ -169,27 +169,7 @@ def draw_riversmap(world, target):
     draw_rivers_on_image(world, target, factor=1)
 
 
-# -------------
-# Draw on files
-# -------------
-
-
-def draw_simple_elevation_on_file(data, filename, width, height, sea_level):
-    img = ImagePixelSetter(width, height, filename)
-    draw_simple_elevation(data, width, height, sea_level, img)
-    img.complete()
-
-
-def draw_riversmap_on_file(world, filename):
-    img = ImagePixelSetter(world.width, world.height, filename)
-    draw_riversmap(world, img)
-    img.complete()
-
-
-def draw_grayscale_heightmap(world, filename):
-    img = Image.new('RGBA', (world.width, world.height))
-    pixels = img.load()
-
+def draw_grayscale_heightmap(world, target):
     min_elev_sea = None
     max_elev_sea = None
     min_elev_land = None
@@ -218,8 +198,30 @@ def draw_grayscale_heightmap(world, filename):
                 c = int(((e - min_elev_land) * 127) / elev_delta_land)+128
             else:
                 c = int(((e - min_elev_sea) * 127) / elev_delta_sea)
-            pixels[x, y] = (c, c, c, 255)
-    img.save(filename)
+            target.set_pixel(x, y, (c, c, c, 255))
+
+
+# -------------
+# Draw on files
+# -------------
+
+
+def draw_simple_elevation_on_file(data, filename, width, height, sea_level):
+    img = ImagePixelSetter(width, height, filename)
+    draw_simple_elevation(data, width, height, sea_level, img)
+    img.complete()
+
+
+def draw_riversmap_on_file(world, filename):
+    img = ImagePixelSetter(world.width, world.height, filename)
+    draw_riversmap(world, img)
+    img.complete()
+
+
+def draw_grayscale_heightmap_on_file(world, filename):
+    img = ImagePixelSetter(world.width, world.height, filename)
+    draw_grayscale_heightmap(world, img)
+    img.complete()
 
 
 def draw_elevation(world, filename, shadow=True):

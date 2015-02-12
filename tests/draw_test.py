@@ -3,7 +3,7 @@ __author__ = 'Federico Tomassetti'
 import unittest
 import os
 from PIL import Image
-from lands.draw import _biome_colors, elevation_color, draw_simple_elevation, draw_riversmap
+from lands.draw import _biome_colors, elevation_color, draw_simple_elevation, draw_riversmap, draw_grayscale_heightmap
 from lands.world import *
 
 class PixelCollector:
@@ -85,6 +85,12 @@ class TestDraw(unittest.TestCase):
         target = PixelCollector(w.width, w.height)
         draw_riversmap(w, target)
         self._assert_img_equal("riversmap_28070", target)
+
+    def test_draw_grayscale_heightmap(self):
+        w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        target = PixelCollector(w.width, w.height)
+        draw_grayscale_heightmap(w, target)
+        self._assert_img_equal("grayscale_heightmap_28070", target)
 
 if __name__ == '__main__':
     unittest.main()
