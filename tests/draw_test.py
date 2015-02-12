@@ -40,6 +40,13 @@ class TestBase(unittest.TestCase):
         self.assertTrue(0.0 <= g <= 1.0, "green component %s is not in [0,1]: %f" % (color_name, g))
         self.assertTrue(0.0 <= b <= 1.0, "blue component %s is not in [0,1]: %f" % (color_name, b))
 
+    def _assert_are_colors_equal(self, expected, actual):
+        if len(expected) == 3:
+            expected = expected + (255,)
+        if len(actual) == 3:
+            actual = actual + (255,)
+        self.assertEqual(expected, actual)
+
     def _assert_img_equal(self, blessed_image_name, drawn_image):
         blessed_img = Image.open("%s/%s.png" % (self.tests_blessed_images_dir, blessed_image_name))
         blessed_img_pixels = blessed_img.load()
