@@ -64,7 +64,7 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
 
     if step.include_biome:
         filename = '%s/%s_biome.png' % (output_dir, world_name)
-        draw_biome_on_file(w.biome, filename)
+        draw_biome_on_file(w, filename)
         print("* biome image generated in '%s'" % filename)
 
     filename = '%s/%s_elevation.png' % (output_dir, world_name)
