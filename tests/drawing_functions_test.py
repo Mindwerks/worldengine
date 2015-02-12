@@ -24,5 +24,10 @@ class TestDrawingFunctions(TestBase):
         draw_ancientmap(w, target, resize_factor=3)
         self._assert_img_equal("ancientmap_28070_factor3", target)
 
+    def test_gradient(self):
+        self._assert_are_colors_equal((10, 20, 40),  gradient(0.0, 0.0, 1.0, (10, 20, 40), (0, 128, 240)))
+        self._assert_are_colors_equal((0, 128, 240), gradient(1.0, 0.0, 1.0, (10, 20, 40), (0, 128, 240)))
+        self._assert_are_colors_equal((5, 74, 140), gradient(0.5, 0.0, 1.0, (10, 20, 40), (0, 128, 240)))
+
 if __name__ == '__main__':
     unittest.main()
