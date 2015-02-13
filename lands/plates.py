@@ -7,18 +7,7 @@ import time
 import platec
 
 from lands.generation import *
-
-
-def array_to_matrix(array, width, height):
-    if len(array) != (width * height):
-        raise Exception("Array as not expected length")
-    matrix = []
-    for y in xrange(height):
-        matrix.append([])
-        for x in xrange(width):
-            matrix[y].append(array[y * width + x])
-    return matrix
-
+from lands.common import *
 
 def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_period=60,
                                folding_ratio=0.02, aggr_overlap_abs=1000000, aggr_overlap_rel=0.33,
