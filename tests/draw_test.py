@@ -1,5 +1,3 @@
-__author__ = 'Federico Tomassetti'
-
 import unittest
 import os
 from PIL import Image

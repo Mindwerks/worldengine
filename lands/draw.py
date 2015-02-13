@@ -1,5 +1,3 @@
-__author__ = 'Federico Tomassetti'
-
 from PIL import Image
 
 from lands.drawing_functions import *

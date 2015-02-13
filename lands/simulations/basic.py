@@ -1,6 +1,3 @@
-__author__ = 'Federico Tomassetti'
-
-
 def find_threshold(elevation, land_perc, ocean=None):
     width = len(elevation[0])
     height = len(elevation)

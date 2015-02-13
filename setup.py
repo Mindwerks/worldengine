@@ -13,9 +13,9 @@ execfile('lands/version.py')
 
 config = {
     'description'      : 'World generator simulating plate tectonics, erosion, etc.',
-    'author'           : 'Federico Tomassetti',
-    'url'              : 'http://github.com/ftomassetti/lands',
-    'download_url'     : 'http://github.com/ftomassetti/lands',
+    'author'           : 'Federico Tomassetti, Bret Curtis',
+    'url'              : 'http://github.com/Mindwerks/lands',
+    'download_url'     : 'https://github.com/Mindwerks/lands/releases',
     'author_email'     : 'f.tomassetti@gmail.com',
     'version'          : __version__,
     'install_requires' : ['nose'],

@@ -1,5 +1,3 @@
-__author__ = 'Federico Tomassetti'
-
 # Every reference to platec has to be kept separated because it is a C extension
 # which is not available when using this project from jython
 

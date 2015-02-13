@@ -1,5 +1,3 @@
-__author__ = 'Federico Tomassetti'
-
 import sys
 from PIL import Image
 from optparse import OptionParser, OptionGroup
@@ -293,7 +291,7 @@ def main():
 
 def usage(error=None):
     print(' -------------------------------------------------------------------------')
-    print(' Federico Tomassetti, 2013-2015')
+    print(' Federico Tomassetti and Bret Curtis, 2011-2015')
     print(' Lands - a world generator (v. %s)' % VERSION)
     print(' ')
     print(' generator <world_name> [operation] [options]')

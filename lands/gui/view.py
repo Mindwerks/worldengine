@@ -1,5 +1,3 @@
-__author__ = 'Federico Tomassetti'
-
 from PyQt4 import QtGui
 from lands.draw import elevation_color
 import lands.drawing_functions

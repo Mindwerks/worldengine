@@ -1,5 +1,3 @@
-__author__ = 'Federico Tomassetti'
-
 from lands.world import *
 from lands.simulations.WatermapSimulation import *
 from lands.simulations.IrrigationSimulation import *
