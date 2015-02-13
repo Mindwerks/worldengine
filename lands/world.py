@@ -37,6 +37,10 @@ class World(object):
         with open(filename, "rb") as f:
             return pickle.load(f)
 
+    def to_pickle_file(self, filename):
+        with open(filename, "wb") as f:
+            pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+
     @classmethod
     def from_dict(cls, dict):
         instance = World(dict['name'], dict['width'], dict['height'])
@@ -127,9 +131,9 @@ class World(object):
 
         # Elevation
         self._to_protobuf_matrix(self.elevation['data'], p_world.heightMapData)
-        p_world.heightMapTh_sea   = self.elevation['thresholds'][0][1];
-        p_world.heightMapTh_plain = self.elevation['thresholds'][1][1];
-        p_world.heightMapTh_hill  = self.elevation['thresholds'][2][1];
+        p_world.heightMapTh_sea = self.elevation['thresholds'][0][1]
+        p_world.heightMapTh_plain = self.elevation['thresholds'][1][1]
+        p_world.heightMapTh_hill = self.elevation['thresholds'][2][1]
 
         # Plates
         self._to_protobuf_matrix(self.plates, p_world.plates)
@@ -413,6 +417,10 @@ class World(object):
         mountain_level = self.elevation['thresholds'][hi + 1][1]
         x, y = pos
         return self.elevation['data'][y][x] > hill_level and self.elevation['data'][y][x] < mountain_level
+
+    def elevation_at(self, pos):
+        x, y = pos
+        return self.elevation['data'][y][x]
 
     ###
     ### Temperature

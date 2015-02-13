@@ -40,14 +40,19 @@ def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_peri
     return hm, pm
 
 
-def world_gen(name, width, height, seed, num_plates=10, ocean_level=1.0, step="full", verbose=False ):
+def _plates_simulation(name, width, height, seed, num_plates=10, ocean_level=1.0, step=Step.full(), verbose=get_verbose()):
     e_as_array, p_as_array = generate_plates_simulation(seed, width, height, num_plates=num_plates, verbose=verbose)
 
-    if verbose:
-        start_time = time.time()
     world = World(name, width, height, seed, num_plates, ocean_level, step)
     world.set_elevation(array_to_matrix(e_as_array, width, height), None)
     world.set_plates(array_to_matrix(p_as_array, width, height))
+    return world
+
+
+def world_gen(name, width, height, seed, num_plates=10, ocean_level=1.0, step=Step.full(), verbose=get_verbose()):
+    if verbose:
+        start_time = time.time()
+    world = _plates_simulation(name, width, height, seed, num_plates, ocean_level, step, verbose)
 
     center_land(world)
     if verbose:

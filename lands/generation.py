@@ -20,41 +20,41 @@ from lands.common import *
 def center_land(world):
     """Translate the map horizontally and vertically to put as much ocean as possible at the borders.
        It operates on elevation and plates map"""
-    miny = None
-    ymin = None
-    minx = None
-    xmin = None
 
+    min_sum_on_y = None
+    y_with_min_sum = None
     for y in range(world.height):
-        sumy = 0
+        sum_on_y = 0
         for x in range(world.width):
-            sumy += world.elevation['data'][y][x]
-        if miny is None or sumy < miny:
-            miny = sumy
-            ymin = y
+            sum_on_y += world.elevation['data'][y][x]
+        if min_sum_on_y is None or sum_on_y < min_sum_on_y:
+            min_sum_on_y = sum_on_y
+            y_with_min_sum = y
     if get_verbose():
         print("geo.center_land: height complete")
 
+    min_sum_on_x = None
+    x_with_min_sum = None
     for x in range(world.width):
-        sumx = 0
+        sum_on_x = 0
         for y in range(world.height):
-            sumx += world.elevation['data'][y][x]
-        if minx is None or sumx < minx:
-            minx = sumx
-            xmin = x
+            sum_on_x += world.elevation['data'][y][x]
+        if min_sum_on_x is None or sum_on_x < min_sum_on_x:
+            min_sum_on_x = sum_on_x
+            x_with_min_sum = x
     if get_verbose():
         print("geo.center_land: width complete")
 
     new_elevation_data = []
-    new_plates         = []
+    new_plates = []
     for y in range(world.height):
         new_elevation_data.append([])
         new_plates.append([])
-        srcy = (ymin + y) % world.height
+        src_y = (y_with_min_sum + y) % world.height
         for x in range(world.width):
-            srcx = (xmin + x) % world.width
-            new_elevation_data[y].append( world.elevation['data'][srcy][srcx] )
-            new_plates[y].append( world.plates[srcy][srcx] )
+            src_x = (x_with_min_sum + x) % world.width
+            new_elevation_data[y].append(world.elevation['data'][src_y][src_x])
+            new_plates[y].append(world.plates[src_y][src_x])
     world.elevation['data'] = new_elevation_data
     world.plates = new_plates
     if get_verbose():
