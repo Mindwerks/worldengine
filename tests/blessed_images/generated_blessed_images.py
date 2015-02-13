@@ -1,5 +1,3 @@
-__author__ = 'Federico Tomassetti'
-
 # Please refer to README.md in this directory
 
 import os

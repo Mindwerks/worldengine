@@ -1,5 +1,3 @@
-__author__ = 'Federico Tomassetti'
-
 import unittest
 
 from lands.drawing_functions import *

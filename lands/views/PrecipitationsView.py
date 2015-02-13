@@ -1,5 +1,3 @@
-__author__ = 'Federico Tomassetti'
-
 from lands.simulations.basic import *
 import random
 from lands.views.basic import color_prop

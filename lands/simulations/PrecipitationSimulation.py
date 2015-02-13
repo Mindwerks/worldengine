@@ -1,5 +1,3 @@
-__author__ = 'Federico Tomassetti'
-
 import random
 import time
 from noise import snoise2

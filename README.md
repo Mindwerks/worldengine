@@ -10,7 +10,7 @@ We started a [google group](https://groups.google.com/forum/?hl=en#!forum/lands_
 Lands - a world generator
 =========================
 
-[![Build Status](https://travis-ci.org/ftomassetti/lands.svg?branch=master)](https://travis-ci.org/ftomassetti/lands)
+[![Build Status](https://travis-ci.org/Mindwerks/lands.svg?branch=master)](https://travis-ci.org/Mindwerks/lands)
 
 _Last Lands version: 0.5.3, Last WorldSynth version: 0.11_
 
@@ -40,7 +40,7 @@ lands ancient_map -w seed1.world
 python lands/generator.py ancient_map -w seed1.world
 ```
 
-![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/ancient_map_seed1.png)
+![](https://raw.githubusercontent.com/Mindwerks/lands/master/examples/ancient_map_seed1.png)
 
 Gui
 ===
@@ -77,11 +77,11 @@ python setup.py install
 
 ### _On Windows_
 
-Executable file is available under [releases](https://github.com/ftomassetti/lands/releases)
+Executable file is available under [releases](https://github.com/Mindwerks/lands/releases)
 
 Note: you need also a copy of the lands src directory in the same folder as the exe.
 
-If you want to build Lands on Windows you can read these [instructions](https://github.com/ftomassetti/lands/wiki/Lands-on-Windows).
+If you want to build Lands on Windows you can read these [instructions](https://github.com/Mindwerks/lands/wiki/Lands-on-Windows).
 
 Note: the problem could crash after generating the files, it is a known problem but you should have anyway your nice maps generated! We are working on a fix for that
 
@@ -97,23 +97,23 @@ The program produces a binary format with all the data of the generated world an
 
 ## Elevation Map
 
-![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_elevation.png)
+![](https://raw.githubusercontent.com/Mindwerks/lands/master/examples/world_seed_1_elevation.png)
 
 ## Precipitation Map
 
-![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_precipitation.png)
+![](https://raw.githubusercontent.com/Mindwerks/lands/master/examples/world_seed_1_precipitation.png)
 
 ## Temperature Map
 
-![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_temperature.png)
+![](https://raw.githubusercontent.com/Mindwerks/lands/master/examples/world_seed_1_temperature.png)
 
 ## Biome Map
 
-![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_biome.png)
+![](https://raw.githubusercontent.com/Mindwerks/lands/master/examples/world_seed_1_biome.png)
 
 ## Ocean Map
 
-![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_ocean.png)
+![](https://raw.githubusercontent.com/Mindwerks/lands/master/examples/world_seed_1_ocean.png)
 
 Usage
 =====
@@ -242,13 +242,13 @@ This is the corresponding ancient map
 python lands/generator.py ancient_map -w an_example.world
 ```
 
-![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/ancient_map_large.png)
+![](https://raw.githubusercontent.com/Mindwerks/lands/master/examples/ancient_map_large.png)
 
 Algorithm
 =========
 
 The world generation algorithm goes through different phases:
-* plates simulation: it is the best way to get proper mountain chains. For this [pyplatec](https://github.com/ftomassetti/pyplatec) is used
+* plates simulation: it is the best way to get proper mountain chains. For this [pyplatec](https://github.com/Mindwerks/pyplatec) is used
 * noise techniques are used at different steps
 * precipitations are calculated considering latitude and rain shadow effects
 * erosion is calculated
