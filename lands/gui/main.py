@@ -13,6 +13,7 @@ import platec
 from lands.world import World
 import lands.generation
 from lands.generation import *
+from lands.common import *
 from view import *
 from lands.plates import *
 from lands.simulations.WatermapSimulation import *

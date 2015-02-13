@@ -71,5 +71,10 @@ class TestCommon(unittest.TestCase):
         antialiased = antialias(original, 10)
         self.assertAlmostEquals(0.8, antialiased[0][0])
 
+    def test_array_to_matrix(self):
+        array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        self.assertEqual([[0, 1, 2, 3, 4], [5, 6, 7, 8, 9]], array_to_matrix(array, 5, 2))
+        self.assertEqual([[0, 1], [2, 3], [4, 5], [6, 7], [8, 9]], array_to_matrix(array, 2, 5))
+
 if __name__ == '__main__':
     unittest.main()
