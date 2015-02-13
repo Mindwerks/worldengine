@@ -12,7 +12,7 @@ Lands - a world generator
 
 [![Build Status](https://travis-ci.org/Mindwerks/lands.svg?branch=master)](https://travis-ci.org/Mindwerks/lands)
 
-_Last Lands version: 0.5.3, Last WorldSynth version: 0.11_
+_Last Lands version: 0.5.3, Last WorldSynth version: 0.12_
 
 You can generate worlds data (heighmap, biome, etc.) and images for your own worlds.
 
