@@ -25,5 +25,9 @@ class Step(object):
             step.include_biome = True
         return step
 
+    @staticmethod
+    def full():
+        return Step.get_by_name("full")
+
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
