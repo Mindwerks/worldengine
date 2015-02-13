@@ -623,10 +623,6 @@ class World(object):
         else:
             return False
 
-    def is_glacier(self, pos):
-        # FIXME
-        return False
-
     def is_iceland(self, pos):
         if isinstance(self.biome_at(pos), Ice):
             return True
@@ -713,9 +709,6 @@ class World(object):
         else:
             return False
 
-    def is_rock_desert(self, pos):
-        # FIXME
-        return False
 
     ###
     ### Plates
