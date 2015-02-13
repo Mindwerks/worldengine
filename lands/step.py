@@ -2,6 +2,10 @@ __author__ = 'Federico Tomassetti'
 
 
 class Step(object):
+    """ A Step in the world generation process.
+        The process starts with plates simulation and go on through different intermediate
+        steps to reach the 'full' step.
+    """
 
     def __init__(self, name):
         self.name = name
@@ -12,22 +16,41 @@ class Step(object):
 
     @staticmethod
     def get_by_name(name):
-        step = None
         if name == "plates":
-            step = Step(name)
+            return Step.plates()
         elif name == "precipitations":
-            step = Step(name)
-            step.include_precipitations = True
+            return Step.precipitations()
         elif name == "full":
-            step = Step(name)
+            return Step.full()
+        raise None
+
+    @classmethod
+    def full(cls):
+        if not hasattr(cls, "_full"):
+            step = Step("full")
             step.include_precipitations = True
             step.include_erosion = True
             step.include_biome = True
-        return step
+            cls._full = step
+        return cls._full
 
-    @staticmethod
-    def full():
-        return Step.get_by_name("full")
+    @classmethod
+    def precipitations(cls):
+        if not hasattr(cls, "_precipitations"):
+            step = Step("precipitations")
+            step.include_precipitations = True
+            cls._precipitations = step
+        return cls._precipitations
+
+    @classmethod
+    def plates(cls):
+        if not hasattr(cls, "_plates"):
+            step = Step("plates")
+            step.include_precipitations = True
+            step.include_erosion = True
+            step.include_biome = True
+            cls._plates = step
+        return cls._plates
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
