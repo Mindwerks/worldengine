@@ -1,7 +1,7 @@
 Lands - a world generator
 =========================
 
-[![Build Status](https://travis-ci.org/ftomassetti/lands.svg?branch=master)](https://travis-ci.org/ftomassetti/lands)
+[![Build Status](https://travis-ci.org/Mindwerks/lands.svg?branch=master)](https://travis-ci.org/ftomassetti/lands)
 
 _Current version: 0.5.3_
 
