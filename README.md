@@ -1,9 +1,18 @@
+### _Announcement: Lands has been merged with WorldSynth_
+
+Lands has been recently merged with [WorldSynth](https://github.com/psi29a/worldsynth).
+We are now working on merging the code, taking the best of the two projects.
+
+We started a [google group](https://groups.google.com/forum/?hl=en#!forum/lands_worldsynth): if you have ideas, problems, suggestions or want to contribute please [join us](https://groups.google.com/forum/?hl=en#!forum/lands_worldsynth)!_
+
+---
+
 Lands - a world generator
 =========================
 
 [![Build Status](https://travis-ci.org/ftomassetti/lands.svg?branch=master)](https://travis-ci.org/ftomassetti/lands)
 
-_Current version: 0.5.3_
+_Last Lands version: 0.5.3, Last WorldSynth version: 0.11_
 
 You can generate worlds data (heighmap, biome, etc.) and images for your own worlds.
 
@@ -269,9 +278,9 @@ pip3 install -r requirements3.txt
 Do you have problems or suggestions for improvements?
 =====================================================
 
-Please write to me!
+Please write to us!
 You can write at f _dot_ tomassetti _at_ gmail _dot_ com
-Thank you, all the feedback is precious for me!
+Thank you, all the feedback is precious for us!
 
 Requirements
 ============
@@ -281,8 +290,10 @@ Libjpeg and libtiff are required by PIL
 Contributors
 ============
 
+The merged project is maintained by [Bret Curtis](https://github.com/psi29a) and [Federico Tomassetti](https://github.com/ftomassetti).
+
 All contributions, questions, ideas are more than welcome!
-Feel free to open an issue or drop me an e-mail.
+Feel free to open an issue or write in our [google group](https://groups.google.com/forum/?hl=en#!forum/lands_worldsynth).
 
 I would like to thank you great people who helped me while working on Lands:
 
