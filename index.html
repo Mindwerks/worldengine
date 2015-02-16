@@ -1,0 +1,432 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Lands by Mindwerks</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Lands</h1>
+        <p class="header">World generator using simulation of plates, rain shadow, erosion, etc.</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/Mindwerks/lands/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/Mindwerks/lands/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/Mindwerks/lands">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/Mindwerks">Mindwerks</a></p>
+
+
+      </header>
+      <section>
+        <h1>
+<a id="lands---a-world-generator" class="anchor" href="#lands---a-world-generator" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lands - a world generator</h1>
+
+<p><a href="https://travis-ci.org/ftomassetti/lands"><img src="https://travis-ci.org/Mindwerks/lands.svg?branch=master" alt="Build Status"></a></p>
+
+<p><em>Current version: 0.5.3</em></p>
+
+<p>You can generate worlds data (heighmap, biome, etc.) and images for your own worlds.</p>
+
+<p>For example:</p>
+
+<div class="highlight highlight-bash"><pre><span class="pl-c"># Lands 0.5.1 or next</span>
+lands world -s 1 -n seed1
+
+<span class="pl-c"># Lands 0.5.0 or previous</span>
+python lands/generator.py world -s 1 -n seed1</pre></div>
+
+<p>Worlds are generated using plate simulations, erosion, rain shadows, Holdridge life zones model and plenty of other phenomenons.</p>
+
+<p>Once a world it can be used for simulation civs evolution (see project <a href="https://github.com/ftomassetti/civs">civs</a>).</p>
+
+<p>For a generated world is also possible to generate additional maps, for example ancient looking map:</p>
+
+<div class="highlight highlight-bash"><pre><span class="pl-c"># Lands 0.5.1 or next</span>
+lands ancient_map -w seed1.world
+
+<span class="pl-c"># Lands 0.5.0 or previous</span>
+python lands/generator.py ancient_map -w seed1.world</pre></div>
+
+<p><img src="https://raw.githubusercontent.com/ftomassetti/lands/master/examples/ancient_map_seed1.png" alt=""></p>
+
+<h1>
+<a id="gui" class="anchor" href="#gui" aria-hidden="true"><span class="octicon octicon-link"></span></a>Gui</h1>
+
+<p>Since version 0.5.0 an experimental (and limited!) GUI is available. </p>
+
+<pre><code>landsgui
+</code></pre>
+
+<p>Note: it requires to install QT (available here <a href="http://qt-project.org/">http://qt-project.org/</a>)</p>
+
+<h1>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h1>
+
+<h3>
+<a id="using-pip" class="anchor" href="#using-pip" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using pip</h3>
+
+<pre><code>pip install lands
+</code></pre>
+
+<h3>
+<a id="from-source-code" class="anchor" href="#from-source-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>From source code</h3>
+
+<pre><code>git clone or download the code
+
+# before using lands: if you plan to change the code
+python setup.py develop 
+
+# before using lands: if you want just to install lands
+# on unix-ish system you could have to prepend sudo
+python setup.py install
+</code></pre>
+
+<h3>
+<a id="on-windows" class="anchor" href="#on-windows" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>On Windows</em>
+</h3>
+
+<p>Executable file is available under <a href="https://github.com/ftomassetti/lands/releases">releases</a></p>
+
+<p>Note: you need also a copy of the lands src directory in the same folder as the exe.</p>
+
+<p>If you want to build Lands on Windows you can read these <a href="https://github.com/ftomassetti/lands/wiki/Lands-on-Windows">instructions</a>.</p>
+
+<p>Note: the problem could crash after generating the files, it is a known problem but you should have anyway your nice maps generated! We are working on a fix for that</p>
+
+<h1>
+<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependencies</h1>
+
+<p>The gui is based on QT, so you will need to install them</p>
+
+<h1>
+<a id="output" class="anchor" href="#output" aria-hidden="true"><span class="octicon octicon-link"></span></a>Output</h1>
+
+<p>The program produces a binary format with all the data of the generated world and a set of images. For examples seed 1 produces.</p>
+
+<h2>
+<a id="elevation-map" class="anchor" href="#elevation-map" aria-hidden="true"><span class="octicon octicon-link"></span></a>Elevation Map</h2>
+
+<p><img src="https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_elevation.png" alt=""></p>
+
+<h2>
+<a id="precipitation-map" class="anchor" href="#precipitation-map" aria-hidden="true"><span class="octicon octicon-link"></span></a>Precipitation Map</h2>
+
+<p><img src="https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_precipitation.png" alt=""></p>
+
+<h2>
+<a id="temperature-map" class="anchor" href="#temperature-map" aria-hidden="true"><span class="octicon octicon-link"></span></a>Temperature Map</h2>
+
+<p><img src="https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_temperature.png" alt=""></p>
+
+<h2>
+<a id="biome-map" class="anchor" href="#biome-map" aria-hidden="true"><span class="octicon octicon-link"></span></a>Biome Map</h2>
+
+<p><img src="https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_biome.png" alt=""></p>
+
+<h2>
+<a id="ocean-map" class="anchor" href="#ocean-map" aria-hidden="true"><span class="octicon octicon-link"></span></a>Ocean Map</h2>
+
+<p><img src="https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_ocean.png" alt=""></p>
+
+<h1>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h1>
+
+<pre><code>lands [options] [world|plates|ancient_map]
+</code></pre>
+
+<p><em>Note that options were changed in version 0.5.3</em></p>
+
+<h3>
+<a id="general-options" class="anchor" href="#general-options" aria-hidden="true"><span class="octicon octicon-link"></span></a>General options</h3>
+
+<table>
+<thead>
+<tr>
+<th>Short</th>
+<th>Long</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-o DIR</td>
+<td>--output-dir=DIR</td>
+<td>generate files in DIR default = '.'</td>
+</tr>
+<tr>
+<td>-n STR</td>
+<td>--worldname=STR</td>
+<td>set world name to STR</td>
+</tr>
+<tr>
+<td>-b</td>
+<td>--protocol-buffer</td>
+<td>save world using protocol buffer format (smaller file)</td>
+</tr>
+<tr>
+<td>-s N</td>
+<td>--seed=N</td>
+<td>use SEED to initialize the pseudo-random generation</td>
+</tr>
+<tr>
+<td>-t STR</td>
+<td>--step=STR</td>
+<td>use STEP to specify how far to proceed in the world generation process. Valid values are: plates precipitations full</td>
+</tr>
+<tr>
+<td>-x N</td>
+<td>--width=N</td>
+<td>WIDTH of the world to be generated</td>
+</tr>
+<tr>
+<td>-y N</td>
+<td>--height=N</td>
+<td>HEIGHT of the world to be generated</td>
+</tr>
+<tr>
+<td>-q N</td>
+<td>--number-of-plates=N</td>
+<td>number of plates</td>
+</tr>
+<tr>
+<td></td>
+<td>--recursion-limit=N</td>
+<td>you need that just if you encounter an error while generating very large maps</td>
+</tr>
+<tr>
+<td>-v</td>
+<td>--verbose</td>
+<td>Enable verbose messages</td>
+</tr>
+</tbody>
+</table>
+
+<h3>
+<a id="options-valid-only-for-generate" class="anchor" href="#options-valid-only-for-generate" aria-hidden="true"><span class="octicon octicon-link"></span></a>Options valid only for generate</h3>
+
+<table>
+<thead>
+<tr>
+<th>Short</th>
+<th>Long</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-r FILE</td>
+<td>--rivers=FILE</td>
+<td>produce a map of reivers, after the option it expects the name of the file where to generate the map</td>
+</tr>
+<tr>
+<td>--gs=FILE</td>
+<td>--grayscale-heightmap=FILE</td>
+<td>produce a grayscale heightmap, after the option it expects the name of the file where to generate the heightmap</td>
+</tr>
+<tr>
+<td></td>
+<td>--ocean_level=N</td>
+<td>elevation cut off for sea level (default = 1.0)</td>
+</tr>
+</tbody>
+</table>
+
+<h3>
+<a id="options-valid-only-for-ancient-map-operations" class="anchor" href="#options-valid-only-for-ancient-map-operations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Options valid only for ancient map operations</h3>
+
+<table>
+<thead>
+<tr>
+<th>Short</th>
+<th>Long</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-w FILE</td>
+<td>--worldfile=FILE</td>
+<td>WORLD_FILE to be loaded</td>
+</tr>
+<tr>
+<td>-g FILE</td>
+<td>--generatedfile=FILE</td>
+<td>name of the GENERATED_FILE</td>
+</tr>
+<tr>
+<td>-f N</td>
+<td>--resize-factor=N</td>
+<td>resize factor</td>
+</tr>
+</tbody>
+</table>
+
+<p>For example these commands:</p>
+
+<div class="highlight highlight-python"><pre>python lands<span class="pl-k">/</span>generator.py world <span class="pl-k">-</span>s <span class="pl-c1">4</span> <span class="pl-k">-</span>n an_example <span class="pl-k">-</span>p <span class="pl-c1">2048</span> <span class="pl-k">-</span>q <span class="pl-c1">25</span> <span class="pl-k">-</span>x <span class="pl-c1">2048</span> <span class="pl-k">-</span>y <span class="pl-c1">2048</span></pre></div>
+
+<p>Produce this output</p>
+
+<pre><code>Lands - world generator
+-----------------------
+ seed              : 4
+ name              : seed3
+ width             : 2048
+ height            : 2048
+ plates resolution : 2048
+ number of plates  : 25
+ operation         : world generation
+ step              : full
+
+starting (it could take a few minutes) ...
+...plates simulated
+...elevation noise added
+...elevation level calculated
+...precipations calculated
+...erosion calculated
+...humidity calculated
+...permeability level calculated
+
+Biome obtained:
+     subtropical thorn woodland =   16353
+                tropical desert =     188
+             boreal rain forest =   69472
+        tropical thorn woodland =   19680
+            subpolar dry tundra =    6316
+      warm temperate wet forest =   17799
+            subpolar wet tundra =   24453
+          subpolar moist tundra =   15104
+            tropical wet forest =   18441
+           subpolar rain tundra =   79723
+           tropical rain forest =    5906
+                            ice =   85254
+          tropical moist forest =   28871
+        subtropical rain forest =   14733
+            boreal moist forest =   24395
+              boreal wet forest =   35212
+         subtropical dry forest =   26259
+       subtropical desert scrub =    3256
+       subtropical moist forest =   25220
+    cool temperate desert scrub =   11162
+          cool temperate steppe =   25604
+               boreal dry scrub =   13403
+            tropical dry forest =   22415
+       tropical very dry forest =   27033
+          tropical desert scrub =    2473
+    warm temperate moist forest =   27704
+    warm temperate desert scrub =    4861
+     warm temperate rain forest =   10774
+    cool temperate moist forest =   42770
+      cool temperate wet forest =   52813
+      warm temperate dry forest =   29992
+                          ocean = 3314282
+          cool temperate desert =    2950
+             subtropical desert =     287
+          warm temperate desert =     709
+     cool temperate rain forest =   46844
+         subtropical wet forest =   18280
+                  boreal desert =    5445
+     warm temperate thorn scrub =   16175
+                   polar desert =    1693
+
+Producing ouput:
+* world data saved in './an_example.world'
+* ocean image generated in './an_example_ocean.png'
+* precipitation image generated in './an_example_precipitation.png'
+* temperature image generated in './an_example_temperature.png'
+* biome image generated in './an_example_biome.png'
+* elevation image generated in './an_example_elevation.png'
+...done
+
+</code></pre>
+
+<p>This is the corresponding ancient map</p>
+
+<div class="highlight highlight-python"><pre>python lands<span class="pl-k">/</span>generator.py ancient_map <span class="pl-k">-</span>w an_example.world</pre></div>
+
+<p><img src="https://raw.githubusercontent.com/ftomassetti/lands/master/examples/ancient_map_large.png" alt=""></p>
+
+<h1>
+<a id="algorithm" class="anchor" href="#algorithm" aria-hidden="true"><span class="octicon octicon-link"></span></a>Algorithm</h1>
+
+<p>The world generation algorithm goes through different phases:</p>
+
+<ul>
+<li>plates simulation: it is the best way to get proper mountain chains. For this <a href="https://github.com/ftomassetti/pyplatec">pyplatec</a> is used</li>
+<li>noise techniques are used at different steps</li>
+<li>precipitations are calculated considering latitude and rain shadow effects</li>
+<li>erosion is calculated</li>
+<li>humidity in each zone is calculated</li>
+<li>terrain permeability is calculated</li>
+<li>biome is calculated using the <a href="http://en.wikipedia.org/wiki/Holdridge_life_zones">Holdridge life zones</a> model</li>
+</ul>
+
+<h1>
+<a id="install-dependencies" class="anchor" href="#install-dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install dependencies</h1>
+
+<p>Using virtualenv you can install the dependencies in this way</p>
+
+<p>Python 2:</p>
+
+<div class="highlight highlight-bash"><pre>virtualenv venv
+<span class="pl-s3">source</span> venv/bin/activate    
+pip install -r requirements2.txt</pre></div>
+
+<p>Python 3:</p>
+
+<div class="highlight highlight-bash"><pre>pyvenv venv3
+<span class="pl-s3">source</span> venv3/bin/activate    
+pip3 install -r requirements3.txt</pre></div>
+
+<h1>
+<a id="do-you-have-problems-or-suggestions-for-improvements" class="anchor" href="#do-you-have-problems-or-suggestions-for-improvements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Do you have problems or suggestions for improvements?</h1>
+
+<p>Please write to me!
+You can write at f <em>dot</em> tomassetti <em>at</em> gmail <em>dot</em> com
+Thank you, all the feedback is precious for me!</p>
+
+<h1>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h1>
+
+<p>Libjpeg and libtiff are required by PIL</p>
+
+<h1>
+<a id="contributors" class="anchor" href="#contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributors</h1>
+
+<p>All contributions, questions, ideas are more than welcome!
+Feel free to open an issue or drop me an e-mail.</p>
+
+<p>I would like to thank you great people who helped me while working on Lands:</p>
+
+<ul>
+<li><p><a href="https://github.com/esampson">Evan Sampson</a> contributed the amazing implementation of the Holdridge life zones model and improved a lot the ancient-looking-map, biome, precipitation and temperature generators. Thanks a million!</p></li>
+<li><p><a href="https://github.com/SourceRyan">Ryan</a> contributed the Windows binary version and discussed Lands on Reddit bringing a lot of users. Thanks a million!</p></li>
+<li><p><a href="https://github.com/stefan-feltmann">stefan-feltmann</a> made Lands depends on pillow instead that on PIL (which is deprecated). This could also help when moving to Python 3. Thanks a million!</p></li>
+<li><p><a href="https://github.com/rbb">Russell Brinkmann</a> helped saving the generation parameters in the generated world (so that we can use it to generate the same world again, for example), improved the command line options and added tracing information (useful for understanding the performance of the various generation steps)</p></li>
+</ul>
+
+<h1>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h1>
+
+<p>Lands is available under the MIT License. You should find the LICENSE in the root of the project.</p>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
