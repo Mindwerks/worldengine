@@ -1,4 +1,4 @@
-### _Announcement: Lands has been merged with WorldSynth_
+### _Announcement: Lands and WorldSynth have been merged to create WorldEngine_
 
 Lands has been recently merged with [WorldSynth](https://github.com/psi29a/worldsynth).
 We are now working on merging the code, taking the best of the two projects.
@@ -7,7 +7,7 @@ We started a [google group](https://groups.google.com/forum/?hl=en#!forum/lands_
 
 ---
 
-Lands - a world generator
+WorldEngine - a world generator
 =========================
 
 [![Build Status](https://travis-ci.org/Mindwerks/lands.svg?branch=master)](https://travis-ci.org/Mindwerks/lands)
@@ -308,4 +308,4 @@ I would like to thank you great people who helped me while working on Lands:
 License
 =======
 
-Lands is available under the MIT License. You should find the LICENSE in the root of the project.
+WorldEngine is available under the MIT License. You should find the LICENSE in the root of the project.
