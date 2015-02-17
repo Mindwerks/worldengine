@@ -2,8 +2,8 @@ import random
 import time
 from noise import snoise2
 
-from lands.simulations.basic import *
-from lands.common import *
+from worldengine.simulations.basic import *
+from worldengine.common import *
 
 class PrecipitationSimulation(object):
 

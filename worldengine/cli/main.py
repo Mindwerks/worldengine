@@ -3,14 +3,14 @@ from PIL import Image
 from optparse import OptionParser, OptionGroup
 import os
 
-import lands.generation as geo
-from lands.plates import world_gen, generate_plates_simulation, array_to_matrix
-from lands.draw import *
-from lands.drawing_functions import *
-from lands.world import *
-from lands.common import *
-from lands.step import Step
-from lands.version import __version__
+import worldengine.generation as geo
+from worldengine.plates import world_gen, generate_plates_simulation, array_to_matrix
+from worldengine.draw import *
+from worldengine.drawing_functions import *
+from worldengine.world import *
+from worldengine.common import *
+from worldengine.step import Step
+from worldengine.version import __version__
 
 VERSION = __version__
 

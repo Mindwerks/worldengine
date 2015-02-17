@@ -1,4 +1,4 @@
-from lands.simulations.basic import *
+from worldengine.simulations.basic import *
 import math
 
 class ErosionSimulation(object):

@@ -1,7 +1,7 @@
 from PIL import Image
 
-from lands.drawing_functions import *
-from lands.common import *
+from worldengine.drawing_functions import *
+from worldengine.common import *
 
 # -------------
 # Helper values

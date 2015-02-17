@@ -8,7 +8,7 @@ import random
 import math
 import sys
 import time
-from lands.common import  *
+from worldengine.common import  *
 
 
 # -------------------
