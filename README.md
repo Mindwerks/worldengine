@@ -10,7 +10,7 @@ We started a [google group](https://groups.google.com/forum/?hl=en#!forum/lands_
 WorldEngine - a world generator
 =========================
 
-[![Build Status](https://travis-ci.org/Mindwerks/lands.svg?branch=master)](https://travis-ci.org/Mindwerks/lands)
+[![Build Status](https://travis-ci.org/Mindwerks/Worldengine.svg?branch=master)](https://travis-ci.org/Mindwerks/worldengine)
 
 _Last Lands version: 0.5.3, Last WorldSynth version: 0.12_
 
@@ -19,6 +19,9 @@ You can generate worlds data (heighmap, biome, etc.) and images for your own wor
 For example:
 
 ```bash
+# WorldEngine
+worldengine world -s 1 -n seed1
+
 # Lands 0.5.1 or next
 lands world -s 1 -n seed1
 
@@ -33,6 +36,9 @@ Once a world it can be used for simulation civs evolution (see project [civs](ht
 For a generated world is also possible to generate additional maps, for example ancient looking map:
 
 ```bash
+# WorldEngine
+worldengine ancient_map -w seed1.world
+
 # Lands 0.5.1 or next
 lands ancient_map -w seed1.world
 
@@ -40,15 +46,15 @@ lands ancient_map -w seed1.world
 python lands/generator.py ancient_map -w seed1.world
 ```
 
-![](https://raw.githubusercontent.com/Mindwerks/lands/master/examples/ancient_map_seed1.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/ancient_map_seed1.png)
 
 Gui
 ===
 
-Since version 0.5.0 an experimental (and limited!) GUI is available. 
+An experimental (and limited!) GUI is available. 
 
 ```
-landsgui
+worldenginegui
 ```
 
 Note: it requires to install QT (available here [http://qt-project.org/](http://qt-project.org/))
@@ -59,7 +65,9 @@ Install
 ### Using pip
 
 ```
-pip install lands
+# Currently not yet released on pypi, you may want to still use Lands or WorldSynth
+# or alternatively download the source
+pip install worldengine
 ```
 
 ### From source code
@@ -67,21 +75,21 @@ pip install lands
 ```
 git clone or download the code
 
-# before using lands: if you plan to change the code
+# before using worldengine: if you plan to change the code
 python setup.py develop 
 
-# before using lands: if you want just to install lands
+# before using worldengine: if you want just to install worldengine
 # on unix-ish system you could have to prepend sudo
 python setup.py install
 ```
 
 ### _On Windows_
 
-Executable file is available under [releases](https://github.com/Mindwerks/lands/releases)
+Executable file is available under [releases](https://github.com/Mindwerks/worldengine/releases)
 
-Note: you need also a copy of the lands src directory in the same folder as the exe.
+Note: you need also a copy of the worldengine src directory in the same folder as the exe.
 
-If you want to build Lands on Windows you can read these [instructions](https://github.com/Mindwerks/lands/wiki/Lands-on-Windows).
+If you want to build Worldengine on Windows you can read these [instructions](https://github.com/Mindwerks/worldengine/wiki/Lands-on-Windows).
 
 Note: the problem could crash after generating the files, it is a known problem but you should have anyway your nice maps generated! We are working on a fix for that
 
@@ -97,29 +105,29 @@ The program produces a binary format with all the data of the generated world an
 
 ## Elevation Map
 
-![](https://raw.githubusercontent.com/Mindwerks/lands/master/examples/world_seed_1_elevation.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_elevation.png)
 
 ## Precipitation Map
 
-![](https://raw.githubusercontent.com/Mindwerks/lands/master/examples/world_seed_1_precipitation.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_precipitation.png)
 
 ## Temperature Map
 
-![](https://raw.githubusercontent.com/Mindwerks/lands/master/examples/world_seed_1_temperature.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_temperature.png)
 
 ## Biome Map
 
-![](https://raw.githubusercontent.com/Mindwerks/lands/master/examples/world_seed_1_biome.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_biome.png)
 
 ## Ocean Map
 
-![](https://raw.githubusercontent.com/Mindwerks/lands/master/examples/world_seed_1_ocean.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_ocean.png)
 
 Usage
 =====
 
 ```
-lands [options] [world|plates|ancient_map]
+worldengine [options] [world|plates|ancient_map]
 ```
 _Note that options were changed in version 0.5.3_
 
@@ -157,13 +165,13 @@ _Note that options were changed in version 0.5.3_
 For example these commands:
 
 ```python
-python lands/generator.py world -s 4 -n an_example -p 2048 -q 25 -x 2048 -y 2048
+worldengine world -s 4 -n an_example -p 2048 -q 25 -x 2048 -y 2048
 ```
 
 Produce this output
 
 ```
-Lands - world generator
+Worldengine - world generator
 -----------------------
  seed              : 4
  name              : seed3
@@ -239,10 +247,10 @@ Producing ouput:
 This is the corresponding ancient map
 
 ```python
-python lands/generator.py ancient_map -w an_example.world
+worldengine ancient_map -w an_example.world
 ```
 
-![](https://raw.githubusercontent.com/Mindwerks/lands/master/examples/ancient_map_large.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/ancient_map_large.png)
 
 Algorithm
 =========
