@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-GUI Interface for Lands
+GUI Interface for Worldengine
 """
 
 import sys
@@ -310,10 +310,10 @@ class SimulationOp(object):
         ui.on_finish()
 
 
-class LandsGui(QtGui.QMainWindow):
+class WorldengineGui(QtGui.QMainWindow):
     
     def __init__(self):
-        super(LandsGui, self).__init__()        
+        super(WorldengineGui, self).__init__()
         self._init_ui()
         self.world = None
         self.current_view = None
@@ -323,7 +323,7 @@ class LandsGui(QtGui.QMainWindow):
         
     def _init_ui(self):            
         self.resize(800, 600)
-        self.setWindowTitle('Lands - A world generator')        
+        self.setWindowTitle('Worldengine - A world generator')
         self.set_status('No world selected: create or load a world')
         self._prepare_menu()
         self.label = QtGui.QLabel()
@@ -571,7 +571,7 @@ def main():
     
     app = QtGui.QApplication(sys.argv)
 
-    lg = LandsGui()
+    lg = WorldengineGui()
     
     sys.exit(app.exec_())
 
