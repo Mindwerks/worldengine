@@ -1,7 +1,7 @@
 import unittest
 
-from lands.drawing_functions import *
-from lands.world import *
+from worldengine.drawing_functions import *
+from worldengine.world import *
 from tests.draw_test import TestBase, PixelCollector, TestDraw
 
 
