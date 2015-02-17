@@ -225,7 +225,7 @@ def main():
     if options.rivers_map and not generation_operation:
         usage(error="Rivers map can be produced only during world generation")
 
-    print('Lands - a world generator (v. %s)' % VERSION)
+    print('Worldengine - a world generator (v. %s)' % VERSION)
     print('-----------------------')
     print(' operation         : %s generation' % operation)
     if generation_operation:
@@ -292,7 +292,7 @@ def main():
 def usage(error=None):
     print(' -------------------------------------------------------------------------')
     print(' Federico Tomassetti and Bret Curtis, 2011-2015')
-    print(' Lands - a world generator (v. %s)' % VERSION)
+    print(' Worldengine - a world generator (v. %s)' % VERSION)
     print(' ')
     print(' generator <world_name> [operation] [options]')
     print(' possible operations: %s' % OPERATIONS)
