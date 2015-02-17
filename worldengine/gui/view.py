@@ -1,6 +1,6 @@
 from PyQt4 import QtGui
-from lands.draw import elevation_color
-import lands.drawing_functions
+from worldengine.draw import elevation_color
+import worldengine.drawing_functions
 
 def draw_simple_elevation_on_screen(world, canvas):
     width = world.width

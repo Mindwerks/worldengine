@@ -1,14 +1,14 @@
-from lands.world import *
-from lands.simulations.WatermapSimulation import *
-from lands.simulations.IrrigationSimulation import *
-from lands.simulations.HumiditySimulation import *
-from lands.simulations.TemperatureSimulation import *
-from lands.simulations.PermeabilitySimulation import *
-from lands.simulations.ErosionSimulation import *
-from lands.simulations.PrecipitationSimulation import *
-from lands.simulations.BiomeSimulation import *
-from lands.simulations.basic import *
-from lands.common import *
+from worldengine.world import *
+from worldengine.simulations.WatermapSimulation import *
+from worldengine.simulations.IrrigationSimulation import *
+from worldengine.simulations.HumiditySimulation import *
+from worldengine.simulations.TemperatureSimulation import *
+from worldengine.simulations.PermeabilitySimulation import *
+from worldengine.simulations.ErosionSimulation import *
+from worldengine.simulations.PrecipitationSimulation import *
+from worldengine.simulations.BiomeSimulation import *
+from worldengine.simulations.basic import *
+from worldengine.common import *
 
 
 # ------------------

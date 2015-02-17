@@ -10,22 +10,22 @@ from PyQt4 import QtGui, QtCore
 import random
 import threading
 import platec
-from lands.world import World
-import lands.generation
-from lands.generation import *
-from lands.common import *
+from worldengine.world import World
+import worldengine.generation
+from worldengine.generation import *
+from worldengine.common import *
 from view import *
-from lands.plates import *
-from lands.simulations.WatermapSimulation import *
-from lands.simulations.IrrigationSimulation import *
-from lands.simulations.HumiditySimulation import *
-from lands.simulations.TemperatureSimulation import *
-from lands.simulations.PermeabilitySimulation import *
-from lands.simulations.BiomeSimulation import *
-from lands.simulations.PrecipitationSimulation import *
+from worldengine.plates import *
+from worldengine.simulations.WatermapSimulation import *
+from worldengine.simulations.IrrigationSimulation import *
+from worldengine.simulations.HumiditySimulation import *
+from worldengine.simulations.TemperatureSimulation import *
+from worldengine.simulations.PermeabilitySimulation import *
+from worldengine.simulations.BiomeSimulation import *
+from worldengine.simulations.PrecipitationSimulation import *
 
-from lands.views.PrecipitationsView import *
-from lands.views.WatermapView import *
+from worldengine.views.PrecipitationsView import *
+from worldengine.views.WatermapView import *
 
 class GenerateDialog(QtGui.QDialog):
 

@@ -1,4 +1,4 @@
-from lands.simulations.basic import *
+from worldengine.simulations.basic import *
 import random
 
 class TemperatureSimulation(object):
