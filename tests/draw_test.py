@@ -1,9 +1,9 @@
 import unittest
 import os
 from PIL import Image
-from lands.draw import *
-from lands.draw import _biome_colors # need to be explicitly imported
-from lands.world import *
+from worldengine.draw import *
+from worldengine.draw import _biome_colors # need to be explicitly imported
+from worldengine.world import *
 
 
 class PixelCollector:

@@ -1,5 +1,5 @@
 import unittest
-from lands.basic_map_operations import *
+from worldengine.basic_map_operations import *
 
 
 class TestBasicMapOperations(unittest.TestCase):
