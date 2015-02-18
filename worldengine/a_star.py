@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Part of the World Generator project. 
+Part of the WorldEngine project.
 
 author:  Bret Curtis
 license: LGPL v2
@@ -20,10 +20,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
+
 class Path:
 
     def __init__( self, nodes, totalCost ):
-
         self.nodes = nodes
         self.totalCost = totalCost
 
@@ -206,10 +206,19 @@ class SQ_MapHandler:
         return None
 
 
-class pathFinder:
-    '''Using the a* algo we will try to find the best path between two
-    points'''
-    def __init__( self ):
+def _matrix_to_array(matrix):
+    array = []
+    for row in matrix:
+        for cell in row:
+            array.append(cell)
+    return array
+
+
+class PathFinder:
+    """Using the a* algo we will try to find the best path between two
+       points"""
+
+    def __init__(self):
         pass
 
     def find( self, heightmap, source, destination ):
@@ -219,7 +228,7 @@ class pathFinder:
         dim = len( heightmap )
 
         # flatten array
-        graph = heightmap.reshape( dim ** 2 )
+        graph = _matrix_to_array(heightmap)
 
         pathFinder = AStar( SQ_MapHandler( graph, dim, dim ) )
         start = SQ_Location( sx, sy )
