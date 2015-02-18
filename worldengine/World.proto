@@ -104,6 +104,9 @@ message World {
     // this is optional for backward compatibility reasons
     optional GenerationData generationData = 31;
 
+    optional DoubleMatrix lakemap = 32;
+    optional DoubleMatrix rivermap = 33;
+
 }
 
 
