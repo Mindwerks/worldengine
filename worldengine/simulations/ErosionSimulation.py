@@ -1,7 +1,7 @@
 from worldengine.simulations.basic import *
 import math
 import numpy
-import worldengine.aStar
+import worldengine.a_star
 from worldengine.common import *
 
 # Direction
@@ -25,10 +25,13 @@ def in_circle(radius, center_x, center_y, x, y):
     square_dist = ((center_x - x) ** 2 + (center_y - y) ** 2)
     return square_dist <= radius ** 2
 
-# Currently we do not know how to serialize numpy array :(
-# In the future we will use pytables
 
 def _numpy_to_matrix(numpyarray):
+    """Convert a bidimensional numpy array to a plain Python matrix.
+
+    This is used because currently we do not know how to serialize numpy arrays :(
+    with pickle. In the future we will use pytables"""
+
     width = numpyarray.shape[0]
     height = numpyarray.shape[1]
     return [[numpyarray[x, y] for x in xrange(width)] for y in xrange(height)]
@@ -42,49 +45,47 @@ class ErosionSimulation(object):
     def is_applicable(self, world):
         return world.has_precipitations()
 
-
     def execute(self, world, seed):
-        waterFlow = numpy.zeros((world.width, world.height))
-        waterPath = numpy.zeros((world.width, world.height), dtype=int)
-        riverList = []
-        lakeList = []
-        riverMap = numpy.zeros((world.width, world.height))
-        lakeMap = numpy.zeros((world.width, world.height))
-
+        water_flow = numpy.zeros((world.width, world.height))
+        water_path = numpy.zeros((world.width, world.height), dtype=int)
+        river_list = []
+        lake_list = []
+        river_map = numpy.zeros((world.width, world.height))
+        lake_map = numpy.zeros((world.width, world.height))
 
         # step one: water flow per cell based on rainfall
-        self.find_water_flow(world, waterPath)
+        self.find_water_flow(world, water_path)
 
         # step two: find river sources (seeds)
-        riverSources = self.river_sources(world, waterFlow, waterPath)
+        river_sources = self.river_sources(world, water_flow, water_path)
 
         # step three: for each source, find a path to sea
-        for source in riverSources:
-            river = self.riverFlow(source, world, riverList, lakeList)
+        for source in river_sources:
+            river = self.river_flow(source, world, river_list, lake_list)
             if len(river) > 0:
-                riverList.append(river)
+                river_list.append(river)
                 self.cleanUpFlow(river, world)
                 rx, ry = river[-1]  # find last cell in river
                 if not world.is_ocean((rx, ry)):
-                    lakeList.append(river[-1])  # river flowed into a lake
+                    lake_list.append(river[-1])  # river flowed into a lake
 
         # step four: simulate erosion and updating river map
-        for river in riverList:
+        for river in river_list:
             self.river_erosion(river, world)
-            self.rivermap_update(river, waterFlow, riverMap, world.precipitation['data'])
+            self.rivermap_update(river, water_flow, river_map, world.precipitation['data'])
 
         # step five: rivers with no paths to sea form lakes
-        for lake in lakeList:
+        for lake in lake_list:
             # print "Found lake at:",lake
             lx, ly = lake
-            lakeMap[lx, ly] = 0.1  # TODO: make this based on rainfall/flow
+            lake_map[lx, ly] = 0.1  # TODO: make this based on rainfall/flow
             # lakeWater = self.simulateFlood(lake['x'], lake['y'], self.heightmap[lake['x'], lake['y']] + 0.001)
 
-        world.set_rivermap(_numpy_to_matrix(riverMap))
-        world.set_lakemap(_numpy_to_matrix(lakeMap))
+        world.set_rivermap(_numpy_to_matrix(river_map))
+        world.set_lakemap(_numpy_to_matrix(lake_map))
 
     def find_water_flow(self, world, water_path):
-        '''Find the flow direction for each cell in heightmap'''
+        """Find the flow direction for each cell in heightmap"""
 
         # iterate through each cell
         for x in range(world.width - 1):
@@ -108,36 +109,35 @@ class ErosionSimulation(object):
         # 0,1 *** 2,1
         # *** 1,2 ***
         x, y = river
-        newPath = []
-        lowestElevation = world.elevation['data'][y][x]
+        new_path = []
+        lowest_elevation = world.elevation['data'][y][x]
         # lowestDirection = [0, 0]
 
         for dx, dy in DIR_NEIGHBORS:
-            tempDir = [x + dx, y + dy]
-            tx, ty = tempDir
+            temp_dir = [x + dx, y + dy]
+            tx, ty = temp_dir
 
-            if not self.wrap and not world.contains(tempDir):
+            if not self.wrap and not world.contains(temp_dir):
                 continue
 
             tx, ty = overflow(tx, world.width), overflow(ty, world.height)
 
             elevation = world.elevation['data'][ty][tx]
 
-            if elevation < lowestElevation:
-                if world.contains(tempDir):
+            if elevation < lowest_elevation:
+                if world.contains(temp_dir):
                     pass
-                lowestElevation = elevation
-                newPath = [tx,ty]
+                lowest_elevation = elevation
+                new_path = [tx,ty]
 
-        return newPath
+        return new_path
 
     def river_sources(self, world, waterFlow, waterPath):
-        '''Find places on map where sources of river can be found'''
-        riverSourceList = []
+        """Find places on map where sources of river can be found"""
+        river_source_list = []
 
         RIVER_TH = 0.02
 
-        # Version 2, with rainfall
         #  Using the wind and rainfall data, create river 'seeds' by
         #     flowing rainfall along paths until a 'flow' threshold is reached
         #     and we have a beginning of a river... trickle->stream->river->sea
@@ -151,27 +151,27 @@ class ErosionSimulation(object):
         #     above sea level are marked as 'sources'.
         for x in range(0, world.width - 1):
             for y in range(0, world.height - 1):
-                rainFall = world.precipitation['data'][y][x]
-                waterFlow[x, y] = rainFall
+                rain_fall = world.precipitation['data'][y][x]
+                waterFlow[x, y] = rain_fall
 
                 if waterPath[x, y] == 0:
                     continue  # ignore cells without flow direction
                 cx, cy = x, y  # begin with starting location
-                neighbourSeedFound = False
-                while not neighbourSeedFound:  # follow flow path to where it may lead
+                neighbour_seed_found = False
+                while not neighbour_seed_found:  # follow flow path to where it may lead
 
                     # have we found a seed?
                     if world.is_mountain((cx, cy)) and waterFlow[cx, cy] >= RIVER_TH:
 
                         # try not to create seeds around other seeds
-                        for seed in riverSourceList:
+                        for seed in river_source_list:
                             sx, sy = seed
                             if in_circle(9, cx, cy, sx, sy):
-                                neighbourSeedFound = True
-                        if neighbourSeedFound:
+                                neighbour_seed_found = True
+                        if neighbour_seed_found:
                             break  # we do not want seeds for neighbors
 
-                        riverSourceList.append([cx, cy])  # river seed
+                        river_source_list.append([cx, cy])  # river seed
                         # self.riverMap[cx,cy] = self.waterFlow[cx,cy] #temp: mark it on map to see 'seed'
                         break
 
@@ -182,79 +182,68 @@ class ErosionSimulation(object):
                     # follow path, add water flow from previous cell
                     dx, dy = DIR_NEIGHBORS_CENTER[waterPath[cx, cy]]
                     nx, ny = cx + dx, cy + dy  # calculate next cell
-                    waterFlow[nx, ny] += rainFall
+                    waterFlow[nx, ny] += rain_fall
                     cx, cy = nx, ny  # set current cell to next cell
-        return riverSourceList
+        return river_source_list
 
-    def riverFlow(self, source, world, riverList, lakeList):
-        '''simulate fluid dynamics by using starting point and flowing to the
-        lowest available point'''
-        currentLocation = source
+    def river_flow(self, source, world, river_list, lake_list):
+        """simulate fluid dynamics by using starting point and flowing to the
+        lowest available point"""
+        current_location = source
         path = [source]
 
         # start the flow
         while True:
-            x, y = currentLocation
-            lowerElevation = None
-            quickSection = None
-            isWrapped = False
+            x, y = current_location
 
             for dx, dy in DIR_NEIGHBORS:  # is there a river nearby, flow into it
                 ax, ay = x + dx, y + dy
                 if self.wrap:
                     ax, ay = overflow(ax, world.width), overflow(ay, world.height)
 
-                for river in riverList:
+                for river in river_list:
                     if [ax, ay] in river:
-                        #print "Found another river at:", x, y, " -> ", ax, ay, " Thus, using that river's path."
                         merge = False
                         for rx, ry in river:
                             if [ax, ay] == [rx, ry]:
                                 merge = True
                                 path.append([rx, ry])
-                            elif merge == True:
+                            elif merge:
                                 path.append([rx, ry])
                         return path  # skip the rest, return path
 
             # found a sea?
-            #print "Flowing to...",x,y
             if world.is_ocean((x,y)):
                 break
 
             # find our immediate lowest elevation and flow there
-            quickSection = self.find_quick_path(currentLocation, world)
+            quick_section = self.find_quick_path(current_location, world)
 
-            if quickSection:
-                path.append(quickSection)
-                currentLocation = quickSection
+            if quick_section:
+                path.append(quick_section)
+                current_location = quick_section
                 continue # stop here and enter back into loop
 
-            isWrapped, lowerElevation = self.findLowerElevation(currentLocation, world)
-            if lowerElevation and not isWrapped:
-                lowerPath = None
-                lowerPath = lands.aStar.pathFinder().find(world.elevation['data'], currentLocation, lowerElevation)
-                if lowerPath:
-                    path += lowerPath
-                    currentLocation = path[-1]
+            is_wrapped, lower_elevation = self.findLowerElevation(current_location, world)
+            if lower_elevation and not is_wrapped:
+                lower_path = worldengine.aStar.pathFinder().find(world.elevation['data'], current_location, lower_elevation)
+                if lower_path:
+                    path += lower_path
+                    current_location = path[-1]
                 else:
                     break
-            elif lowerElevation and isWrapped:
-                #TODO: make this more natural
-                maxRadius = 40
-                wrappedX = wrappedY = False
-#                print 'Found a lower elevation on wrapped path, searching path!'
-#                print 'We go from',currentLocation,'to',lowerElevation
-                cx,cy = currentLocation
-                lx,ly = lowerElevation
-                nx,ny = lowerElevation
+            elif lower_elevation and is_wrapped:
+                # TODO: make this more natural
+                max_radius = 40
 
-                if (x < 0 or y < 0 or x > world.width or y > world.height):
-                    print("BUG: fix me... we shouldn't be here:", currentLocation, lowerElevation)
-                    break
+                cx, cy = current_location
+                lx, ly = lower_elevation
 
-                if not in_circle(maxRadius, cx, cy, lx, cy):
+                if x < 0 or y < 0 or x > world.width or y > world.height:
+                    raise Exception("BUG: fix me... we shouldn't be here: %s %s" % (current_location, lower_elevation))
+
+                if not in_circle(max_radius, cx, cy, lx, cy):
                     # are we wrapping on x axis?
-                    #print "We found wrapping along x-axis"
                     if cx-lx < 0:
                         lx = 0 # move to left edge
                         nx = world.width-1 # next step is wrapped around
@@ -262,9 +251,8 @@ class ErosionSimulation(object):
                         lx = world.width-1 # move to right edge
                         nx = 0 # next step is wrapped around
                     ly = ny = int( (cy+ly)/2 ) # move halfway
-                elif not in_circle(maxRadius, cx, cy, cx, ly):
+                elif not in_circle(max_radius, cx, cy, cx, ly):
                     # are we wrapping on y axis?
-#                    print "We found wrapping along y-axis"
                     if cy-ly < 0:
                         ly = 0 # move to top edge
                         ny = world.height-1 # next step is wrapped around
@@ -273,44 +261,30 @@ class ErosionSimulation(object):
                         ny = 0 # next step is wrapped around
                     lx = nx = int( (cx+lx)/2 ) # move halfway
                 else:
-#                    print "BUG: fix me... we are not in circle:", currentLocation, lowerElevation
-                    break
+                    raise Exception("BUG: fix me... we are not in circle: %s %s" % (current_location, lower_elevation))
 
                 # find our way to the edge
                 edgePath = None
-                edgePath = lands.aStar.pathFinder().find(world.elevation['data'], [cx,cy], [lx,ly])
+                edgePath = worldengine.aStar.pathFinder().find(world.elevation['data'], [cx,cy], [lx,ly])
                 if not edgePath:
-#                    print "We've reached the end of this river, we cannot get through."
                     # can't find another other path, make it a lake
-                    lakeList.append(currentLocation)
+                    lake_list.append(current_location)
                     break
                 path += edgePath # add our newly found path
                 path.append([nx,ny]) # finally add our overflow to other side
-                currentLocation = path[-1]
-#                print "Path found from ", [cx,cy], 'to', [lx,ly], 'via:'
-#                print edgePath
-#                print "We then wrap on: ", [nx, ny]
+                current_location = path[-1]
 
                 # find our way to lowest position original found
-                lowerPath = lands.aStar.pathFinder().find(world.elevation['data'], currentLocation, lowerElevation)
-                path += lowerPath
-                currentLocation = path[-1]
-#                print "We then go to our destination: ", lowerElevation
-#                print lowerPath
-#                print " "
-#                print "Full path begin and end ", path[0], path[-1]
-                hx,hy = path[0]
-                hlx,hly = path[-1]
-#                print "Elevations: ", self.heightmap[hx,hy], self.heightmap[hlx,hly]
-#                print "Erosion: ", self.erosionMap[hx,hy], self.erosionMap[hlx,hly]
-#                print " "
-                #break
-            else: # can't find any other path, make it a lake
-                lakeList.append(currentLocation)
-                break # end of river
+                lower_path = worldengine.aStar.pathFinder().find(world.elevation['data'], current_location, lower_elevation)
+                path += lower_path
+                current_location = path[-1]
 
-            if not world.contains(currentLocation):
-                print("Why are we here:",currentLocation)
+            else: # can't find any other path, make it a lake
+                lake_list.append(current_location)
+                break  # end of river
+
+            if not world.contains(current_location):
+                print("Why are we here:",current_location)
 
         return path
 
