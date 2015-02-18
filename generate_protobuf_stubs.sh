@@ -1,2 +1,2 @@
 #!/bin/bash
-protoc -I=lands --python_out=lands/protobuf lands/World.proto
+protoc -I=worldengine --python_out=worldengine/protobuf worldengine/World.proto
