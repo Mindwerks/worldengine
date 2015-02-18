@@ -226,7 +226,7 @@ class ErosionSimulation(object):
 
             is_wrapped, lower_elevation = self.findLowerElevation(current_location, world)
             if lower_elevation and not is_wrapped:
-                lower_path = worldengine.aStar.pathFinder().find(world.elevation['data'], current_location, lower_elevation)
+                lower_path = worldengine.a_star.PathFinder().find(world.elevation['data'], current_location, lower_elevation)
                 if lower_path:
                     path += lower_path
                     current_location = path[-1]
@@ -265,7 +265,7 @@ class ErosionSimulation(object):
 
                 # find our way to the edge
                 edgePath = None
-                edgePath = worldengine.aStar.pathFinder().find(world.elevation['data'], [cx,cy], [lx,ly])
+                edgePath = worldengine.a_star.PathFinder().find(world.elevation['data'], [cx,cy], [lx,ly])
                 if not edgePath:
                     # can't find another other path, make it a lake
                     lake_list.append(current_location)
@@ -275,7 +275,7 @@ class ErosionSimulation(object):
                 current_location = path[-1]
 
                 # find our way to lowest position original found
-                lower_path = worldengine.aStar.pathFinder().find(world.elevation['data'], current_location, lower_elevation)
+                lower_path = worldengine.a_star.PathFinder().find(world.elevation['data'], current_location, lower_elevation)
                 path += lower_path
                 current_location = path[-1]
 
