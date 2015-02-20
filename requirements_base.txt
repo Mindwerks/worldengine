@@ -1,5 +1,5 @@
 Pillow==2.6.1
-PyPlatec==1.2.8
+PyPlatec==1.2.9
 langgen==0.1.2
 argparse==1.2.1
 noise==1.2.1
