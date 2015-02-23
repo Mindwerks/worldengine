@@ -1,18 +1,16 @@
-__author__ = 'Federico Tomassetti'
-
 import sys
 from PIL import Image
 from optparse import OptionParser, OptionGroup
 import os
 
-import lands.generation as geo
-from lands.plates import world_gen, generate_plates_simulation, array_to_matrix
-from lands.draw import *
-from lands.drawing_functions import *
-from lands.world import *
-from lands.common import *
-from lands.step import Step
-from lands.version import __version__
+import worldengine.generation as geo
+from worldengine.plates import world_gen, generate_plates_simulation, array_to_matrix
+from worldengine.draw import *
+from worldengine.drawing_functions import *
+from worldengine.world import *
+from worldengine.common import *
+from worldengine.step import Step
+from worldengine.version import __version__
 
 VERSION = __version__
 
@@ -227,7 +225,7 @@ def main():
     if options.rivers_map and not generation_operation:
         usage(error="Rivers map can be produced only during world generation")
 
-    print('Lands - a world generator (v. %s)' % VERSION)
+    print('Worldengine - a world generator (v. %s)' % VERSION)
     print('-----------------------')
     print(' operation         : %s generation' % operation)
     if generation_operation:
@@ -293,8 +291,8 @@ def main():
 
 def usage(error=None):
     print(' -------------------------------------------------------------------------')
-    print(' Federico Tomassetti, 2013-2015')
-    print(' Lands - a world generator (v. %s)' % VERSION)
+    print(' Federico Tomassetti and Bret Curtis, 2011-2015')
+    print(' Worldengine - a world generator (v. %s)' % VERSION)
     print(' ')
     print(' generator <world_name> [operation] [options]')
     print(' possible operations: %s' % OPERATIONS)

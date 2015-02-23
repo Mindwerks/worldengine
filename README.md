@@ -1,15 +1,27 @@
-Lands - a world generator
+### _Announcement: Lands and WorldSynth have been merged to create WorldEngine_
+
+Lands has been recently merged with [WorldSynth](https://github.com/psi29a/worldsynth).
+We are now working on merging the code, taking the best of the two projects.
+
+We started a [google group](https://groups.google.com/forum/?hl=en#!forum/lands_worldsynth): if you have ideas, problems, suggestions or want to contribute please [join us](https://groups.google.com/forum/?hl=en#!forum/lands_worldsynth)!_
+
+---
+
+WorldEngine - a world generator
 =========================
 
-[![Build Status](https://travis-ci.org/Mindwerks/lands.svg?branch=master)](https://travis-ci.org/ftomassetti/lands)
+[![Build Status](https://travis-ci.org/Mindwerks/Worldengine.svg?branch=master)](https://travis-ci.org/Mindwerks/worldengine)
 
-_Current version: 0.5.3_
+_Last Lands version: 0.5.3, Last WorldSynth version: 0.12_
 
 You can generate worlds data (heighmap, biome, etc.) and images for your own worlds.
 
 For example:
 
 ```bash
+# WorldEngine
+worldengine world -s 1 -n seed1
+
 # Lands 0.5.1 or next
 lands world -s 1 -n seed1
 
@@ -24,6 +36,9 @@ Once a world it can be used for simulation civs evolution (see project [civs](ht
 For a generated world is also possible to generate additional maps, for example ancient looking map:
 
 ```bash
+# WorldEngine
+worldengine ancient_map -w seed1.world
+
 # Lands 0.5.1 or next
 lands ancient_map -w seed1.world
 
@@ -31,15 +46,15 @@ lands ancient_map -w seed1.world
 python lands/generator.py ancient_map -w seed1.world
 ```
 
-![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/ancient_map_seed1.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/ancient_map_seed1.png)
 
 Gui
 ===
 
-Since version 0.5.0 an experimental (and limited!) GUI is available. 
+An experimental (and limited!) GUI is available. 
 
 ```
-landsgui
+worldenginegui
 ```
 
 Note: it requires to install QT (available here [http://qt-project.org/](http://qt-project.org/))
@@ -50,7 +65,9 @@ Install
 ### Using pip
 
 ```
-pip install lands
+# Currently not yet released on pypi, you may want to still use Lands or WorldSynth
+# or alternatively download the source
+pip install worldengine
 ```
 
 ### From source code
@@ -58,21 +75,21 @@ pip install lands
 ```
 git clone or download the code
 
-# before using lands: if you plan to change the code
+# before using worldengine: if you plan to change the code
 python setup.py develop 
 
-# before using lands: if you want just to install lands
+# before using worldengine: if you want just to install worldengine
 # on unix-ish system you could have to prepend sudo
 python setup.py install
 ```
 
 ### _On Windows_
 
-Executable file is available under [releases](https://github.com/ftomassetti/lands/releases)
+Executable file is available under [releases](https://github.com/Mindwerks/worldengine/releases)
 
-Note: you need also a copy of the lands src directory in the same folder as the exe.
+Note: you need also a copy of the worldengine src directory in the same folder as the exe.
 
-If you want to build Lands on Windows you can read these [instructions](https://github.com/ftomassetti/lands/wiki/Lands-on-Windows).
+If you want to build Worldengine on Windows you can read these [instructions](https://github.com/Mindwerks/worldengine/wiki/Lands-on-Windows).
 
 Note: the problem could crash after generating the files, it is a known problem but you should have anyway your nice maps generated! We are working on a fix for that
 
@@ -88,29 +105,29 @@ The program produces a binary format with all the data of the generated world an
 
 ## Elevation Map
 
-![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_elevation.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_elevation.png)
 
 ## Precipitation Map
 
-![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_precipitation.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_precipitation.png)
 
 ## Temperature Map
 
-![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_temperature.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_temperature.png)
 
 ## Biome Map
 
-![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_biome.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_biome.png)
 
 ## Ocean Map
 
-![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/world_seed_1_ocean.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_ocean.png)
 
 Usage
 =====
 
 ```
-lands [options] [world|plates|ancient_map]
+worldengine [options] [world|plates|ancient_map]
 ```
 _Note that options were changed in version 0.5.3_
 
@@ -148,13 +165,13 @@ _Note that options were changed in version 0.5.3_
 For example these commands:
 
 ```python
-python lands/generator.py world -s 4 -n an_example -p 2048 -q 25 -x 2048 -y 2048
+worldengine world -s 4 -n an_example -p 2048 -q 25 -x 2048 -y 2048
 ```
 
 Produce this output
 
 ```
-Lands - world generator
+Worldengine - world generator
 -----------------------
  seed              : 4
  name              : seed3
@@ -230,16 +247,16 @@ Producing ouput:
 This is the corresponding ancient map
 
 ```python
-python lands/generator.py ancient_map -w an_example.world
+worldengine ancient_map -w an_example.world
 ```
 
-![](https://raw.githubusercontent.com/ftomassetti/lands/master/examples/ancient_map_large.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/ancient_map_large.png)
 
 Algorithm
 =========
 
 The world generation algorithm goes through different phases:
-* plates simulation: it is the best way to get proper mountain chains. For this [pyplatec](https://github.com/ftomassetti/pyplatec) is used
+* plates simulation: it is the best way to get proper mountain chains. For this [pyplatec](https://github.com/Mindwerks/pyplatec) is used
 * noise techniques are used at different steps
 * precipitations are calculated considering latitude and rain shadow effects
 * erosion is calculated
@@ -269,9 +286,9 @@ pip3 install -r requirements3.txt
 Do you have problems or suggestions for improvements?
 =====================================================
 
-Please write to me!
+Please write to us!
 You can write at f _dot_ tomassetti _at_ gmail _dot_ com
-Thank you, all the feedback is precious for me!
+Thank you, all the feedback is precious for us!
 
 Requirements
 ============
@@ -281,8 +298,10 @@ Libjpeg and libtiff are required by PIL
 Contributors
 ============
 
+The merged project is maintained by [Bret Curtis](https://github.com/psi29a) and [Federico Tomassetti](https://github.com/ftomassetti).
+
 All contributions, questions, ideas are more than welcome!
-Feel free to open an issue or drop me an e-mail.
+Feel free to open an issue or write in our [google group](https://groups.google.com/forum/?hl=en#!forum/lands_worldsynth).
 
 I would like to thank you great people who helped me while working on Lands:
 
@@ -297,4 +316,4 @@ I would like to thank you great people who helped me while working on Lands:
 License
 =======
 
-Lands is available under the MIT License. You should find the LICENSE in the root of the project.
+WorldEngine is available under the MIT License. You should find the LICENSE in the root of the project.

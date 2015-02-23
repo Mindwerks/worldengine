@@ -4,13 +4,11 @@ so no references to PIL are necessary and the module can be used also through
 Jython
 """
 
-__author__ = 'Federico Tomassetti'
-
 import random
 import math
 import sys
 import time
-from lands.common import  *
+from worldengine.common import  *
 
 
 # -------------------

@@ -1,6 +1,4 @@
-__author__ = 'Federico Tomassetti'
-
-from lands.simulations.basic import *
+from worldengine.simulations.basic import *
 
 class HumiditySimulation(object):
 

@@ -1,8 +1,6 @@
-__author__ = 'Federico Tomassetti'
-
-from lands.simulations.basic import *
+from worldengine.simulations.basic import *
 import random
-from lands.views.basic import color_prop
+from worldengine.views.basic import color_prop
 from PyQt4 import QtGui
 
 class PrecipitationsView(object):

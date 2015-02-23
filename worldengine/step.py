@@ -1,6 +1,3 @@
-__author__ = 'Federico Tomassetti'
-
-
 class Step(object):
     """ A Step in the world generation process.
         The process starts with plates simulation and go on through different intermediate

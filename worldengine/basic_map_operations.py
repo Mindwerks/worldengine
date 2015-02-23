@@ -1,5 +1,3 @@
-__author__ = 'Federico Tomassetti'
-
 import math
 import random
 

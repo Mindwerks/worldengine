@@ -1,7 +1,5 @@
-__author__ = 'Federico Tomassetti'
-
 import unittest
-from lands.common import *
+from worldengine.common import *
 
 
 class TestCommon(unittest.TestCase):
