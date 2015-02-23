@@ -160,7 +160,13 @@ class World(object):
             self._to_protobuf_matrix(self.watermap['data'], p_world.watermapData)
             p_world.watermap_creek = self.watermap['thresholds']['creek']
             p_world.watermap_river = self.watermap['thresholds']['river']
-            p_world.watermap_mainriver = self.watermap['thresholds']['main river']            
+            p_world.watermap_mainriver = self.watermap['thresholds']['main river']
+
+        if hasattr(self, 'lake_map'):
+            self._to_protobuf_matrix(self.lake_map, p_world.lakemap)
+
+        if hasattr(self, 'river_map'):
+            self._to_protobuf_matrix(self.river_map, p_world.rivermap)
 
         if hasattr(self, 'precipitation'):
             self._to_protobuf_matrix(self.precipitation['data'], p_world.precipitationData)
@@ -249,7 +255,23 @@ class World(object):
             ]
             w.set_temperature(t, t_th)
 
+        if len(p_world.lakemap.rows) > 0:
+            m = World._from_protobuf_matrix(p_world.lakemap)
+            w.set_lakemap(m)
+
+        if len(p_world.rivermap.rows) > 0:
+            m = World._from_protobuf_matrix(p_world.rivermap)
+            w.set_rivermap(m)
+
         return w
+
+    ###
+    ### General
+    ###
+
+    def contains(self, pos):
+        x, y = pos
+        return x >= 0 and y >= 0 and x < self.width and y < self.height
 
     ###
     ### Land/Ocean
@@ -797,3 +819,9 @@ class World(object):
 
     def has_biome(self):
         return hasattr(self, 'biome')
+
+    def set_rivermap(self, river_map):
+        self.river_map = river_map
+
+    def set_lakemap(self, lake_map):
+        self.lake_map = lake_map
