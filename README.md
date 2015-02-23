@@ -10,7 +10,7 @@ We started a [google group](https://groups.google.com/forum/?hl=en#!forum/lands_
 WorldEngine - a world generator
 =========================
 
-[![Build Status](https://travis-ci.org/Mindwerks/Worldengine.svg?branch=master)](https://travis-ci.org/Mindwerks/worldengine)
+[![Build Status](https://travis-ci.org/Mindwerks/worldengine.svg?branch=master)](https://travis-ci.org/Mindwerks/worldengine)
 
 _Last Lands version: 0.5.3, Last WorldSynth version: 0.12_
 
