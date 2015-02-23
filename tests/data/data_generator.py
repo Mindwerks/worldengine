@@ -5,8 +5,8 @@
 # because the plate simulation steps do not provide the same results on all the platforms
 
 import os
-from lands.plates import _plates_simulation
-from lands.world import World
+from worldengine.plates import _plates_simulation
+from worldengine.world import World
 
 
 def main(tests_data_dir):

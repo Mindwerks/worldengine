@@ -1,7 +1,5 @@
-__author__ = 'Federico Tomassetti'
-
 import unittest
-from lands.biome import *
+from worldengine.biome import *
 
 
 class TestBiome(unittest.TestCase):

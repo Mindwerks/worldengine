@@ -1,6 +1,6 @@
 import unittest
-from lands.generation import *
-from lands.plates import *
+from worldengine.generation import *
+from worldengine.plates import *
 import tempfile
 
 from tests.draw_test import TestBase
