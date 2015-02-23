@@ -3,7 +3,7 @@
 Lands has been recently merged with [WorldSynth](https://github.com/psi29a/worldsynth).
 We are now working on merging the code, taking the best of the two projects.
 
-We started a [google group](https://groups.google.com/forum/?hl=en#!forum/lands_worldsynth): if you have ideas, problems, suggestions or want to contribute please [join us](https://groups.google.com/forum/?hl=en#!forum/lands_worldsynth)!_
+We started a [google group](https://groups.google.com/forum/?hl=en#!forum/lands_worldsynth): if you have ideas, problems, suggestions or want to contribute please [join us](https://groups.google.com/forum/?hl=en#!forum/lands_worldsynth)!
 
 ---
 
