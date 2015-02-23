@@ -1,6 +1,3 @@
-__author__ = 'Federico Tomassetti'
-
-
 class BiomeSimulation(object):
 
     def is_applicable(self, world):

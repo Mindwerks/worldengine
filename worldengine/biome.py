@@ -1,7 +1,6 @@
 """
 This file contains all possible Biome as separate classes.
 """
-__author__ = 'Federico Tomassetti'
 
 import re
 

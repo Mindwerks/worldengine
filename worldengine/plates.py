@@ -1,13 +1,11 @@
-__author__ = 'Federico Tomassetti'
-
 # Every reference to platec has to be kept separated because it is a C extension
 # which is not available when using this project from jython
 
 import time
 import platec
 
-from lands.generation import *
-from lands.common import *
+from worldengine.generation import *
+from worldengine.common import *
 
 
 def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_period=60,

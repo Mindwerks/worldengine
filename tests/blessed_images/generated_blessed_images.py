@@ -1,10 +1,8 @@
-__author__ = 'Federico Tomassetti'
-
 # Please refer to README.md in this directory
 
 import os
-from lands.world import *
-from lands.draw import *
+from worldengine.world import *
+from worldengine.draw import *
 
 
 def main(blessed_images_dir, tests_data_dir):

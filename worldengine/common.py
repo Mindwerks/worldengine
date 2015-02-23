@@ -1,5 +1,3 @@
-__author__ = 'Federico Tomassetti'
-
 import math
 import sys
 import copy
@@ -27,7 +25,7 @@ def get_verbose():
 
 def set_verbose(value):
     """
-    Set the level of verbosity for all the operations executed in Lands
+    Set the level of verbosity for all the operations executed in Worldengine
     """
     global verbose
     verbose = value
