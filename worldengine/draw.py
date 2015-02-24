@@ -150,13 +150,15 @@ class ImagePixelSetter(object):
 
 
 def draw_simple_elevation(data, width, height, sea_level, target):
-    """ This function can be used on a generic canvas (either an image to save on disk or a canvas part of a GUI)
+    """ This function can be used on a generic canvas (either an image to save
+        on disk or a canvas part of a GUI)
     """
     for y in range(height):
         for x in range(width):
             e = data[y][x]
             r, g, b = elevation_color(e, sea_level)
-            target.set_pixel(x, y, (int(r * 255), int(g * 255), int(b * 255), 255))
+            target.set_pixel(x, y, (int(r * 255), int(g * 255),
+                                    int(b * 255), 255))
 
 
 def draw_riversmap(world, target):
@@ -181,7 +183,7 @@ def draw_grayscale_heightmap(world, target):
     for y in range(world.height):
         for x in range(world.width):
             e = world.elevation['data'][y][x]
-            if world.is_land((x,y)):
+            if world.is_land((x, y)):
                 if min_elev_land is None or e < min_elev_land:
                     min_elev_land = e
                 if max_elev_land is None or e > max_elev_land:
@@ -198,7 +200,7 @@ def draw_grayscale_heightmap(world, target):
     for y in range(world.height):
         for x in range(world.width):
             e = world.elevation['data'][y][x]
-            if world.is_land((x,y)):
+            if world.is_land((x, y)):
                 c = int(((e - min_elev_land) * 127) / elev_delta_land)+128
             else:
                 c = int(((e - min_elev_sea) * 127) / elev_delta_sea)
@@ -234,10 +236,12 @@ def draw_elevation(world, shadow, target):
                 if shadow and y > 2 and x > 2:
                     if data[y - 1][x - 1] > e:
                         c -= 15
-                    if data[y - 2][x - 2] > e and data[y - 2][x - 2] > data[y - 1][x - 1]:
+                    if data[y - 2][x - 2] > e \
+                            and data[y - 2][x - 2] > data[y - 1][x - 1]:
                         c -= 10
-                    if data[y - 3][x - 3] > e and data[y - 3][x - 3] > data[y - 1][x - 1] and data[y - 3][x - 3] > \
-                            data[y - 2][x - 2]:
+                    if data[y - 3][x - 3] > e \
+                            and data[y - 3][x - 3] > data[y - 1][x - 1] \
+                            and data[y - 3][x - 3] > data[y - 2][x - 2]:
                         c -= 5
                     if c < 0:
                         c = 0
@@ -390,7 +394,9 @@ def draw_biome_on_file(world, filename):
     img.complete()
 
 
-def draw_ancientmap_on_file(world, filename, resize_factor=1, sea_color=(212, 198, 169, 255), verbose=False):
-    img = ImagePixelSetter(world.width * resize_factor, world.height * resize_factor, filename)
+def draw_ancientmap_on_file(world, filename, resize_factor=1,
+                            sea_color=(212, 198, 169, 255), verbose=False):
+    img = ImagePixelSetter(world.width * resize_factor,
+                           world.height * resize_factor, filename)
     draw_ancientmap(world, img, resize_factor, sea_color, verbose)
     img.complete()
