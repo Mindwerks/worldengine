@@ -1,5 +1,6 @@
 from worldengine.simulations.basic import *
 
+
 class WatermapSimulation(object):
 
     def is_applicable(self, world):
@@ -7,7 +8,6 @@ class WatermapSimulation(object):
 
     def execute(self, world, seed):
         world.watermap = self._watermap(world, 20000)
-
 
     def _watermap(self, world, n):
         def droplet(world, pos, q, _watermap):
@@ -25,7 +25,7 @@ class WatermapSimulation(object):
                 e = world.elevation['data'][py][px] + _watermap[py][px]
                 if e < pos_elev:
                     dq = int(pos_elev - e) << 2
-                    if min_lower == None or e < min_lower:
+                    if min_lower is None or e < min_lower:
                         min_lower = e
                         if dq == 0:
                             dq = 1
@@ -33,7 +33,7 @@ class WatermapSimulation(object):
                     tot_lowers += dq
 
                 else:
-                    if min_higher == None or e > min_higher:
+                    if min_higher is None or e > min_higher:
                         min_higher = e
                         pos_min_higher = p
             if lowers:
@@ -51,14 +51,21 @@ class WatermapSimulation(object):
             else:
                 _watermap[y][x] += q
 
-        _watermap_data = [[0 for x in xrange(world.width)] for y in xrange(world.height)]
+        _watermap_data = [[0 for x in xrange(world.width)] for y in
+                          xrange(world.height)]
         for i in xrange(n):
             x, y = world.random_land()
             if True and world.precipitation['data'][y][x] > 0:
-                droplet(world, (x, y), world.precipitation['data'][y][x], _watermap_data)
+                droplet(world, (x, y), world.precipitation['data'][y][x],
+                        _watermap_data)
         _watermap = {'data': _watermap_data}
         _watermap['thresholds'] = {}
-        _watermap['thresholds']['creek'] = find_threshold_f(_watermap_data, 0.05, ocean=world.ocean)
-        _watermap['thresholds']['river'] = find_threshold_f(_watermap_data, 0.02, ocean=world.ocean)
-        _watermap['thresholds']['main river'] = find_threshold_f(_watermap_data, 0.007, ocean=world.ocean)
+        _watermap['thresholds']['creek'] = find_threshold_f(_watermap_data,
+                                                            0.05,
+                                                            ocean=world.ocean)
+        _watermap['thresholds']['river'] = find_threshold_f(_watermap_data,
+                                                            0.02,
+                                                            ocean=world.ocean)
+        _watermap['thresholds']['main river'] = \
+            find_threshold_f(_watermap_data, 0.007, ocean=world.ocean)
         return _watermap

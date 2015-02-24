@@ -1,8 +1,8 @@
 from worldengine.simulations.basic import *
 import random
 
-class PermeabilitySimulation(object):
 
+class PermeabilitySimulation(object):
     def is_applicable(self, world):
         return not world.has_permeability()
 
