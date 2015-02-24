@@ -1,6 +1,7 @@
 from worldengine.simulations.basic import *
 import math
 
+
 class IrrigationSimulation(object):
 
     def is_applicable(self, world):
@@ -24,6 +25,8 @@ class IrrigationSimulation(object):
                             for dx in range(-radius, radius + 1):
                                 if (x + dx) >= 0 and (x + dx) < world.width:
                                     dist = math.sqrt(dx ** 2 + dy ** 2)
-                                    values[y + dy][x + dx] += world.watermap['data'][y][x] / (math.log(dist + 1) + 1)
+                                    values[y + dy][x + dx] += \
+                                        world.watermap['data'][y][x] / (
+                                            math.log(dist + 1) + 1)
 
         return values

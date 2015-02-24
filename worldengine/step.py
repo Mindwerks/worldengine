@@ -1,7 +1,7 @@
 class Step(object):
     """ A Step in the world generation process.
-        The process starts with plates simulation and go on through different intermediate
-        steps to reach the 'full' step.
+        The process starts with plates simulation and go on through different
+        intermediate steps to reach the 'full' step.
     """
 
     def __init__(self, name):
@@ -50,4 +50,5 @@ class Step(object):
         return cls._plates
 
     def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+        return isinstance(other, self.__class__) and \
+               self.__dict__ == other.__dict__
