@@ -16,7 +16,8 @@ def index_of_nearest(p, hot_points, distance_f=distance):
     """Given a point and a set of hot points it found the hot point
     nearest to the given point. An arbitrary distance function can
     be specified
-    :return the index of the nearest hot points, or None if the list of hot points is empty
+    :return the index of the nearest hot points, or None if the list of hot
+            points is empty
     """
     min_dist = None
     nearest_hp_i = None
