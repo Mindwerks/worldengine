@@ -7,10 +7,12 @@ from worldengine.step import Step
 
 
 class World(object):
-    """A world composed by name, dimensions and all the characteristics of each cell.
+    """A world composed by name, dimensions and all the characteristics of
+    each cell.
     """
 
-    def __init__(self, name, width, height, seed, num_plates, ocean_level, step):
+    def __init__(self, name, width, height, seed, num_plates, ocean_level,
+                 step):
         self.name = name
         self.width = width
         self.height = height
@@ -19,16 +21,16 @@ class World(object):
         self.ocean_level = ocean_level
         self.step = step
 
-    ###
-    ### General methods
-    ###
+    #
+    # General methods
+    #
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
-    ###
-    ### Serialization/Unserialization
-    ###
+    #
+    # Serialization/Unserialization
+    #
 
     @classmethod
     def from_pickle_file(cls, filename):
@@ -67,7 +69,7 @@ class World(object):
         return World._from_protobuf_world(p_world)
 
     @staticmethod
-    def _to_protobuf_matrix(matrix, p_matrix, transformation = None):
+    def _to_protobuf_matrix(matrix, p_matrix, transformation=None):
         for row in matrix:
             p_row = p_matrix.rows.add()
             for cell in row:
@@ -81,16 +83,16 @@ class World(object):
         for k in quantiles:
             entry = p_quantiles.add()
             v = quantiles[k]
-            entry.key   = int(k)
-            entry.value = v   
+            entry.key = int(k)
+            entry.value = v
 
     @staticmethod
     def _to_protobuf_matrix_with_quantiles(matrix, p_matrix):
         World._to_protobuf_quantiles(matrix['quantiles'], p_matrix.quantiles)
-        World._to_protobuf_matrix(matrix['data'], p_matrix)                    
+        World._to_protobuf_matrix(matrix['data'], p_matrix)
 
     @staticmethod
-    def _from_protobuf_matrix(p_matrix, transformation = None):
+    def _from_protobuf_matrix(p_matrix, transformation=None):
         matrix = []
         for p_row in p_matrix.rows:
             row = []
@@ -99,7 +101,7 @@ class World(object):
                 if transformation:
                     value = transformation(value)
                 row.append(value)
-            matrix.append(row)                
+            matrix.append(row)
         return matrix
 
     @staticmethod
@@ -113,13 +115,14 @@ class World(object):
     def _from_protobuf_matrix_with_quantiles(p_matrix):
         matrix = {}
         matrix['data'] = World._from_protobuf_matrix(p_matrix)
-        matrix['quantiles'] = World._from_protobuf_quantiles(p_matrix.quantiles)
+        matrix['quantiles'] = World._from_protobuf_quantiles(
+            p_matrix.quantiles)
         return matrix
 
     def _to_protobuf_world(self):
         p_world = Protobuf.World()
-        p_world.name   = self.name
-        p_world.width  = self.width
+        p_world.name = self.name
+        p_world.width = self.width
         p_world.height = self.height
 
         p_world.generationData.seed = self.seed
@@ -136,31 +139,36 @@ class World(object):
         # Plates
         self._to_protobuf_matrix(self.plates, p_world.plates)
 
-        # Ocean                            
+        # Ocean
         self._to_protobuf_matrix(self.ocean, p_world.ocean)
         self._to_protobuf_matrix(self.sea_depth, p_world.sea_depth)
 
         # Biome
         if hasattr(self, 'biome'):
-            self._to_protobuf_matrix(self.biome, p_world.biome, biome_name_to_index)
+            self._to_protobuf_matrix(self.biome, p_world.biome,
+                                     biome_name_to_index)
 
         # Humidty
         if hasattr(self, 'humidity'):
-            self._to_protobuf_matrix_with_quantiles(self.humidity, p_world.humidity)
+            self._to_protobuf_matrix_with_quantiles(self.humidity,
+                                                    p_world.humidity)
 
         if hasattr(self, 'irrigation'):
             self._to_protobuf_matrix(self.irrigation, p_world.irrigation)
 
         if hasattr(self, 'permeability'):
-            self._to_protobuf_matrix(self.permeability['data'], p_world.permeabilityData)
+            self._to_protobuf_matrix(self.permeability['data'],
+                                     p_world.permeabilityData)
             p_world.permeability_low = self.permeability['thresholds'][0][1]
             p_world.permeability_med = self.permeability['thresholds'][1][1]
 
         if hasattr(self, 'watermap'):
-            self._to_protobuf_matrix(self.watermap['data'], p_world.watermapData)
+            self._to_protobuf_matrix(self.watermap['data'],
+                                     p_world.watermapData)
             p_world.watermap_creek = self.watermap['thresholds']['creek']
             p_world.watermap_river = self.watermap['thresholds']['river']
-            p_world.watermap_mainriver = self.watermap['thresholds']['main river']
+            p_world.watermap_mainriver = self.watermap['thresholds'][
+                'main river']
 
         if hasattr(self, 'lake_map'):
             self._to_protobuf_matrix(self.lake_map, p_world.lakemap)
@@ -169,36 +177,42 @@ class World(object):
             self._to_protobuf_matrix(self.river_map, p_world.rivermap)
 
         if hasattr(self, 'precipitation'):
-            self._to_protobuf_matrix(self.precipitation['data'], p_world.precipitationData)
+            self._to_protobuf_matrix(self.precipitation['data'],
+                                     p_world.precipitationData)
             p_world.precipitation_low = self.precipitation['thresholds'][0][1]
             p_world.precipitation_med = self.precipitation['thresholds'][1][1]
 
         if hasattr(self, 'temperature'):
-            self._to_protobuf_matrix(self.temperature['data'], p_world.temperatureData)
-            p_world.temperature_polar       = self.temperature['thresholds'][0][1]
-            p_world.temperature_alpine      = self.temperature['thresholds'][1][1]
-            p_world.temperature_boreal      = self.temperature['thresholds'][2][1]
-            p_world.temperature_cool        = self.temperature['thresholds'][3][1]
-            p_world.temperature_warm        = self.temperature['thresholds'][4][1]
-            p_world.temperature_subtropical = self.temperature['thresholds'][5][1]
+            self._to_protobuf_matrix(self.temperature['data'],
+                                     p_world.temperatureData)
+            p_world.temperature_polar = self.temperature['thresholds'][0][1]
+            p_world.temperature_alpine = self.temperature['thresholds'][1][1]
+            p_world.temperature_boreal = self.temperature['thresholds'][2][1]
+            p_world.temperature_cool = self.temperature['thresholds'][3][1]
+            p_world.temperature_warm = self.temperature['thresholds'][4][1]
+            p_world.temperature_subtropical = \
+                self.temperature['thresholds'][5][1]
 
         return p_world
 
     @classmethod
     def _from_protobuf_world(cls, p_world):
-        w = World(p_world.name, p_world.width, p_world.height, p_world.generationData.seed,
-                p_world.generationData.n_plates, p_world.generationData.ocean_level, Step.get_by_name(p_world.generationData.step))
+        w = World(p_world.name, p_world.width, p_world.height,
+                  p_world.generationData.seed,
+                  p_world.generationData.n_plates,
+                  p_world.generationData.ocean_level,
+                  Step.get_by_name(p_world.generationData.step))
 
         # Elevation
         e = World._from_protobuf_matrix(p_world.heightMapData)
-        e_th = [('sea',      p_world.heightMapTh_sea), 
-                ('plain',    p_world.heightMapTh_plain), 
-                ('hill',     p_world.heightMapTh_hill), 
+        e_th = [('sea', p_world.heightMapTh_sea),
+                ('plain', p_world.heightMapTh_plain),
+                ('hill', p_world.heightMapTh_hill),
                 ('mountain', None)]
         w.set_elevation(e, e_th)
 
         # Plates
-        w.set_plates( World._from_protobuf_matrix(p_world.plates) )
+        w.set_plates(World._from_protobuf_matrix(p_world.plates))
 
         # Ocean
         w.set_ocean(World._from_protobuf_matrix(p_world.ocean))
@@ -206,12 +220,15 @@ class World(object):
 
         # Biome
         if len(p_world.biome.rows) > 0:
-            w.set_biome(World._from_protobuf_matrix(p_world.biome, biome_index_to_name))
+            w.set_biome(
+                World._from_protobuf_matrix(
+                    p_world.biome, biome_index_to_name))
 
         # Humidity
         # FIXME: use setters
         if len(p_world.humidity.rows) > 0:
-            w.humidity = World._from_protobuf_matrix_with_quantiles(p_world.humidity)
+            w.humidity = World._from_protobuf_matrix_with_quantiles(
+                p_world.humidity)
 
         if len(p_world.irrigation.rows) > 0:
             w.irrigation = World._from_protobuf_matrix(p_world.irrigation)
@@ -219,15 +236,16 @@ class World(object):
         if len(p_world.permeabilityData.rows) > 0:
             p = World._from_protobuf_matrix(p_world.permeabilityData)
             p_th = [
-                ('low' , p_world.permeability_low),
-                ('med' , p_world.permeability_med),
-                ('hig' , None)
+                ('low', p_world.permeability_low),
+                ('med', p_world.permeability_med),
+                ('hig', None)
             ]
             w.set_permeability(p, p_th)
 
         if len(p_world.watermapData.rows) > 0:
             w.watermap = {}
-            w.watermap['data'] = World._from_protobuf_matrix(p_world.watermapData)
+            w.watermap['data'] = World._from_protobuf_matrix(
+                p_world.watermapData)
             w.watermap['thresholds'] = {}
             w.watermap['thresholds']['creek'] = p_world.watermap_creek
             w.watermap['thresholds']['river'] = p_world.watermap_river
@@ -236,22 +254,22 @@ class World(object):
         if len(p_world.precipitationData.rows) > 0:
             p = World._from_protobuf_matrix(p_world.precipitationData)
             p_th = [
-                ('low' , p_world.precipitation_low),
-                ('med' , p_world.precipitation_med),
-                ('hig' , None)
+                ('low', p_world.precipitation_low),
+                ('med', p_world.precipitation_med),
+                ('hig', None)
             ]
             w.set_precipitation(p, p_th)
 
         if len(p_world.temperatureData.rows) > 0:
             t = World._from_protobuf_matrix(p_world.temperatureData)
             t_th = [
-                ('polar',       p_world.temperature_polar),
-                ('alpine',      p_world.temperature_alpine),
-                ('boreal',      p_world.temperature_boreal),
-                ('cool',        p_world.temperature_cool),
-                ('warm',        p_world.temperature_warm),
+                ('polar', p_world.temperature_polar),
+                ('alpine', p_world.temperature_alpine),
+                ('boreal', p_world.temperature_boreal),
+                ('cool', p_world.temperature_cool),
+                ('warm', p_world.temperature_warm),
                 ('subtropical', p_world.temperature_subtropical),
-                ('tropical',    None)
+                ('tropical', None)
             ]
             w.set_temperature(t, t_th)
 
@@ -265,17 +283,17 @@ class World(object):
 
         return w
 
-    ###
-    ### General
-    ###
+    #
+    # General
+    #
 
     def contains(self, pos):
         x, y = pos
         return x >= 0 and y >= 0 and x < self.width and y < self.height
 
-    ###
-    ### Land/Ocean
-    ###
+    #
+    # Land/Ocean
+    #
 
     def random_land(self):
         x, y = random_point(self.width, self.height)
@@ -295,18 +313,19 @@ class World(object):
     def sea_level(self):
         return self.elevation['thresholds'][0][1]
 
-    ###
-    ### Tiles around
-    ###
+    #
+    # Tiles around
+    #
 
     def on_tiles_around_factor(self, factor, pos, radius=1, action=None):
         x, y = pos
         for dx in range(-radius, radius + 1):
             nx = x + dx
-            if nx >= 0 and nx/factor < self.width:
+            if nx >= 0 and nx / factor < self.width:
                 for dy in range(-radius, radius + 1):
                     ny = y + dy
-                    if ny >= 0 and ny/factor < self.height and (dx != 0 or dy != 0):
+                    if ny >= 0 and ny / factor < self.height and (
+                                    dx != 0 or dy != 0):
                         action((nx, ny))
 
     def on_tiles_around(self, pos, radius=1, action=None):
@@ -328,7 +347,7 @@ class World(object):
                 for dy in range(-radius, radius + 1):
                     ny = y + dy
                     if ny >= 0 and ny < self.height and (dx != 0 or dy != 0):
-                        if predicate == None or predicate((nx, ny)):
+                        if predicate is None or predicate((nx, ny)):
                             ps.append((nx, ny))
         return ps
 
@@ -337,11 +356,12 @@ class World(object):
         x, y = pos
         for dx in range(-radius, radius + 1):
             nx = x + dx
-            if nx >= 0 and nx < self.width*factor:
+            if nx >= 0 and nx < self.width * factor:
                 for dy in range(-radius, radius + 1):
                     ny = y + dy
-                    if ny >= 0 and ny < self.height*factor and (dx != 0 or dy != 0):
-                        if predicate == None or predicate((nx, ny)):
+                    if ny >= 0 and ny < self.height * factor and (
+                                    dx != 0 or dy != 0):
+                        if predicate is None or predicate((nx, ny)):
                             ps.append((nx, ny))
         return ps
 
@@ -353,10 +373,9 @@ class World(object):
         # remove elements in pos
         return list(set(tiles) - set(pos_list))
 
-
-    ###
-    ### Elevation
-    ###
+    #
+    # Elevation
+    #
 
     def start_mountain_th(self):
         return self.elevation['thresholds'][2][1]
@@ -377,7 +396,7 @@ class World(object):
                 el = self.elevation['data'][y][x]
                 if min_el is None or el < min_el:
                     min_el = el
-        return min_el        
+        return min_el
 
     def is_mountain(self, pos):
         if not self.is_land(pos):
@@ -436,15 +455,15 @@ class World(object):
         hill_level = self.elevation['thresholds'][hi][1]
         mountain_level = self.elevation['thresholds'][hi + 1][1]
         x, y = pos
-        return self.elevation['data'][y][x] > hill_level and self.elevation['data'][y][x] < mountain_level
+        return hill_level < self.elevation['data'][y][x] < mountain_level
 
     def elevation_at(self, pos):
         x, y = pos
         return self.elevation['data'][y][x]
 
-    ###
-    ### Temperature
-    ###
+    #
+    # Temperature
+    #
 
     def is_temperature_polar(self, pos):
         th_max = self.temperature['thresholds'][0][1]
@@ -493,9 +512,9 @@ class World(object):
         t = self.temperature['data'][y][x]
         return t >= th_min
 
-    ###
-    ### Humidity
-    ###
+    #
+    # Humidity
+    #
 
     def is_humidity_above_quantile(self, pos, q):
         th = self.humidity['quantiles'][str(q)]
@@ -557,22 +576,25 @@ class World(object):
         t = self.humidity['data'][y][x]
         return t >= th_min
 
-    ###
-    ### Streams
-    ###
+    #
+    # Streams
+    #
 
     def contains_stream(self, pos):
-        return self.contains_creek(pos) or self.contains_river(pos) or self.contains_main_river(pos)
+        return self.contains_creek(pos) or self.contains_river(
+            pos) or self.contains_main_river(pos)
 
     def contains_creek(self, pos):
         x, y = pos
         v = self.watermap['data'][y][x]
-        return v >= self.watermap['thresholds']['creek'] and v < self.watermap['thresholds']['river']
+        return self.watermap['thresholds']['creek'] <= v < \
+            self.watermap['thresholds']['river']
 
     def contains_river(self, pos):
         x, y = pos
         v = self.watermap['data'][y][x]
-        return v >= self.watermap['thresholds']['river'] and v < self.watermap['thresholds']['main river']
+        return self.watermap['thresholds']['river'] <= v < \
+            self.watermap['thresholds']['main river']
 
     def contains_main_river(self, pos):
         x, y = pos
@@ -583,10 +605,9 @@ class World(object):
         x, y = pos
         return self.watermap['data'][y][x]
 
-
-    ###
-    ### Biome
-    ###
+    #
+    # Biome
+    #
 
     def biome_at(self, pos):
         x, y = pos
@@ -729,10 +750,9 @@ class World(object):
         else:
             return False
 
-
-    ###
-    ### Plates
-    ###
+    #
+    # Plates
+    #
 
     def n_actual_plates(self):
         res = -1
@@ -741,26 +761,32 @@ class World(object):
                 res = max([cell, res])
         return res + 1
 
-    ###
-    ### Setters
-    ###
+    #
+    # Setters
+    #
 
     def set_elevation(self, data, thresholds):
         if (len(data) != self.height) or (len(data[0]) != self.width):
-            raise Exception("Setting elevation map with wrong dimension. Expected %d x %d, found %d x %d" % (
-                self.width, self.height, (len[data[0]], len(data))))
+            raise Exception(
+                "Setting elevation map with wrong dimension. " +
+                "Expected %d x %d, found %d x %d" % (
+                    self.width, self.height, (len[data[0]], len(data))))
         self.elevation = {'data': data, 'thresholds': thresholds}
-
 
     def set_plates(self, data):
         if (len(data) != self.height) or (len(data[0]) != self.width):
-            raise Exception("Setting plates map with wrong dimension. Expected %d x %d, found %d x %d" % (
-                self.width, self.height, (len[data[0]], len(data))))
+            raise Exception(
+                "Setting plates map with wrong dimension. " +
+                "Expected %d x %d, found %d x %d" % (
+                    self.width, self.height, (len[data[0]], len(data))))
         self.plates = data
 
     def set_biome(self, biome):
         if len(biome) != self.height:
-            raise Exception("Setting data with wrong height: biome has height %i while the height is currently %i" % (len(biome), self.height))
+            raise Exception(
+                "Setting data with wrong height: biome has height %i while " +
+                "the height is currently %i" % (
+                    len(biome), self.height))
         if len(biome[0]) != self.width:
             raise Exception("Setting data with wrong width")
 
@@ -768,8 +794,10 @@ class World(object):
 
     def set_ocean(self, ocean):
         if (len(ocean) != self.height) or (len(ocean[0]) != self.width):
-            raise Exception("Setting ocean map with wrong dimension. Expected %d x %d, found %d x %d" % (
-                self.width, self.height, len(ocean[0]), len(ocean)))
+            raise Exception(
+                "Setting ocean map with wrong dimension. Expected %d x %d, " +
+                "found %d x %d" % (self.width, self.height,
+                                   len(ocean[0]), len(ocean)))
 
         self.ocean = ocean
 

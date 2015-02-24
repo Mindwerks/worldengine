@@ -5,6 +5,7 @@ from noise import snoise2
 from worldengine.simulations.basic import *
 from worldengine.common import *
 
+
 class PrecipitationSimulation(object):
 
     def is_applicable(self, world):
@@ -22,11 +23,12 @@ class PrecipitationSimulation(object):
         world.set_precipitation(prec, ths)
         if get_verbose():
             elapsed_time = time.time() - start_time
-            print("...precipitations calculated. Elapsed time %f  seconds." % elapsed_time)
-
+            print(
+                "...precipitations calculated. Elapsed time %f  seconds."
+                % elapsed_time)
 
     def _calculate(self, seed, width, height):
-        """"Precipitation is a value in [-1,1]"""
+        """Precipitation is a value in [-1,1]"""
         border = width / 4
         random.seed(seed * 13)
         base = random.randint(0, 4096)
@@ -43,7 +45,10 @@ class PrecipitationSimulation(object):
 
                 # Added to allow noise pattern to wrap around right and left.
                 if x < border:
-                    n = (snoise2(x / freq, y / freq, octaves, base=base) * x / border) + (snoise2((x+width) / freq, y / freq, octaves, base=base) * (border-x)/border)
+                    n = (snoise2(x / freq, y / freq, octaves,
+                                 base=base) * x / border) + (
+                            snoise2((x + width) / freq, y / freq, octaves,
+                                    base=base) * (border - x) / border)
 
                 prec = (latitude_factor + n * 4) / 5.0
                 precipitations[y][x] = prec
