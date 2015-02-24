@@ -47,14 +47,15 @@ def find_threshold_f(elevation, land_perc, ocean=None):
     if ocean:
         if (width != len(ocean[0])) or (height != len(ocean)):
             raise Exception(
-                "Dimension of elevation and ocean do not match. Elevation is %d x %d, while ocean is %d x%d" % (
+                "Dimension of elevation and ocean do not match. " +
+                "Elevation is %d x %d, while ocean is %d x%d" % (
                     width, height, len(ocean[0]), len(ocean)))
 
     def count(e):
         tot = 0
         for y in range(0, height):
             for x in range(0, width):
-                if elevation[y][x] > e and (ocean == None or not ocean[y][x]):
+                if elevation[y][x] > e and (ocean is None or not ocean[y][x]):
                     tot += 1
         return tot
 
@@ -85,4 +86,3 @@ def find_threshold_f(elevation, land_perc, ocean=None):
                     all_land -= 1
     desired_land = all_land * land_perc
     return search(-1000.0, 1000.0, desired_land)
-
