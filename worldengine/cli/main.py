@@ -68,7 +68,7 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
 
 
 def generate_grayscale_heightmap(world, filename):
-    draw_grayscale_heightmap(world, filename)
+    draw_grayscale_heightmap_on_file(world, filename)
     print("+ grayscale heightmap generated in '%s'" % filename)
 
 
