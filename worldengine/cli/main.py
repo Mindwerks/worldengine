@@ -68,7 +68,7 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
 
 
 def generate_grayscale_heightmap(world, filename):
-    draw_grayscale_heightmap(world, filename)
+    draw_grayscale_heightmap_on_file(world, filename)
     print("+ grayscale heightmap generated in '%s'" % filename)
 
 
@@ -213,8 +213,12 @@ def main():
 
     (options, args) = parser.parse_args()
 
-    if not os.path.isdir(options.output_dir):
-        raise Exception("Output dir does not exist or it is not a dir")
+    if os.path.exists(options.output_dir):
+        if not os.path.isdir(options.output_dir):
+            raise Exception("Output dir exists but it is not a dir")
+    else:
+        print('Directory does not exist, we are creating it')
+        os.makedirs(options.output_dir)
 
     # it needs to be increased to be able to generate very large maps
     # the limit is hit when drawing ancient maps
