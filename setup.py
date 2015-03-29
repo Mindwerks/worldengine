@@ -27,7 +27,7 @@ config = {
                             'worldenginegui=worldengine.gui.main:main'],
     },
     'install_requires': ['Pillow==2.6.1', 'PyPlatec==1.3.1.post1', 'langgen==0.1.2',
-                         'argparse==1.2.1', 'noise==1.2.1', 'nose==1.3.1',
+                         'argparse==1.2.1', 'noise==1.2.2', 'nose==1.3.1',
                          'wsgiref==0.1.2', 'protobuf==2.6.0', 'numpy==1.9.1'],
     'name': 'worldengine'
 }
