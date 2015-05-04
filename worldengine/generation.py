@@ -16,8 +16,8 @@ from worldengine.common import *
 # ------------------
 
 def center_land(world):
-    """Translate the map horizontally and vertically to put as much ocean as possible at the borders.
-       It operates on elevation and plates map"""
+    """Translate the map horizontally and vertically to put as much ocean as
+       possible at the borders. It operates on elevation and plates map"""
 
     min_sum_on_y = None
     y_with_min_sum = None
@@ -67,7 +67,8 @@ def place_oceans_at_map_borders(world):
     ocean_border = int(min(30, max(world.width / 5, world.height / 5)))
 
     def place_ocean(x, y, i):
-        world.elevation['data'][y][x] = (world.elevation['data'][y][x] * i) / ocean_border
+        world.elevation['data'][y][x] = (world.elevation['data'][y][x] * i) / \
+                                        ocean_border
 
     for x in range(world.width):
         for i in range(ocean_border):
@@ -127,7 +128,10 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
     ocean = fill_ocean(e, ocean_level)
     hl = find_threshold_f(e, 0.10)
     ml = find_threshold_f(e, 0.03)
-    e_th = [('sea', ocean_level), ('plain', hl), ('hill', ml), ('mountain', None)]
+    e_th = [('sea', ocean_level),
+            ('plain', hl),
+            ('hill', ml),
+            ('mountain', None)]
     world.set_ocean(ocean)
     world.set_elevation(e, e_th)
     world.sea_depth = sea_depth(world, ocean_level)
@@ -138,7 +142,8 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
 # ----
 
 def sea_depth(world, sea_level):
-    sea_depth = [[sea_level - world.elevation['data'][y][x] for x in range(world.width)] for y in range(world.height)]
+    sea_depth = [[sea_level - world.elevation['data'][y][x]
+                  for x in range(world.width)] for y in range(world.height)]
     for y in range(world.height):
         for x in range(world.width):
             if world.tiles_around((x, y), radius=1, predicate=world.is_land):
@@ -153,7 +158,9 @@ def sea_depth(world, sea_level):
                 sea_depth[y][x] *= 0.9
     sea_depth = antialias(sea_depth, 10)
     min_depth, max_depth = matrix_min_and_max(sea_depth)
-    sea_depth = [[rescale_value(sea_depth[y][x], min_depth, max_depth, 0.0, 1.0) for x in range(world.width)] for y in
+    sea_depth = [[rescale_value(sea_depth[y][x], min_depth,
+                                max_depth, 0.0, 1.0)
+                  for x in range(world.width)] for y in
                  range(world.height)]
     return sea_depth
 

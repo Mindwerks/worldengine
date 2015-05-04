@@ -1,5 +1,5 @@
-# Every reference to platec has to be kept separated because it is a C extension
-# which is not available when using this project from jython
+# Every reference to platec has to be kept separated because it is a C
+# extension which is not available when using this project from jython
 
 import time
 import platec
@@ -8,14 +8,17 @@ from worldengine.generation import *
 from worldengine.common import *
 
 
-def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_period=60,
-                               folding_ratio=0.02, aggr_overlap_abs=1000000, aggr_overlap_rel=0.33,
-                               cycle_count=2, num_plates=10, verbose=get_verbose()):
+def generate_plates_simulation(seed, width, height, sea_level=0.65,
+                               erosion_period=60, folding_ratio=0.02,
+                               aggr_overlap_abs=1000000, aggr_overlap_rel=0.33,
+                               cycle_count=2, num_plates=10,
+                               verbose=get_verbose()):
 
     if verbose:
         start_time = time.time()
-    p = platec.create(seed, width, height, sea_level, erosion_period, folding_ratio,
-                      aggr_overlap_abs, aggr_overlap_rel, cycle_count, num_plates)
+    p = platec.create(seed, width, height, sea_level, erosion_period,
+                      folding_ratio, aggr_overlap_abs, aggr_overlap_rel,
+                      cycle_count, num_plates)
 
     while platec.is_finished(p) == 0:
         # TODO: add a if verbose: message here?
@@ -24,12 +27,17 @@ def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_peri
     pm = platec.get_platesmap(p)
     if verbose:
         elapsed_time = time.time() - start_time
-        print("...plates.generate_plates_simulation() complete. Elapsed time " +str(elapsed_time) +" seconds.")
+        print("...plates.generate_plates_simulation() complete. " +
+              "Elapsed time " + str(elapsed_time) + " seconds.")
     return hm, pm
 
 
-def _plates_simulation(name, width, height, seed, num_plates=10, ocean_level=1.0, step=Step.full(), verbose=get_verbose()):
-    e_as_array, p_as_array = generate_plates_simulation(seed, width, height, num_plates=num_plates, verbose=verbose)
+def _plates_simulation(name, width, height, seed, num_plates=10,
+                       ocean_level=1.0, step=Step.full(),
+                       verbose=get_verbose()):
+    e_as_array, p_as_array = generate_plates_simulation(seed, width, height,
+                                                        num_plates=num_plates,
+                                                        verbose=verbose)
 
     world = World(name, width, height, seed, num_plates, ocean_level, step)
     world.set_elevation(array_to_matrix(e_as_array, width, height), None)
@@ -37,22 +45,26 @@ def _plates_simulation(name, width, height, seed, num_plates=10, ocean_level=1.0
     return world
 
 
-def world_gen(name, width, height, seed, num_plates=10, ocean_level=1.0, step=Step.full(), verbose=get_verbose()):
+def world_gen(name, width, height, seed, num_plates=10, ocean_level=1.0,
+              step=Step.full(), verbose=get_verbose()):
     if verbose:
         start_time = time.time()
-    world = _plates_simulation(name, width, height, seed, num_plates, ocean_level, step, verbose)
+    world = _plates_simulation(name, width, height, seed, num_plates,
+                               ocean_level, step, verbose)
 
     center_land(world)
     if verbose:
         elapsed_time = time.time() - start_time
-        print("...plates.world_gen: set_elevation, set_plates, center_land complete. Elapsed time " +str(elapsed_time) +" seconds.")
+        print("...plates.world_gen: set_elevation, set_plates, center_land " +
+              "complete. Elapsed time " + str(elapsed_time) + " seconds.")
 
     if verbose:
         start_time = time.time()
     add_noise_to_elevation(world, random.randint(0, 4096))
     if verbose:
         elapsed_time = time.time() - start_time
-        print("...plates.world_gen: elevation noise added. Elapsed time " +str(elapsed_time) +" seconds.")
+        print("...plates.world_gen: elevation noise added. Elapsed time " +
+              str(elapsed_time) + " seconds.")
 
     if verbose:
         start_time = time.time()
@@ -60,6 +72,7 @@ def world_gen(name, width, height, seed, num_plates=10, ocean_level=1.0, step=St
     initialize_ocean_and_thresholds(world)
     if verbose:
         elapsed_time = time.time() - start_time
-        print("...plates.world_gen: oceans initialized. Elapsed time " +str(elapsed_time) +" seconds.")
+        print("...plates.world_gen: oceans initialized. Elapsed time " +
+              str(elapsed_time) + " seconds.")
 
     return generate_world(world, step)
