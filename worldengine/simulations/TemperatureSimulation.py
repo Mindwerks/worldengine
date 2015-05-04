@@ -1,6 +1,7 @@
 from worldengine.simulations.basic import *
 import random
 
+
 class TemperatureSimulation(object):
 
     def is_applicable(self, world):
@@ -23,7 +24,6 @@ class TemperatureSimulation(object):
         ]
         world.set_temperature(t, t_th)
 
-
     def _calculate(self, world, seed, elevation, mountain_level):
         width = world.width
         height = world.height
@@ -44,19 +44,21 @@ class TemperatureSimulation(object):
             for x in range(0, width):
                 n = snoise2(x / freq, y / freq, octaves, base=base)
 
-                #Added to allow noise pattern to wrap around right and left.
+                # Added to allow noise pattern to wrap around right and left.
                 if x <= border:
-                    n = (snoise2(x / freq, y / freq, octaves, base=base) * x / border) \
-                        + (snoise2((x+width) / freq, y / freq, octaves, base=base) * (border-x)/border)
+                    n = (snoise2(x / freq, y / freq, octaves,
+                                 base=base) * x / border) \
+                        + (snoise2((x + width) / freq, y / freq, octaves,
+                                   base=base) * (border - x) / border)
 
                 t = (latitude_factor * 3 + n * 2) / 5.0
                 if elevation[y][x] > mountain_level:
                     if elevation[y][x] > (mountain_level + 29):
                         altitude_factor = 0.033
                     else:
-                        altitude_factor = 1.00 - (float(elevation[y][x] - mountain_level) / 30)
+                        altitude_factor = 1.00 - (
+                            float(elevation[y][x] - mountain_level) / 30)
                     t *= altitude_factor
                 temp[y][x] = t
 
         return temp
-

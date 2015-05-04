@@ -16,7 +16,8 @@ class _BiomeMetaclass(type):
         if not hasattr(_BiomeMetaclass, "biomes"):
             _BiomeMetaclass.biomes = {}
         uncamelized_name = _uncamelize(name)
-        created_class = super(_BiomeMetaclass, cls).__new__(cls, name, parents, dct)
+        created_class = super(_BiomeMetaclass, cls).__new__(cls, name,
+                                                            parents, dct)
         if object not in parents:
             _BiomeMetaclass.biomes[uncamelized_name] = created_class
         return created_class
@@ -91,6 +92,7 @@ class BorealWetForest(Biome):
 
 class BorealRainForest(Biome):
     pass
+
 
 class CoolTemperateDesert(Biome):
     pass

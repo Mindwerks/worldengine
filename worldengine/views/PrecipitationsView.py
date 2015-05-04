@@ -3,6 +3,7 @@ import random
 from worldengine.views.basic import color_prop
 from PyQt4 import QtGui
 
+
 class PrecipitationsView(object):
 
     def is_applicable(self, world):
@@ -22,7 +23,7 @@ class PrecipitationsView(object):
         for y in range(0, height):
             for x in range(0, width):
                 p = world.precipitation['data'][y][x]
-                if world.is_ocean((x,y)):
+                if world.is_ocean((x, y)):
                     r = g = b = 255
                 elif p < low_th:
                     r, g, b = color_prop(color1, color2, -1.0, low_th, p)
