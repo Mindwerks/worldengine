@@ -326,7 +326,10 @@ def main():
             usage(
                 "For generating an ancient map is necessary to specify the " +
                 "world to be used (-w option)")
-        world = World.from_pickle_file(options.world_file)
+        try:
+            world = World.from_pickle_file(options.world_file)
+        except Exception, e:
+            world = World.open_protobuf(options.world_file)
 
         print_verbose(" * world loaded")
 
