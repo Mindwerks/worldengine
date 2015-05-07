@@ -125,6 +125,36 @@ def operation_ancient_map(world, map_filename, resize_factor, sea_color):
     print("+ ancient map generated in '%s'" % map_filename)
 
 
+def __seems_protobuf_worldfile__(world_filename):
+    pass
+
+
+def __seems_pickle_file__(world_filename):
+    pass
+
+
+def load_world(world_filename):
+    pb = __seems_protobuf_worldfile__(world_filename)
+    pi = __seems_pickle_file__(world_filename)
+    if pb and pi:
+        print("we cannot distinguish if the file is a pickle or a protobuf worldfile. " +
+            "Trying to load first as protobuf then as pickle file")
+        try:
+            return World.open_protobuf(world_filename)
+        except Exception:
+            try:
+                return World.from_pickle_file(world_filename)
+            except Exception:
+                raise Exception("Unable to load the worldfile neither as protobuf or pickle file")
+
+    elif pb:
+        return World.open_protobuf(world_filename)
+    elif pi:
+        return World.from_pickle_file(world_filename)
+    else:
+        raise Exception("The given worldfile does not seem a pickle or a protobuf file")
+
+
 def main():
     parser = OptionParser(usage="usage: %prog [options] [" + OPERATIONS + "]",
                           version="%prog " + VERSION)
@@ -326,10 +356,7 @@ def main():
             usage(
                 "For generating an ancient map is necessary to specify the " +
                 "world to be used (-w option)")
-        try:
-            world = World.from_pickle_file(options.world_file)
-        except Exception, e:
-            world = World.open_protobuf(options.world_file)
+        world = load_world(options.word_file)
 
         print_verbose(" * world loaded")
 
