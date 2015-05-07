@@ -125,12 +125,23 @@ def operation_ancient_map(world, map_filename, resize_factor, sea_color):
     print("+ ancient map generated in '%s'" % map_filename)
 
 
+def __get_last_byte__(filename):
+    with open(filename, 'rb') as ifile:
+        data = tmp_data = ifile.read(1024 * 1024)
+        while tmp_data:
+            tmp_data = ifile.read(1024 * 1024)
+            if tmp_data:
+                data = tmp_data
+    return ord(data[len(data) - 1])
+
+
 def __seems_protobuf_worldfile__(world_filename):
     pass
 
 
 def __seems_pickle_file__(world_filename):
-    pass
+    last_byte = __get_last_byte__(world_filename)
+    return last_byte == ord('.')
 
 
 def load_world(world_filename):
@@ -356,7 +367,7 @@ def main():
             usage(
                 "For generating an ancient map is necessary to specify the " +
                 "world to be used (-w option)")
-        world = load_world(options.word_file)
+        world = load_world(options.world_file)
 
         print_verbose(" * world loaded")
 
