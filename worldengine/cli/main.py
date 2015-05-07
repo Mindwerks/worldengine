@@ -135,8 +135,44 @@ def __get_last_byte__(filename):
     return ord(data[len(data) - 1])
 
 
+def __varint_to_value__(varint):
+    # See https://developers.google.com/protocol-buffers/docs/encoding for details
+
+    # to convert it to value we must start from the first byte
+    # and add to it the second last multiplied by 128, the one after
+    # multiplied by 128 ** 2 and so on
+    if len(varint) == 1:
+        return varint[0]
+    else:
+        return varint[0] + 128 * __varint_to_value__(varint[1:])
+
+
+def __get_tag__(filename):
+    with open(filename, 'rb') as ifile:
+        # drop first byte, it should tell us the protobuf version and it should be normally equial to 8
+        data = ifile.read(1)
+        if not data:
+            return None
+        done = False
+        bytes = []
+        # We read bytes until we find a bit with the MSB not set
+        while data and not done:
+            data = ifile.read(1)
+            if not data:
+                return None
+            value = ord(data)
+            bytes.append(value % 128)
+            if value < 128:
+                done = True
+        # to convert it to value we must start from the last byte
+        # and add to it the second last multiplied by 128, the one before
+        # multiplied by 128 ** 2 and so on
+        return __varint_to_value__(bytes)
+
+
 def __seems_protobuf_worldfile__(world_filename):
-    pass
+    worldengine_tag = __get_tag__(world_filename)
+    return worldengine_tag == World.worldengine_tag()
 
 
 def __seems_pickle_file__(world_filename):

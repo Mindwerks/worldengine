@@ -120,6 +120,11 @@ class World(object):
             p_matrix.quantiles)
         return matrix
 
+    @staticmethod
+    def worldengine_tag():
+        return ord('W') * (256 ** 3) + ord('o') * (256 ** 2) + \
+            ord('e') * (256 ** 1) + ord('n')
+
 
     def __version_hashcode__(self):
         parts = __version__.split('.')
@@ -128,8 +133,7 @@ class World(object):
     def _to_protobuf_world(self):
         p_world = Protobuf.World()
 
-        p_world.worldengine_tag = ord('W') * (256 ** 3) + ord('o') * (256 ** 2) + \
-                                  ord('e') * (256 ** 1) + ord('n')
+        p_world.worldengine_tag = World.worldengine_tag()
         p_world.worldengine_version = self.__version_hashcode__()
 
         p_world.name = self.name
