@@ -5,6 +5,7 @@ from worldengine.basic_map_operations import *
 import worldengine.protobuf.World_pb2 as Protobuf
 from worldengine.step import Step
 
+execfile('worldengine/version.py')
 
 class World(object):
     """A world composed by name, dimensions and all the characteristics of
@@ -119,8 +120,22 @@ class World(object):
             p_matrix.quantiles)
         return matrix
 
+    @staticmethod
+    def worldengine_tag():
+        return ord('W') * (256 ** 3) + ord('o') * (256 ** 2) + \
+            ord('e') * (256 ** 1) + ord('n')
+
+
+    def __version_hashcode__(self):
+        parts = __version__.split('.')
+        return int(parts[0])*(256**3) + int(parts[1])*(256**2) + int(parts[2])*(256**1)
+
     def _to_protobuf_world(self):
         p_world = Protobuf.World()
+
+        p_world.worldengine_tag = World.worldengine_tag()
+        p_world.worldengine_version = self.__version_hashcode__()
+
         p_world.name = self.name
         p_world.width = self.width
         p_world.height = self.height

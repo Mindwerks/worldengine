@@ -1,6 +1,5 @@
 import unittest
 import os
-from PIL import Image
 from worldengine.draw import *
 from worldengine.draw import _biome_colors # need to be explicitly imported
 from worldengine.world import *

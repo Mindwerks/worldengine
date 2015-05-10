@@ -19,7 +19,7 @@ class Step(object):
             return Step.precipitations()
         elif name == "full":
             return Step.full()
-        raise None
+        raise Exception("Unknown step '%s'" % name)
 
     @classmethod
     def full(cls):
