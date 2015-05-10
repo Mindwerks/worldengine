@@ -80,10 +80,6 @@ function main () {
     InstallPython $env:PYTHON_VERSION $env:PYTHON_ARCH $env:PYTHON
     InstallPip $env:PYTHON
     InstallPackage $env:PYTHON wheel
-
-    $python_home = $env:PYTHON
-    $pip_path = $python_home + "/Scripts/pip.exe"
-    Start-Process -FilePath "$pip_path" -ArgumentList { "install", "-r", "requirements2.txt"} -Wait -Passthru
 }
 
 main
