@@ -6,7 +6,6 @@
 
 import os
 from worldengine.plates import _plates_simulation
-from worldengine.world import World
 
 
 def main(tests_data_dir):

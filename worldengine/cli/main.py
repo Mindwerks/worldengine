@@ -125,6 +125,83 @@ def operation_ancient_map(world, map_filename, resize_factor, sea_color):
     print("+ ancient map generated in '%s'" % map_filename)
 
 
+def __get_last_byte__(filename):
+    with open(filename, 'rb') as ifile:
+        data = tmp_data = ifile.read(1024 * 1024)
+        while tmp_data:
+            tmp_data = ifile.read(1024 * 1024)
+            if tmp_data:
+                data = tmp_data
+    return ord(data[len(data) - 1])
+
+
+def __varint_to_value__(varint):
+    # See https://developers.google.com/protocol-buffers/docs/encoding for details
+
+    # to convert it to value we must start from the first byte
+    # and add to it the second last multiplied by 128, the one after
+    # multiplied by 128 ** 2 and so on
+    if len(varint) == 1:
+        return varint[0]
+    else:
+        return varint[0] + 128 * __varint_to_value__(varint[1:])
+
+
+def __get_tag__(filename):
+    with open(filename, 'rb') as ifile:
+        # drop first byte, it should tell us the protobuf version and it should be normally equial to 8
+        data = ifile.read(1)
+        if not data:
+            return None
+        done = False
+        bytes = []
+        # We read bytes until we find a bit with the MSB not set
+        while data and not done:
+            data = ifile.read(1)
+            if not data:
+                return None
+            value = ord(data)
+            bytes.append(value % 128)
+            if value < 128:
+                done = True
+        # to convert it to value we must start from the last byte
+        # and add to it the second last multiplied by 128, the one before
+        # multiplied by 128 ** 2 and so on
+        return __varint_to_value__(bytes)
+
+
+def __seems_protobuf_worldfile__(world_filename):
+    worldengine_tag = __get_tag__(world_filename)
+    return worldengine_tag == World.worldengine_tag()
+
+
+def __seems_pickle_file__(world_filename):
+    last_byte = __get_last_byte__(world_filename)
+    return last_byte == ord('.')
+
+
+def load_world(world_filename):
+    pb = __seems_protobuf_worldfile__(world_filename)
+    pi = __seems_pickle_file__(world_filename)
+    if pb and pi:
+        print("we cannot distinguish if the file is a pickle or a protobuf worldfile. " +
+            "Trying to load first as protobuf then as pickle file")
+        try:
+            return World.open_protobuf(world_filename)
+        except Exception:
+            try:
+                return World.from_pickle_file(world_filename)
+            except Exception:
+                raise Exception("Unable to load the worldfile neither as protobuf or pickle file")
+
+    elif pb:
+        return World.open_protobuf(world_filename)
+    elif pi:
+        return World.from_pickle_file(world_filename)
+    else:
+        raise Exception("The given worldfile does not seem a pickle or a protobuf file")
+
+
 def main():
     parser = OptionParser(usage="usage: %prog [options] [" + OPERATIONS + "]",
                           version="%prog " + VERSION)
@@ -326,7 +403,7 @@ def main():
             usage(
                 "For generating an ancient map is necessary to specify the " +
                 "world to be used (-w option)")
-        world = World.from_pickle_file(options.world_file)
+        world = load_world(options.world_file)
 
         print_verbose(" * world loaded")
 
