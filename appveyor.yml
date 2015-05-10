@@ -43,6 +43,7 @@ init:
 
 install:
   - "powershell appveyor\\install.ps1"
+  - %PYTHON%\\Scripts\\pip.exe install -r requirements2.txt
 
 build: off
 
