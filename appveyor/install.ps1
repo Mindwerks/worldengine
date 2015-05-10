@@ -56,7 +56,6 @@ function InstallPython ($python_version, $architecture, $python_home) {
     return $true
 }
 
-
 function InstallPip ($python_home) {
     $pip_path = $python_home + "/Scripts/pip.exe"
     $python_path = $python_home + "/python.exe"
@@ -68,8 +67,9 @@ function InstallPip ($python_home) {
         Start-Process -FilePath "$python_path" -ArgumentList "$GET_PIP_PATH" -Wait -Passthru
     } else {
         Write-Host "pip already installed."        
-        Start-Process -FilePath "$pip_path" -ArgumentList { "install", "wheel"} -Wait -Passthru        
+#        Start-Process -FilePath "$pip_path" -ArgumentList { "install", "wheel"} -Wait -Passthru        
     }
+    Start-Process -FilePath "$pip_path" -ArgumentList { "install", "-r", "requirements2.txt"} -Wait -Passthru
 }
 
 function InstallPackage ($python_home, $pkg) {
@@ -81,6 +81,7 @@ function main () {
     InstallPython $env:PYTHON_VERSION $env:PYTHON_ARCH $env:PYTHON
     InstallPip $env:PYTHON
     InstallPackage $env:PYTHON wheel
+
 }
 
 main
