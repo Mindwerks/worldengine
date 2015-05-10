@@ -67,13 +67,8 @@ function InstallPip ($python_home) {
         Write-Host "Executing:" $python_path $GET_PIP_PATH
         Start-Process -FilePath "$python_path" -ArgumentList "$GET_PIP_PATH" -Wait -Passthru
     } else {
-        Write-Host "pip already installed."
-        Write-Host "we delete pip and reinstall it"
-        Remove-Item $pip_path
-        $webclient = New-Object System.Net.WebClient
-        $webclient.DownloadFile($GET_PIP_URL, $GET_PIP_PATH)
-        Write-Host "Executing:" $python_path $GET_PIP_PATH
-        Start-Process -FilePath "$python_path" -ArgumentList "$GET_PIP_PATH" -Wait -Passthru        
+        Write-Host "pip already installed."        
+        Start-Process -FilePath "$pip_path" -ArgumentList { "install" "wheel"} -Wait -Passthru        
     }
 }
 
