@@ -10,9 +10,10 @@ We started a [google group](https://groups.google.com/forum/?hl=en#!forum/worlde
 WorldEngine - a world generator
 =========================
 
-[![Build Status](https://travis-ci.org/Mindwerks/worldengine.svg?branch=master)](https://travis-ci.org/Mindwerks/worldengine)
+[![Build Status](https://travis-ci.org/Mindwerks/worldengine.svg?branch=master)](https://travis-ci.org/Mindwerks/worldengine) [![Build status](https://ci.appveyor.com/api/projects/status/io4ljim2ra83df23?svg=true)](https://ci.appveyor.com/project/ftomassetti/worldengine)
 
-_Last Lands version: 0.5.3, Last WorldSynth version: 0.12_
+
+_Last Lands version: 0.5.3, Last WorldSynth version: 0.12, First WorldEngine version will be 0.18_
 
 You can generate worlds data (heighmap, biome, etc.) and images for your own worlds.
 
