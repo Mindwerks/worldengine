@@ -68,8 +68,7 @@ function InstallPip ($python_home) {
     } else {
         Write-Host "pip already installed."        
 #        Start-Process -FilePath "$pip_path" -ArgumentList { "install", "wheel"} -Wait -Passthru        
-    }
-    Start-Process -FilePath "$pip_path" -ArgumentList { "install", "-r", "requirements2.txt"} -Wait -Passthru
+    }    
 }
 
 function InstallPackage ($python_home, $pkg) {
@@ -82,6 +81,9 @@ function main () {
     InstallPip $env:PYTHON
     InstallPackage $env:PYTHON wheel
 
+    $python_home = $env:PYTHON
+    $pip_path = $python_home + "/Scripts/pip.exe"
+    Start-Process -FilePath "$pip_path" -ArgumentList { "install", "-r", "requirements2.txt"} -Wait -Passthru
 }
 
 main
