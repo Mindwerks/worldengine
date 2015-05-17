@@ -86,13 +86,11 @@ python setup.py install
 
 ### _On Windows_
 
-Executable file is available under [releases](https://github.com/Mindwerks/worldengine/releases)
+If you want to install Worldengine on Windows you can read these [instructions](https://github.com/Mindwerks/worldengine/wiki/Installing-Worldengine-on-Windows).
+
+Executable file is also available under [releases](https://github.com/Mindwerks/worldengine/releases), but is currently out of date.
 
 Note: you need also a copy of the worldengine src directory in the same folder as the exe.
-
-If you want to build Worldengine on Windows you can read these [instructions](https://github.com/Mindwerks/worldengine/wiki/Lands-on-Windows).
-
-Note: the problem could crash after generating the files, it is a known problem but you should have anyway your nice maps generated! We are working on a fix for that
 
 Dependencies
 ============
