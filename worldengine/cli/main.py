@@ -174,6 +174,10 @@ def main():
                       metavar="N", default='2000')
     parser.add_option('-v', '--verbose', dest='verbose', action="store_true",
                       help="Enable verbose messages", default=False)
+    parser.add_option('--bw', '--black-and-white', dest='black_and_white',
+                      action="store_true",
+                      help="generate maps in black and white",
+                      default=False)
 
     # -----------------------------------------------------
     g_generate = OptionGroup(parser, "Generate Options",
@@ -273,13 +277,14 @@ def main():
     print('-----------------------')
     print(' operation         : %s generation' % operation)
     if generation_operation:
-        print(' seed              : %i' % seed)
-        print(' name              : %s' % world_name)
-        print(' width             : %i' % options.width)
-        print(' height            : %i' % options.height)
-        print(' number of plates  : %i' % number_of_plates)
-        print(' world format      : %s' % world_format)
-        print(' step              : %s' % step.name)
+        print(' seed                 : %i' % seed)
+        print(' name                 : %s' % world_name)
+        print(' width                : %i' % options.width)
+        print(' height               : %i' % options.height)
+        print(' number of plates     : %i' % number_of_plates)
+        print(' world format         : %s' % world_format)
+        print(' black and white maps : %s' % options.black_and_white)
+        print(' step                 : %s' % step.name)
         if produce_grayscale_heightmap:
             print(
                 ' + greyscale heightmap in "%s"' % produce_grayscale_heightmap)
@@ -290,9 +295,9 @@ def main():
         else:
             print(' (no rivers map)')
     if operation == 'ancient_map':
-        print(' resize factor     : %i' % options.resize_factor)
-        print(' world file        : %s' % options.world_file)
-        print(' sea color         : %s' % options.sea_color)
+        print(' resize factor        : %i' % options.resize_factor)
+        print(' world file           : %s' % options.world_file)
+        print(' sea color            : %s' % options.sea_color)
 
     print('')  # empty line
     print('starting (it could take a few minutes) ...')

@@ -145,6 +145,7 @@ _Note that options were changed in version 0.5.3_
 | -q N   | --number-of-plates=N | number of plates |
 |       | --recursion-limit=N | you need that just if you encounter an error while generating very large maps |
 | -v    | --verbose | Enable verbose messages |
+| --bw  | --black-and-white | Draw maps in black and white |
 
 ### Options valid only for generate
 
