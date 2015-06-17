@@ -260,29 +260,49 @@ def draw_ocean(ocean, target):
                 target.set_pixel(x, y, (0, 255, 255, 255))
 
 
-def draw_precipitation(world, target):
+def draw_precipitation(world, target, black_and_white=False):
     # FIXME we are drawing humidity, not precipitations
     width = world.width
     height = world.height
 
-    for y in range(height):
-        for x in range(width):
-            if world.is_humidity_superarid((x, y)):
-                target.set_pixel(x, y, (0, 32, 32, 255))
-            elif world.is_humidity_perarid((x, y)):
-                target.set_pixel(x, y, (0, 64, 64, 255))
-            elif world.is_humidity_arid((x, y)):
-                target.set_pixel(x, y, (0, 96, 96, 255))
-            elif world.is_humidity_semiarid((x, y)):
-                target.set_pixel(x, y, (0, 128, 128, 255))
-            elif world.is_humidity_subhumid((x, y)):
-                target.set_pixel(x, y, (0, 160, 160, 255))
-            elif world.is_humidity_humid((x, y)):
-                target.set_pixel(x, y, (0, 192, 192, 255))
-            elif world.is_humidity_perhumid((x, y)):
-                target.set_pixel(x, y, (0, 224, 224, 255))
-            elif world.is_humidity_superhumid((x, y)):
-                target.set_pixel(x, y, (0, 255, 255, 255))
+    if black_and_white:
+        low = None
+        high = None
+        for y in range(height):
+            for x in range(width):
+                p = world.precipitations_at((x, y))
+                if low is None or p < low:
+                    low = p
+                if high is None or p > high:
+                    high = p
+        for y in range(height):
+            for x in range(width):
+                p = world.precipitations_at((x, y))
+                if p <= low:
+                    target.set_pixel(x, y, (0, 0, 0, 255))
+                elif p >= high:
+                    target.set_pixel(x, y, (255, 255, 255, 255))
+                else:
+                    target.set_pixel(x, y, gradient(p, low, high, (0, 0, 0), (255, 255, 255)))
+    else:
+        for y in range(height):
+            for x in range(width):
+                if world.is_humidity_superarid((x, y)):
+                    target.set_pixel(x, y, (0, 32, 32, 255))
+                elif world.is_humidity_perarid((x, y)):
+                    target.set_pixel(x, y, (0, 64, 64, 255))
+                elif world.is_humidity_arid((x, y)):
+                    target.set_pixel(x, y, (0, 96, 96, 255))
+                elif world.is_humidity_semiarid((x, y)):
+                    target.set_pixel(x, y, (0, 128, 128, 255))
+                elif world.is_humidity_subhumid((x, y)):
+                    target.set_pixel(x, y, (0, 160, 160, 255))
+                elif world.is_humidity_humid((x, y)):
+                    target.set_pixel(x, y, (0, 192, 192, 255))
+                elif world.is_humidity_perhumid((x, y)):
+                    target.set_pixel(x, y, (0, 224, 224, 255))
+                elif world.is_humidity_superhumid((x, y)):
+                    target.set_pixel(x, y, (0, 255, 255, 255))
 
 
 def draw_world(world, target):
@@ -384,9 +404,9 @@ def draw_ocean_on_file(ocean, filename):
     img.complete()
 
 
-def draw_precipitation_on_file(world, filename):
+def draw_precipitation_on_file(world, filename, black_and_white=False):
     img = ImagePixelSetter(world.width, world.height, filename)
-    draw_precipitation(world, img)
+    draw_precipitation(world, img, black_and_white)
     img.complete()
 
 
