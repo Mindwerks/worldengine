@@ -48,7 +48,7 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
 
     if step.include_precipitations:
         filename = '%s/%s_precipitation.png' % (output_dir, world_name)
-        draw_precipitation_on_file(w, filename)
+        draw_precipitation_on_file(w, filename, black_and_white)
         print("* precipitation image generated in '%s'" % filename)
         filename = '%s/%s_temperature.png' % (output_dir, world_name)
         draw_temperature_levels_on_file(w, filename, black_and_white)
