@@ -299,26 +299,40 @@ def draw_world(world, target):
                 target.set_pixel(x, y, (0, 0, 255 - c, 255))
 
 
-def draw_temperature_levels(world, target):
+def draw_temperature_levels(world, target, black_and_white=False):
     width = world.width
     height = world.height
 
-    for y in range(height):
-        for x in range(width):
-            if world.is_temperature_polar((x, y)):
-                target.set_pixel(x, y, (0, 0, 255, 255))
-            elif world.is_temperature_alpine((x, y)):
-                target.set_pixel(x, y, (42, 0, 213, 255))
-            elif world.is_temperature_boreal((x, y)):
-                target.set_pixel(x, y, (85, 0, 170, 255))
-            elif world.is_temperature_cool((x, y)):
-                target.set_pixel(x, y, (128, 0, 128, 255))
-            elif world.is_temperature_warm((x, y)):
-                target.set_pixel(x, y, (170, 0, 85, 255))
-            elif world.is_temperature_subtropical((x, y)):
-                target.set_pixel(x, y, (213, 0, 42, 255))
-            elif world.is_temperature_tropical((x, y)):
-                target.set_pixel(x, y, (255, 0, 0, 255))
+    if black_and_white:
+        low = world.temperature_thresholds()[0][1]
+        high = world.temperature_thresholds()[5][1]
+        for y in range(height):
+            for x in range(width):
+                t = world.temperature_at((x, y))
+                if t <= low:
+                    target.set_pixel(x, y, (0, 0, 0, 255))
+                elif t >= high:
+                    target.set_pixel(x, y, (255, 255, 255, 255))
+                else:
+                    target.set_pixel(x, y, gradient(t, low, high, (0, 0, 0), (255, 255, 255)))
+
+    else:
+        for y in range(height):
+            for x in range(width):
+                if world.is_temperature_polar((x, y)):
+                    target.set_pixel(x, y, (0, 0, 255, 255))
+                elif world.is_temperature_alpine((x, y)):
+                    target.set_pixel(x, y, (42, 0, 213, 255))
+                elif world.is_temperature_boreal((x, y)):
+                    target.set_pixel(x, y, (85, 0, 170, 255))
+                elif world.is_temperature_cool((x, y)):
+                    target.set_pixel(x, y, (128, 0, 128, 255))
+                elif world.is_temperature_warm((x, y)):
+                    target.set_pixel(x, y, (170, 0, 85, 255))
+                elif world.is_temperature_subtropical((x, y)):
+                    target.set_pixel(x, y, (213, 0, 42, 255))
+                elif world.is_temperature_tropical((x, y)):
+                    target.set_pixel(x, y, (255, 0, 0, 255))
 
 
 def draw_biome(world, target):
@@ -382,9 +396,9 @@ def draw_world_on_file(world, filename):
     img.complete()
 
 
-def draw_temperature_levels_on_file(world, filename):
+def draw_temperature_levels_on_file(world, filename, black_and_white=False):
     img = ImagePixelSetter(world.width, world.height, filename)
-    draw_temperature_levels(world, img)
+    draw_temperature_levels(world, img, black_and_white)
     img.complete()
 
 

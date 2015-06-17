@@ -512,6 +512,13 @@ class World(object):
         t = self.temperature['data'][y][x]
         return t >= th_min
 
+    def temperature_at(self, pos):
+        x, y = pos
+        return self.temperature['data'][y][x]
+
+    def temperature_thresholds(self):
+        return self.temperature['thresholds']
+
     #
     # Humidity
     #

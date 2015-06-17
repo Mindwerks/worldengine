@@ -21,7 +21,7 @@ STEPS = 'plates|precipitations|full'
 
 
 def generate_world(world_name, width, height, seed, num_plates, output_dir,
-                   step, ocean_level, world_format='pickle', verbose=True):
+                   step, ocean_level, world_format='pickle', verbose=True, black_and_white=False):
     w = world_gen(world_name, width, height, seed, num_plates, ocean_level,
                   step, verbose=verbose)
 
@@ -51,7 +51,7 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
         draw_precipitation_on_file(w, filename)
         print("* precipitation image generated in '%s'" % filename)
         filename = '%s/%s_temperature.png' % (output_dir, world_name)
-        draw_temperature_levels_on_file(w, filename)
+        draw_temperature_levels_on_file(w, filename, black_and_white)
         print("* temperature image generated in '%s'" % filename)
 
     if step.include_biome:
@@ -308,7 +308,7 @@ def main():
         world = generate_world(world_name, options.width, options.height,
                                seed, number_of_plates, options.output_dir,
                                step, options.ocean_level, world_format,
-                               options.verbose)
+                               options.verbose, black_and_white=options.black_and_white)
         if produce_grayscale_heightmap:
             generate_grayscale_heightmap(world, produce_grayscale_heightmap)
         if options.rivers_map:
