@@ -203,9 +203,22 @@ def load_world(world_filename):
 
 
 def print_world_info(world):
-    print("name: %s" % world.name)
-    print("width: %i" % world.width)
-    print("height: %i" % world.height)
+    print(" name               : %s" % world.name)
+    print(" width              : %i" % world.width)
+    print(" height             : %i" % world.height)
+    print(" seed               : %i" % world.seed)
+    print(" no plates          : %i" % world.n_plates)
+    print(" ocean level        : %f" % world.ocean_level)
+    print(" step               : %s" % world.step.name)
+
+    print(" has biome          : %s" % world.has_biome())
+    print(" has humidity       : %s" % world.has_humidity())
+    print(" has irrigation     : %s" % world.has_irrigation())
+    print(" has permeability   : %s" % world.has_permeability())
+    print(" has watermap       : %s" % world.has_watermap())
+    print(" has precipitations : %s" % world.has_precipitations())
+    print(" has temperature    : %s" % world.has_temperature())
+
 
 def main():
     parser = OptionParser(usage="usage: %prog [options] [" + OPERATIONS + "]",
