@@ -15,7 +15,7 @@ from worldengine.version import __version__
 
 VERSION = __version__
 
-OPERATIONS = 'world|plates|ancient_map'
+OPERATIONS = 'world|plates|ancient_map|info'
 SEA_COLORS = 'blue|brown'
 STEPS = 'plates|precipitations|full'
 
@@ -202,6 +202,24 @@ def load_world(world_filename):
         raise Exception("The given worldfile does not seem a pickle or a protobuf file")
 
 
+def print_world_info(world):
+    print(" name               : %s" % world.name)
+    print(" width              : %i" % world.width)
+    print(" height             : %i" % world.height)
+    print(" seed               : %i" % world.seed)
+    print(" no plates          : %i" % world.n_plates)
+    print(" ocean level        : %f" % world.ocean_level)
+    print(" step               : %s" % world.step.name)
+
+    print(" has biome          : %s" % world.has_biome())
+    print(" has humidity       : %s" % world.has_humidity())
+    print(" has irrigation     : %s" % world.has_irrigation())
+    print(" has permeability   : %s" % world.has_permeability())
+    print(" has watermap       : %s" % world.has_watermap())
+    print(" has precipitations : %s" % world.has_precipitations())
+    print(" has temperature    : %s" % world.has_temperature())
+
+
 def main():
     parser = OptionParser(usage="usage: %prog [options] [" + OPERATIONS + "]",
                           version="%prog " + VERSION)
@@ -308,10 +326,17 @@ def main():
     except:
         usage(error="Number of plates should be a number")
 
-    if len(args) > 1:
+    if len(args) > 1 and args[0] != 'info':
         parser.print_help()
         usage("Only 1 operation allowed [" + OPERATIONS + "]")
-    if len(args) == 1:
+    if (args[0] == 'info'):
+        if len(args) != 2:
+            parser.print_help()
+            usage("For operation info only the filename should be specified")
+        if not os.path.exists(args[1]):
+            usage("The specified world file does not exist")
+        operation = 'info'
+    elif len(args) == 1:
         if args[0] in OPERATIONS:
             operation = args[0]
         else:
@@ -371,12 +396,12 @@ def main():
         print(' world file        : %s' % options.world_file)
         print(' sea color         : %s' % options.sea_color)
 
-    print('')  # empty line
-    print('starting (it could take a few minutes) ...')
-
     set_verbose(options.verbose)
 
     if operation == 'world':
+        print('')  # empty line
+        print('starting (it could take a few minutes) ...')
+
         world = generate_world(world_name, options.width, options.height,
                                seed, number_of_plates, options.output_dir,
                                step, options.ocean_level, world_format,
@@ -387,10 +412,16 @@ def main():
             generate_rivers_map(world, options.rivers_map)
 
     elif operation == 'plates':
+        print('')  # empty line
+        print('starting (it could take a few minutes) ...')
+
         generate_plates(seed, world_name, options.output_dir, options.width,
                         options.height, num_plates=number_of_plates)
 
     elif operation == 'ancient_map':
+        print('')  # empty line
+        print('starting (it could take a few minutes) ...')
+
         # First, some error checking
         if options.sea_color == "blue":
             sea_color = (142, 162, 179, 255)
@@ -411,6 +442,9 @@ def main():
             options.generated_file = "ancient_map_%s.png" % world.name
         operation_ancient_map(world, options.generated_file,
                               options.resize_factor, sea_color)
+    elif operation == 'info':
+        world = load_world(args[1])
+        print_world_info(world)
     else:
         raise Exception(
             'Unknown operation: valid operations are %s' % OPERATIONS)
