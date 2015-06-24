@@ -126,7 +126,7 @@ Usage
 =====
 
 ```
-worldengine [options] [world|plates|ancient_map]
+worldengine [options] [world|plates|ancient_map|info]
 ```
 _Note that options were changed in version 0.5.3_
 
