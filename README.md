@@ -302,7 +302,7 @@ The merged project is maintained by [Bret Curtis](https://github.com/psi29a) and
 All contributions, questions, ideas are more than welcome!
 Feel free to open an issue or write in our [google group](https://groups.google.com/forum/?hl=en#!forum/lands_worldsynth).
 
-I would like to thank you great people who helped me while working on Lands:
+We would like to thank you great people who helped us while working on WorldEngine and the projects from which it was derived:
 
 * [Evan Sampson](https://github.com/esampson) contributed the amazing implementation of the Holdridge life zones model and improved a lot the ancient-looking-map, biome, precipitation and temperature generators. Thanks a million!
 
