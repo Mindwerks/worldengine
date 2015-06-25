@@ -45,16 +45,16 @@
 <p>Lands has been recently merged with <a href="https://github.com/psi29a/worldsynth">WorldSynth</a>.
 We are now working on merging the code, taking the best of the two projects.</p>
 
-<p>We started a <a href="https://groups.google.com/forum/?hl=en#!forum/lands_worldsynth">google group</a>: if you have ideas, problems, suggestions or want to contribute please <a href="https://groups.google.com/forum/?hl=en#!forum/lands_worldsynth">join us</a>!_</p>
+<p>We started a <a href="https://groups.google.com/forum/?hl=en#!forum/worldengine">google group</a>: if you have ideas, problems, suggestions or want to contribute please <a href="https://groups.google.com/forum/?hl=en#!forum/worldengine">join us</a>!</p>
 
 <hr>
 
 <h1>
 <a id="worldengine---a-world-generator" class="anchor" href="#worldengine---a-world-generator" aria-hidden="true"><span class="octicon octicon-link"></span></a>WorldEngine - a world generator</h1>
 
-<p><a href="https://travis-ci.org/Mindwerks/worldengine"><img src="https://travis-ci.org/Mindwerks/worldengine.svg?branch=master" alt="Build Status"></a></p>
+<p><a href="https://travis-ci.org/Mindwerks/worldengine"><img src="https://travis-ci.org/Mindwerks/worldengine.svg?branch=master" alt="Build Status"></a> <a href="https://ci.appveyor.com/project/ftomassetti/worldengine"><img src="https://ci.appveyor.com/api/projects/status/io4ljim2ra83df23?svg=true" alt="Build status"></a></p>
 
-<p><em>Last Lands version: 0.5.3, Last WorldSynth version: 0.12</em></p>
+<p><em>Last Lands version: 0.5.3, Last WorldSynth version: 0.12, First WorldEngine version will be 0.18</em></p>
 
 <p>You can generate worlds data (heighmap, biome, etc.) and images for your own worlds.</p>
 
@@ -84,7 +84,7 @@ lands ancient_map -w seed1.world
 <span class="pl-c"># Lands 0.5.0 or previous</span>
 python lands/generator.py ancient_map -w seed1.world</pre></div>
 
-<p><img src="https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/ancient_map_seed1.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/examples/ancient_map_seed1.png" alt=""></p>
 
 <h1>
 <a id="gui" class="anchor" href="#gui" aria-hidden="true"><span class="octicon octicon-link"></span></a>Gui</h1>
@@ -124,13 +124,11 @@ python setup.py install
 <a id="on-windows" class="anchor" href="#on-windows" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>On Windows</em>
 </h3>
 
-<p>Executable file is available under <a href="https://github.com/Mindwerks/worldengine/releases">releases</a></p>
+<p>If you want to install Worldengine on Windows you can read these <a href="https://github.com/Mindwerks/worldengine/wiki/Installing-Worldengine-on-Windows">instructions</a>.</p>
+
+<p>Executable file is also available under <a href="https://github.com/Mindwerks/worldengine/releases">releases</a>, but is currently out of date.</p>
 
 <p>Note: you need also a copy of the worldengine src directory in the same folder as the exe.</p>
-
-<p>If you want to build Worldengine on Windows you can read these <a href="https://github.com/Mindwerks/worldengine/wiki/Lands-on-Windows">instructions</a>.</p>
-
-<p>Note: the problem could crash after generating the files, it is a known problem but you should have anyway your nice maps generated! We are working on a fix for that</p>
 
 <h1>
 <a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependencies</h1>
@@ -145,32 +143,32 @@ python setup.py install
 <h2>
 <a id="elevation-map" class="anchor" href="#elevation-map" aria-hidden="true"><span class="octicon octicon-link"></span></a>Elevation Map</h2>
 
-<p><img src="https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_elevation.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/examples/world_seed_1_elevation.png" alt=""></p>
 
 <h2>
 <a id="precipitation-map" class="anchor" href="#precipitation-map" aria-hidden="true"><span class="octicon octicon-link"></span></a>Precipitation Map</h2>
 
-<p><img src="https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_precipitation.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/examples/world_seed_1_precipitation.png" alt=""></p>
 
 <h2>
 <a id="temperature-map" class="anchor" href="#temperature-map" aria-hidden="true"><span class="octicon octicon-link"></span></a>Temperature Map</h2>
 
-<p><img src="https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_temperature.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/examples/world_seed_1_temperature.png" alt=""></p>
 
 <h2>
 <a id="biome-map" class="anchor" href="#biome-map" aria-hidden="true"><span class="octicon octicon-link"></span></a>Biome Map</h2>
 
-<p><img src="https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_biome.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/examples/world_seed_1_biome.png" alt=""></p>
 
 <h2>
 <a id="ocean-map" class="anchor" href="#ocean-map" aria-hidden="true"><span class="octicon octicon-link"></span></a>Ocean Map</h2>
 
-<p><img src="https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_ocean.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/examples/world_seed_1_ocean.png" alt=""></p>
 
 <h1>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h1>
 
-<pre><code>worldengine [options] [world|plates|ancient_map]
+<pre><code>worldengine [options] [world|plates|ancient_map|info]
 </code></pre>
 
 <p><em>Note that options were changed in version 0.5.3</em></p>
@@ -236,6 +234,11 @@ python setup.py install
 <td>-v</td>
 <td>--verbose</td>
 <td>Enable verbose messages</td>
+</tr>
+<tr>
+<td>--bw</td>
+<td>--black-and-white</td>
+<td>Draw maps in black and white</td>
 </tr>
 </tbody>
 </table>
@@ -383,7 +386,7 @@ Producing ouput:
 
 <div class="highlight highlight-python"><pre>worldengine ancient_map <span class="pl-k">-</span>w an_example.world</pre></div>
 
-<p><img src="https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/ancient_map_large.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/examples/ancient_map_large.png" alt=""></p>
 
 <h1>
 <a id="algorithm" class="anchor" href="#algorithm" aria-hidden="true"><span class="octicon octicon-link"></span></a>Algorithm</h1>
@@ -437,7 +440,7 @@ Thank you, all the feedback is precious for us!</p>
 <p>All contributions, questions, ideas are more than welcome!
 Feel free to open an issue or write in our <a href="https://groups.google.com/forum/?hl=en#!forum/lands_worldsynth">google group</a>.</p>
 
-<p>I would like to thank you great people who helped me while working on Lands:</p>
+<p>We would like to thank you great people who helped us while working on WorldEngine and the projects from which it was derived:</p>
 
 <ul>
 <li><p><a href="https://github.com/esampson">Evan Sampson</a> contributed the amazing implementation of the Holdridge life zones model and improved a lot the ancient-looking-map, biome, precipitation and temperature generators. Thanks a million!</p></li>
