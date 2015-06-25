@@ -477,6 +477,17 @@ class World(object):
         return self.elevation['data'][y][x]
 
     #
+    # Precipitations
+    #
+
+    def precipitations_at(self, pos):
+        x, y = pos
+        return self.precipitation['data'][y][x]
+
+    def precipitations_thresholds(self):
+        return self.precipitation['thresholds']
+
+    #
     # Temperature
     #
 
@@ -526,6 +537,13 @@ class World(object):
         x, y = pos
         t = self.temperature['data'][y][x]
         return t >= th_min
+
+    def temperature_at(self, pos):
+        x, y = pos
+        return self.temperature['data'][y][x]
+
+    def temperature_thresholds(self):
+        return self.temperature['thresholds']
 
     #
     # Humidity
