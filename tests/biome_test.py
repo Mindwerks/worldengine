@@ -64,7 +64,6 @@ class TestBiome(unittest.TestCase):
         self.assertEqual(39, biome_name_to_index('warm temperate thorn scrub'))
         self.assertEqual(40, biome_name_to_index('warm temperate wet forest'))
 
-
     def test_biome_index_to_name(self):
         self.assertRaises(Exception, biome_index_to_name, -1)
         self.assertRaises(Exception, biome_index_to_name, 41)

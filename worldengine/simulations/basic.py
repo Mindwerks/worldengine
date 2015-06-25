@@ -1,4 +1,4 @@
-def find_threshold(elevation, land_perc, ocean=None):
+def find_threshold(elevation, land_percentage, ocean=None):
     width = len(elevation[0])
     height = len(elevation)
 
@@ -12,7 +12,7 @@ def find_threshold(elevation, land_perc, ocean=None):
 
     def search(a, b, desired):
         if (not type(a) == int) or (not type(b) == int):
-            raise "A and B should be int"
+            raise Exception("A and B should be int")
         if a == b:
             return a
         if (b - a) == 1:
@@ -37,7 +37,7 @@ def find_threshold(elevation, land_perc, ocean=None):
             for x in range(0, width):
                 if ocean[y][x]:
                     all_land -= 1
-    desired_land = all_land * land_perc
+    desired_land = all_land * land_percentage
     return search(0, 255, desired_land)
 
 

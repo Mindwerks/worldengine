@@ -1,10 +1,11 @@
-from worldengine.simulations.basic import *
+from worldengine.simulations.basic import find_threshold_f
 import random
 
 
 class TemperatureSimulation(object):
 
-    def is_applicable(self, world):
+    @staticmethod
+    def is_applicable(world):
         return not world.has_temperature()
 
     def execute(self, world, seed):
@@ -24,13 +25,14 @@ class TemperatureSimulation(object):
         ]
         world.set_temperature(t, t_th)
 
-    def _calculate(self, world, seed, elevation, mountain_level):
+    @staticmethod
+    def _calculate(world, seed, elevation, mountain_level):
         width = world.width
         height = world.height
 
         random.seed(seed * 7)
         base = random.randint(0, 4096)
-        temp = [[0 for x in xrange(width)] for y in xrange(height)]
+        temp = [[0 for x in xrange(width)] for y in xrange(height)]  # TODO: replace with numpy
 
         from noise import snoise2
 
@@ -39,8 +41,8 @@ class TemperatureSimulation(object):
         freq = 16.0 * octaves
 
         for y in range(0, height):
-            yscaled = float(y) / height
-            latitude_factor = 1.0 - (abs(yscaled - 0.5) * 2)
+            y_scaled = float(y) / height
+            latitude_factor = 1.0 - (abs(y_scaled - 0.5) * 2)
             for x in range(0, width):
                 n = snoise2(x / freq, y / freq, octaves, base=base)
 

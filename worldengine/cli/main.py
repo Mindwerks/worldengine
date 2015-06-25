@@ -1,16 +1,16 @@
 import sys
-from PIL import Image
 from optparse import OptionParser, OptionGroup
 import os
-
+import pickle
+import random
 import worldengine.generation as geo
-from worldengine.plates import world_gen, generate_plates_simulation, \
-    array_to_matrix
-from worldengine.draw import *
-from worldengine.drawing_functions import *
-from worldengine.world import *
-from worldengine.common import *
+from worldengine.common import array_to_matrix, set_verbose, print_verbose
+from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
+    draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
+    draw_temperature_levels_on_file, draw_riversmap_on_file
+from worldengine.plates import world_gen, generate_plates_simulation
 from worldengine.step import Step
+from worldengine.world import World
 from worldengine.version import __version__
 
 VERSION = __version__
@@ -333,7 +333,7 @@ def main():
     if len(args) > 1 and args[0] != 'info':
         parser.print_help()
         usage("Only 1 operation allowed [" + OPERATIONS + "]")
-    if (args[0] == 'info'):
+    if len(args) > 1 and args[0] == 'info':
         if len(args) != 2:
             parser.print_help()
             usage("For operation info only the filename should be specified")

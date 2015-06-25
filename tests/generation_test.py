@@ -1,7 +1,5 @@
 import unittest
-from worldengine.generation import *
 from worldengine.plates import *
-import tempfile
 
 from tests.draw_test import TestBase
 
@@ -14,7 +12,7 @@ class TestGeneration(TestBase):
     def test_world_gen_does_not_explode_badly(self):
         # FIXME remove me when proper tests are in place
         # Very stupid test that just verify nothing explode badly
-        w = world_gen("Dummy", 32, 16, 1, step=Step.get_by_name("full"))
+        world_gen("Dummy", 32, 16, 1, step=Step.get_by_name("full"))
 
     @staticmethod
     def _mean_elevation_at_borders(world):

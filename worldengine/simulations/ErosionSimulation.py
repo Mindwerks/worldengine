@@ -1,8 +1,6 @@
-from worldengine.simulations.basic import *
 import math
 import numpy
 import worldengine.a_star
-from worldengine.common import *
 
 # Direction
 NORTH = [0, -1]
@@ -18,9 +16,10 @@ CENTER = [0, 0]
 DIR_NEIGHBORS = [NORTH, EAST, SOUTH, WEST]
 DIR_NEIGHBORS_CENTER = [CENTER, NORTH, EAST, SOUTH, WEST]
 
+RIVER_TH = 0.02
 
-def overflow(value, maxValue):
-    return value % maxValue
+def overflow(value, max_value):
+    return value % max_value
 
 
 def in_circle(radius, center_x, center_y, x, y):
@@ -28,15 +27,15 @@ def in_circle(radius, center_x, center_y, x, y):
     return square_dist <= radius ** 2
 
 
-def _numpy_to_matrix(numpyarray):
-    """Convert a bidimensional numpy array to a plain Python matrix.
+def _numpy_to_matrix(numpy_array):
+    """Convert a bi-dimensional numpy array to a plain Python matrix.
 
     This is used because currently we do not know how to serialize numpy
-    arrays :( with pickle. In the future we will use pytables"""
+    arrays :( with pickle. In the future we will use pytables/hdf5"""
 
-    width = numpyarray.shape[0]
-    height = numpyarray.shape[1]
-    return [[numpyarray[x, y] for x in xrange(width)] for y in xrange(height)]
+    width = numpy_array.shape[0]
+    height = numpy_array.shape[1]
+    return [[numpy_array[x, y] for x in xrange(width)] for y in xrange(height)]
 
 
 class ErosionSimulation(object):
@@ -95,10 +94,10 @@ class ErosionSimulation(object):
                 path = self.find_quick_path([x, y], world)
                 if path:
                     tx, ty = path
-                    flowDir = [tx - x, ty - y]
+                    flow_dir = [tx - x, ty - y]
                     key = 0
                     for direction in DIR_NEIGHBORS_CENTER:
-                        if direction == flowDir:
+                        if direction == flow_dir:
                             water_path[x, y] = key
                         key += 1
 
@@ -134,11 +133,10 @@ class ErosionSimulation(object):
 
         return new_path
 
-    def river_sources(self, world, waterFlow, waterPath):
+    @staticmethod
+    def river_sources(world, water_flow, water_path):
         """Find places on map where sources of river can be found"""
         river_source_list = []
-
-        RIVER_TH = 0.02
 
         # Using the wind and rainfall data, create river 'seeds' by
         #     flowing rainfall along paths until a 'flow' threshold is reached
@@ -154,9 +152,9 @@ class ErosionSimulation(object):
         for x in range(0, world.width - 1):
             for y in range(0, world.height - 1):
                 rain_fall = world.precipitation['data'][y][x]
-                waterFlow[x, y] = rain_fall
+                water_flow[x, y] = rain_fall
 
-                if waterPath[x, y] == 0:
+                if water_path[x, y] == 0:
                     continue  # ignore cells without flow direction
                 cx, cy = x, y  # begin with starting location
                 neighbour_seed_found = False
@@ -164,8 +162,8 @@ class ErosionSimulation(object):
                 while not neighbour_seed_found:
 
                     # have we found a seed?
-                    if world.is_mountain((cx, cy)) and\
-                                    waterFlow[cx, cy] >= RIVER_TH:
+                    if world.is_mountain((cx, cy)) and \
+                            water_flow[cx, cy] >= RIVER_TH:
 
                         # try not to create seeds around other seeds
                         for seed in river_source_list:
@@ -179,13 +177,13 @@ class ErosionSimulation(object):
                         break
 
                     # no path means dead end...
-                    if waterPath[cx, cy] == 0:
+                    if water_path[cx, cy] == 0:
                         break  # break out of loop
 
                     # follow path, add water flow from previous cell
-                    dx, dy = DIR_NEIGHBORS_CENTER[waterPath[cx, cy]]
+                    dx, dy = DIR_NEIGHBORS_CENTER[water_path[cx, cy]]
                     nx, ny = cx + dx, cy + dy  # calculate next cell
-                    waterFlow[nx, ny] += rain_fall
+                    water_flow[nx, ny] += rain_fall
                     cx, cy = nx, ny  # set current cell to next cell
         return river_source_list
 
@@ -275,14 +273,13 @@ class ErosionSimulation(object):
                             current_location, lower_elevation))
 
                 # find our way to the edge
-                edgePath = None
-                edgePath = worldengine.a_star.PathFinder().find(
+                edge_path = worldengine.a_star.PathFinder().find(
                     world.elevation['data'], [cx, cy], [lx, ly])
-                if not edgePath:
+                if not edge_path:
                     # can't find another other path, make it a lake
                     lake_list.append(current_location)
                     break
-                path += edgePath  # add our newly found path
+                path += edge_path  # add our newly found path
                 path.append([nx, ny])  # finally add our overflow to other side
                 current_location = path[-1]
 

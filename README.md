@@ -79,6 +79,10 @@ git clone or download the code
 # before using worldengine: if you plan to change the code
 python setup.py develop 
 
+# for unit-testing: also clone worldengine-data
+git clone git@github.com:Mindwerks/worldengine-data.git ../worldengine-data
+nosetest tests
+
 # before using worldengine: if you want just to install worldengine
 # on unix-ish system you could have to prepend sudo
 python setup.py install
@@ -150,7 +154,7 @@ _Note that options were changed in version 0.5.3_
 
 | Short     | Long | Description |
 |-----------|------|-------------|
-| -r FILE   | --rivers=FILE | produce a map of reivers, after the option it expects the name of the file where to generate the map  |
+| -r FILE   | --rivers=FILE | produce a map of rivers, after the option it expects the name of the file where to generate the map  |
 | --gs=FILE  | --grayscale-heightmap=FILE | produce a grayscale heightmap, after the option it expects the name of the file where to generate the heightmap |
 |   | --ocean_level=N   |  elevation cut off for sea level (default = 1.0) |
 
@@ -287,7 +291,9 @@ Do you have problems or suggestions for improvements?
 =====================================================
 
 Please write to us!
-You can write at f _dot_ tomassetti _at_ gmail _dot_ com
+You can write us at:
+ * f _dot_ tomassetti _at_ gmail _dot_ com
+ * psi29a _at_ gmail _dot_ com
 Thank you, all the feedback is precious for us!
 
 Requirements

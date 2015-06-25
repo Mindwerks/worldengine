@@ -1,31 +1,27 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-
 """
 GUI Interface for Worldengine
 """
-
-import sys
-from PyQt4 import QtGui, QtCore
-import random
-import threading
+from PyQt4 import QtGui
 import platec
-from worldengine.world import World
-import worldengine.generation
-from worldengine.generation import *
-from worldengine.common import *
-from view import *
-from worldengine.plates import *
-from worldengine.simulations.WatermapSimulation import *
-from worldengine.simulations.IrrigationSimulation import *
-from worldengine.simulations.HumiditySimulation import *
-from worldengine.simulations.TemperatureSimulation import *
-from worldengine.simulations.PermeabilitySimulation import *
-from worldengine.simulations.BiomeSimulation import *
-from worldengine.simulations.PrecipitationSimulation import *
-
-from worldengine.views.PrecipitationsView import *
-from worldengine.views.WatermapView import *
+import random
+import sys
+import threading
+from world import World, Step
+from worldengine.common import array_to_matrix
+from worldengine.generation import ErosionSimulation
+from view import draw_bw_elevation_on_screen, draw_land_on_screen, \
+    draw_plates_and_elevation_on_screen, draw_plates_on_screen
+from worldengine.plates import add_noise_to_elevation, center_land, initialize_ocean_and_thresholds, place_oceans_at_map_borders
+from worldengine.simulations.WatermapSimulation import WatermapSimulation
+from worldengine.simulations.IrrigationSimulation import IrrigationSimulation
+from worldengine.simulations.HumiditySimulation import HumiditySimulation
+from worldengine.simulations.TemperatureSimulation import TemperatureSimulation
+from worldengine.simulations.PermeabilitySimulation import PermeabilitySimulation
+from worldengine.simulations.BiomeSimulation import BiomeSimulation
+from worldengine.simulations.PrecipitationSimulation import PrecipitationSimulation
+from worldengine.views.PrecipitationsView import PrecipitationsView
+from worldengine.views.WatermapView import WatermapView
 
 
 class GenerateDialog(QtGui.QDialog):
@@ -604,11 +600,9 @@ class WorldengineGui(QtGui.QMainWindow):
 
 def main():
     app = QtGui.QApplication(sys.argv)
-
     lg = WorldengineGui()
-
+    assert lg
     sys.exit(app.exec_())
-
 
 if __name__ == '__main__':
     main()

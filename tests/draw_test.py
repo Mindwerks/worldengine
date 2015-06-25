@@ -31,8 +31,13 @@ class TestBase(unittest.TestCase):
 
     def setUp(self):
         tests_dir = os.path.dirname(os.path.realpath(__file__))
-        self.tests_data_dir = os.path.abspath(os.path.join(tests_dir, './data'))
-        self.tests_blessed_images_dir = os.path.abspath(os.path.join(tests_dir, './blessed_images'))
+        self.tests_data_dir = os.path.abspath(os.path.join(
+            tests_dir, "../../worldengine-data/tests/data"))
+        self.tests_blessed_images_dir = os.path.abspath(
+            os.path.join(tests_dir, "../../worldengine-data/tests/images"))
+        self.assertTrue(
+            os.path.isdir(self.tests_data_dir),
+            "worldengine-data doesn't exist, please clone it before continuing.")
 
     def _assert_is_valid_color(self, color, color_name):
         r, g, b = color
@@ -114,7 +119,7 @@ class TestDraw(TestBase):
         draw_elevation(w, False, target)
         self._assert_img_equal("elevation_28070_no_shadow", target)
 
-    def test_draw_riversmap(self):
+    def test_draw_river_map(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
         target = PixelCollector(w.width, w.height)
         draw_riversmap(w, target)
