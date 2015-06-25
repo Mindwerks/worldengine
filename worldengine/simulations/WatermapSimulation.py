@@ -1,15 +1,18 @@
-from worldengine.simulations.basic import *
+from worldengine.simulations.basic import find_threshold_f
 
 
 class WatermapSimulation(object):
 
-    def is_applicable(self, world):
+    @staticmethod
+    def is_applicable(world):
         return world.has_precipitations() and (not world.has_watermap())
 
     def execute(self, world, seed):
+        assert seed
         world.watermap = self._watermap(world, 20000)
 
-    def _watermap(self, world, n):
+    @staticmethod
+    def _watermap(world, n):
         def droplet(world, pos, q, _watermap):
             if q < 0:
                 return
@@ -18,7 +21,7 @@ class WatermapSimulation(object):
             lowers = []
             min_higher = None
             min_lower = None
-            pos_min_higher = None
+            # pos_min_higher = None  # TODO: no longer used?
             tot_lowers = 0
             for p in world.tiles_around((x, y)):
                 px, py = p
@@ -35,7 +38,7 @@ class WatermapSimulation(object):
                 else:
                     if min_higher is None or e > min_higher:
                         min_higher = e
-                        pos_min_higher = p
+                        # pos_min_higher = p
             if lowers:
                 f = q / tot_lowers
                 for l in lowers:
@@ -52,14 +55,15 @@ class WatermapSimulation(object):
                 _watermap[y][x] += q
 
         _watermap_data = [[0 for x in xrange(world.width)] for y in
-                          xrange(world.height)]
+                          xrange(world.height)]  # TODO: replace with numpy
         for i in xrange(n):
             x, y = world.random_land()
             if True and world.precipitation['data'][y][x] > 0:
                 droplet(world, (x, y), world.precipitation['data'][y][x],
                         _watermap_data)
-        _watermap = {'data': _watermap_data}
-        _watermap['thresholds'] = {}
+        _watermap = dict()
+        _watermap['data'] = _watermap_data
+        _watermap['thresholds'] = dict()
         _watermap['thresholds']['creek'] = find_threshold_f(_watermap_data,
                                                             0.05,
                                                             ocean=world.ocean)

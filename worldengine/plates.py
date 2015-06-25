@@ -1,11 +1,14 @@
 # Every reference to platec has to be kept separated because it is a C
 # extension which is not available when using this project from jython
 
-import time
 import platec
+import random
+import time
 
-from worldengine.generation import *
-from worldengine.common import *
+from worldengine.generation import Step, add_noise_to_elevation, center_land, generate_world, \
+    get_verbose, initialize_ocean_and_thresholds, place_oceans_at_map_borders
+from worldengine.common import array_to_matrix
+from world import World
 
 
 def generate_plates_simulation(seed, width, height, sea_level=0.65,

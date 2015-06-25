@@ -1,9 +1,20 @@
 import pickle
 
-from worldengine.biome import *
-from worldengine.basic_map_operations import *
+from worldengine.biome import Biome, BorealDesert, BorealDryScrub, BorealMoistForest, \
+    BorealRainForest, BorealWetForest, CoolTemperateDesertScrub, CoolTemperateDesert, \
+    CoolTemperateMoistForest, CoolTemperateRainForest, CoolTemperateSteppe, CoolTemperateWetForest,\
+    Ice, PolarDesert, SubpolarDryTundra, SubpolarMoistTundra, SubpolarRainTundra, \
+    SubpolarWetTundra, SubtropicalDesert, SubtropicalDesertScrub, SubtropicalDryForest, \
+    SubtropicalMoistForest, SubtropicalRainForest, SubtropicalThornWoodland, SubtropicalWetForest, \
+    WarmTemperateDesert, WarmTemperateDesertScrub, WarmTemperateDryForest, \
+    WarmTemperateMoistForest, WarmTemperateRainForest, WarmTemperateThornScrub, \
+    WarmTemperateWetForest, TropicalDesert, TropicalDesertScrub, TropicalDryForest, \
+    TropicalMoistForest, TropicalRainForest, TropicalThornWoodland, TropicalWetForest, \
+    TropicalVeryDryForest, biome_index_to_name, biome_name_to_index
+from worldengine.basic_map_operations import random_point
 import worldengine.protobuf.World_pb2 as Protobuf
 from worldengine.step import Step
+from version import __version__
 
 execfile('worldengine/version.py')
 
@@ -114,7 +125,7 @@ class World(object):
 
     @staticmethod
     def _from_protobuf_matrix_with_quantiles(p_matrix):
-        matrix = {}
+        matrix = dict()
         matrix['data'] = World._from_protobuf_matrix(p_matrix)
         matrix['quantiles'] = World._from_protobuf_quantiles(
             p_matrix.quantiles)
@@ -125,8 +136,8 @@ class World(object):
         return ord('W') * (256 ** 3) + ord('o') * (256 ** 2) + \
             ord('e') * (256 ** 1) + ord('n')
 
-
-    def __version_hashcode__(self):
+    @staticmethod
+    def __version_hashcode__():
         parts = __version__.split('.')
         return int(parts[0])*(256**3) + int(parts[1])*(256**2) + int(parts[2])*(256**1)
 
@@ -163,7 +174,7 @@ class World(object):
             self._to_protobuf_matrix(self.biome, p_world.biome,
                                      biome_name_to_index)
 
-        # Humidty
+        # Humidity
         if hasattr(self, 'humidity'):
             self._to_protobuf_matrix_with_quantiles(self.humidity,
                                                     p_world.humidity)
@@ -258,7 +269,7 @@ class World(object):
             w.set_permeability(p, p_th)
 
         if len(p_world.watermapData.rows) > 0:
-            w.watermap = {}
+            w.watermap = dict()
             w.watermap['data'] = World._from_protobuf_matrix(
                 p_world.watermapData)
             w.watermap['thresholds'] = {}
@@ -375,7 +386,7 @@ class World(object):
                 for dy in range(-radius, radius + 1):
                     ny = y + dy
                     if ny >= 0 and ny < self.height * factor and (
-                                    dx != 0 or dy != 0):
+                            dx != 0 or dy != 0):
                         if predicate is None or predicate((nx, ny)):
                             ps.append((nx, ny))
         return ps
@@ -801,23 +812,23 @@ class World(object):
     def set_elevation(self, data, thresholds):
         if (len(data) != self.height) or (len(data[0]) != self.width):
             raise Exception(
-                "Setting elevation map with wrong dimension. " +
+                "Setting elevation map with wrong dimension. "
                 "Expected %d x %d, found %d x %d" % (
-                    self.width, self.height, (len[data[0]], len(data))))
+                    self.width, self.height, len(data[0]), len(data)))
         self.elevation = {'data': data, 'thresholds': thresholds}
 
     def set_plates(self, data):
         if (len(data) != self.height) or (len(data[0]) != self.width):
             raise Exception(
-                "Setting plates map with wrong dimension. " +
+                "Setting plates map with wrong dimension. "
                 "Expected %d x %d, found %d x %d" % (
-                    self.width, self.height, (len[data[0]], len(data))))
+                    self.width, self.height, len(data[0]), len(data)))
         self.plates = data
 
     def set_biome(self, biome):
         if len(biome) != self.height:
             raise Exception(
-                "Setting data with wrong height: biome has height %i while " +
+                "Setting data with wrong height: biome has height %i while "
                 "the height is currently %i" % (
                     len(biome), self.height))
         if len(biome[0]) != self.width:
@@ -828,7 +839,7 @@ class World(object):
     def set_ocean(self, ocean):
         if (len(ocean) != self.height) or (len(ocean[0]) != self.width):
             raise Exception(
-                "Setting ocean map with wrong dimension. Expected %d x %d, " +
+                "Setting ocean map with wrong dimension. Expected %d x %d, "
                 "found %d x %d" % (self.width, self.height,
                                    len(ocean[0]), len(ocean)))
 
