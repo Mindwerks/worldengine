@@ -47,7 +47,7 @@ lands ancient_map -w seed1.world
 python lands/generator.py ancient_map -w seed1.world
 ```
 
-![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/ancient_map_seed1.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/ancient_map_seed1.png)
 
 Gui
 ===
@@ -104,23 +104,23 @@ The program produces a binary format with all the data of the generated world an
 
 ## Elevation Map
 
-![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_elevation.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/examples/world_seed_1_elevation.png)
 
 ## Precipitation Map
 
-![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_precipitation.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/world_seed_1_precipitation.png)
 
 ## Temperature Map
 
-![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_temperature.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/world_seed_1_temperature.png)
 
 ## Biome Map
 
-![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_biome.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/world_seed_1_biome.png)
 
 ## Ocean Map
 
-![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/world_seed_1_ocean.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/world_seed_1_ocean.png)
 
 Usage
 =====
@@ -250,7 +250,7 @@ This is the corresponding ancient map
 worldengine ancient_map -w an_example.world
 ```
 
-![](https://raw.githubusercontent.com/Mindwerks/worldengine/master/examples/ancient_map_large.png)
+![](https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/ancient_map_large.png)
 
 Algorithm
 =========
