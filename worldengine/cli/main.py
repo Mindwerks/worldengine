@@ -21,7 +21,7 @@ STEPS = 'plates|precipitations|full'
 
 
 def generate_world(world_name, width, height, seed, num_plates, output_dir,
-                   step, ocean_level, world_format='pickle', verbose=True):
+                   step, ocean_level, world_format='pickle', verbose=True, black_and_white=False):
     w = world_gen(world_name, width, height, seed, num_plates, ocean_level,
                   step, verbose=verbose)
 
@@ -48,10 +48,10 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
 
     if step.include_precipitations:
         filename = '%s/%s_precipitation.png' % (output_dir, world_name)
-        draw_precipitation_on_file(w, filename)
+        draw_precipitation_on_file(w, filename, black_and_white)
         print("* precipitation image generated in '%s'" % filename)
         filename = '%s/%s_temperature.png' % (output_dir, world_name)
-        draw_temperature_levels_on_file(w, filename)
+        draw_temperature_levels_on_file(w, filename, black_and_white)
         print("* temperature image generated in '%s'" % filename)
 
     if step.include_biome:
@@ -269,6 +269,10 @@ def main():
                       metavar="N", default='2000')
     parser.add_option('-v', '--verbose', dest='verbose', action="store_true",
                       help="Enable verbose messages", default=False)
+    parser.add_option('--bw', '--black-and-white', dest='black_and_white',
+                      action="store_true",
+                      help="generate maps in black and white",
+                      default=False)
 
     # -----------------------------------------------------
     g_generate = OptionGroup(parser, "Generate Options",
@@ -375,13 +379,14 @@ def main():
     print('-----------------------')
     print(' operation         : %s generation' % operation)
     if generation_operation:
-        print(' seed              : %i' % seed)
-        print(' name              : %s' % world_name)
-        print(' width             : %i' % options.width)
-        print(' height            : %i' % options.height)
-        print(' number of plates  : %i' % number_of_plates)
-        print(' world format      : %s' % world_format)
-        print(' step              : %s' % step.name)
+        print(' seed                 : %i' % seed)
+        print(' name                 : %s' % world_name)
+        print(' width                : %i' % options.width)
+        print(' height               : %i' % options.height)
+        print(' number of plates     : %i' % number_of_plates)
+        print(' world format         : %s' % world_format)
+        print(' black and white maps : %s' % options.black_and_white)
+        print(' step                 : %s' % step.name)
         if produce_grayscale_heightmap:
             print(
                 ' + greyscale heightmap in "%s"' % produce_grayscale_heightmap)
@@ -392,9 +397,9 @@ def main():
         else:
             print(' (no rivers map)')
     if operation == 'ancient_map':
-        print(' resize factor     : %i' % options.resize_factor)
-        print(' world file        : %s' % options.world_file)
-        print(' sea color         : %s' % options.sea_color)
+        print(' resize factor        : %i' % options.resize_factor)
+        print(' world file           : %s' % options.world_file)
+        print(' sea color            : %s' % options.sea_color)
 
     set_verbose(options.verbose)
 
@@ -405,7 +410,7 @@ def main():
         world = generate_world(world_name, options.width, options.height,
                                seed, number_of_plates, options.output_dir,
                                step, options.ocean_level, world_format,
-                               options.verbose)
+                               options.verbose, black_and_white=options.black_and_white)
         if produce_grayscale_heightmap:
             generate_grayscale_heightmap(world, produce_grayscale_heightmap)
         if options.rivers_map:
