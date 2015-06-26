@@ -1,7 +1,7 @@
 from PIL import Image
 
-from worldengine.drawing_functions import *
-from worldengine.common import *
+from worldengine.drawing_functions import draw_ancientmap, \
+    draw_rivers_on_image, gradient
 
 # -------------
 # Helper values

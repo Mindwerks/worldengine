@@ -1,24 +1,26 @@
-from worldengine.simulations.basic import *
+from worldengine.simulations.basic import find_threshold_f
 
 
 class HumiditySimulation(object):
-
-    def is_applicable(self, world):
+    @staticmethod
+    def is_applicable(world):
         return world.has_precipitations() and world.has_irrigation() and (
             not world.has_humidity())
 
     def execute(self, world, seed):
+        assert seed
         world.humidity = self._calculate(world)
 
-    def _calculate(self, world):
-        humidity = {}
+    @staticmethod
+    def _calculate(world):
+        humidity = dict()
         humidity['data'] = [[0 for x in xrange(world.width)] for y in
-                            xrange(world.height)]
+                            xrange(world.height)]  # TODO: replace with numpy
 
         for y in xrange(world.height):
             for x in xrange(world.width):
                 humidity['data'][y][x] = world.precipitation['data'][y][x] + \
-                                         world.irrigation[y][x]
+                    world.irrigation[y][x]
 
         # These were originally evenly spaced at 12.5% each but changing them
         # to a bell curve produced better results

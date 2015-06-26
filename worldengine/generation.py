@@ -1,14 +1,15 @@
-from worldengine.world import *
-from worldengine.simulations.WatermapSimulation import *
-from worldengine.simulations.IrrigationSimulation import *
-from worldengine.simulations.HumiditySimulation import *
-from worldengine.simulations.TemperatureSimulation import *
-from worldengine.simulations.PermeabilitySimulation import *
-from worldengine.simulations.ErosionSimulation import *
-from worldengine.simulations.PrecipitationSimulation import *
-from worldengine.simulations.BiomeSimulation import *
-from worldengine.simulations.basic import *
-from worldengine.common import *
+from noise import snoise2
+from worldengine.world import Step
+from worldengine.simulations.basic import find_threshold_f
+from worldengine.simulations.WatermapSimulation import WatermapSimulation
+from worldengine.simulations.IrrigationSimulation import IrrigationSimulation
+from worldengine.simulations.HumiditySimulation import HumiditySimulation
+from worldengine.simulations.TemperatureSimulation import TemperatureSimulation
+from worldengine.simulations.PermeabilitySimulation import PermeabilitySimulation
+from worldengine.simulations.ErosionSimulation import ErosionSimulation
+from worldengine.simulations.PrecipitationSimulation import PrecipitationSimulation
+from worldengine.simulations.BiomeSimulation import BiomeSimulation
+from worldengine.common import anti_alias, get_verbose, matrix_min_and_max, rescale_value
 
 
 # ------------------
@@ -67,8 +68,8 @@ def place_oceans_at_map_borders(world):
     ocean_border = int(min(30, max(world.width / 5, world.height / 5)))
 
     def place_ocean(x, y, i):
-        world.elevation['data'][y][x] = (world.elevation['data'][y][x] * i) / \
-                                        ocean_border
+        world.elevation['data'][y][x] = \
+            (world.elevation['data'][y][x] * i) / ocean_border
 
     for x in range(world.width):
         for i in range(ocean_border):
@@ -94,7 +95,7 @@ def fill_ocean(elevation, sea_level):
     width = len(elevation[0])
     height = len(elevation)
 
-    ocean = [[False for x in range(width)] for y in range(height)]
+    ocean = [[False for x in range(width)] for y in range(height)]  # TODO: use numpy
     to_expand = []
     for x in range(width):
         if elevation[0][x] <= sea_level:
@@ -156,7 +157,7 @@ def sea_depth(world, sea_level):
                 sea_depth[y][x] *= 0.7
             elif world.tiles_around((x, y), radius=5, predicate=world.is_land):
                 sea_depth[y][x] *= 0.9
-    sea_depth = antialias(sea_depth, 10)
+    sea_depth = anti_alias(sea_depth, 10)
     min_depth, max_depth = matrix_min_and_max(sea_depth)
     sea_depth = [[rescale_value(sea_depth[y][x], min_depth,
                                 max_depth, 0.0, 1.0)

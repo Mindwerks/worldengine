@@ -1,15 +1,14 @@
-from worldengine.simulations.basic import *
-import random
-from worldengine.views.basic import color_prop
 from PyQt4 import QtGui
 
 
 class WatermapView(object):
 
-    def is_applicable(self, world):
+    @staticmethod
+    def is_applicable(world):
         return world.has_watermap()
 
-    def draw(self, world, canvas):
+    @staticmethod
+    def draw(world, canvas):
         width = world.width
         height = world.height
         th = world.watermap['thresholds']['river']

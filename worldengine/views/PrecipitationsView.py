@@ -1,15 +1,15 @@
-from worldengine.simulations.basic import *
-import random
 from worldengine.views.basic import color_prop
 from PyQt4 import QtGui
 
 
 class PrecipitationsView(object):
 
-    def is_applicable(self, world):
+    @staticmethod
+    def is_applicable(world):
         return world.has_precipitations()
 
-    def draw(self, world, canvas):
+    @staticmethod
+    def draw(world, canvas):
         width = world.width
         height = world.height
         low_th = world.precipitation['thresholds'][0][1]

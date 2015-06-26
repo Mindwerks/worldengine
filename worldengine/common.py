@@ -1,4 +1,3 @@
-import math
 import sys
 import copy
 
@@ -47,13 +46,13 @@ class Counter(object):
         self.c[what] += 1
 
     def to_str(self):
-        str = ""
+        string = ""
         keys = self.c.keys()
         keys.sort()
         for w in keys:
-            str += "%s : %i" % (w, self.c[w])
-            str += "\n"
-        return str
+            string += "%s : %i" % (w, self.c[w])
+            string += "\n"
+        return string
 
     def print_self(self):
         # print without the new line
@@ -82,21 +81,21 @@ def rescale_value(original, prev_min, prev_max, min, max):
     return min + ((max - min) * f)
 
 
-def antialias(elevation, steps):
+def anti_alias(elevation, steps):
     """
-    Execute the antialias operation steps times on the given elevation map
+    Execute the anti_alias operation steps times on the given elevation map
     """
     width = len(elevation[0])
     height = len(elevation)
 
-    def _antialias_step(original):
-        antialiased = copy.deepcopy(original)
+    def _anti_alias_step(original):
+        anti_aliased = copy.deepcopy(original)
         for y in range(height):
             for x in range(width):
-                antialiased[y][x] = antialias_point(original, x, y)
-        return antialiased
+                anti_aliased[y][x] = anti_alias_point(original, x, y)
+        return anti_aliased
 
-    def antialias_point(original, x, y):
+    def anti_alias_point(original, x, y):
         n = 2
         tot = elevation[y][x] * 2
         for dy in range(-1, +2):
@@ -109,7 +108,7 @@ def antialias(elevation, steps):
 
     current = elevation
     for i in range(steps):
-        current = _antialias_step(current)
+        current = _anti_alias_step(current)
     return current
 
 

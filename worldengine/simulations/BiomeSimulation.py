@@ -1,17 +1,20 @@
 class BiomeSimulation(object):
 
-    def is_applicable(self, world):
+    @staticmethod
+    def is_applicable(world):
         return world.has_humidity() and world.has_temperature() and \
-               (not world.has_biome())
+            (not world.has_biome())
 
-    def execute(self, world, seed):
+    @staticmethod
+    def execute(world, seed):
+        assert seed
         w = world
         width = world.width
         height = world.height
         ocean = world.ocean
         cm = {}
         biome_cm = {}
-        biome = [[None for x in xrange(width)] for y in xrange(height)]
+        biome = [[None for x in xrange(width)] for y in xrange(height)]  # TODO: replace with numpy
         for y in xrange(height):
             for x in xrange(width):
                 if ocean[y][x]:
@@ -108,4 +111,4 @@ class BiomeSimulation(object):
                     biome_cm[biome[y][x]] = 0
                 biome_cm[biome[y][x]] += 1
         w.set_biome(biome)
-        return (cm, biome_cm)
+        return cm, biome_cm

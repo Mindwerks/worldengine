@@ -4,11 +4,11 @@ so no references to PIL are necessary and the module can be used also through
 Jython
 """
 
-import random
 import math
+import random
 import sys
 import time
-from worldengine.common import *
+from worldengine.common import get_verbose
 
 
 # -------------------
@@ -303,7 +303,7 @@ def _draw_steppe(pixels, x, y):
 
 def _draw_cool_desert(pixels, x, y, w, h):
     c = (72, 72, 53, 255)
-    c2 = (219, 220, 200, 255)
+    # c2 = (219, 220, 200, 255)  # TODO: not used?
 
     pixels[x - 1, y - 2] = c
     pixels[x - 0, y - 2] = c
@@ -378,7 +378,7 @@ def _draw_chaparral(pixels, x, y):
 
 def _draw_hot_desert(pixels, x, y, w, h):
     c = (72, 72, 53, 255)
-    c2 = (219, 220, 200, 255)
+    # c2 = (219, 220, 200, 255)  # TODO: not used?
 
     pixels[x - 1, y - 2] = c
     pixels[x - 0, y - 2] = c
@@ -491,8 +491,8 @@ def _draw_savanna(pixels, x, y):
 
 
 def _draw_a_mountain(pixels, x, y, w=3, h=3):
-    mcl = (0, 0, 0, 255)
-    mcll = (128, 128, 128, 255)
+    # mcl = (0, 0, 0, 255)  # TODO: No longer used?
+    # mcll = (128, 128, 128, 255)
     mcr = (75, 75, 75, 255)
     # left edge
     for mody in range(-h, h + 1):
@@ -552,6 +552,7 @@ def draw_ancientmap(world, target, resize_factor=1,
     cool_desert_mask = _mask(world, world.is_cool_desert, resize_factor)
     chaparral_mask = _mask(world, world.is_chaparral, resize_factor)
     hot_desert_mask = _mask(world, world.is_hot_desert, resize_factor)
+    rock_desert_mask = _mask(world, world.is_hot_desert, resize_factor)  # TODO: add is_desert_mask
 
     def unset_mask(pos):
         x, y = pos
@@ -631,7 +632,7 @@ def draw_ancientmap(world, target, resize_factor=1,
                 min_elev = e
             if max_elev is None or e > max_elev:
                 max_elev = e
-    elev_delta = max_elev - min_elev
+    # elev_delta = max_elev - min_elev  # TODO: no longer used?
     if verbose:
         elapsed_time = time.time() - start_time
         print(
@@ -659,14 +660,14 @@ def draw_ancientmap(world, target, resize_factor=1,
     if verbose:
         start_time = time.time()
 
-    def antialias(steps):
+    def anti_alias(steps):
 
-        def _antialias_step():
+        def _anti_alias_step():
             for y in range(resize_factor * world.height):
                 for x in range(resize_factor * world.width):
-                    _antialias_point(x, y)
+                    _anti_alias_point(x, y)
 
-        def _antialias_point(x, y):
+        def _anti_alias_point(x, y):
             n = 2
             tot_r = target[x, y][0] * 2
             tot_g = target[x, y][1] * 2
@@ -687,9 +688,9 @@ def draw_ancientmap(world, target, resize_factor=1,
             target[x, y] = (r, g, b, 255)
 
         for i in range(steps):
-            _antialias_step()
+            _anti_alias_step()
 
-    antialias(1)
+    anti_alias(1)
     if verbose:
         elapsed_time = time.time() - start_time
         print(

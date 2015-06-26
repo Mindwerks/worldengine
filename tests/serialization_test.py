@@ -1,5 +1,4 @@
 import unittest
-from worldengine.generation import *
 from worldengine.plates import *
 import tempfile
 import os

@@ -5,21 +5,21 @@ This file contains all possible Biome as separate classes.
 import re
 
 
-def _uncamelize(name):
+def _un_camelize(name):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1 \2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1 \2', s1).lower()
 
 
 class _BiomeMetaclass(type):
 
-    def __new__(cls, name, parents, dct):
+    def __new__(mcs, name, parents, dct):
         if not hasattr(_BiomeMetaclass, "biomes"):
             _BiomeMetaclass.biomes = {}
-        uncamelized_name = _uncamelize(name)
-        created_class = super(_BiomeMetaclass, cls).__new__(cls, name,
+        un_camelized_name = _un_camelize(name)
+        created_class = super(_BiomeMetaclass, mcs).__new__(mcs, name,
                                                             parents, dct)
         if object not in parents:
-            _BiomeMetaclass.biomes[uncamelized_name] = created_class
+            _BiomeMetaclass.biomes[un_camelized_name] = created_class
         return created_class
 
 
@@ -39,7 +39,7 @@ class Biome(object):
 
     @classmethod
     def name(cls):
-        return _uncamelize(cls.__name__)
+        return _un_camelize(cls.__name__)
 
 
 class Ocean(Biome):
