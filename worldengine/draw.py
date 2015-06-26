@@ -137,6 +137,8 @@ class ImagePixelSetter(object):
         self.filename = filename
 
     def set_pixel(self, x, y, color):
+        if len(color) == 3:  # Convert RGB to RGBA - TODO: go through code to fix this
+            color = (color[0], color[1], color[2], 255)
         self.pixels[x, y] = color
 
     def complete(self):
