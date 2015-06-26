@@ -1,0 +1,116 @@
+package World;
+
+message World {
+
+    message DoubleRow {
+        repeated double cells = 1;
+    }
+
+    message BooleanRow {
+        repeated bool cells = 1;
+    }
+
+    message IntegerRow {
+        repeated int32 cells = 1;
+    }
+
+    message ByteRow {
+        repeated int32 cells = 1;
+    }
+
+    message DoubleMatrix {
+        repeated DoubleRow rows = 1;
+    }
+
+    message BooleanMatrix {
+        repeated BooleanRow rows = 1;
+    }    
+
+    message IntegerMatrix {
+        repeated IntegerRow rows = 1;
+    }   
+
+    message DoubleQuantile {
+        required int32 key = 1;
+        required double value = 2;
+    }
+
+    message DoubleMatrixWithQuantiles {
+        repeated DoubleQuantile quantiles = 1;
+        repeated DoubleRow rows = 2;
+    }
+
+    message GenerationData {
+        optional int32 seed          = 1;
+        optional int32 n_plates      = 2;
+        optional float ocean_level   = 3;
+        optional string step         = 4;
+    }
+
+    // these two fields have been introduced in Worldengine 0.18.0
+    required int32 worldengine_tag = 1;
+    required int32 worldengine_version = 2;
+
+    required string name   = 3;
+    required int32  width  = 4;
+    required int32  height = 5;
+
+    // Elevation
+
+    required DoubleMatrix heightMapData  = 6;
+    required double heightMapTh_sea      = 7;
+    required double heightMapTh_plain    = 8;
+    required double heightMapTh_hill     = 9;
+
+    // Plates
+    required IntegerMatrix plates        = 10;
+
+    // Ocean
+    required BooleanMatrix ocean         = 11;
+    required DoubleMatrix  sea_depth     = 12;
+
+    // Biome
+    optional IntegerMatrix biome         = 13;
+
+    // Humidity
+    optional DoubleMatrixWithQuantiles humidity = 14;
+
+    // Irrigation
+    optional DoubleMatrix irrigation  = 15;
+
+    // Permeability
+    optional DoubleMatrix permeabilityData = 16;
+    optional double permeability_low       = 17;
+    optional double permeability_med       = 18;
+
+    // Watermap
+    optional DoubleMatrix watermapData     = 19;
+    optional double watermap_creek         = 20;
+    optional double watermap_river         = 21;
+    optional double watermap_mainriver     = 22;
+
+    // Precipitation
+    optional DoubleMatrix precipitationData = 23;
+    optional double precipitation_low       = 24;
+    optional double precipitation_med       = 25;
+
+    // Temperature
+    optional DoubleMatrix temperatureData    = 26;
+    optional double temperature_polar        = 27;
+    optional double temperature_alpine       = 28;
+    optional double temperature_boreal       = 29;
+    optional double temperature_cool         = 30;
+    optional double temperature_warm         = 31;
+    optional double temperature_subtropical  = 32;
+
+    // Data about generation:
+    // introduced in v0.5.3
+    // this is optional for backward compatibility reasons
+    optional GenerationData generationData = 33;
+
+    optional DoubleMatrix lakemap = 34;
+    optional DoubleMatrix rivermap = 35;
+
+}
+
+
