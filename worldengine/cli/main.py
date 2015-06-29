@@ -120,8 +120,10 @@ def check_step(step_name):
         return step
 
 
-def operation_ancient_map(world, map_filename, resize_factor, sea_color):
-    draw_ancientmap_on_file(world, map_filename, resize_factor, sea_color)
+def operation_ancient_map(world, map_filename, resize_factor, sea_color, draw_biome, draw_rivers, draw_mountains,
+                    draw_outer_land_border):
+    draw_ancientmap_on_file(world, map_filename, resize_factor, sea_color, draw_biome, draw_rivers, draw_mountains,
+                    draw_outer_land_border)
     print("+ ancient map generated in '%s'" % map_filename)
 
 
@@ -307,6 +309,23 @@ def main():
     g_ancient_map.add_option('--sea_color', dest='sea_color',
                              help="string for color [" + SEA_COLORS + "]",
                              metavar="S", default="brown")
+    g_ancient_map.add_option('--not-draw-biome', dest='draw_biome',
+                             action="store_false",
+                             help="Not draw biome",
+                             default=True)
+    g_ancient_map.add_option('--not-draw-mountains', dest='draw_mountains',
+                             action="store_false",
+                             help="Not draw mountains",
+                             default=True)
+    g_ancient_map.add_option('--not-draw-rivers', dest='draw_rivers',
+                             action="store_false",
+                             help="Not draw rivers",
+                             default=True)
+    g_ancient_map.add_option('--draw-outer-border', dest='draw_outer_border',
+                             action="store_true",
+                             help="Draw outer land border",
+                             default=False)
+
     # TODO: allow for RGB specification as [r g b], ie [0.5 0.5 0.5] for gray
     parser.add_option_group(g_ancient_map)
 
@@ -397,9 +416,14 @@ def main():
         else:
             print(' (no rivers map)')
     if operation == 'ancient_map':
-        print(' resize factor        : %i' % options.resize_factor)
-        print(' world file           : %s' % options.world_file)
-        print(' sea color            : %s' % options.sea_color)
+        print(' resize factor          : %i' % options.resize_factor)
+        print(' world file             : %s' % options.world_file)
+        print(' sea color              : %s' % options.sea_color)
+        print(' draw biome             : %s' % options.draw_biome)
+        print(' draw rivers            : %s' % options.draw_rivers)
+        print(' draw mountains         : %s' % options.draw_mountains)
+        print(' draw land outer border : %s' % options.draw_outer_border)
+
 
     set_verbose(options.verbose)
 
@@ -446,7 +470,9 @@ def main():
         if not options.generated_file:
             options.generated_file = "ancient_map_%s.png" % world.name
         operation_ancient_map(world, options.generated_file,
-                              options.resize_factor, sea_color)
+                              options.resize_factor, sea_color,
+                              options.draw_biome, options.draw_rivers,
+                              options.draw_mountains, options.draw_outer_border)
     elif operation == 'info':
         world = load_world(args[1])
         print_world_info(world)
@@ -463,7 +489,7 @@ def usage(error=None):
     print(' Federico Tomassetti and Bret Curtis, 2011-2015')
     print(' Worldengine - a world generator (v. %s)' % VERSION)
     print(' ')
-    print(' generator <world_name> [operation] [options]')
+    print(' worldengine <world_name> [operation] [options]')
     print(' possible operations: %s' % OPERATIONS)
     print(' use -h to see options')
     print(
