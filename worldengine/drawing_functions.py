@@ -577,20 +577,15 @@ def _pseudo_random_land_pos(world, i):
 def draw_ancientmap(world, target, resize_factor=1,
                     sea_color=(212, 198, 169, 255),
                     draw_biome = True, draw_rivers = True, draw_mountains = True,
-                    draw_outer_land_border = False,
-                    verbose=get_verbose()):
-    random.seed(world.seed * 11)
-
-    draw_biome = False
-    draw_rivers = False
-    draw_mountains = True
-    draw_outer_land_border = True    
+                    draw_outer_land_border = False, verbose=get_verbose()):
+    random.seed(world.seed * 11)  
 
     if verbose:
         start_time = time.time()
 
     land_color = (
         181, 166, 127, 255)  # TODO: Put this in the argument list too??
+    borders = _find_land_borders(world, resize_factor)
 
     if draw_outer_land_border:
         outer_borders = _find_outer_borders(world, resize_factor, borders)
