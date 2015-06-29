@@ -30,6 +30,11 @@ def gradient(value, low, high, low_color, high_color):
     return r, g, b, 255
 
 
+def rgba_to_rgb(rgba):
+    r, g, b, a = rgba
+    return (r, g, b)
+
+
 def draw_rivers_on_image(world, target, factor=1):
     """Draw only the rivers, it expect the background to be in place
     """
@@ -100,10 +105,28 @@ def _find_land_borders(world, factor):
 
     for y in range(world.height * factor):
         for x in range(world.width * factor):
-            if not _ocean[y][x] \
-                    and world.tiles_around_factor(factor, (x, y),
-                                                  radius=1,
-                                                  predicate=my_is_ocean):
+            if not _ocean[y][x] and world.tiles_around_factor(factor, (x, y), radius=1, predicate=my_is_ocean):
+                _borders[y][x] = True
+    return _borders
+
+
+def _find_outer_borders(world, factor, inner_borders):
+    _ocean = [[False for x in range(factor * world.width)] for y in
+              range(factor * world.height)]
+    _borders = [[False for x in range(factor * world.width)] for y in
+                range(factor * world.height)]
+    for y in range(world.height * factor):
+        for x in range(world.width * factor):
+            if world.ocean[int(y / factor)][int(x / factor)]:
+                _ocean[y][x] = True
+
+    def is_inner_border(pos):
+        x, y = pos
+        return inner_borders[y][x]
+
+    for y in range(world.height * factor):
+        for x in range(world.width * factor):
+            if _ocean[y][x] and not inner_borders[y][x] and world.tiles_around_factor(factor, (x, y), radius=1, predicate=is_inner_border):
                 _borders[y][x] = True
     return _borders
 
@@ -495,23 +518,50 @@ def _draw_a_mountain(pixels, x, y, w=3, h=3):
     # mcll = (128, 128, 128, 255)
     mcr = (75, 75, 75, 255)
     # left edge
+    last_leftborder = None
     for mody in range(-h, h + 1):
         bottomness = (float(mody + h) / 2.0) / w
-        leftborder = int(bottomness * w)
+
+        min_leftborder = int(bottomness * w * 0.66)
+        if not last_leftborder == None:
+            min_leftborder = max(min_leftborder, last_leftborder - 1)
+        max_leftborder = int(bottomness * w * 1.33)
+        if not last_leftborder == None:
+            max_leftborder = min(max_leftborder, last_leftborder + 1)
+        leftborder = int(bottomness * w) + random.randint(-2, 2)/2
+        if leftborder < min_leftborder:
+            leftborder = min_leftborder
+        if leftborder > max_leftborder:
+            leftborder = max_leftborder
+        last_leftborder = leftborder
+
         darkarea = int(bottomness * w / 2)
         lightarea = int(bottomness * w / 2)
         for itx in range(darkarea, leftborder + 1):
             pixels[x - itx, y + mody] = gradient(itx, darkarea, leftborder,
                                                  (0, 0, 0), (64, 64, 64))
-        for itx in range(-darkarea, lightarea + 1):
-            pixels[x + itx, y + mody] = gradient(itx, -darkarea, lightarea,
-                                                 (64, 64, 64), (128, 128, 128))
+        #for itx in range(-darkarea, lightarea + 1):
+        #    pixels[x + itx, y + mody] = gradient(itx, -darkarea, lightarea,
+        #                                         (64, 64, 64), (128, 128, 128))
         for itx in range(lightarea, leftborder):
             pixels[x + itx, y + mody] = (181, 166, 127, 255)  # land_color
     # right edge
+    chaos = 0
+    last_modx = None
     for mody in range(-h, h + 1):
         bottomness = (float(mody + h) / 2.0) / w
-        modx = int(bottomness * w)
+        min_modx = int(bottomness * w * 0.66)
+        if not last_modx == None:
+            min_modx = max(min_modx, last_modx - 1)
+        max_modx = int(bottomness * w * 1.33)
+        if not last_modx == None:
+            max_modx = min(max_modx, last_modx + 1)
+        modx = int(bottomness * w) + random.randint(-2, 2)/2
+        if modx < min_modx:
+            modx = min_modx
+        if modx > max_modx:
+            modx = max_modx
+        last_modx = modx
         pixels[x + modx, y + mody] = mcr
 
 
@@ -525,34 +575,48 @@ def _pseudo_random_land_pos(world, i):
 
 
 def draw_ancientmap(world, target, resize_factor=1,
-                    sea_color=(212, 198, 169, 255), verbose=get_verbose()):
+                    sea_color=(212, 198, 169, 255),
+                    draw_biome = True, draw_rivers = True, draw_mountains = True,
+                    draw_outer_land_border = False,
+                    verbose=get_verbose()):
     random.seed(world.seed * 11)
+
+    draw_biome = False
+    draw_rivers = False
+    draw_mountains = True
+    draw_outer_land_border = True    
 
     if verbose:
         start_time = time.time()
 
     land_color = (
         181, 166, 127, 255)  # TODO: Put this in the argument list too??
-    borders = _find_land_borders(world, resize_factor)
-    mountains_mask = _find_mountains_mask(world, resize_factor)
-    boreal_forest_mask = _find_boreal_forest_mask(world, resize_factor)
-    temperate_forest_mask = _find_temperate_forest_mask(world, resize_factor)
-    warm_temperate_forest_mask = \
-        _find_warm_temperate_forest_mask(world, resize_factor)
-    tropical_dry_forest_mask = _find_tropical_dry_forest_mask(world,
-                                                              resize_factor)
-    # jungle is actually Tropical Rain Forest and Tropical Seasonal Forest
-    jungle_mask = _mask(world, world.is_jungle,
-                        resize_factor)
-    tundra_mask = _mask(world, world.is_tundra, resize_factor)
-    # savanna is actually Tropical semi-arid
-    savanna_mask = _mask(world, world.is_savanna, resize_factor)
-    cold_parklands_mask = _mask(world, world.is_cold_parklands, resize_factor)
-    steppe_mask = _mask(world, world.is_steppe, resize_factor)
-    cool_desert_mask = _mask(world, world.is_cool_desert, resize_factor)
-    chaparral_mask = _mask(world, world.is_chaparral, resize_factor)
-    hot_desert_mask = _mask(world, world.is_hot_desert, resize_factor)
-    rock_desert_mask = _mask(world, world.is_hot_desert, resize_factor)  # TODO: add is_desert_mask
+
+    if draw_outer_land_border:
+        outer_borders = _find_outer_borders(world, resize_factor, borders)
+        outer_borders = _find_outer_borders(world, resize_factor, outer_borders)
+
+    if draw_mountains:
+        mountains_mask = _find_mountains_mask(world, resize_factor)
+    if draw_biome:
+        boreal_forest_mask = _find_boreal_forest_mask(world, resize_factor)
+        temperate_forest_mask = _find_temperate_forest_mask(world, resize_factor)
+        warm_temperate_forest_mask = \
+            _find_warm_temperate_forest_mask(world, resize_factor)
+        tropical_dry_forest_mask = _find_tropical_dry_forest_mask(world,
+                                                                   resize_factor)
+        # jungle is actually Tropical Rain Forest and Tropical Seasonal Forest
+        jungle_mask = _mask(world, world.is_jungle,
+                            resize_factor)
+        tundra_mask = _mask(world, world.is_tundra, resize_factor)
+        # savanna is actually Tropical semi-arid
+        savanna_mask = _mask(world, world.is_savanna, resize_factor)
+        cold_parklands_mask = _mask(world, world.is_cold_parklands, resize_factor)
+        steppe_mask = _mask(world, world.is_steppe, resize_factor)
+        cool_desert_mask = _mask(world, world.is_cool_desert, resize_factor)
+        chaparral_mask = _mask(world, world.is_chaparral, resize_factor)
+        hot_desert_mask = _mask(world, world.is_hot_desert, resize_factor)
+        rock_desert_mask = _mask(world, world.is_hot_desert, resize_factor)  # TODO: add is_desert_mask
 
     def unset_mask(pos):
         x, y = pos
@@ -641,12 +705,16 @@ def draw_ancientmap(world, target, resize_factor=1,
 
     if verbose:
         start_time = time.time()
+    border_color = (0, 0, 0, 255)
+    outer_border_color = gradient(0.5, 0, 1.0, rgba_to_rgb(border_color), rgba_to_rgb(sea_color))
     for y in range(resize_factor * world.height):
         for x in range(resize_factor * world.width):
             xf = int(x / resize_factor)
             yf = int(y / resize_factor)
             if borders[y][x]:
-                target.set_pixel(x, y, (0, 0, 0, 255))
+                target.set_pixel(x, y, border_color)
+            elif draw_outer_land_border and outer_borders[y][x]:
+                target.set_pixel(x, y, outer_border_color)
             elif world.ocean[yf][xf]:
                 target.set_pixel(x, y, sea_color)
             else:
@@ -698,188 +766,191 @@ def draw_ancientmap(world, target, resize_factor=1,
             "Elapsed time " + str(elapsed_time) + " seconds.")
 
     # Draw glacier
-    if verbose:
-        start_time = time.time()
-    for y in range(resize_factor * world.height):
-        for x in range(resize_factor * world.width):
-            if not borders[y][x] and world.is_iceland(
-                    (int(x / resize_factor), int(y / resize_factor))):
-                _draw_glacier(target, x, y)
-    if verbose:
-        elapsed_time = time.time() - start_time
-        print(
-            "...drawing_functions.draw_oldmap_on_pixel: draw glacier " +
-            "Elapsed time " + str(elapsed_time) + " seconds.")
+    if draw_biome:
+        if verbose:
+            start_time = time.time()
+        for y in range(resize_factor * world.height):
+            for x in range(resize_factor * world.width):
+                if not borders[y][x] and world.is_iceland(
+                        (int(x / resize_factor), int(y / resize_factor))):
+                    _draw_glacier(target, x, y)
+        if verbose:
+            elapsed_time = time.time() - start_time
+            print(
+                "...drawing_functions.draw_oldmap_on_pixel: draw glacier " +
+                "Elapsed time " + str(elapsed_time) + " seconds.")
 
-    # Draw tundra
-    if verbose:
-        start_time = time.time()
-    for y in range(resize_factor * world.height):
-        for x in range(resize_factor * world.width):
-            if tundra_mask[y][x]:
-                _draw_tundra(target, x, y)
-    if verbose:
-        elapsed_time = time.time() - start_time
-        print(
-            "...drawing_functions.draw_oldmap_on_pixel: draw tundra " +
-            "Elapsed time " + str(elapsed_time) + " seconds.")
+        # Draw tundra
+        if verbose:
+            start_time = time.time()
+        for y in range(resize_factor * world.height):
+            for x in range(resize_factor * world.width):
+                if tundra_mask[y][x]:
+                    _draw_tundra(target, x, y)
+        if verbose:
+            elapsed_time = time.time() - start_time
+            print(
+                "...drawing_functions.draw_oldmap_on_pixel: draw tundra " +
+                "Elapsed time " + str(elapsed_time) + " seconds.")
 
-    # Draw cold parklands
-    for y in range(resize_factor * world.height):
-        for x in range(resize_factor * world.width):
-            if cold_parklands_mask[y][x]:
-                _draw_cold_parklands(target, x, y)
+        # Draw cold parklands
+        for y in range(resize_factor * world.height):
+            for x in range(resize_factor * world.width):
+                if cold_parklands_mask[y][x]:
+                    _draw_cold_parklands(target, x, y)
 
-    # Draw steppes
-    for y in range(resize_factor * world.height):
-        for x in range(resize_factor * world.width):
-            if steppe_mask[y][x]:
-                _draw_steppe(target, x, y)
+        # Draw steppes
+        for y in range(resize_factor * world.height):
+            for x in range(resize_factor * world.width):
+                if steppe_mask[y][x]:
+                    _draw_steppe(target, x, y)
 
-    # Draw chaparral
-    for y in range(resize_factor * world.height):
-        for x in range(resize_factor * world.width):
-            if chaparral_mask[y][x]:
-                _draw_chaparral(target, x, y)
+        # Draw chaparral
+        for y in range(resize_factor * world.height):
+            for x in range(resize_factor * world.width):
+                if chaparral_mask[y][x]:
+                    _draw_chaparral(target, x, y)
 
-    # Draw savanna
-    for y in range(resize_factor * world.height):
-        for x in range(resize_factor * world.width):
-            if savanna_mask[y][x]:
-                _draw_savanna(target, x, y)
+        # Draw savanna
+        for y in range(resize_factor * world.height):
+            for x in range(resize_factor * world.width):
+                if savanna_mask[y][x]:
+                    _draw_savanna(target, x, y)
 
-    # Draw cool desert
-    for y in range(resize_factor * world.height):
-        for x in range(resize_factor * world.width):
-            if cool_desert_mask[y][x]:
-                w = 8
-                h = 2
-                r = 9
-                if len(world.tiles_around_factor(resize_factor, (x, y),
-                                                 radius=r,
-                                                 predicate=on_border)) <= 2:
-                    _draw_cool_desert(target, x, y, w=w, h=h)
-                    world.on_tiles_around_factor(resize_factor, (x, y),
-                                                 radius=r,
-                                                 action=unset_cool_desert_mask)
+        # Draw cool desert
+        for y in range(resize_factor * world.height):
+            for x in range(resize_factor * world.width):
+                if cool_desert_mask[y][x]:
+                    w = 8
+                    h = 2
+                    r = 9
+                    if len(world.tiles_around_factor(resize_factor, (x, y),
+                                                     radius=r,
+                                                     predicate=on_border)) <= 2:
+                        _draw_cool_desert(target, x, y, w=w, h=h)
+                        world.on_tiles_around_factor(resize_factor, (x, y),
+                                                     radius=r,
+                                                     action=unset_cool_desert_mask)
 
-    # Draw hot desert
-    for y in range(resize_factor * world.height):
-        for x in range(resize_factor * world.width):
-            if hot_desert_mask[y][x]:
-                w = 8
-                h = 2
-                r = 9
-                if len(world.tiles_around_factor(resize_factor, (x, y),
-                                                 radius=r,
-                                                 predicate=on_border)) <= 2:
-                    _draw_hot_desert(target, x, y, w=w, h=h)
-                    world.on_tiles_around_factor(resize_factor, (x, y),
-                                                 radius=r,
-                                                 action=unset_hot_desert_mask)
+        # Draw hot desert
+        for y in range(resize_factor * world.height):
+            for x in range(resize_factor * world.width):
+                if hot_desert_mask[y][x]:
+                    w = 8
+                    h = 2
+                    r = 9
+                    if len(world.tiles_around_factor(resize_factor, (x, y),
+                                                     radius=r,
+                                                     predicate=on_border)) <= 2:
+                        _draw_hot_desert(target, x, y, w=w, h=h)
+                        world.on_tiles_around_factor(resize_factor, (x, y),
+                                                     radius=r,
+                                                     action=unset_hot_desert_mask)
 
-    # Draw boreal forest
-    for y in range(resize_factor * world.height):
-        for x in range(resize_factor * world.width):
-            if boreal_forest_mask[y][x]:
-                w = 4
-                h = 5
-                r = 6
-                if len(world.tiles_around_factor(resize_factor, (x, y),
-                                                 radius=r,
-                                                 predicate=on_border)) <= 2:
-                    _draw_boreal_forest(target, x, y, w=w, h=h)
-                    world.on_tiles_around_factor(
-                        resize_factor, (x, y),
-                        radius=r,
-                        action=unset_boreal_forest_mask)
+        # Draw boreal forest
+        for y in range(resize_factor * world.height):
+            for x in range(resize_factor * world.width):
+                if boreal_forest_mask[y][x]:
+                    w = 4
+                    h = 5
+                    r = 6
+                    if len(world.tiles_around_factor(resize_factor, (x, y),
+                                                     radius=r,
+                                                     predicate=on_border)) <= 2:
+                        _draw_boreal_forest(target, x, y, w=w, h=h)
+                        world.on_tiles_around_factor(
+                            resize_factor, (x, y),
+                            radius=r,
+                            action=unset_boreal_forest_mask)
 
-    # Draw temperate forest
-    for y in range(resize_factor * world.height):
-        for x in range(resize_factor * world.width):
-            if temperate_forest_mask[y][x]:
-                w = 4
-                h = 5
-                r = 6
-                if len(world.tiles_around_factor(resize_factor, (x, y),
-                                                 radius=r,
-                                                 predicate=on_border)) <= 2:
-                    if random.random() <= .5:
-                        _draw_temperate_forest1(target, x, y, w=w, h=h)
-                    else:
-                        _draw_temperate_forest2(target, x, y, w=w, h=h)
-                    world.on_tiles_around_factor(
-                        resize_factor, (x, y),
-                        radius=r,
-                        action=unset_temperate_forest_mask)
+        # Draw temperate forest
+        for y in range(resize_factor * world.height):
+            for x in range(resize_factor * world.width):
+                if temperate_forest_mask[y][x]:
+                    w = 4
+                    h = 5
+                    r = 6
+                    if len(world.tiles_around_factor(resize_factor, (x, y),
+                                                     radius=r,
+                                                     predicate=on_border)) <= 2:
+                        if random.random() <= .5:
+                            _draw_temperate_forest1(target, x, y, w=w, h=h)
+                        else:
+                            _draw_temperate_forest2(target, x, y, w=w, h=h)
+                        world.on_tiles_around_factor(
+                            resize_factor, (x, y),
+                            radius=r,
+                            action=unset_temperate_forest_mask)
 
-    # Draw warm temperate forest
-    for y in range(resize_factor * world.height):
-        for x in range(resize_factor * world.width):
-            if warm_temperate_forest_mask[y][x]:
-                w = 4
-                h = 5
-                r = 6
-                if len(world.tiles_around_factor(resize_factor, (x, y),
-                                                 radius=r,
-                                                 predicate=on_border)) <= 2:
-                    _draw_warm_temperate_forest(target, x, y, w=w, h=h)
-                    world.on_tiles_around_factor(
-                        resize_factor, (x, y),
-                        radius=r,
-                        action=unset_warm_temperate_forest_mask)
+        # Draw warm temperate forest
+        for y in range(resize_factor * world.height):
+            for x in range(resize_factor * world.width):
+                if warm_temperate_forest_mask[y][x]:
+                    w = 4
+                    h = 5
+                    r = 6
+                    if len(world.tiles_around_factor(resize_factor, (x, y),
+                                                     radius=r,
+                                                     predicate=on_border)) <= 2:
+                        _draw_warm_temperate_forest(target, x, y, w=w, h=h)
+                        world.on_tiles_around_factor(
+                            resize_factor, (x, y),
+                            radius=r,
+                            action=unset_warm_temperate_forest_mask)
 
-    # Draw dry tropical forest
-    for y in range(resize_factor * world.height):
-        for x in range(resize_factor * world.width):
-            if tropical_dry_forest_mask[y][x]:
-                w = 4
-                h = 5
-                r = 6
-                if len(world.tiles_around_factor(resize_factor, (x, y),
-                                                 radius=r,
-                                                 predicate=on_border)) <= 2:
-                    _draw_tropical_dry_forest(target, x, y, w=w, h=h)
-                    world.on_tiles_around_factor(
-                        resize_factor, (x, y),
-                        radius=r,
-                        action=unset_tropical_dry_forest_mask)
+        # Draw dry tropical forest
+        for y in range(resize_factor * world.height):
+            for x in range(resize_factor * world.width):
+                if tropical_dry_forest_mask[y][x]:
+                    w = 4
+                    h = 5
+                    r = 6
+                    if len(world.tiles_around_factor(resize_factor, (x, y),
+                                                     radius=r,
+                                                     predicate=on_border)) <= 2:
+                        _draw_tropical_dry_forest(target, x, y, w=w, h=h)
+                        world.on_tiles_around_factor(
+                            resize_factor, (x, y),
+                            radius=r,
+                            action=unset_tropical_dry_forest_mask)
 
-    # Draw jungle
-    for y in range(resize_factor * world.height):
-        for x in range(resize_factor * world.width):
-            if jungle_mask[y][x]:
-                w = 4
-                h = 5
-                r = 6
-                if len(world.tiles_around_factor(resize_factor, (x, y),
-                                                 radius=r,
-                                                 predicate=on_border)) <= 2:
-                    _draw_jungle(target, x, y, w=w, h=h)
-                    world.on_tiles_around_factor(resize_factor, (x, y),
-                                                 radius=r,
-                                                 action=unset_jungle_mask)
+        # Draw jungle
+        for y in range(resize_factor * world.height):
+            for x in range(resize_factor * world.width):
+                if jungle_mask[y][x]:
+                    w = 4
+                    h = 5
+                    r = 6
+                    if len(world.tiles_around_factor(resize_factor, (x, y),
+                                                     radius=r,
+                                                     predicate=on_border)) <= 2:
+                        _draw_jungle(target, x, y, w=w, h=h)
+                        world.on_tiles_around_factor(resize_factor, (x, y),
+                                                     radius=r,
+                                                     action=unset_jungle_mask)
 
-    draw_rivers_on_image(world, target, resize_factor)
+    if draw_rivers:
+        draw_rivers_on_image(world, target, resize_factor)
 
     # Draw mountains
-    if verbose:
-        start_time = time.time()
-    for y in range(resize_factor * world.height):
-        for x in range(resize_factor * world.width):
-            if mountains_mask[y][x]:
-                w = mountains_mask[y][x]
-                h = 3 + int(world.level_of_mountain(
-                    (int(x / resize_factor), int(y / resize_factor))))
-                r = max(int(w / 3 * 2), h)
-                if len(world.tiles_around_factor(resize_factor, (x, y),
-                                                 radius=r,
-                                                 predicate=on_border)) <= 2:
-                    _draw_a_mountain(target, x, y, w=w, h=h)
-                    world.on_tiles_around_factor(resize_factor, (x, y),
-                                                 radius=r, action=unset_mask)
-    if verbose:
-        elapsed_time = time.time() - start_time
-        print(
-            "...drawing_functions.draw_oldmap_on_pixel: draw mountains " +
-            "Elapsed time " + str(elapsed_time) + " seconds.")
+    if draw_mountains:
+        if verbose:
+            start_time = time.time()
+        for y in range(resize_factor * world.height):
+            for x in range(resize_factor * world.width):
+                if mountains_mask[y][x]:
+                    w = mountains_mask[y][x]
+                    h = 3 + int(world.level_of_mountain(
+                        (int(x / resize_factor), int(y / resize_factor))))
+                    r = max(int(w / 3 * 2), h)
+                    if len(world.tiles_around_factor(resize_factor, (x, y),
+                                                     radius=r,
+                                                     predicate=on_border)) <= 2:
+                        _draw_a_mountain(target, x, y, w=w, h=h)
+                        world.on_tiles_around_factor(resize_factor, (x, y),
+                                                     radius=r, action=unset_mask)
+        if verbose:
+            elapsed_time = time.time() - start_time
+            print(
+                "...drawing_functions.draw_oldmap_on_pixel: draw mountains " +
+                "Elapsed time " + str(elapsed_time) + " seconds.")
