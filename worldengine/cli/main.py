@@ -489,7 +489,7 @@ def usage(error=None):
     print(' Federico Tomassetti and Bret Curtis, 2011-2015')
     print(' Worldengine - a world generator (v. %s)' % VERSION)
     print(' ')
-    print(' generator <world_name> [operation] [options]')
+    print(' worldengine <world_name> [operation] [options]')
     print(' possible operations: %s' % OPERATIONS)
     print(' use -h to see options')
     print(
