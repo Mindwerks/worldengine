@@ -1,4 +1,4 @@
-from worldengine.simulations.basic import find_threshold_f
+from basic import find_threshold_f
 
 
 class WatermapSimulation(object):

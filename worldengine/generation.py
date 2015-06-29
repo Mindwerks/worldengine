@@ -1,15 +1,15 @@
 from noise import snoise2
-from worldengine.world import Step
-from worldengine.simulations.basic import find_threshold_f
-from worldengine.simulations.WatermapSimulation import WatermapSimulation
-from worldengine.simulations.IrrigationSimulation import IrrigationSimulation
-from worldengine.simulations.HumiditySimulation import HumiditySimulation
-from worldengine.simulations.TemperatureSimulation import TemperatureSimulation
-from worldengine.simulations.PermeabilitySimulation import PermeabilitySimulation
-from worldengine.simulations.ErosionSimulation import ErosionSimulation
-from worldengine.simulations.PrecipitationSimulation import PrecipitationSimulation
-from worldengine.simulations.BiomeSimulation import BiomeSimulation
-from worldengine.common import anti_alias, get_verbose, matrix_min_and_max, rescale_value
+from world import Step
+from simulations.basic import find_threshold_f
+from simulations.WatermapSimulation import WatermapSimulation
+from simulations.IrrigationSimulation import IrrigationSimulation
+from simulations.HumiditySimulation import HumiditySimulation
+from simulations.TemperatureSimulation import TemperatureSimulation
+from simulations.PermeabilitySimulation import PermeabilitySimulation
+from simulations.ErosionSimulation import ErosionSimulation
+from simulations.PrecipitationSimulation import PrecipitationSimulation
+from simulations.BiomeSimulation import BiomeSimulation
+from common import anti_alias, get_verbose, matrix_min_and_max, rescale_value
 
 
 # ------------------
