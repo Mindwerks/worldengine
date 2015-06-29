@@ -47,5 +47,5 @@ nosetests.xml
 *.world
 
 generator.spec
-winbuild*.orig
+*.orig
 *.rej
