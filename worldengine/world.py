@@ -1,6 +1,6 @@
 import pickle
 
-from worldengine.biome import Biome, BorealDesert, BorealDryScrub, BorealMoistForest, \
+from biome import Biome, BorealDesert, BorealDryScrub, BorealMoistForest, \
     BorealRainForest, BorealWetForest, CoolTemperateDesertScrub, CoolTemperateDesert, \
     CoolTemperateMoistForest, CoolTemperateRainForest, CoolTemperateSteppe, CoolTemperateWetForest,\
     Ice, PolarDesert, SubpolarDryTundra, SubpolarMoistTundra, SubpolarRainTundra, \
@@ -11,12 +11,10 @@ from worldengine.biome import Biome, BorealDesert, BorealDryScrub, BorealMoistFo
     WarmTemperateWetForest, TropicalDesert, TropicalDesertScrub, TropicalDryForest, \
     TropicalMoistForest, TropicalRainForest, TropicalThornWoodland, TropicalWetForest, \
     TropicalVeryDryForest, biome_index_to_name, biome_name_to_index
-from worldengine.basic_map_operations import random_point
-import worldengine.protobuf.World_pb2 as Protobuf
-from worldengine.step import Step
+from basic_map_operations import random_point
+import protobuf.World_pb2 as Protobuf
+from step import Step
 from version import __version__
-
-execfile('worldengine/version.py')
 
 class World(object):
     """A world composed by name, dimensions and all the characteristics of

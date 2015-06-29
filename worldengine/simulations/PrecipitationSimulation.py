@@ -2,8 +2,8 @@ import random
 import time
 from noise import snoise2
 
-from worldengine.simulations.basic import find_threshold_f
-from worldengine.common import get_verbose
+from basic import find_threshold_f
+from common import get_verbose
 
 
 class PrecipitationSimulation(object):

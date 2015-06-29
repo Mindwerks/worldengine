@@ -5,9 +5,9 @@ import platec
 import random
 import time
 
-from worldengine.generation import Step, add_noise_to_elevation, center_land, generate_world, \
+from generation import Step, add_noise_to_elevation, center_land, generate_world, \
     get_verbose, initialize_ocean_and_thresholds, place_oceans_at_map_borders
-from worldengine.common import array_to_matrix
+from common import array_to_matrix
 from world import World
 
 

@@ -8,7 +8,7 @@ import math
 import random
 import sys
 import time
-from worldengine.common import get_verbose
+from common import get_verbose
 
 
 # -------------------
