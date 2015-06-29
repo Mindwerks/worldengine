@@ -513,7 +513,8 @@ def _draw_savanna(pixels, x, y):
     pixels[x, y] = (r, g, b, 255)
 
 
-def _draw_a_mountain(pixels, x, y, w=3, h=3):
+# TODO: complete and enable this one
+def _dynamic_draw_a_mountain(pixels, x, y, w=3, h=3):
     # mcl = (0, 0, 0, 255)  # TODO: No longer used?
     # mcll = (128, 128, 128, 255)
     mcr = (75, 75, 75, 255)
@@ -540,9 +541,9 @@ def _draw_a_mountain(pixels, x, y, w=3, h=3):
         for itx in range(darkarea, leftborder + 1):
             pixels[x - itx, y + mody] = gradient(itx, darkarea, leftborder,
                                                  (0, 0, 0), (64, 64, 64))
-        #for itx in range(-darkarea, lightarea + 1):
-        #    pixels[x + itx, y + mody] = gradient(itx, -darkarea, lightarea,
-        #                                         (64, 64, 64), (128, 128, 128))
+        for itx in range(-darkarea, lightarea + 1):
+            pixels[x + itx, y + mody] = gradient(itx, -darkarea, lightarea,
+                                                 (64, 64, 64), (128, 128, 128))
         for itx in range(lightarea, leftborder):
             pixels[x + itx, y + mody] = (181, 166, 127, 255)  # land_color
     # right edge
@@ -563,6 +564,30 @@ def _draw_a_mountain(pixels, x, y, w=3, h=3):
             modx = max_modx
         last_modx = modx
         pixels[x + modx, y + mody] = mcr
+
+def _draw_a_mountain(pixels, x, y, w=3, h=3):
+    # mcl = (0, 0, 0, 255)  # TODO: No longer used?
+    # mcll = (128, 128, 128, 255)
+    mcr = (75, 75, 75, 255)
+    # left edge
+    for mody in range(-h, h + 1):
+        bottomness = (float(mody + h) / 2.0) / w
+        leftborder = int(bottomness * w)
+        darkarea = int(bottomness * w / 2)
+        lightarea = int(bottomness * w / 2)
+        for itx in range(darkarea, leftborder + 1):
+            pixels[x - itx, y + mody] = gradient(itx, darkarea, leftborder,
+                                                 (0, 0, 0), (64, 64, 64))
+        for itx in range(-darkarea, lightarea + 1):
+            pixels[x + itx, y + mody] = gradient(itx, -darkarea, lightarea,
+                                                 (64, 64, 64), (128, 128, 128))
+        for itx in range(lightarea, leftborder):
+            pixels[x + itx, y + mody] = (181, 166, 127, 255)  # land_color
+    # right edge
+    for mody in range(-h, h + 1):
+        bottomness = (float(mody + h) / 2.0) / w
+        modx = int(bottomness * w)
+        pixels[x + modx, y + mody] = mcr        
 
 
 def _pseudo_random_land_pos(world, i):
