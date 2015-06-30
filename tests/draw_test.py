@@ -1,8 +1,10 @@
 import unittest
 import os
-from worldengine.draw import *
-from worldengine.draw import _biome_colors # need to be explicitly imported
-from worldengine.world import *
+from worldengine.draw import _biome_colors, Image, draw_simple_elevation, elevation_color, \
+    draw_elevation, draw_riversmap, draw_grayscale_heightmap, draw_ocean, draw_precipitation, \
+    draw_world, draw_temperature_levels, draw_biome
+from worldengine.biome import Biome
+from worldengine.world import World
 
 
 class PixelCollector:

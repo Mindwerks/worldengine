@@ -12,14 +12,15 @@ from worldengine.common import array_to_matrix
 from worldengine.generation import ErosionSimulation
 from view import draw_bw_elevation_on_screen, draw_land_on_screen, \
     draw_plates_and_elevation_on_screen, draw_plates_on_screen
-from worldengine.plates import add_noise_to_elevation, center_land, initialize_ocean_and_thresholds, place_oceans_at_map_borders
-from worldengine.simulations.WatermapSimulation import WatermapSimulation
-from worldengine.simulations.IrrigationSimulation import IrrigationSimulation
-from worldengine.simulations.HumiditySimulation import HumiditySimulation
-from worldengine.simulations.TemperatureSimulation import TemperatureSimulation
-from worldengine.simulations.PermeabilitySimulation import PermeabilitySimulation
-from worldengine.simulations.BiomeSimulation import BiomeSimulation
-from worldengine.simulations.PrecipitationSimulation import PrecipitationSimulation
+from worldengine.plates import add_noise_to_elevation, center_land, \
+    initialize_ocean_and_thresholds, place_oceans_at_map_borders
+from worldengine.simulations.hydrology import WatermapSimulation
+from worldengine.simulations.irrigation import IrrigationSimulation
+from worldengine.simulations.humidity import HumiditySimulation
+from worldengine.simulations.temperature import TemperatureSimulation
+from worldengine.simulations.permeability import PermeabilitySimulation
+from worldengine.simulations.biome import BiomeSimulation
+from worldengine.simulations.precipitation import PrecipitationSimulation
 from worldengine.views.PrecipitationsView import PrecipitationsView
 from worldengine.views.WatermapView import WatermapView
 

@@ -1,5 +1,6 @@
 import unittest
-from worldengine.plates import *
+from worldengine.plates import Step, world_gen
+from worldengine.world import World
 import tempfile
 import os
 
