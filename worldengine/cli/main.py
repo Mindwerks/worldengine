@@ -130,10 +130,10 @@ def operation_ancient_map(world, map_filename, resize_factor, sea_color,
 
 
 def __get_last_byte__(filename):
-    with open(filename, 'rb') as ifile:
-        data = tmp_data = ifile.read(1024 * 1024)
+    with open(filename, 'rb') as input_file:
+        data = tmp_data = input_file.read(1024 * 1024)
         while tmp_data:
-            tmp_data = ifile.read(1024 * 1024)
+            tmp_data = input_file.read(1024 * 1024)
             if tmp_data:
                 data = tmp_data
     return ord(data[len(data) - 1])
@@ -159,20 +159,20 @@ def __get_tag__(filename):
         if not data:
             return None
         done = False
-        bytes = []
+        tag_bytes = []
         # We read bytes until we find a bit with the MSB not set
         while data and not done:
             data = ifile.read(1)
             if not data:
                 return None
             value = ord(data)
-            bytes.append(value % 128)
+            tag_bytes.append(value % 128)
             if value < 128:
                 done = True
         # to convert it to value we must start from the last byte
         # and add to it the second last multiplied by 128, the one before
         # multiplied by 128 ** 2 and so on
-        return __varint_to_value__(bytes)
+        return __varint_to_value__(tag_bytes)
 
 
 def __seems_protobuf_worldfile__(world_filename):
@@ -357,9 +357,8 @@ def main():
     except Exception as e:
         usage(error="Number of plates should be a number: %s" % str(e))
 
-    if args.OPERATOR is None:
-        operation = 'world'
-    elif args.OPERATOR not in OPERATIONS:
+    operation = 'world'
+    if args.OPERATOR is not None and args.OPERATOR not in OPERATIONS:
         parser.print_help()
         usage("Only 1 operation allowed [" + OPERATIONS + "]")
     elif args.OPERATOR == 'info':
