@@ -32,7 +32,7 @@ def gradient(value, low, high, low_color, high_color):
 
 def rgba_to_rgb(rgba):
     r, g, b, a = rgba
-    return (r, g, b)
+    return r, g, b
 
 
 def draw_rivers_on_image(world, target, factor=1):
@@ -547,7 +547,6 @@ def _dynamic_draw_a_mountain(pixels, x, y, w=3, h=3):
         for itx in range(lightarea, leftborder):
             pixels[x + itx, y + mody] = (181, 166, 127, 255)  # land_color
     # right edge
-    chaos = 0
     last_modx = None
     for mody in range(-h, h + 1):
         bottomness = (float(mody + h) / 2.0) / w

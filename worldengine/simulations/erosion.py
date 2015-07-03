@@ -232,7 +232,6 @@ class ErosionSimulation(object):
             if lower_elevation and not is_wrapped:
                 lower_path = worldengine.astar.PathFinder().find(
                     world.elevation['data'], current_location, lower_elevation)
-                import pdb; pdb.set_trace()
                 if lower_path:
                     path += lower_path
                     current_location = path[-1]

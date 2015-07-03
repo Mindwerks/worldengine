@@ -7,7 +7,8 @@ class TestCommon(unittest.TestCase):
 
     def test_traversal(self):
         test_map = numpy.zeros((20, 20))
-        line = numpy.ones(20)
+        line = numpy.array(20)
+        line.fill(1.0)
         test_map[10, :] = line
         test_map[10, 18] = 0.0
         path_data = [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], [0, 8], [0, 9],

@@ -340,6 +340,9 @@ def main():
 
     args = parser.parse_args()
 
+    if args.version:
+        usage()
+
     if os.path.exists(args.output_dir):
         if not os.path.isdir(args.output_dir):
             raise Exception("Output dir exists but it is not a dir")
@@ -357,17 +360,21 @@ def main():
     except Exception as e:
         usage(error="Number of plates should be a number: %s" % str(e))
 
-    operation = 'world'
-    if args.OPERATOR is not None and args.OPERATOR not in OPERATIONS:
+    operation = "world"
+    if args.OPERATOR is None:
+        pass
+    elif args.OPERATOR is not None and args.OPERATOR.lower() not in OPERATIONS:
         parser.print_help()
         usage("Only 1 operation allowed [" + OPERATIONS + "]")
-    elif args.OPERATOR == 'info':
+    else:
+        operation = args.OPERATOR.lower()
+
+    if args.OPERATOR == 'info':
         if args.FILE is None:
             parser.print_help()
             usage("For operation info only the filename should be specified")
         if not os.path.exists(args.FILE):
             usage("The specified world file does not exist")
-        operation = 'info'
 
     random.seed()
     if args.seed:
@@ -451,7 +458,6 @@ def main():
     elif operation == 'ancient_map':
         print('')  # empty line
         print('starting (it could take a few minutes) ...')
-
         # First, some error checking
         if args.sea_color == "blue":
             sea_color = (142, 162, 179, 255)
@@ -471,11 +477,11 @@ def main():
         if not args.generated_file:
             args.generated_file = "ancient_map_%s.png" % world.name
         operation_ancient_map(world, args.generated_file,
-                              args.resize_factor, args.sea_color,
+                              args.resize_factor, sea_color,
                               args.draw_biome, args.draw_rivers,
                               args.draw_mountains, args.draw_outer_border)
     elif operation == 'info':
-        world = load_world(args[1])
+        world = load_world(args.FILE)
         print_world_info(world)
     else:
         raise Exception(
