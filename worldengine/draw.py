@@ -148,6 +148,8 @@ class ImagePixelSetter(object):
         return self.pixels[item]
 
     def __setitem__(self, item, value):
+        if len(value) == 3:  # Convert RGB to RGBA - TODO: go through code to fix this
+            value = (value[0], value[1], value[2], 255)
         self.pixels[item] = value
 
 

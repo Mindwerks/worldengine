@@ -1,5 +1,6 @@
 import unittest
-from worldengine.common import *
+from worldengine.common import Counter, anti_alias, array_to_matrix, get_verbose, \
+    matrix_min_and_max, rescale_value, set_verbose
 
 
 class TestCommon(unittest.TestCase):

@@ -1,7 +1,7 @@
 import unittest
 
-from worldengine.drawing_functions import *
-from worldengine.world import *
+from worldengine.drawing_functions import draw_ancientmap, gradient, draw_rivers_on_image
+from worldengine.world import World
 from tests.draw_test import TestBase, PixelCollector
 
 
