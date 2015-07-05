@@ -22,6 +22,10 @@ class TestCLI(TestBase):
         self.assertRaises(SystemExit, main)
         sys.argv = ["python", "info"]
         self.assertRaises(SystemExit, main)
+        sys.argv = ["python", "infooooooooo"]
+        self.assertRaises(SystemExit, main)
+        sys.argv = ["python", "info", "does_not_exist"]
+        self.assertRaises(SystemExit, main)
         sys.argv = ["python", "info", self.world]
         try:
             main()
