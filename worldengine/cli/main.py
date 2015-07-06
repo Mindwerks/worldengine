@@ -354,11 +354,8 @@ def main():
     # the limit is hit when drawing ancient maps
     sys.setrecursionlimit(args.recursion_limit)
 
-    try:
-        if args.number_of_plates < 1 or args.number_of_plates > 100:
-            usage(error="Number of plates should be a in [1, 100]")
-    except Exception as e:
-        usage(error="Number of plates should be a number: %s" % str(e))
+    if args.number_of_plates < 1 or args.number_of_plates > 100:
+        usage(error="Number of plates should be a in [1, 100]")
 
     operation = "world"
     if args.OPERATOR is None:
