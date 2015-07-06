@@ -22,12 +22,17 @@ class TestCLI(TestBase):
         self.assertRaises(SystemExit, main)
         sys.argv = ["python", "info"]
         self.assertRaises(SystemExit, main)
+        sys.argv = ["python", "infooooooooo"]
+        self.assertRaises(SystemExit, main)
+        sys.argv = ["python", "info", "does_not_exist"]
+        self.assertRaises(SystemExit, main)
         sys.argv = ["python", "info", self.world]
         try:
             main()
         except Exception as e:
             raise e
         # TODO: fill in the rest of the options and their possibilities
+        sys.argv = backup_argv
 
     def test_smoke_full(self):
         # the big smoke test, can we go through
@@ -51,6 +56,23 @@ class TestCLI(TestBase):
             except Exception as e:
                 raise e
             sys.argv = backup_argv
+
+    def test_smoke_plates(self):
+            backup_argv = sys.argv
+            sys.argv = ["python", "plates", "--width", "16",
+                        "--height", "16", "--number-of-plates", "2"]
+            try:
+                main()
+            except Exception as e:
+                raise e
+            sys.argv = ["python", "plates", "--number-of-plates", "0"]
+            self.assertRaises(SystemExit, main)
+            sys.argv = ["python", "plates", "--number-of-plates", "101"]
+            self.assertRaises(SystemExit, main)
+
+            sys.argv = backup_argv
+
+
 
 if __name__ == '__main__':
     unittest.main()
