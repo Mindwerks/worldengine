@@ -1,3 +1,4 @@
+import os
 import sys
 from tests.draw_test import TestBase
 import unittest
@@ -26,6 +27,16 @@ class TestCLI(TestBase):
         self.assertRaises(SystemExit, main)
         sys.argv = ["python", "info", "does_not_exist"]
         self.assertRaises(SystemExit, main)
+        sys.argv = ["python", "info", "--gs", "greyscale.png"]
+        self.assertRaises(SystemExit, main)
+        sys.argv = ["python", "-o", __file__]
+        self.assertRaises(Exception, main)
+        sys.argv = ["python", "info", "-o", "test_dir"]
+        self.assertRaises(SystemExit, main)
+        self.assertTrue(os.path.isdir("test_dir"))
+
+    def test_smoke_info(self):
+        backup_argv = sys.argv
         sys.argv = ["python", "info", self.world]
         try:
             main()
@@ -39,7 +50,7 @@ class TestCLI(TestBase):
         # everything without it exploding?
         backup_argv = sys.argv
         sys.argv = ["python", "--width", "16", "--height", "16",
-                    "-r", "rivers.png",
+                    "-r", "rivers.png", "-s", "1", "-n", "test_map",
                     "--gs", "greyscale.png"
                     ]
         try:
