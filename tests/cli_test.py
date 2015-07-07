@@ -34,6 +34,10 @@ class TestCLI(TestBase):
         sys.argv = ["python", "info", "-o", "test_dir"]
         self.assertRaises(SystemExit, main)
         self.assertTrue(os.path.isdir("test_dir"))
+        sys.argv = ["python", "plates", "--number-of-plates", "0"]
+        self.assertRaises(SystemExit, main)
+        sys.argv = ["python", "plates", "--number-of-plates", "101"]
+        self.assertRaises(SystemExit, main)
 
     def test_smoke_info(self):
         backup_argv = sys.argv
@@ -50,14 +54,13 @@ class TestCLI(TestBase):
         # everything without it exploding?
         backup_argv = sys.argv
         sys.argv = ["python", "--width", "16", "--height", "16",
-                    "-r", "rivers.png", "-s", "1", "-n", "test_map",
+                    "-r", "rivers.png",
                     "--gs", "greyscale.png"
                     ]
         try:
             main()
         except Exception as e:
             raise e
-        sys.argv = backup_argv
 
     def test_smoke_ancient(self):
             backup_argv = sys.argv
@@ -76,13 +79,7 @@ class TestCLI(TestBase):
                 main()
             except Exception as e:
                 raise e
-            sys.argv = ["python", "plates", "--number-of-plates", "0"]
-            self.assertRaises(SystemExit, main)
-            sys.argv = ["python", "plates", "--number-of-plates", "101"]
-            self.assertRaises(SystemExit, main)
-
             sys.argv = backup_argv
-
 
 
 if __name__ == '__main__':
