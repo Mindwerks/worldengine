@@ -2,12 +2,15 @@
 """
 GUI Interface for Worldengine
 """
-from PyQt4 import QtGui
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QAction, \
+    QFileDialog, QLabel, QWidget, QGridLayout, QPushButton, QLineEdit, QSpinBox
 import platec
 import random
 import sys
 import threading
-from world import World, Step
+from worldengine.world import World, Step
 from worldengine.common import array_to_matrix
 from worldengine.generation import ErosionSimulation
 from view import draw_bw_elevation_on_screen, draw_land_on_screen, \
@@ -25,47 +28,47 @@ from worldengine.views.PrecipitationsView import PrecipitationsView
 from worldengine.views.WatermapView import WatermapView
 
 
-class GenerateDialog(QtGui.QDialog):
+class GenerateDialog(QDialog):
     def __init__(self, parent):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self._init_ui()
 
     def _init_ui(self):
         self.resize(500, 250)
         self.setWindowTitle('Generate a new world')
-        grid = QtGui.QGridLayout()
+        grid = QGridLayout()
 
         seed = random.randint(0, 65535)
 
-        name_label = QtGui.QLabel('Name')
+        name_label = QLabel('Name')
         grid.addWidget(name_label, 0, 0, 1, 1)
         name = 'world_seed_%i' % seed
-        self.name_value = QtGui.QLineEdit(name)
+        self.name_value = QLineEdit(name)
         grid.addWidget(self.name_value, 0, 1, 1, 2)
 
-        seed_label = QtGui.QLabel('Seed')
+        seed_label = QLabel('Seed')
         grid.addWidget(seed_label, 1, 0, 1, 1)
         self.seed_value = self._spinner_box(0, 65525, seed)
         grid.addWidget(self.seed_value, 1, 1, 1, 2)
 
-        width_label = QtGui.QLabel('Width')
+        width_label = QLabel('Width')
         grid.addWidget(width_label, 2, 0, 1, 1)
         self.width_value = self._spinner_box(100, 8192, 512)
         grid.addWidget(self.width_value, 2, 1, 1, 2)
 
-        height_label = QtGui.QLabel('Height')
+        height_label = QLabel('Height')
         grid.addWidget(height_label, 3, 0, 1, 1)
         self.height_value = self._spinner_box(100, 8192, 512)
         grid.addWidget(self.height_value, 3, 1, 1, 2)
 
-        plates_num_label = QtGui.QLabel('Number of plates')
+        plates_num_label = QLabel('Number of plates')
         grid.addWidget(plates_num_label, 4, 0, 1, 1)
         self.plates_num_value = self._spinner_box(2, 100, 10)
         grid.addWidget(self.plates_num_value, 4, 1, 1, 2)
 
         buttons_row = 5
-        cancel = QtGui.QPushButton('Cancel')
-        generate = QtGui.QPushButton('Generate')
+        cancel = QPushButton('Cancel')
+        generate = QPushButton('Generate')
         grid.addWidget(cancel, buttons_row, 1, 1, 1)
         grid.addWidget(generate, buttons_row, 2, 1, 1)
         cancel.clicked.connect(self._on_cancel)
@@ -74,17 +77,17 @@ class GenerateDialog(QtGui.QDialog):
         self.setLayout(grid)
 
     def _spinner_box(self, min, max, value):
-        spinner = QtGui.QSpinBox()
+        spinner = QSpinBox()
         spinner.setMinimum(min)
         spinner.setMaximum(max)
         spinner.setValue(value)
         return spinner
 
     def _on_cancel(self):
-        QtGui.QDialog.reject(self)
+        QDialog.reject(self)
 
     def _on_generate(self):
-        QtGui.QDialog.accept(self)
+        QDialog.accept(self)
 
     def seed(self):
         return self.seed_value.value()
@@ -102,9 +105,9 @@ class GenerateDialog(QtGui.QDialog):
         return self.name_value.text()
 
 
-class GenerationProgressDialog(QtGui.QDialog):
+class GenerationProgressDialog(QDialog):
     def __init__(self, parent, seed, name, width, height, num_plates):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self._init_ui()
         self.world = None
         self.gen_thread = GenerationThread(self, seed, name, width, height,
@@ -114,16 +117,16 @@ class GenerationProgressDialog(QtGui.QDialog):
     def _init_ui(self):
         self.resize(400, 100)
         self.setWindowTitle('Generating a new world...')
-        grid = QtGui.QGridLayout()
+        grid = QGridLayout()
 
-        self.status = QtGui.QLabel('....')
+        self.status = QLabel('....')
         grid.addWidget(self.status, 0, 0, 1, 3)
 
-        cancel = QtGui.QPushButton('Cancel')
+        cancel = QPushButton('Cancel')
         grid.addWidget(cancel, 1, 0, 1, 1)
         cancel.clicked.connect(self._on_cancel)
 
-        done = QtGui.QPushButton('Done')
+        done = QPushButton('Done')
         grid.addWidget(done, 1, 2, 1, 1)
         done.clicked.connect(self._on_done)
         done.setEnabled(False)
@@ -132,10 +135,10 @@ class GenerationProgressDialog(QtGui.QDialog):
         self.setLayout(grid)
 
     def _on_cancel(self):
-        QtGui.QDialog.reject(self)
+        QDialog.reject(self)
 
     def _on_done(self):
-        QtGui.QDialog.accept(self)
+        QDialog.accept(self)
 
     def on_finish(self):
         self.done.setEnabled(True)
@@ -209,9 +212,9 @@ class PlatesGeneration(object):
         return world
 
 
-class MapCanvas(QtGui.QImage):
+class MapCanvas(QImage):
     def __init__(self, label, width, height):
-        QtGui.QImage.__init__(self, width, height, QtGui.QImage.Format_RGB32)
+        QImage.__init__(self, width, height, QImage.Format_RGB32)
         self.label = label
         self._update()
 
@@ -234,12 +237,12 @@ class MapCanvas(QtGui.QImage):
         self._update()
 
     def _update(self):
-        self.label.setPixmap(QtGui.QPixmap.fromImage(self))
+        self.label.setPixmap(QPixmap.fromImage(self))
 
 
-class OperationDialog(QtGui.QDialog):
+class OperationDialog(QDialog):
     def __init__(self, parent, world, operation):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.operation = operation
         self._init_ui()
         self.op_thread = OperationThread(world, operation, self)
@@ -248,16 +251,16 @@ class OperationDialog(QtGui.QDialog):
     def _init_ui(self):
         self.resize(400, 100)
         self.setWindowTitle(self.operation.title())
-        grid = QtGui.QGridLayout()
+        grid = QGridLayout()
 
-        self.status = QtGui.QLabel('....')
+        self.status = QLabel('....')
         grid.addWidget(self.status, 0, 0, 1, 3)
 
-        cancel = QtGui.QPushButton('Cancel')
+        cancel = QPushButton('Cancel')
         grid.addWidget(cancel, 1, 0, 1, 1)
         cancel.clicked.connect(self._on_cancel)
 
-        done = QtGui.QPushButton('Done')
+        done = QPushButton('Done')
         grid.addWidget(done, 1, 2, 1, 1)
         done.clicked.connect(self._on_done)
         done.setEnabled(False)
@@ -266,10 +269,10 @@ class OperationDialog(QtGui.QDialog):
         self.setLayout(grid)
 
     def _on_cancel(self):
-        QtGui.QDialog.reject(self)
+        QDialog.reject(self)
 
     def _on_done(self):
-        QtGui.QDialog.accept(self)
+        QDialog.accept(self)
 
     def on_finish(self):
         self.done.setEnabled(True)
@@ -310,7 +313,7 @@ class SimulationOp(object):
         ui.on_finish()
 
 
-class WorldengineGui(QtGui.QMainWindow):
+class WorldengineGui(QMainWindow):
     def __init__(self):
         super(WorldengineGui, self).__init__()
         self._init_ui()
@@ -325,14 +328,14 @@ class WorldengineGui(QtGui.QMainWindow):
         self.setWindowTitle('Worldengine - A world generator')
         self.set_status('No world selected: create or load a world')
         self._prepare_menu()
-        self.label = QtGui.QLabel()
+        self.label = QLabel()
         self.canvas = MapCanvas(self.label, 0, 0)
 
         # dummy widget to contain the layout manager
-        self.main_widget = QtGui.QWidget(self)
+        self.main_widget = QWidget(self)
 
         self.setCentralWidget(self.main_widget)
-        self.layout = QtGui.QGridLayout(self.main_widget)
+        self.layout = QGridLayout(self.main_widget)
         # Set the stretch
         self.layout.setColumnStretch(0, 1)
         self.layout.setColumnStretch(2, 1)
@@ -377,38 +380,38 @@ class WorldengineGui(QtGui.QMainWindow):
             world is not None and ErosionSimulation().is_applicable(world))
 
     def _prepare_menu(self):
-        generate_action = QtGui.QAction('&Generate', self)
+        generate_action = QAction('&Generate', self)
         generate_action.setShortcut('Ctrl+G')
         generate_action.setStatusTip('Generate new world')
         generate_action.triggered.connect(self._on_generate)
 
-        exit_action = QtGui.QAction('Leave', self)
+        exit_action = QAction('Leave', self)
         exit_action.setShortcut('Ctrl+L')
         exit_action.setStatusTip('Exit application')
-        exit_action.triggered.connect(QtGui.qApp.quit)
+        exit_action.triggered.connect(QApplication.quit)
 
-        open_action = QtGui.QAction('&Open', self)
+        open_action = QAction('&Open', self)
         open_action.triggered.connect(self._on_open)
 
-        self.saveproto_action = QtGui.QAction('&Save (protobuf)', self)
+        self.saveproto_action = QAction('&Save (protobuf)', self)
         self.saveproto_action.setEnabled(False)
         self.saveproto_action.setShortcut('Ctrl+S')
         self.saveproto_action.setStatusTip('Save (protobuf format)')
         self.saveproto_action.triggered.connect(self._on_save_protobuf)
 
-        self.bw_view = QtGui.QAction('Black and white', self)
+        self.bw_view = QAction('Black and white', self)
         self.bw_view.triggered.connect(self._on_bw_view)
-        self.plates_view = QtGui.QAction('Plates', self)
+        self.plates_view = QAction('Plates', self)
         self.plates_view.triggered.connect(self._on_plates_view)
-        self.plates_bw_view = QtGui.QAction('Plates and elevation', self)
+        self.plates_bw_view = QAction('Plates and elevation', self)
         self.plates_bw_view.triggered.connect(
             self._on_plates_and_elevation_view)
-        self.land_and_ocean_view = QtGui.QAction('Land and ocean', self)
+        self.land_and_ocean_view = QAction('Land and ocean', self)
         self.land_and_ocean_view.triggered.connect(self._on_land_view)
-        self.precipitations_view = QtGui.QAction('Precipitations', self)
+        self.precipitations_view = QAction('Precipitations', self)
         self.precipitations_view.triggered.connect(
             self._on_precipitations_view)
-        self.watermap_view = QtGui.QAction('Watermap', self)
+        self.watermap_view = QAction('Watermap', self)
         self.watermap_view.triggered.connect(self._on_watermap_view)
 
         self.bw_view.setEnabled(False)
@@ -418,35 +421,35 @@ class WorldengineGui(QtGui.QMainWindow):
         self.precipitations_view.setEnabled(False)
         self.watermap_view.setEnabled(False)
 
-        self.precipitations_action = QtGui.QAction('Precipitations', self)
+        self.precipitations_action = QAction('Precipitations', self)
         self.precipitations_action.triggered.connect(self._on_precipitations)
         self.precipitations_action.setEnabled(False)
 
-        self.erosion_action = QtGui.QAction('Erosion', self)
+        self.erosion_action = QAction('Erosion', self)
         self.erosion_action.triggered.connect(self._on_erosion)
         self.erosion_action.setEnabled(False)
 
-        self.watermap_action = QtGui.QAction('Watermap', self)
+        self.watermap_action = QAction('Watermap', self)
         self.watermap_action.triggered.connect(self._on_watermap)
         self.watermap_action.setEnabled(False)
 
-        self.irrigation_action = QtGui.QAction('Irrigation', self)
+        self.irrigation_action = QAction('Irrigation', self)
         self.irrigation_action.triggered.connect(self._on_irrigation)
         self.irrigation_action.setEnabled(False)
 
-        self.humidity_action = QtGui.QAction('Humidity', self)
+        self.humidity_action = QAction('Humidity', self)
         self.humidity_action.triggered.connect(self._on_humidity)
         self.humidity_action.setEnabled(False)
 
-        self.temperature_action = QtGui.QAction('Temperature', self)
+        self.temperature_action = QAction('Temperature', self)
         self.temperature_action.triggered.connect(self._on_temperature)
         self.temperature_action.setEnabled(False)
 
-        self.permeability_action = QtGui.QAction('Permeability', self)
+        self.permeability_action = QAction('Permeability', self)
         self.permeability_action.triggered.connect(self._on_permeability)
         self.permeability_action.setEnabled(False)
 
-        self.biome_action = QtGui.QAction('Biome', self)
+        self.biome_action = QAction('Biome', self)
         self.biome_action.triggered.connect(self._on_biome)
         self.biome_action.setEnabled(False)
 
@@ -516,12 +519,12 @@ class WorldengineGui(QtGui.QMainWindow):
                 self.set_world(dialog2.world)
 
     def _on_save_protobuf(self):
-        filename = QtGui.QFileDialog.getSaveFileName(self, "Save world", "",
+        filename = QFileDialog.getSaveFileName(self, "Save world", "",
                                                      "*.world")
         self.world.protobuf_to_file(filename)
 
     def _on_open(self):
-        filename = QtGui.QFileDialog.getOpenFileName(self, "Open world", "",
+        filename = QFileDialog.getOpenFileName(self, "Open world", "",
                                                      "*.world")
         world = World.open_protobuf(filename)
         self.set_world(world)
@@ -600,7 +603,7 @@ class WorldengineGui(QtGui.QMainWindow):
 
 
 def main():
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     lg = WorldengineGui()
     assert lg
     sys.exit(app.exec_())

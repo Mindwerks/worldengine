@@ -1,5 +1,5 @@
 from worldengine.views.basic import color_prop
-from PyQt4 import QtGui
+from PyQt5 import QtGui
 
 
 class PrecipitationsView(object):

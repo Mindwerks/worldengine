@@ -1,4 +1,4 @@
-from PyQt4 import QtGui
+from PyQt5 import QtGui
 import math
 from worldengine.draw import elevation_color
 
