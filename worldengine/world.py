@@ -16,8 +16,6 @@ import worldengine.protobuf.World_pb2 as Protobuf
 from worldengine.step import Step
 from version import __version__
 
-execfile('worldengine/version.py')
-
 class World(object):
     """A world composed by name, dimensions and all the characteristics of
     each cell.

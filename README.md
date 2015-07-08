@@ -76,16 +76,9 @@ pip install worldengine
 ```
 git clone or download the code
 
-# before using worldengine: if you plan to change the code
-python setup.py develop 
-
 # for unit-testing: also clone worldengine-data
 git clone git@github.com:Mindwerks/worldengine-data.git ../worldengine-data
 nosetest tests
-
-# before using worldengine: if you want just to install worldengine
-# on unix-ish system you could have to prepend sudo
-python setup.py install
 ```
 
 ### _On Windows_
@@ -276,7 +269,8 @@ Using virtualenv you can install the dependencies in this way
 Python 2:
 ```bash
 virtualenv venv
-source venv/bin/activate    
+source venv/bin/activate
+pip install --upgrade pip setuptools
 pip install -r requirements2.txt
 ```
 
@@ -284,8 +278,21 @@ Python 3:
 ```bash
 pyvenv venv3
 source venv3/bin/activate    
+pip install --upgrade pip setuptools
 pip3 install -r requirements3.txt
 ```
+
+Distribution
+============
+
+For Linux, we use PyInstaller to wrap everything up into one binary.
+Because of the libraries we use, it is best to use their `develop` branch.
+```bash
+pip install git+https://github.com/pyinstaller/pyinstaller.git@develop
+pyinstaller --clean -F -n worldengine worldengine/__main__.py
+```
+This will create a binary located `dist/worldengine` that has all the
+required libs necessary to run.
 
 Do you have problems or suggestions for improvements?
 =====================================================
@@ -299,7 +306,7 @@ Thank you, all the feedback is precious for us!
 Requirements
 ============
 
-Libjpeg and libtiff are required by PIL
+Libjpeg and libtiff are required by Pillow
 
 Contributors
 ============
