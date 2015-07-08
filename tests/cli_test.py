@@ -1,3 +1,4 @@
+import os
 import sys
 from tests.draw_test import TestBase
 import unittest
@@ -26,6 +27,20 @@ class TestCLI(TestBase):
         self.assertRaises(SystemExit, main)
         sys.argv = ["python", "info", "does_not_exist"]
         self.assertRaises(SystemExit, main)
+        sys.argv = ["python", "info", "--gs", "greyscale.png"]
+        self.assertRaises(SystemExit, main)
+        sys.argv = ["python", "-o", __file__]
+        self.assertRaises(Exception, main)
+        sys.argv = ["python", "info", "-o", "test_dir"]
+        self.assertRaises(SystemExit, main)
+        self.assertTrue(os.path.isdir("test_dir"))
+        sys.argv = ["python", "plates", "--number-of-plates", "0"]
+        self.assertRaises(SystemExit, main)
+        sys.argv = ["python", "plates", "--number-of-plates", "101"]
+        self.assertRaises(SystemExit, main)
+
+    def test_smoke_info(self):
+        backup_argv = sys.argv
         sys.argv = ["python", "info", self.world]
         try:
             main()
@@ -46,7 +61,6 @@ class TestCLI(TestBase):
             main()
         except Exception as e:
             raise e
-        sys.argv = backup_argv
 
     def test_smoke_ancient(self):
             backup_argv = sys.argv
@@ -65,13 +79,7 @@ class TestCLI(TestBase):
                 main()
             except Exception as e:
                 raise e
-            sys.argv = ["python", "plates", "--number-of-plates", "0"]
-            self.assertRaises(SystemExit, main)
-            sys.argv = ["python", "plates", "--number-of-plates", "101"]
-            self.assertRaises(SystemExit, main)
-
             sys.argv = backup_argv
-
 
 
 if __name__ == '__main__':
