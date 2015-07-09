@@ -307,17 +307,18 @@ copy google/protobuf python to dist/google/protobuf and create __init__.py in
 dist/google
 
 ### Windows
-Turning Windows into a developer environment is like pulling teeth with black magic.
+Turning your Windows into a developer environment is a long and drawn out process.
+I'll try to keep this as short as possible and to the point.
 
 Remember, be consistent if you are either win32 or win64 and everything you download
-and install is either one or the other.
+and install is either one or the other, but not both.
 
 You'll want to install msysgit: https://msysgit.github.io/ which will get you
 a Linux like environment. After that, clone the repo and install Python 2.7 for
 windows: https://www.python.org/downloads/windows/ This will get you also pip
 which is required for the rest. You'll first need to pip install virtualenv.
 
-The laytout is a bit different than in Linux.
+The layout is a bit different than in Linux.
 ```bash
 virtualenv venv
 venv/Scripts/pip install requirements2.txt
