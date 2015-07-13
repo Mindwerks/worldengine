@@ -1,19 +1,9 @@
-### _Announcement: Lands and WorldSynth have been merged to create WorldEngine_
-
-Lands has been recently merged with [WorldSynth](https://github.com/psi29a/worldsynth).
-We are now working on merging the code, taking the best of the two projects.
-
-We started a [google group](https://groups.google.com/forum/?hl=en#!forum/worldengine): if you have ideas, problems, suggestions or want to contribute please [join us](https://groups.google.com/forum/?hl=en#!forum/worldengine)!
-
----
-
 WorldEngine - a world generator
 =========================
 
 [![Coverage Status](https://coveralls.io/repos/Mindwerks/worldengine/badge.svg?branch=master&service=github)](https://coveralls.io/github/Mindwerks/worldengine?branch=master) [![Build Status](https://travis-ci.org/Mindwerks/worldengine.svg?branch=master)](https://travis-ci.org/Mindwerks/worldengine) [![Build status](https://ci.appveyor.com/api/projects/status/io4ljim2ra83df23?svg=true)](https://ci.appveyor.com/project/ftomassetti/worldengine)
 
-
-_Last Lands version: 0.5.3, Last WorldSynth version: 0.12, First WorldEngine version will be 0.18_
+_The current stable version is 0.18.0_
 
 You can generate worlds data (heighmap, biome, etc.) and images for your own worlds.
 
@@ -49,16 +39,18 @@ python lands/generator.py ancient_map -w seed1.world
 
 ![](https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/examples/ancient_map_seed1.png)
 
+
+We started a [google group](https://groups.google.com/forum/?hl=en#!forum/worldengine): if you have ideas, problems, suggestions or want to contribute please [join us](https://groups.google.com/forum/?hl=en#!forum/worldengine)!
+
+Binary packages
+===============
+
+For Windows, Linux and Mac are available on the [releases page](https://github.com/Mindwerks/worldengine/releases).
+
 Gui
 ===
 
-An experimental (and limited!) GUI is available. 
-
-```
-worldenginegui
-```
-
-Note: it requires to install QT (available here [http://qt-project.org/](http://qt-project.org/))
+An experimental (and limited!) GUI is available as a separate project: [https://github.com/Mindwerks/worldengine-gui](worldengine-gui).
 
 Install
 =======
@@ -378,6 +370,12 @@ We would like to thank you great people who helped us while working on WorldEngi
 * [stefan-feltmann](https://github.com/stefan-feltmann) made Lands depends on pillow instead that on PIL (which is deprecated). This could also help when moving to Python 3. Thanks a million!
 
 * [Russell Brinkmann](https://github.com/rbb) helped saving the generation parameters in the generated world (so that we can use it to generate the same world again, for example), improved the command line options and added tracing information (useful for understanding the performance of the various generation steps)
+
+History
+=======
+
+WorldEngine has been created by merging Lands and [WorldSynth](https://github.com/psi29a/worldsynth).
+Last Lands version was 0.5.3, last WorldSynth version: 0.12, first WorldEngine version has been 0.18.
 
 License
 =======
