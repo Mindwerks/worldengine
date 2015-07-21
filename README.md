@@ -40,6 +40,13 @@ Binary packages
 
 For Windows, Linux and Mac are available on the [releases page](https://github.com/Mindwerks/worldengine/releases).
 
+Windows command prompt
+======================
+
+The program is intended to be used by the command line. If you prefer using a graphical interface read the paragraph titled _GUI_.
+
+If you are not familiar with the Windows command prompt you can look at [this screenshot](https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/docs/windows_command_prompt.gif).
+
 Gui
 ===
 
