@@ -9,13 +9,14 @@ from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_o
     draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
     draw_temperature_levels_on_file, draw_riversmap_on_file
 from worldengine.plates import world_gen, generate_plates_simulation
+from worldengine.imex import export
 from worldengine.step import Step
 from worldengine.world import World
 from worldengine.version import __version__
 
 VERSION = __version__
 
-OPERATIONS = 'world|plates|ancient_map|info'
+OPERATIONS = 'world|plates|ancient_map|info|export'
 SEA_COLORS = 'blue|brown'
 STEPS = 'plates|precipitations|full'
 
@@ -335,8 +336,20 @@ def main():
                                action="store_true",
                                help="Draw outer land border",
                                default=False)
-
     # TODO: allow for RGB specification as [r g b], ie [0.5 0.5 0.5] for gray
+
+    # -----------------------------------------------------
+    export_options = parser.add_argument_group(
+        "Export Options", "You can specify the formats you wish the generated output to be in. ")
+    export_options.add_argument("--export-type", dest="export_type",
+                                help="Export to a specific format such as: BMP or PNG",
+                                default="bmp")
+    export_options.add_argument("--export-scale", dest="export_scale", action="store_true",
+                                help="Scale to the min and max of your export format.",
+                                default=False)
+    export_options.add_argument("--export-bpp", dest="export_bpp", type=int,
+                                help="Bits per pixel: 8, 16 and 32",
+                                default=8)
 
     args = parser.parse_args()
 
@@ -366,7 +379,7 @@ def main():
     else:
         operation = args.OPERATOR.lower()
 
-    if args.OPERATOR == 'info':
+    if args.OPERATOR == 'info' or args.OPERATOR == 'export':
         if args.FILE is None:
             parser.print_help()
             usage("For operation info only the filename should be specified")
@@ -480,6 +493,10 @@ def main():
     elif operation == 'info':
         world = load_world(args.FILE)
         print_world_info(world)
+    elif operation == 'export':
+        world = load_world(args.FILE)
+        print_world_info(world)
+        export.export(world, args.export_type, args.export_bpp, args.export_scale)
     else:
         raise Exception(
             'Unknown operation: valid operations are %s' % OPERATIONS)
