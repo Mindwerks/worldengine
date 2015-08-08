@@ -344,12 +344,12 @@ def main():
     export_options.add_argument("--export-type", dest="export_type",
                                 help="Export to a specific format such as: BMP or PNG",
                                 default="bmp")
-    export_options.add_argument("--export-scale", dest="export_scale", action="store_true",
-                                help="Scale to the min and max of your export format.",
-                                default=False)
     export_options.add_argument("--export-bpp", dest="export_bpp", type=int,
                                 help="Bits per pixel: 8, 16 and 32",
                                 default=8)
+    export_options.add_argument("--export-signed", dest="export_signed", action="store_true",
+                                help="Used signed bits or not.",
+                                default=False)
 
     args = parser.parse_args()
 
@@ -496,7 +496,7 @@ def main():
     elif operation == 'export':
         world = load_world(args.FILE)
         print_world_info(world)
-        export.export(world, args.export_type, args.export_bpp, args.export_scale)
+        export.export(world, args.export_type, args.export_bpp, args.export_signed)
     else:
         raise Exception(
             'Unknown operation: valid operations are %s' % OPERATIONS)
