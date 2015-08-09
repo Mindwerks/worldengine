@@ -40,10 +40,13 @@ def export(world, export_type, export_bpp, export_signed):
     # massage data to scale between the absolute min and max
     elevation = numpy.array(world.elevation['data'])
 
-    if not export_signed and elevation.min() < 0.0:
-        elevation += abs(elevation.min())+1
+    if elevation.min() < 0.0:  # TODO: need better way to handle negative numbers
+        elevation += abs(elevation.min())
 
-    elevation *= ((2**export_bpp)/elevation.max())
+    if export_signed:
+        elevation *= (((2**export_bpp)/2)-1)/elevation.max()
+    else:
+        elevation *= (2**export_bpp)/elevation.max()
 
     elevation = elevation.astype(numpy_type)
 
