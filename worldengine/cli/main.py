@@ -350,6 +350,9 @@ def main():
     export_options.add_argument("--export-signed", dest="export_signed", action="store_true",
                                 help="Used signed bits or not.",
                                 default=False)
+    export_options.add_argument("--normalize", dest="export_normalize", action="store_true",
+                                help="Normalize data to the min and max of your bpp choice.",
+                                default=False)
 
     args = parser.parse_args()
 
@@ -496,7 +499,7 @@ def main():
     elif operation == 'export':
         world = load_world(args.FILE)
         print_world_info(world)
-        export.export(world, args.export_type, args.export_bpp, args.export_signed)
+        export(world, args.export_type, args.export_bpp, args.export_signed, args.export_normalize)
     else:
         raise Exception(
             'Unknown operation: valid operations are %s' % OPERATIONS)
