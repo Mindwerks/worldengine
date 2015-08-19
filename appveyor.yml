@@ -40,10 +40,27 @@ environment:
 
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
+  - echo %path%
+#  - mkdir %systemdrive%\OSGeo4w
+#  - cd %systemdrive%\OSGeo4w
+#  - ps: (new-object net.webclient).DownloadFile('http://download.osgeo.org/osgeo4w/osgeo4w-setup-x86.exe', 'osgeo4w-setup-x86.exe')
+#  - osgeo4w-setup-x86.exe --quiet-mode --upgrade-also --delete-orphans --no-desktop --advanced  --root %systemdrive%\OSGeo4w --packages msvcrt setup shell avce00 zlib iconv libxml2 cairo openssl curl expat fcgi ffmpeg fftw freexl fribidi libpng libjpeg libjpeg12 libtiff libgeotiff proj-hpgn proj-datumgrid proj geos libmysql sqlite3 hdf5 netcdf libpq xerces-c-vc10 hdf4 ogdi openjpeg spatialite gdal python-core python-numpy gdal-python gdal-autotest gdal-filegdb pdcurses msys python-win32 wxpython python-pil pyopengl gs grass gsl-libs libspatialindex mapserver mapscript-python msinttypes opencv psycopg2 qt4-libs pyqt4 pyspatialite six python-dateutil python-devel python-help sip qscintilla python-qscintilla python-shapely python-simplejson python-tcltk python-test python-tools python-xlrd python-xlwt qwt5-libs-qt4 qgis-common qgis qgis-grass-plugin qgis-server setuptools --site http://download.osgeo.org/osgeo4w
+#  - cd %APPVEYOR_BUILD_FOLDER%
+#  - set path=%systemdrive%\OSGeo4w;%path%
+  - mkdir %systemdrive%\temp
+  - cd %systemdrive%\temp
+  - appveyor DownloadFile http://download.gisinternals.com/sdk/downloads/release-1400-gdal-1-11-1-mapserver-6-4-1/gdal-111-1400-core.msi
+  - dir
+  - msiexec /i gdal-111-1400-core.msi /qn
+  - cd %APPVEYOR_BUILD_FOLDER%
 
 install:
   - "powershell appveyor\\install.ps1"
   - "%PYTHON%\\Scripts\\pip.exe install -r requirements2.txt"
+  - cd %systemdrive%\temp
+  - appveyor DownloadFile http://download.gisinternals.com/sdk/downloads/release-1400-gdal-1-11-1-mapserver-6-4-1/GDAL-1.11.1.win32-py2.7.msi
+  - msiexec /i GDAL-1.11.1.win32-py2.7.msi /qn
+  - cd %APPVEYOR_BUILD_FOLDER%
 
 build: off
 
