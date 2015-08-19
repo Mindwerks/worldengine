@@ -1,5 +1,8 @@
 language: python
 python: 2.7
+os:
+    - linux
+    - osx
 sudo: false
 cache:
     - pip
@@ -14,6 +17,7 @@ env:
 matrix:
   fast_finish: true
   allow_failures:
+    - os: osx
     - env: TOX_ENV=pypy
     - env: TOX_ENV=pyflakes
     - env: TOX_ENV=manifest
