@@ -2,6 +2,7 @@ __author__ = 'Federico Tomassetti'
 
 from noise import snoise2
 from world import *
+import time
 
 
 def center_elevation_map(elevation, width, height):
@@ -10,6 +11,7 @@ def center_elevation_map(elevation, width, height):
     ymin = None
     minx = None
     xmin = None
+    latshift = -200
 
     for y in xrange(height):
         sumy = 0
@@ -29,7 +31,7 @@ def center_elevation_map(elevation, width, height):
 
     new_elevation = [0] * (width * height)
     for y in xrange(height):
-        srcy = (ymin + y) % height
+        srcy = (ymin + y - latshift) % height
         for x in xrange(width):
             srcx = (xmin + x) % width
             new_elevation[y * width + x] = elevation[srcy * width + srcx]
@@ -449,7 +451,7 @@ def temperature(seed, elevation, mountain_level):
     from noise import snoise2
 
     border = width / 4
-    octaves = 6
+    octaves = 8
     freq = 16.0 * octaves
 
     for y in range(0, height):
@@ -462,7 +464,7 @@ def temperature(seed, elevation, mountain_level):
             if x <= border:
                 n = (snoise2(x / freq, y / freq, octaves, base=base) * x / border) + (snoise2((x+width) / freq, y / freq, octaves, base=base) * (border-x)/border)
 
-            t = (latitude_factor * 3 + n * 2) / 5.0
+            t = (latitude_factor * 24.0 + n * 1.0) / 25.0
             if elevation[y][x] > mountain_level:
                 if elevation[y][x] > (mountain_level + 29):
                     altitude_factor = 0.033
@@ -484,11 +486,11 @@ def precipitation(seed, width, height):
     from noise import snoise2
 
     octaves = 6
-    freq = 64.0 * octaves
+    freq = 8.0 * octaves
 
     for y in range(0, height):
         yscaled = float(y) / height
-        latitude_factor = 1.0 - (abs(yscaled - 0.5) * 2)
+        #latitude_factor = 1.0 - (abs(yscaled - 0.5) * 2)
         for x in range(0, width):
             n = snoise2(x / freq, y / freq, octaves, base=base)
 
@@ -496,7 +498,7 @@ def precipitation(seed, width, height):
             if x < border: 
 		n = (snoise2(x / freq, y / freq, octaves, base=base) * x / border) + (snoise2((x+width) / freq, y / freq, octaves, base=base) * (border-x)/border)
 
-            t = (latitude_factor + n * 4) / 5.0
+            t = n #(latitude_factor + n * 4) / 5.0
             temp[y][x] = t
 
     return temp
@@ -577,23 +579,28 @@ def place_oceans_at_map_borders(elevation):
 
 
 def humidity(world):
+    temperatureWeight = 2.3
+    precipitationWeight = 1.0
+    irrigationWeight = .8
     humidity = {}
     humidity['data'] = [[0 for x in xrange(world.width)] for y in xrange(world.height)]
 
     for y in xrange(world.height):
         for x in xrange(world.width):
-            humidity['data'][y][x] = world.precipitation['data'][y][x] + world.irrigation[y][x]
+            humidity['data'][y][x] = (((world.precipitation['data'][y][x] * precipitationWeight - world.irrigation[y][x] * 
+            irrigationWeight)+1) * ((world.temperature['data'][y][x] * 
+            temperatureWeight + 1.0)/(temperatureWeight + 1.0)))
 
     #These were originally evenly spaced at 12.5% each but changing them to a bell curve produced
     #better results
     humidity['quantiles'] = {}
-    humidity['quantiles']['12'] = find_threshold_f(humidity['data'], 0.02, world.ocean)
-    humidity['quantiles']['25'] = find_threshold_f(humidity['data'], 0.09, world.ocean)
-    humidity['quantiles']['37'] = find_threshold_f(humidity['data'], 0.26, world.ocean)
-    humidity['quantiles']['50'] = find_threshold_f(humidity['data'], 0.50, world.ocean)
-    humidity['quantiles']['62'] = find_threshold_f(humidity['data'], 0.74, world.ocean)
-    humidity['quantiles']['75'] = find_threshold_f(humidity['data'], 0.91, world.ocean)
-    humidity['quantiles']['87'] = find_threshold_f(humidity['data'], 0.98, world.ocean)
+    humidity['quantiles']['12'] = find_threshold_f(humidity['data'], 0.002, world.ocean)
+    humidity['quantiles']['25'] = find_threshold_f(humidity['data'], 0.014, world.ocean)
+    humidity['quantiles']['37'] = find_threshold_f(humidity['data'], 0.073, world.ocean)
+    humidity['quantiles']['50'] = find_threshold_f(humidity['data'], 0.236, world.ocean)
+    humidity['quantiles']['62'] = find_threshold_f(humidity['data'], 0.507, world.ocean)
+    humidity['quantiles']['75'] = find_threshold_f(humidity['data'], 0.778, world.ocean)
+    humidity['quantiles']['87'] = find_threshold_f(humidity['data'], 0.941, world.ocean)
     return humidity
 
 
@@ -618,6 +625,7 @@ def init_world_from_elevation(name, elevation, ocean_level, verbose):
     w.sea_depth = sea_depth(w, sl)
     if verbose:
         print("...elevation level calculated")
+        print(time.strftime("%B %d %H:%M:%S",time.localtime()))
 
     return [w, ocean, sl, hl, ml, e_th]
 
@@ -635,6 +643,7 @@ def world_gen_precipitation(w, i, ocean, verbose):
     w.set_precipitation(p, p_th)
     if verbose:
         print("...precipations calculated")
+        print(time.strftime("%B %d %H:%M:%S",time.localtime()))
     return [p, p_th]
 
 
@@ -655,6 +664,23 @@ def world_gen_from_elevation(name, elevation, seed, ocean_level, verbose, width,
     erode(w, 3000000)
     if verbose:
         print("...erosion calculated")
+        print(time.strftime("%B %d %H:%M:%S",time.localtime()))
+
+    # Temperature with thresholds
+    t = temperature(i, e, ml)
+    t_th = [
+	('polar', find_threshold_f(t, 0.874, ocean)),
+        ('alpine', find_threshold_f(t, 0.765, ocean)),
+        ('boreal', find_threshold_f(t, 0.594, ocean)),
+        ('cool', find_threshold_f(t, 0.439, ocean)),
+        ('warm', find_threshold_f(t, 0.366, ocean)),
+        ('subtropical', find_threshold_f(t, 0.124, ocean)),
+        ('tropical', None)
+    ]
+    w.set_temperature(t, t_th)
+    if verbose:
+        print("...temperature calculated")
+        print(time.strftime("%B %d %H:%M:%S",time.localtime()))
 
     w.watermap = watermap(w, 20000)
     w.irrigation = irrigation(w)
@@ -666,19 +692,7 @@ def world_gen_from_elevation(name, elevation, seed, ocean_level, verbose, width,
     ]
     if verbose:
         print("...humidity calculated")
-
-    # Temperature with thresholds
-    t = temperature(i, e, ml)
-    t_th = [
-	('polar', find_threshold_f(t, 0.90, ocean)),
-        ('alpine', find_threshold_f(t, 0.76, ocean)),
-        ('boreal', find_threshold_f(t, 0.59, ocean)),
-        ('cool', find_threshold_f(t, 0.38, ocean)),
-        ('warm', find_threshold_f(t, 0.26, ocean)),
-        ('subtropical', find_threshold_f(t, 0.14, ocean)),
-        ('tropical', None)
-    ]
-    w.set_temperature(t, t_th)
+        print(time.strftime("%B %d %H:%M:%S",time.localtime()))
 
     # Permeability with thresholds
     perm = permeability(i, width, height)
@@ -691,6 +705,7 @@ def world_gen_from_elevation(name, elevation, seed, ocean_level, verbose, width,
 
     if verbose:
         print("...permeability level calculated")
+        print(time.strftime("%B %d %H:%M:%S",time.localtime()))
 
     cm = {}
     biome_cm = {}
@@ -797,6 +812,7 @@ def world_gen_from_elevation(name, elevation, seed, ocean_level, verbose, width,
             print("%s = %i" % (str(cl), count))
 
     if verbose:
+        print(time.strftime("%B %d %H:%M:%S",time.localtime()))
         print('')  # empty line
         print('Biome obtained:')
 

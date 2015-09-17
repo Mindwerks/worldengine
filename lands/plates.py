@@ -5,6 +5,7 @@ __author__ = 'Federico Tomassetti'
 
 from geo import *
 import platec
+import time
 
 def generate_plates_simulation(seed, width, height, sea_level=0.65, erosion_period=60,
                                folding_ratio=0.02, aggr_overlap_abs=1000000, aggr_overlap_rel=0.33,
@@ -27,11 +28,13 @@ def world_gen(name, seed, verbose, width, height, step="full"):
     e_as_array = center_elevation_map(e_as_array, width, height)
     if verbose:
         print("...plates simulated")
+        print(time.strftime("%B %d %H:%M:%S",time.localtime()))
     e = [[e_as_array[y * width + x] for x in xrange(width)] for y in xrange(height)]
     elevnoise(e, random.randint(0, 4096))
     place_oceans_at_map_borders(e)
     if verbose:
         print("...elevation noise added")
+        print(time.strftime("%B %d %H:%M:%S",time.localtime()))
 
     return world_gen_from_elevation(name, e, seed, ocean_level=1.0, verbose=verbose, width=width, height=height,
                                     step=step)

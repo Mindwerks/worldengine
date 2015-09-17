@@ -75,6 +75,12 @@ def draw_simple_elevation(data, filename, shadow, width, height):
                                          COLOR_STEP) / (3 * COLOR_STEP),
                         0.375 + 0.625 * (c - 5.0 *
                                          COLOR_STEP) / (3 * COLOR_STEP))
+            elif (c < 10.0 * COLOR_STEP):
+                return (1, 1 - (c - 8.0 * COLOR_STEP) / 4.0, 1)
+            elif (c < 12.0 * COLOR_STEP):
+                return (1 - (c - 10.0 * COLOR_STEP) / 4.0, .25 + (c - 10 * COLOR_STEP) / 4.0, 1)
+            elif (c < 14.0 * COLOR_STEP):
+                return ( .25 + (c - 12.0 * COLOR_STEP) / 4.0, 1, 1 - (c - 12 * COLOR_STEP) / 4.0)
             else:
                 c -= 8.0 * COLOR_STEP
                 while (c > 2.0 * COLOR_STEP):

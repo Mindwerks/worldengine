@@ -9,6 +9,7 @@ import geo
 import draw
 import drawing_functions
 import os
+import time
 from world import *
 
 from PIL import Image
@@ -188,6 +189,7 @@ def main():
 
     print('')  # empty line
     print('starting...')
+    print(time.strftime("%B %d %H:%M:%S",time.localtime()))
     if operation == 'world':
         generate_world(seed, world_name, options.output_dir, width, height, step)
     elif operation == 'plates':
