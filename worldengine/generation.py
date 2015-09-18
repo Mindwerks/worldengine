@@ -22,6 +22,7 @@ def center_land(world):
 
     min_sum_on_y = None
     y_with_min_sum = None
+    latshift = 0
     for y in range(world.height):
         sum_on_y = 0
         for x in range(world.width):
@@ -49,7 +50,7 @@ def center_land(world):
     for y in range(world.height):
         new_elevation_data.append([])
         new_plates.append([])
-        src_y = (y_with_min_sum + y) % world.height
+        src_y = (y_with_min_sum + y - latshift) % world.height
         for x in range(world.width):
             src_x = (x_with_min_sum + x) % world.width
             new_elevation_data[y].append(world.elevation['data'][src_y][src_x])
@@ -83,7 +84,7 @@ def place_oceans_at_map_borders(world):
 
 
 def add_noise_to_elevation(world, seed):
-    octaves = 6
+    octaves = 8
     freq = 16.0 * octaves
     for y in range(world.height):
         for x in range(world.width):
@@ -199,9 +200,10 @@ def generate_world(w, step):
 
     # FIXME: create setters
     IrrigationSimulation().execute(w, seed)
+    TemperatureSimulation().execute(w, seed)
     HumiditySimulation().execute(w, seed)
 
-    TemperatureSimulation().execute(w, seed)
+    
     PermeabilitySimulation().execute(w, seed)
 
     cm, biome_cm = BiomeSimulation().execute(w, seed)
