@@ -53,7 +53,7 @@ class TemperatureSimulation(object):
                         + (snoise2((x + width) / freq, y / freq, octaves,
                                    base=base) * (border - x) / border)
 
-                t = (latitude_factor * 24 + n * 1) / 25.0
+                t = (latitude_factor * 12 + n * 1) / 13.0
                 if elevation[y][x] > mountain_level:
                     if elevation[y][x] > (mountain_level + 29):
                         altitude_factor = 0.033

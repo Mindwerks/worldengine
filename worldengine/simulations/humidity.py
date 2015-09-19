@@ -16,7 +16,7 @@ class HumiditySimulation(object):
         humidity = dict()
         temperatureWeight = 2.3
         precipitationWeight = 1.0
-        irrigationWeight = .8
+        irrigationWeight = 3
         humidity['data'] = [[0 for x in xrange(world.width)] for y in
                             xrange(world.height)]  # TODO: replace with numpy
 
