@@ -1,5 +1,4 @@
-# Sample script to install Python and pip under Windows
-# Authors: Olivier Grisel and Kyle Kastner
+# Authors: Olivier Grisel, Kyle Kastner, Bret Curtis
 # License: CC0 1.0 Universal: http://creativecommons.org/publicdomain/zero/1.0/
 
 $BASE_URL = "https://www.python.org/ftp/python/"
