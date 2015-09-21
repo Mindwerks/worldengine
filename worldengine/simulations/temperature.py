@@ -15,12 +15,12 @@ class TemperatureSimulation(object):
 
         t = self._calculate(world, seed, e, ml)
         t_th = [
-            ('polar', find_threshold_f(t, 0.90, ocean)),
-            ('alpine', find_threshold_f(t, 0.76, ocean)),
-            ('boreal', find_threshold_f(t, 0.59, ocean)),
-            ('cool', find_threshold_f(t, 0.38, ocean)),
-            ('warm', find_threshold_f(t, 0.26, ocean)),
-            ('subtropical', find_threshold_f(t, 0.14, ocean)),
+            ('polar', find_threshold_f(t, 0.874, ocean)),
+            ('alpine', find_threshold_f(t, 0.765, ocean)),
+            ('boreal', find_threshold_f(t, 0.594, ocean)),
+            ('cool', find_threshold_f(t, 0.439, ocean)),
+            ('warm', find_threshold_f(t, 0.366, ocean)),
+            ('subtropical', find_threshold_f(t, 0.124, ocean)),
             ('tropical', None)
         ]
         world.set_temperature(t, t_th)
@@ -37,7 +37,7 @@ class TemperatureSimulation(object):
         from noise import snoise2
 
         border = width / 4
-        octaves = 6
+        octaves = 8
         freq = 16.0 * octaves
 
         for y in range(0, height):
@@ -53,7 +53,7 @@ class TemperatureSimulation(object):
                         + (snoise2((x + width) / freq, y / freq, octaves,
                                    base=base) * (border - x) / border)
 
-                t = (latitude_factor * 3 + n * 2) / 5.0
+                t = (latitude_factor * 12 + n * 1) / 13.0
                 if elevation[y][x] > mountain_level:
                     if elevation[y][x] > (mountain_level + 29):
                         altitude_factor = 0.033
