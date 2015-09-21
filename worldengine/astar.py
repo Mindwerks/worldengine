@@ -114,10 +114,14 @@ class AStar:
 
     def find_path(self, from_location, to_location):
         end = to_location
-        f_node = self.mh.get_node(from_location)
-        self.on.append(f_node)
-        self.o.append(f_node.lid)
-        next_node = f_node
+        try:
+            f_node = self.mh.get_node(from_location)
+            self.on.append(f_node)
+            self.o.append(f_node.lid)
+            next_node = f_node
+        except:
+            print "Error with: ", self
+            return None
 
         counter = 0  # a bail-out counter
 
