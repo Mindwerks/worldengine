@@ -1,6 +1,7 @@
 Version 0.19-UNRELEASED
 
 * Added export support using libgdal
+* Trap rivers and greyscale_heightmap errors when a bad filename is given.
 
 Version 0.18
 

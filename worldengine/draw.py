@@ -142,7 +142,13 @@ class ImagePixelSetter(object):
         self.pixels[x, y] = color
 
     def complete(self):
-        self.img.save(self.filename)
+        try:
+            self.img.save(self.filename)
+        except KeyError:
+            print "Cannot save to file `{}`, unsupported file format.".format(self.filename)
+            filename = self.filename+".png"
+            print "Defaulting to PNG: `{}`".format(filename)
+            self.img.save(filename)
 
     def __getitem__(self, item):
         return self.pixels[item]

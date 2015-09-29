@@ -407,12 +407,19 @@ def main():
 
     generation_operation = (operation == 'world') or (operation == 'plates')
 
-    produce_grayscale_heightmap = args.grayscale_heightmap
-    if produce_grayscale_heightmap and not generation_operation:
+    if args.grayscale_heightmap and args.grayscale_heightmap.rfind('.') == -1:
+        print("Invalid filename `{}`, you must specify a valid image extension.".format(
+            args.grayscale_heightmap))
+        sys.exit(-1)
+    if args.grayscale_heightmap and not generation_operation:
         usage(
             error="Grayscale heightmap can be produced only during world " +
                   "generation")
 
+    if args.rivers_map and args.rivers_map.rfind('.') == -1:
+        print("Invalid filename `{}`, you must specify a valid image extension.".format(
+            args.rivers_map))
+        sys.exit(-1)
     if args.rivers_map and not generation_operation:
         usage(error="Rivers map can be produced only during world generation")
 
@@ -428,9 +435,9 @@ def main():
         print(' world format         : %s' % world_format)
         print(' black and white maps : %s' % args.black_and_white)
         print(' step                 : %s' % step.name)
-        if produce_grayscale_heightmap:
+        if args.grayscale_heightmap:
             print(
-                ' + greyscale heightmap in "%s"' % produce_grayscale_heightmap)
+                ' + greyscale heightmap in "%s"' % args.grayscale_heightmap)
         else:
             print(' (no greyscale heightmap)')
         if args.rivers_map:
@@ -456,8 +463,8 @@ def main():
                                seed, args.number_of_plates, args.output_dir,
                                step, args.ocean_level, world_format,
                                args.verbose, black_and_white=args.black_and_white)
-        if produce_grayscale_heightmap:
-            generate_grayscale_heightmap(world, produce_grayscale_heightmap)
+        if args.grayscale_heightmap:
+            generate_grayscale_heightmap(world, args.grayscale_heightmap)
         if args.rivers_map:
             generate_rivers_map(world, args.rivers_map)
 
