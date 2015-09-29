@@ -360,6 +360,14 @@ Requirements
 
 Libjpeg and libtiff are required by Pillow
 
+Projects using WorldEngine
+==========================
+
+WorldEngine is being used in several products and we are starting to list them here:
+* [http://store.steampowered.com/app/319830](AX:EL - Air XenoDawn) a sce-fi aerial dogfighting game
+
+If you are using WorldEngine please let us know!
+
 Contributors
 ============
 
