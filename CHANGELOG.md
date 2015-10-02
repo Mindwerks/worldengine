@@ -1,6 +1,8 @@
 Version 0.19-UNRELEASED
 
 * Added export support using libgdal
+* Force rivers and grayscale_heightmap to PNG to avoid ambiguity of providing a 
+filename which can introduce input error.
 
 Version 0.18
 
