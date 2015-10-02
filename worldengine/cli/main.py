@@ -292,11 +292,10 @@ def main():
         "Generate Options", "These options are only useful in plate and " +
         "world modes")
     g_generate.add_argument('-r', '--rivers', dest='rivers_map',
-                            help="generate rivers map in FILE", metavar="FILE")
+                            action="store_true", help="generate rivers map")
     g_generate.add_argument('--gs', '--grayscale-heightmap',
-                            dest='grayscale_heightmap',
-                            help='produce a grayscale heightmap in FILE',
-                            metavar="FILE")
+                            dest='grayscale_heightmap', action="store_true",
+                            help='produce a grayscale heightmap')
     g_generate.add_argument('--ocean_level', dest='ocean_level', type=float,
                             help='elevation cut off for sea level " +'
                                  '[default = %(default)s]',
@@ -407,19 +406,11 @@ def main():
 
     generation_operation = (operation == 'world') or (operation == 'plates')
 
-    if args.grayscale_heightmap and args.grayscale_heightmap.rfind('.') == -1:
-        print("Invalid filename `{}`, you must specify a valid image extension.".format(
-            args.grayscale_heightmap))
-        sys.exit(-1)
     if args.grayscale_heightmap and not generation_operation:
         usage(
             error="Grayscale heightmap can be produced only during world " +
                   "generation")
 
-    if args.rivers_map and args.rivers_map.rfind('.') == -1:
-        print("Invalid filename `{}`, you must specify a valid image extension.".format(
-            args.rivers_map))
-        sys.exit(-1)
     if args.rivers_map and not generation_operation:
         usage(error="Rivers map can be produced only during world generation")
 
@@ -435,15 +426,8 @@ def main():
         print(' world format         : %s' % world_format)
         print(' black and white maps : %s' % args.black_and_white)
         print(' step                 : %s' % step.name)
-        if args.grayscale_heightmap:
-            print(
-                ' + greyscale heightmap in "%s"' % args.grayscale_heightmap)
-        else:
-            print(' (no greyscale heightmap)')
-        if args.rivers_map:
-            print(' + rivers map in "%s"' % args.rivers_map)
-        else:
-            print(' (no rivers map)')
+        print(' greyscale heightmap  : %s' % args.grayscale_heightmap)
+        print(' rivers map           : %s' % args.rivers_map)
     if operation == 'ancient_map':
         print(' resize factor          : %i' % args.resize_factor)
         print(' world file             : %s' % args.world_file)
@@ -464,9 +448,9 @@ def main():
                                step, args.ocean_level, world_format,
                                args.verbose, black_and_white=args.black_and_white)
         if args.grayscale_heightmap:
-            generate_grayscale_heightmap(world, args.grayscale_heightmap)
+            generate_grayscale_heightmap(world, world_name+"_grayscale.png")
         if args.rivers_map:
-            generate_rivers_map(world, args.rivers_map)
+            generate_rivers_map(world, world_name+"_rivers.png")
 
     elif operation == 'plates':
         print('')  # empty line

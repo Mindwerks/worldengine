@@ -27,7 +27,7 @@ class TestCLI(TestBase):
         self.assertRaises(SystemExit, main)
         sys.argv = ["python", "info", "does_not_exist"]
         self.assertRaises(SystemExit, main)
-        sys.argv = ["python", "info", "--gs", "greyscale.png"]
+        sys.argv = ["python", "info", "--gs"]
         self.assertRaises(SystemExit, main)
         sys.argv = ["python", "-o", __file__]
         self.assertRaises(Exception, main)
@@ -54,9 +54,7 @@ class TestCLI(TestBase):
         # everything without it exploding?
         backup_argv = sys.argv
         sys.argv = ["python", "--width", "16", "--height", "16",
-                    "-r", "rivers.png",
-                    "--gs", "greyscale.png"
-                    ]
+                    "-r", "--gs"]
         try:
             main()
         except Exception as e:
