@@ -365,7 +365,7 @@ Projects using WorldEngine
 
 WorldEngine is being used in several products and we are starting to list them here:
 * [Lost Islands](https://wl.widelands.org/maps/lost-islands/) WorldEngine has been used to generate a map for [Widelands](https://widelands.org), an open-source real time strategy game
-* [http://store.steampowered.com/app/319830](AX:EL - Air XenoDawn) a sci-fi aerial dogfighting commercial game released on Steam
+* [AX:EL - Air XenoDawn](http://store.steampowered.com/app/319830) a sci-fi aerial dogfighting commercial game released on Steam
 
 If you are using WorldEngine please let us know!
 
