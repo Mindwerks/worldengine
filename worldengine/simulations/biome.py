@@ -14,9 +14,9 @@ class BiomeSimulation(object):
         ocean = world.ocean
         cm = {}
         biome_cm = {}
-        biome = [[None for x in xrange(width)] for y in xrange(height)]  # TODO: replace with numpy
-        for y in xrange(height):
-            for x in xrange(width):
+        biome = [[None for x in range(width)] for y in range(height)]  # TODO: replace with numpy
+        for y in range(height):
+            for x in range(width):
                 if ocean[y][x]:
                     biome[y][x] = 'ocean'
                 else:
