@@ -85,6 +85,8 @@ def fill_ocean(elevation, sea_level):#TODO: Make more use of numpy?
             to_expand.append((0, y))
         if elevation[y, width - 1] <= sea_level:
             to_expand.append((width - 1, y))
+
+    #generate the ocean, starting on borders and then moving inwards
     for t in to_expand:
         tx, ty = t
         if not ocean[ty, tx]:
@@ -96,15 +98,20 @@ def fill_ocean(elevation, sea_level):#TODO: Make more use of numpy?
     return ocean
 
 
-def initialize_ocean_and_thresholds(world, ocean_level=1.0):
+def initialize_ocean_and_thresholds(world, ocean_level=0.65):
     """
     Calculate the ocean, the sea depth and the elevation thresholds
     :param world: a world having elevation but not thresholds
-    :param ocean_level: the elevation representing the ocean level
+    :param ocean_level: the amount of surface area covered by ocean
     :return: nothing, the world will be changed
     """
     e = world.elevation['data']
-    ocean = fill_ocean(e, ocean_level)
+
+    #Calculate the height of the ocean relative to the geometry
+    ocean_maxlevel = find_threshold_f(e, 1.0 - ocean_level,
+                                      ocean=None, max=1.0, mindist=0.00001)
+    ocean = fill_ocean(e, ocean_maxlevel)
+
     hl = find_threshold_f(e, 0.10)  # the highest 10% of all (!) land are declared hills
     ml = find_threshold_f(e, 0.03)  # the highest 3% are declared mountains
     e_th = [('sea', ocean_level),
@@ -114,7 +121,7 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
     harmonize_ocean(ocean, e, ocean_level)
     world.set_ocean(ocean)
     world.set_elevation(e, e_th)
-    world.sea_depth = sea_depth(world, ocean_level)
+    world.sea_depth = sea_depth(world, ocean_maxlevel)
 
 
 def harmonize_ocean(ocean, elevation, ocean_level):
