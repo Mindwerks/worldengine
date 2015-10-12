@@ -219,11 +219,12 @@ class PathFinder:
         sx, sy = source
         dx, dy = destination
         path = []
-        dim = len(height_map)
+        width = len(height_map[0])
+        height = len(height_map)
 
         graph = _matrix_to_array(height_map)  # flatten array
 
-        pathfinder = AStar(SQMapHandler(graph, dim, dim))
+        pathfinder = AStar(SQMapHandler(graph, width, height))
         start = SQLocation(sx, sy)
         end = SQLocation(dx, dy)
         p = pathfinder.find_path(start, end)
