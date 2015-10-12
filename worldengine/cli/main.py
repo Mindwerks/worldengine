@@ -297,7 +297,7 @@ def main():
                             dest='grayscale_heightmap', action="store_true",
                             help='produce a grayscale heightmap')
     g_generate.add_argument('--ocean_level', dest='ocean_level', type=float,
-                            help='elevation cut off for sea level " +'
+                            help='amount of surface covered by ocean " +'
                                  '[default = %(default)s]',
                             metavar="N", default=1.0)
 

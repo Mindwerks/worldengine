@@ -41,7 +41,7 @@ def find_threshold(elevation, land_percentage, ocean=None):
     return search(0, 255, desired_land)
 
 
-def find_threshold_f(elevation, land_perc, ocean=None):
+def find_threshold_f(elevation, land_perc, ocean=None, max=1000.0, mindist=0.005):
     width = len(elevation[0])
     height = len(elevation)
     if ocean:
@@ -62,7 +62,7 @@ def find_threshold_f(elevation, land_perc, ocean=None):
     def search(a, b, desired):
         if a == b:
             return a
-        if abs(b - a) < 0.005:
+        if abs(b - a) < mindist:
             ca = count(a)
             cb = count(b)
             dista = abs(desired - ca)
@@ -85,4 +85,4 @@ def find_threshold_f(elevation, land_perc, ocean=None):
                 if ocean[y][x]:
                     all_land -= 1
     desired_land = all_land * land_perc
-    return search(-1000.0, 1000.0, desired_land)
+    return search(-1*max, max, desired_land)
