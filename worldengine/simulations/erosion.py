@@ -35,7 +35,7 @@ def _numpy_to_matrix(numpy_array):
 
     width = numpy_array.shape[0]
     height = numpy_array.shape[1]
-    return [[numpy_array[x, y] for x in xrange(width)] for y in xrange(height)]
+    return [[numpy_array[x, y] for x in range(width)] for y in range(height)]
 
 
 class ErosionSimulation(object):

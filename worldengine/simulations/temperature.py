@@ -32,7 +32,7 @@ class TemperatureSimulation(object):
 
         random.seed(seed * 7)
         base = random.randint(0, 4096)
-        temp = [[0 for x in xrange(width)] for y in xrange(height)]  # TODO: replace with numpy
+        temp = [[0 for x in range(width)] for y in range(height)]  # TODO: replace with numpy
 
         from noise import snoise2
 

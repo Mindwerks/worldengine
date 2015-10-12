@@ -14,11 +14,11 @@ class IrrigationSimulation(object):
         width = world.width
         height = world.height
 
-        values = [[0 for x in xrange(width)] for y in xrange(height)]  # TODO: replace with numpy
+        values = [[0 for x in range(width)] for y in range(height)]  # TODO: replace with numpy
         radius = 10
 
-        for y in xrange(height):
-            for x in xrange(width):
+        for y in range(height):
+            for x in range(width):
                 if world.is_land((x, y)):
                     for dy in range(-radius, radius + 1):   # TODO: below can be simplified
                         if (y + dy) >= 0 and (y + dy) < world.height:

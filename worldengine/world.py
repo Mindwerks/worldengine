@@ -14,7 +14,7 @@ from worldengine.biome import Biome, BorealDesert, BorealDryScrub, BorealMoistFo
 from worldengine.basic_map_operations import random_point
 import worldengine.protobuf.World_pb2 as Protobuf
 from worldengine.step import Step
-from version import __version__
+from worldengine.version import __version__
 
 class World(object):
     """A world composed by name, dimensions and all the characteristics of
@@ -406,8 +406,8 @@ class World(object):
 
     def max_elevation(self):
         max_el = None
-        for y in xrange(self.height):
-            for x in xrange(self.width):
+        for y in range(self.height):
+            for x in range(self.width):
                 el = self.elevation['data'][y][x]
                 if max_el is None or el > max_el:
                     max_el = el
@@ -415,8 +415,8 @@ class World(object):
 
     def min_elevation(self):
         min_el = None
-        for y in xrange(self.height):
-            for x in xrange(self.width):
+        for y in range(self.height):
+            for x in range(self.width):
                 el = self.elevation['data'][y][x]
                 if min_el is None or el < min_el:
                     min_el = el
