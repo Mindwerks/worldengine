@@ -10,7 +10,7 @@ from worldengine.generation import Step, add_noise_to_elevation, center_land, ge
 from worldengine.world import World
 
 
-def generate_plates_simulation(seed, width, height, sea_level=0.65,
+def generate_plates_simulation(seed, width, height, ocean_level=1.0,
                                erosion_period=60, folding_ratio=0.02,
                                aggr_overlap_abs=1000000, aggr_overlap_rel=0.33,
                                cycle_count=2, num_plates=10,
@@ -18,7 +18,7 @@ def generate_plates_simulation(seed, width, height, sea_level=0.65,
 
     if verbose:
         start_time = time.time()
-    p = platec.create(seed, width, height, sea_level, erosion_period,
+    p = platec.create(seed, width, height, ocean_level, erosion_period,
                       folding_ratio, aggr_overlap_abs, aggr_overlap_rel,
                       cycle_count, num_plates)
     # Note: To rescale the worlds heightmap to roughly Earths scale, multiply by 2000.
@@ -41,6 +41,7 @@ def _plates_simulation(name, width, height, seed, temps=
                        curve_offset=.2, num_plates=10, ocean_level=1.0,
                        step=Step.full(), verbose=get_verbose()):
     e_as_array, p_as_array = generate_plates_simulation(seed, width, height,
+                                                        ocean_level=ocean_level,
                                                         num_plates=num_plates,
                                                         verbose=verbose)
 
