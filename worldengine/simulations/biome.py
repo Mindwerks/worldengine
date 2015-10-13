@@ -7,7 +7,7 @@ class BiomeSimulation(object):
 
     @staticmethod
     def execute(world, seed):
-        assert seed is None
+        assert seed is not None
         w = world
         width = world.width
         height = world.height
