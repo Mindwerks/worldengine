@@ -260,25 +260,31 @@ The world generation algorithm goes through different phases:
 * terrain permeability is calculated
 * biome is calculated using the [Holdridge life zones](http://en.wikipedia.org/wiki/Holdridge_life_zones) model
 
-Install dependencies
-====================
+Development
+===========
 
-Using virtualenv you can install the dependencies in this way
+Using virtualenv you can create a sandbox in which to develop.
 
-Python 2:
+Python 2
+--------
+
 ```bash
 virtualenv venv
 source venv/bin/activate
 pip install --upgrade pip setuptools
-pip install -r requirements2.txt
+pip install -r requirements-dev.txt
+python worldengine
 ```
 
-Python 3:
+Python 3
+--------
+
 ```bash
-pyvenv venv3
-source venv3/bin/activate    
+virtualenv venv -p /usr/bin/python3
+source venv/bin/activate
 pip install --upgrade pip setuptools
-pip3 install -r requirements3.txt
+pip install -r requirements-dev.txt
+python worldengine
 ```
 
 Distribution
@@ -320,7 +326,7 @@ which is required for the rest. You'll first need to pip install virtualenv.
 The layout is a bit different than in Linux.
 ```bash
 virtualenv venv
-venv/Scripts/pip install requirements2.txt
+venv/Scripts/pip install -r requirements.txt
 ```
 
 Numpy install will fail, so you'll need download a pre-compiled wheel file and
@@ -358,7 +364,7 @@ Thank you, all the feedback is precious for us!
 Requirements
 ============
 
-Libjpeg and libtiff are required by Pillow
+Libjpeg, libtiff and zlib are required by Pillow
 
 Projects using WorldEngine
 ==========================

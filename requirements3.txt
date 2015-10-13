@@ -1,4 +1,0 @@
--r requirements_base.txt
---allow-external protobuf
---allow-unverified protobuf
-protobuf==3.0.0a3
