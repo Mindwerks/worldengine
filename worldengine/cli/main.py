@@ -388,11 +388,12 @@ def main():
         if not os.path.exists(args.FILE):
             usage("The specified world file does not exist")
 
-    random.seed()
     if args.seed is not None:
         seed = int(args.seed)
     else:
-        seed = random.randint(0, 65535)
+        seed = random.randint(0, 65535)#RNG initialization is done automatically
+    random.seed(seed)
+
     if args.world_name:
         world_name = args.world_name
     else:
