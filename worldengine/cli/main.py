@@ -137,7 +137,7 @@ def __get_last_byte__(filename):
             tmp_data = input_file.read(1024 * 1024)
             if tmp_data:
                 data = tmp_data
-    return ord(data[len(data) - 1])
+    return data[len(data) - 1]
 
 
 def __varint_to_value__(varint):

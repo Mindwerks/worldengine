@@ -47,8 +47,7 @@ class Counter(object):
 
     def to_str(self):
         string = ""
-        keys = self.c.keys()
-        keys.sort()
+        keys = sorted(self.c.keys())
         for w in keys:
             string += "%s : %i" % (w, self.c[w])
             string += "\n"
@@ -116,8 +115,8 @@ def array_to_matrix(array, width, height):
     if len(array) != (width * height):
         raise Exception("Array as not expected length")
     matrix = []
-    for y in xrange(height):
+    for y in range(height):
         matrix.append([])
-        for x in xrange(width):
+        for x in range(width):
             matrix[y].append(array[y * width + x])
     return matrix

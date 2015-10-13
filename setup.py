@@ -10,7 +10,7 @@ from setuptools import setup, Extension, Command
 # e.g. ['django==1.5.1', 'mezzanine==1.4.6']
 # reqs = [str(ir.req) for ir in install_reqs]
 
-execfile('worldengine/version.py')
+exec(open('worldengine/version.py').read())
 
 config = {
     'name': 'worldengine',
@@ -21,12 +21,12 @@ config = {
     'download_url': 'https://github.com/Mindwerks/worldengine/releases',
     'version': __version__,
     'packages': ['worldengine', 'worldengine.cli', 'worldengine.simulations',
-                 'worldengine.protobuf'],
+                 'worldengine.protobuf', 'worldengine.imex'],
     'entry_points': {
         'console_scripts': ['worldengine=worldengine.cli.main:main'],
     },
     'install_requires': ['Pillow==2.8.2', 'PyPlatec==1.3.1.post1',
-                         'argparse==1.2.1', 'noise==1.2.2', 'protobuf==2.6.0',
+                         'argparse==1.2.1', 'noise==1.2.2', 'protobuf>=2.6.0',
                          'numpy==1.9.2'],
     'license': 'MIT License'
 }

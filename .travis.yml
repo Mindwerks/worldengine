@@ -10,6 +10,7 @@ cache:
 
 env:
     - TOX_ENV=py27
+    - TOX_ENV=py34
     - TOX_ENV=pypy
     - TOX_ENV=pyflakes
     - TOX_ENV=manifest
@@ -19,6 +20,7 @@ matrix:
   allow_failures:
     - os: osx
     - env: TOX_ENV=pypy
+    - env: TOX_ENV=py34
     - env: TOX_ENV=pyflakes
     - env: TOX_ENV=manifest
 

@@ -9,6 +9,7 @@ from worldengine.drawing_functions import draw_ancientmap, \
 
 _biome_colors = {
     'ocean': (23, 94, 145),
+    'sea': (23, 94, 145),
     'ice': (255, 255, 255),
     'subpolar dry tundra': (128, 128, 128),
     'subpolar moist tundra': (96, 128, 128),
@@ -145,9 +146,9 @@ class ImagePixelSetter(object):
         try:
             self.img.save(self.filename)
         except KeyError:
-            print "Cannot save to file `{}`, unsupported file format.".format(self.filename)
+            print("Cannot save to file `{}`, unsupported file format.".format(self.filename))
             filename = self.filename+".png"
-            print "Defaulting to PNG: `{}`".format(filename)
+            print("Defaulting to PNG: `{}`".format(filename))
             self.img.save(filename)
 
     def __getitem__(self, item):

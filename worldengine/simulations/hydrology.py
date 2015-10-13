@@ -54,9 +54,9 @@ class WatermapSimulation(object):
             else:
                 _watermap[y][x] += q
 
-        _watermap_data = [[0 for x in xrange(world.width)] for y in
-                          xrange(world.height)]  # TODO: replace with numpy
-        for i in xrange(n):
+        _watermap_data = [[0 for x in range(world.width)] for y in
+                          range(world.height)]  # TODO: replace with numpy
+        for i in range(n):
             x, y = world.random_land()
             if True and world.precipitation['data'][y][x] > 0:
                 droplet(world, (x, y), world.precipitation['data'][y][x],
