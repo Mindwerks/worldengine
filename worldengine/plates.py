@@ -79,7 +79,7 @@ def world_gen(name, width, height, seed, temps=[.874, .765, .594, .439, .366, .1
         start_time = time.time()
     if fade_borders:
         place_oceans_at_map_borders(world)
-    initialize_ocean_and_thresholds(world)
+    initialize_ocean_and_thresholds(world, ocean_level)
     if verbose:
         elapsed_time = time.time() - start_time
         print("...plates.world_gen: oceans initialized. Elapsed time " +

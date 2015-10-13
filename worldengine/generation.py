@@ -109,7 +109,7 @@ def initialize_ocean_and_thresholds(world, ocean_level=0.65):
 
     #Calculate the height of the ocean relative to the geometry
     ocean_maxlevel = find_threshold_f(e, 1.0 - ocean_level,
-                                      ocean=None, max=1.0, mindist=0.00001)
+                                      ocean=None, max=100.0, mindist=0.00001)
     ocean = fill_ocean(e, ocean_maxlevel)
 
     hl = find_threshold_f(e, 0.10)  # the highest 10% of all (!) land are declared hills
