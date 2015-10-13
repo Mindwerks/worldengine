@@ -391,8 +391,7 @@ def main():
     if args.seed is not None:
         seed = int(args.seed)
     else:
-        random.seed()
-        seed = random.randint(0, 65535)
+        seed = random.randint(0, 65535)#RNG initialization is done automatically
     random.seed(seed)
 
     if args.world_name:
