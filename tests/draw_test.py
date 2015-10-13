@@ -76,7 +76,7 @@ class TestDraw(TestBase):
         super(TestDraw, self).setUp()
 
     def test_biome_colors(self):
-        self.assertEqual(Biome.all_names(), _biome_colors.keys().sort())
+        self.assertEqual(Biome.all_names(), sorted(_biome_colors.keys()))
 
     def test_elevation_color(self):
         for i in range(0, 20):

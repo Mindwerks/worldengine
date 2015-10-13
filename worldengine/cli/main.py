@@ -9,7 +9,7 @@ from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_o
     draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
     draw_temperature_levels_on_file, draw_riversmap_on_file
 from worldengine.plates import world_gen, generate_plates_simulation
-#from worldengine.imex import export
+from worldengine.imex import export
 from worldengine.step import Step
 from worldengine.world import World
 from worldengine.version import __version__
@@ -137,7 +137,7 @@ def __get_last_byte__(filename):
             tmp_data = input_file.read(1024 * 1024)
             if tmp_data:
                 data = tmp_data
-    return ord(data[len(data) - 1])
+    return data[len(data) - 1]
 
 
 def __varint_to_value__(varint):
@@ -490,8 +490,7 @@ def main():
     elif operation == 'export':
         world = load_world(args.FILE)
         print_world_info(world)
-        print("Dependency missing: imex/export.py")
-        #export(world, args.export_type, args.export_bpp, args.export_signed, args.export_normalize)
+        export(world, args.export_type, args.export_bpp, args.export_signed, args.export_normalize)
     else:
         raise Exception(
             'Unknown operation: valid operations are %s' % OPERATIONS)

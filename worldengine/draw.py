@@ -9,6 +9,7 @@ from worldengine.drawing_functions import draw_ancientmap, \
 
 _biome_colors = {
     'ocean': (23, 94, 145),
+    'sea': (23, 94, 145),
     'ice': (255, 255, 255),
     'subpolar dry tundra': (128, 128, 128),
     'subpolar moist tundra': (96, 128, 128),

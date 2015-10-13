@@ -3,6 +3,7 @@ This file contains all possible Biome as separate classes.
 """
 
 import re
+from six import with_metaclass
 
 
 def _un_camelize(name):
@@ -23,9 +24,7 @@ class _BiomeMetaclass(type):
         return created_class
 
 
-class Biome(object):
-
-    __metaclass__ = _BiomeMetaclass
+class Biome(with_metaclass(_BiomeMetaclass, object)):
 
     @classmethod
     def by_name(cls, name):
@@ -35,7 +34,7 @@ class Biome(object):
 
     @classmethod
     def all_names(cls):
-        return _BiomeMetaclass.biomes.keys().sort()
+        return sorted(_BiomeMetaclass.biomes.keys())
 
     @classmethod
     def name(cls):
@@ -211,8 +210,7 @@ class TropicalRainForest(Biome):
 # -------------
 
 def biome_name_to_index(biome_name):
-    names = _BiomeMetaclass.biomes.keys()
-    names.sort()
+    names = sorted(_BiomeMetaclass.biomes.keys())
     for i in range(len(names)):
         if names[i] == biome_name:
             return i
@@ -220,8 +218,7 @@ def biome_name_to_index(biome_name):
 
 
 def biome_index_to_name(biome_index):
-    names = _BiomeMetaclass.biomes.keys()
-    names.sort()
+    names = sorted(_BiomeMetaclass.biomes.keys())
     if biome_index < 0 or biome_index >= len(names):
         raise Exception("Not found")
     return names[biome_index]

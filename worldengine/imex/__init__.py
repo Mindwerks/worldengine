@@ -4,7 +4,7 @@ except ImportError:
     try:
         import gdal
     except ImportError:
-        print "Unable to load GDAL support, no heightmap export possible."
+        print("Unable to load GDAL support, no heightmap export possible.")
 
 import tempfile
 import numpy

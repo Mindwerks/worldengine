@@ -47,8 +47,7 @@ class Counter(object):
 
     def to_str(self):
         string = ""
-        keys = self.c.keys()
-        keys.sort()
+        keys = sorted(self.c.keys())
         for w in keys:
             string += "%s : %i" % (w, self.c[w])
             string += "\n"
