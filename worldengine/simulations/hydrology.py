@@ -8,7 +8,7 @@ class WatermapSimulation(object):
         return world.has_precipitations() and (not world.has_watermap())
 
     def execute(self, world, seed):
-        assert seed
+        assert seed is None
         world.watermap = self._watermap(world, 20000)
 
     @staticmethod

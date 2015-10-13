@@ -8,7 +8,7 @@ class HumiditySimulation(object):
             not world.has_humidity())
 
     def execute(self, world, seed):
-        assert seed
+        assert seed is None
         world.humidity = self._calculate(world)
 
     @staticmethod
