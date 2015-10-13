@@ -449,9 +449,11 @@ def main():
                                step, args.ocean_level, world_format,
                                args.verbose, black_and_white=args.black_and_white)
         if args.grayscale_heightmap:
-            generate_grayscale_heightmap(world, world_name+"_grayscale.png")
+            generate_grayscale_heightmap(world,
+            '%s/%s_grayscale.png' % (args.output_dir, world_name))
         if args.rivers_map:
-            generate_rivers_map(world, world_name+"_rivers.png")
+            generate_rivers_map(world,
+            '%s/%s_rivers.png' % (args.output_dir, world_name))
 
     elif operation == 'plates':
         print('')  # empty line
