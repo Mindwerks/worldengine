@@ -389,7 +389,7 @@ def main():
             usage("The specified world file does not exist")
 
     random.seed()
-    if args.seed:
+    if args.seed is not None:
         seed = int(args.seed)
     else:
         seed = random.randint(0, 65536)
