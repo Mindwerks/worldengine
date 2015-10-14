@@ -3,6 +3,7 @@ from worldengine.plates import Step, world_gen
 from worldengine.world import World
 import tempfile
 import os
+import numpy
 
 
 def _sort(l):
@@ -27,7 +28,7 @@ class TestSerialization(unittest.TestCase):
         self.assertEqual(w.ocean,                   unserialized.ocean)
         self.assertEqual(w.biome,                   unserialized.biome)
         self.assertEqual(w.humidity,                unserialized.humidity)
-        self.assertEqual(w.irrigation,              unserialized.irrigation)
+        self.assertTrue(numpy.array_equiv(w.irrigation, unserialized.irrigation))
         self.assertEqual(w.permeability,            unserialized.permeability)
         self.assertEqual(w.watermap,                unserialized.watermap)
         self.assertEqual(w.precipitation,           unserialized.precipitation)
@@ -51,7 +52,7 @@ class TestSerialization(unittest.TestCase):
         self.assertEqual(w.ocean,                   unserialized.ocean)
         self.assertEqual(w.biome,                   unserialized.biome)
         self.assertEqual(w.humidity,                unserialized.humidity)
-        self.assertEqual(w.irrigation,              unserialized.irrigation)
+        self.assertTrue(numpy.array_equiv(w.irrigation, unserialized.irrigation))
         self.assertEqual(w.permeability,            unserialized.permeability)
         self.assertEqual(w.watermap,                unserialized.watermap)
         self.assertEqual(w.precipitation,           unserialized.precipitation)
