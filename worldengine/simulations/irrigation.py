@@ -45,7 +45,7 @@ class IrrigationSimulation(object):
                                   x + it_logs.multi_index[1] - radius)
 
                     if 0 <= pt[0] < height and 0 <= pt[1] < width:
-                        values[pt] += world.watermap['data'][y][x] /logs[it_logs.multi_index]
+                        values[pt] += world.watermap['data'][y][x] / logs[it_logs.multi_index]
 
                     it_logs.iternext()
             it_all.iternext()
