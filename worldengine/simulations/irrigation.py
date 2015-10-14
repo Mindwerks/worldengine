@@ -59,15 +59,17 @@ class IrrigationSimulation(object):
 
         values.transpose()
 
+#        values = [[0 for x in range(width)] for y in range(height)]  # TODO: replace with numpy
+#
 #        for y in range(height):
 #            for x in range(width):
 #                if world.is_land((x, y)):
 #                    for dy in range(-radius, radius + 1):   # TODO: below can be simplified
-#                        if (y + dy) >= 0 and (y + dy) < height:
+#                        if (y + dy) >= 0 and (y + dy) < world.height:
 #                            for dx in range(-radius, radius + 1):
-#                                if (x + dx) >= 0 and (x + dx) < width:
+#                                if (x + dx) >= 0 and (x + dx) < world.width:
 #                                    dist = math.sqrt(dx ** 2 + dy ** 2)
-#                                    values[y + dy, x + dx] += \
+#                                    values[y + dy][x + dx] += \
 #                                        world.watermap['data'][y][x] / (
 #                                            math.log(dist + 1) + 1)
 
