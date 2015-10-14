@@ -1,7 +1,6 @@
 import numpy
 #import math
 
-
 class IrrigationSimulation(object):
     @staticmethod
     def is_applicable(world):
@@ -17,7 +16,7 @@ class IrrigationSimulation(object):
         radius = 10
 
         #----------prepare helper arrays
-        #create array of distances so that less calls to sqrt() and square() occur
+        #create array of pre-calculated values so that less calls to sqrt(), square() and log() occur
         logs = numpy.empty((2*radius + 1, 2*radius + 1), dtype=numpy.float)
 
         it_logs = numpy.nditer(logs, flags=['multi_index'], op_flags=['writeonly'])
@@ -25,39 +24,33 @@ class IrrigationSimulation(object):
             #shift the "center" of the array to (radius, radius)
             coordinate = (it_logs.multi_index[0] - radius, it_logs.multi_index[1] - radius)
             #store squared distance to the center
-            it_logs[0] = numpy.square(coordinate[0]) + numpy.square(coordinate[1])
-            it_logs.iternext()
-        logs = numpy.sqrt(logs)
-
-        #save time calculating log10()
-        it_logs = numpy.nditer(logs, flags=['multi_index'], op_flags=['readwrite'])
-        while not it_logs.finished:
-            #store log10-calculation
-            it_logs[0] = numpy.log10(it_logs[0] + 1) + 1
+            sqrt = numpy.sqrt(numpy.square(coordinate[0]) + numpy.square(coordinate[1]))
+            it_logs[0] = numpy.log1p(sqrt) + 1#equal to: ln(sqrt + 1) + 1
             it_logs.iternext()
         #----------preparations done
 
         #create output array
-        values = numpy.zeros((width, height), dtype=numpy.float)
+        values = numpy.zeros((height, width), dtype=numpy.float)
 
         it_all = numpy.nditer(values, flags=['multi_index'], op_flags=['readonly'])
         it_logs = numpy.nditer(logs, flags=['multi_index'], op_flags=['readonly'])
         while not it_all.finished:
-            if world.is_land(it_all.multi_index):
+            x = it_all.multi_index[1]
+            y = it_all.multi_index[0]
+            if world.is_land((x, y)):
                 #iterate over area [[x-radius, x+radius], [y-radius, y+radius]]
                 it_logs.reset()
                 while not it_logs.finished:
-                    #calculate absolute coordinates
-                    coordinate = (it_all.multi_index[0] + it_logs.multi_index[0] - radius,
-                                  it_all.multi_index[1] + it_logs.multi_index[1] - radius)
+                    #calculate absolute coordinates; (y, x)
+                    coordinate = (y + it_logs.multi_index[0] - radius,
+                                  x + it_logs.multi_index[1] - radius)
 
-                    if coordinate >= (0, 0) and coordinate <= (width, height):
-                        values[coordinate] += world.watermap['data'][it_all.multi_index[1]][it_all.multi_index[0]] / logs[it_logs.multi_index]
+                    #if 0 <= coordinate[0] < height and 0 <= coordinate[1] < width:
+                    if 0 <= coordinate[0] and coordinate[0] < height and 0 <= coordinate[1] and coordinate[1] < width:
+                        values[coordinate] += world.watermap['data'][y][x] / logs[it_logs.multi_index]
 
                     it_logs.iternext()
             it_all.iternext()
-
-        values.transpose()
 
 #        values = [[0 for x in range(width)] for y in range(height)]  # TODO: replace with numpy
 #
