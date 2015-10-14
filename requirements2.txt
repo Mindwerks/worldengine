@@ -1,2 +1,0 @@
--r requirements_base.txt
-protobuf==2.6.0

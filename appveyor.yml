@@ -44,7 +44,7 @@ init:
 
 install:
   - "powershell appveyor\\install.ps1"
-  - "%PYTHON%\\Scripts\\pip.exe install -r requirements2.txt"
+  - "%PYTHON%\\Scripts\\pip.exe install -r requirements-dev.txt"
   - mkdir %systemdrive%\temp
   - cd %systemdrive%\temp
   - appveyor DownloadFile http://download.gisinternals.com/sdk/downloads/release-1400-gdal-1-11-1-mapserver-6-4-1/gdal-111-1400-core.msi
