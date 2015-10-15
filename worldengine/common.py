@@ -1,5 +1,6 @@
 import sys
 import copy
+import numpy #for the _equal method only
 
 # ----------------
 # Global variables
@@ -120,3 +121,33 @@ def array_to_matrix(array, width, height):
         for x in range(width):
             matrix[y].append(array[y * width + x])
     return matrix
+
+def _equal(a, b):
+    #recursion on subclasses of types: tuple, list, dict
+    #specifically checks             : float, ndarray
+    if type(a) is float and type(b) is float:#float
+        return(numpy.allclose(a, b))
+    elif type(a) is numpy.ndarray and type(b) is numpy.ndarray:#ndarray
+        return(numpy.array_equiv(a, b))#alternative for float-arrays: numpy.allclose(a, b[, rtol, atol])
+    elif isinstance(a, dict) and isinstance(b, dict):#dict
+        if len(a) != len(b):
+            return(False)
+        t = True
+        for key, val in a.items():
+            if key not in b:
+                return(False)
+            t = _equal(val, b[key])
+            if not t:
+                return(False)
+        return(t)
+    elif (isinstance(a, list) and isinstance(b, list)) or (isinstance(a, tuple) and isinstance(b, tuple)):#list, tuples
+        if len(a) != len(b):
+            return(False)
+        t = True
+        for vala, valb in zip(a, b):
+            t = _equal(vala, valb)
+            if not t:
+                return(False)
+        return(t)
+    else:#fallback
+        return(a == b)

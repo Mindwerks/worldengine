@@ -15,6 +15,7 @@ from worldengine.biome import Biome, BorealDesert, BorealDryScrub, BorealMoistFo
 from worldengine.basic_map_operations import random_point
 import worldengine.protobuf.World_pb2 as Protobuf
 from worldengine.step import Step
+from worldengine.common import _equal
 from worldengine.version import __version__
 
 class World(object):
@@ -37,17 +38,7 @@ class World(object):
     #
 
     def __eq__(self, other):
-        test = True
-        sd = self.__dict__
-        od = other.__dict__
-        for key, val in sd.items():
-            if type(val) is numpy.ndarray:
-                test = numpy.array_equiv(val, od[key])#interesting alternative: numpy.allclose(a, b[, rtol, atol])
-            else:
-                test = (val == od[key])
-            if not test:
-                break
-        return test
+        return _equal(self.__dict__, other.__dict__)
 
     #
     # Serialization/Unserialization

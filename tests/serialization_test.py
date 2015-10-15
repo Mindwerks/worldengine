@@ -1,9 +1,9 @@
 import unittest
 from worldengine.plates import Step, world_gen
 from worldengine.world import World
+from worldengine.common import _equal
 import tempfile
 import os
-import numpy
 
 
 def _sort(l):
@@ -28,7 +28,7 @@ class TestSerialization(unittest.TestCase):
         self.assertEqual(w.ocean,                   unserialized.ocean)
         self.assertEqual(w.biome,                   unserialized.biome)
         self.assertEqual(w.humidity,                unserialized.humidity)
-        self.assertTrue(numpy.array_equiv(w.irrigation, unserialized.irrigation))
+        self.assertTrue(_equal(w.irrigation,        unserialized.irrigation))
         self.assertEqual(w.permeability,            unserialized.permeability)
         self.assertEqual(w.watermap,                unserialized.watermap)
         self.assertEqual(w.precipitation,           unserialized.precipitation)
@@ -36,7 +36,7 @@ class TestSerialization(unittest.TestCase):
         self.assertEqual(w.sea_depth,               unserialized.sea_depth)
         self.assertEquals(w.seed,                   unserialized.seed)
         self.assertEquals(w.n_plates,               unserialized.n_plates)
-        self.assertEquals(w.ocean_level,            unserialized.ocean_level)
+        self.assertTrue(_equal(w.ocean_level,       unserialized.ocean_level))
         self.assertEquals(w.lake_map,               unserialized.lake_map)
         self.assertEquals(w.river_map,              unserialized.river_map)
         self.assertEquals(w.step,                   unserialized.step)
@@ -52,7 +52,7 @@ class TestSerialization(unittest.TestCase):
         self.assertEqual(w.ocean,                   unserialized.ocean)
         self.assertEqual(w.biome,                   unserialized.biome)
         self.assertEqual(w.humidity,                unserialized.humidity)
-        self.assertTrue(numpy.array_equiv(w.irrigation, unserialized.irrigation))
+        self.assertTrue(_equal(w.irrigation,        unserialized.irrigation))
         self.assertEqual(w.permeability,            unserialized.permeability)
         self.assertEqual(w.watermap,                unserialized.watermap)
         self.assertEqual(w.precipitation,           unserialized.precipitation)
