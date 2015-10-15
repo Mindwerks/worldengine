@@ -21,16 +21,12 @@ class IrrigationSimulation(object):
 
         #----------prepare helper arrays
         #create array of pre-calculated values -> less calls to sqrt(), square() and log()
-        logs = numpy.empty((2*radius + 1, 2*radius + 1), dtype=numpy.float)
-
-        it_logs = numpy.nditer(logs, flags=['multi_index'], op_flags=['writeonly'])
-        while not it_logs.finished:
-            #shift the "center" of the array to (radius, radius)
-            pt = (it_logs.multi_index[0] - radius, it_logs.multi_index[1] - radius)
-            #store squared distance to the center
-            sqrt = numpy.sqrt(numpy.square(pt[0]) + numpy.square(pt[1]))
-            it_logs[0] = numpy.log1p(sqrt) + 1#equal to: ln(sqrt + 1) + 1
-            it_logs.iternext()
+        d = numpy.arange(-radius, radius + 1, 1, dtype=numpy.float)
+        x, y = numpy.meshgrid(d, d)#x,y now contain x/y-coordinates of the distance-matrix
+        
+        #calculat the final matrix: ln(sqrt(x^2+y^2) + 1)
+        logs = numpy.log1p(numpy.sqrt(numpy.add(numpy.square(x), numpy.square(y))))
+        logs = numpy.add(logs, 1)
         #----------preparations done
 
         #create output array
