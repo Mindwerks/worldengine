@@ -81,32 +81,31 @@ def rescale_value(original, prev_min, prev_max, min, max):
     return min + ((max - min) * f)
 
 
-def anti_alias(elevation, steps):#is not only called with elevation maps
+def anti_alias(map, steps):#TODO: There is probably a bit of numpy-optimization that can be done here.
     """
-    Execute the anti_alias operation steps times on the given elevation map
+    Execute the anti_alias operation steps times on the given map
     """
-    width = len(elevation[0])#TODO: use numpy when all possible input maps are converted to it
-    height = len(elevation)
+    height, width = map.shape
 
     def _anti_alias_step(original):
         anti_aliased = copy.deepcopy(original)
         for y in range(height):
             for x in range(width):
-                anti_aliased[y][x] = anti_alias_point(original, x, y)
+                anti_aliased[y, x] = anti_alias_point(original, x, y)
         return anti_aliased
 
     def anti_alias_point(original, x, y):
         n = 2
-        tot = elevation[y][x] * 2
+        tot = map[y, x] * 2
         for dy in range(-1, +2):
             py = (y + dy) % height
             for dx in range(-1, +2):
                 px = (x + dx) % width
                 n += 1
-                tot += original[py][px]
+                tot += original[py, px]
         return tot / n
 
-    current = elevation
+    current = map
     for i in range(steps):
         current = _anti_alias_step(current)
     return current

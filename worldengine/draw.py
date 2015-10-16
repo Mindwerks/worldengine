@@ -320,7 +320,7 @@ def draw_world(world, target):
                 biome = world.biome_at((x, y))
                 target.set_pixel(x, y, _biome_colors[biome.name()])
             else:
-                c = int(world.sea_depth[y][x] * 200 + 50)
+                c = int(world.sea_depth[y, x] * 200 + 50)
                 target.set_pixel(x, y, (0, 0, 255 - c, 255))
 
 

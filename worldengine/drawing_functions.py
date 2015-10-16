@@ -48,7 +48,7 @@ def draw_rivers_on_image(world, target, factor=1):
             for dy in range(-1, 1):
                 if dx != 0 or dy != 0:
                     e = world.elevation['data'][y + dy, 
-                        x + dx]  # +world.humidity['data'][y+dy][x+dx]/3.0
+                        x + dx]  # +world.humidity['data'][y+dy, x+dx]/3.0
                     if (not lowest_lvl) or (e < lowest_lvl):
                         lowest_lvl = e
                         lowest = (x + dx, y + dy)
@@ -77,7 +77,7 @@ def draw_rivers_on_image(world, target, factor=1):
         cc = None
         for c in candidates:
             cx, cy = c
-            wl = world.humidity['data'][cy][cx] * \
+            wl = world.humidity['data'][cy, cx] * \
                 world.precipitation['data'][cy, cx] * \
                 world.elevation['data'][cy, cx]
             if max is None or wl > max:

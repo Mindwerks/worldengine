@@ -9,7 +9,7 @@ from worldengine.simulations.permeability import PermeabilitySimulation
 from worldengine.simulations.erosion import ErosionSimulation
 from worldengine.simulations.precipitation import PrecipitationSimulation
 from worldengine.simulations.biome import BiomeSimulation
-from worldengine.common import anti_alias, get_verbose, matrix_min_and_max, rescale_value
+from worldengine.common import anti_alias, get_verbose
 import numpy
 
 
@@ -140,26 +140,24 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
 # ----
 
 def sea_depth(world, sea_level):
-    sea_depth = [[sea_level - world.elevation['data'][y, x]
-                  for x in range(world.width)] for y in range(world.height)]
+    sea_depth = sea_level - world.elevation['data']
     for y in range(world.height):
         for x in range(world.width):
             if world.tiles_around((x, y), radius=1, predicate=world.is_land):
-                sea_depth[y][x] = 0
+                sea_depth[y, x] = 0
             elif world.tiles_around((x, y), radius=2, predicate=world.is_land):
-                sea_depth[y][x] *= 0.3
+                sea_depth[y, x] *= 0.3
             elif world.tiles_around((x, y), radius=3, predicate=world.is_land):
-                sea_depth[y][x] *= 0.5
+                sea_depth[y, x] *= 0.5
             elif world.tiles_around((x, y), radius=4, predicate=world.is_land):
-                sea_depth[y][x] *= 0.7
+                sea_depth[y, x] *= 0.7
             elif world.tiles_around((x, y), radius=5, predicate=world.is_land):
-                sea_depth[y][x] *= 0.9
+                sea_depth[y, x] *= 0.9
     sea_depth = anti_alias(sea_depth, 10)
-    min_depth, max_depth = matrix_min_and_max(sea_depth)
-    sea_depth = [[rescale_value(sea_depth[y][x], min_depth,
-                                max_depth, 0.0, 1.0)
-                  for x in range(world.width)] for y in
-                 range(world.height)]
+
+    min_depth = sea_depth.min()
+    max_depth = sea_depth.max()
+    sea_depth = (sea_depth - min_depth) / (max_depth - min_depth)
     return sea_depth
 
 
