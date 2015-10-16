@@ -54,12 +54,12 @@ class TemperatureSimulation(object):
                                    base=base) * (border - x) / border)
 
                 t = (latitude_factor * 12 + n * 1) / 13.0
-                if elevation[y][x] > mountain_level:
-                    if elevation[y][x] > (mountain_level + 29):
+                if elevation[y, x] > mountain_level:
+                    if elevation[y, x] > (mountain_level + 29):
                         altitude_factor = 0.033
                     else:
                         altitude_factor = 1.00 - (
-                            float(elevation[y][x] - mountain_level) / 30)
+                            float(elevation[y, x] - mountain_level) / 30)
                     t *= altitude_factor
                 temp[y][x] = t
 

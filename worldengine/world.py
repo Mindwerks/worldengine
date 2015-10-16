@@ -85,7 +85,16 @@ class World(object):
         for row in matrix:
             p_row = p_matrix.rows.add()
             for cell in row:
-                value = cell
+                '''
+                When using numpy, certain primitive types are replaced with
+                numpy-specifc versions that, even though mostly compatible,
+                cannot be digested by protobuf. This might change at some point;
+                for now a conversion is necessary.
+                '''
+                if type(cell) is numpy.bool_:
+                    value = bool(cell)
+                else:
+                    value = cell
                 if transformation:
                     value = transformation(value)
                 p_row.cells.append(value)
@@ -230,7 +239,7 @@ class World(object):
                   Step.get_by_name(p_world.generationData.step))
 
         # Elevation
-        e = World._from_protobuf_matrix(p_world.heightMapData)
+        e = numpy.array(World._from_protobuf_matrix(p_world.heightMapData))
         e_th = [('sea', p_world.heightMapTh_sea),
                 ('plain', p_world.heightMapTh_plain),
                 ('hill', p_world.heightMapTh_hill),
@@ -241,7 +250,7 @@ class World(object):
         w.set_plates(World._from_protobuf_matrix(p_world.plates))
 
         # Ocean
-        w.set_ocean(World._from_protobuf_matrix(p_world.ocean))
+        w.set_ocean(numpy.array(World._from_protobuf_matrix(p_world.ocean)))
         w.sea_depth = World._from_protobuf_matrix(p_world.sea_depth)
 
         # Biome
@@ -270,15 +279,15 @@ class World(object):
 
         if len(p_world.watermapData.rows) > 0:
             w.watermap = dict()
-            w.watermap['data'] = World._from_protobuf_matrix(
-                p_world.watermapData)
+            w.watermap['data'] = numpy.array(World._from_protobuf_matrix(
+                p_world.watermapData))
             w.watermap['thresholds'] = {}
             w.watermap['thresholds']['creek'] = p_world.watermap_creek
             w.watermap['thresholds']['river'] = p_world.watermap_river
             w.watermap['thresholds']['main river'] = p_world.watermap_mainriver
 
         if len(p_world.precipitationData.rows) > 0:
-            p = World._from_protobuf_matrix(p_world.precipitationData)
+            p = numpy.array(World._from_protobuf_matrix(p_world.precipitationData))
             p_th = [
                 ('low', p_world.precipitation_low),
                 ('med', p_world.precipitation_med),
@@ -323,18 +332,16 @@ class World(object):
 
     def random_land(self):
         x, y = random_point(self.width, self.height)
-        if self.ocean[y][x]:
+        if self.ocean[y, x]:#TODO: this method should get a safer/quicker way of finding land!
             return self.random_land()
         else:
             return x, y
 
     def is_land(self, pos):
-        x, y = pos
-        return not self.ocean[y][x]
+        return not self.ocean.T[pos]
 
     def is_ocean(self, pos):
-        x, y = pos
-        return self.ocean[y][x]
+        return self.ocean.T[pos]
 
     def sea_level(self):
         return self.elevation['thresholds'][0][1]
@@ -407,22 +414,10 @@ class World(object):
         return self.elevation['thresholds'][2][1]
 
     def max_elevation(self):
-        max_el = None
-        for y in range(self.height):
-            for x in range(self.width):
-                el = self.elevation['data'][y][x]
-                if max_el is None or el > max_el:
-                    max_el = el
-        return max_el
+        return self.elevation['data'].max()
 
     def min_elevation(self):
-        min_el = None
-        for y in range(self.height):
-            for x in range(self.width):
-                el = self.elevation['data'][y][x]
-                if min_el is None or el < min_el:
-                    min_el = el
-        return min_el
+        return self.elevation['data'].min()
 
     def is_mountain(self, pos):
         if not self.is_land(pos):
@@ -444,7 +439,7 @@ class World(object):
             mi = 1
         mountain_level = self.elevation['thresholds'][mi][1]
         x, y = pos
-        return self.elevation['data'][y][x] < mountain_level + 2.0
+        return self.elevation['data'][y, x] < mountain_level + 2.0
 
     def level_of_mountain(self, pos):
         if not self.is_land(pos):
@@ -455,10 +450,10 @@ class World(object):
             mi = 1
         mountain_level = self.elevation['thresholds'][mi][1]
         x, y = pos
-        if self.elevation['data'][y][x] <= mountain_level:
+        if self.elevation['data'][y, x] <= mountain_level:
             return 0
         else:
-            return self.elevation['data'][y][x] - mountain_level
+            return self.elevation['data'][y, x] - mountain_level
 
     def is_high_mountain(self, pos):
         if not self.is_mountain(pos):
@@ -469,7 +464,7 @@ class World(object):
             mi = 1
         mountain_level = self.elevation['thresholds'][mi][1]
         x, y = pos
-        return self.elevation['data'][y][x] > mountain_level + 4.0
+        return self.elevation['data'][y, x] > mountain_level + 4.0
 
     def is_hill(self, pos):
         if not self.is_land(pos):
@@ -481,11 +476,10 @@ class World(object):
         hill_level = self.elevation['thresholds'][hi][1]
         mountain_level = self.elevation['thresholds'][hi + 1][1]
         x, y = pos
-        return hill_level < self.elevation['data'][y][x] < mountain_level
+        return hill_level < self.elevation['data'][y, x] < mountain_level
 
     def elevation_at(self, pos):
-        x, y = pos
-        return self.elevation['data'][y][x]
+        return self.elevation['data'].T[pos]
 
     #
     # Precipitations
@@ -493,7 +487,7 @@ class World(object):
 
     def precipitations_at(self, pos):
         x, y = pos
-        return self.precipitation['data'][y][x]
+        return self.precipitation['data'][y, x]
 
     def precipitations_thresholds(self):
         return self.precipitation['thresholds']
@@ -630,24 +624,24 @@ class World(object):
 
     def contains_creek(self, pos):
         x, y = pos
-        v = self.watermap['data'][y][x]
+        v = self.watermap['data'][y, x]
         return self.watermap['thresholds']['creek'] <= v < \
             self.watermap['thresholds']['river']
 
     def contains_river(self, pos):
         x, y = pos
-        v = self.watermap['data'][y][x]
+        v = self.watermap['data'][y, x]
         return self.watermap['thresholds']['river'] <= v < \
             self.watermap['thresholds']['main river']
 
     def contains_main_river(self, pos):
         x, y = pos
-        v = self.watermap['data'][y][x]
+        v = self.watermap['data'][y, x]
         return v >= self.watermap['thresholds']['main river']
 
     def watermap_at(self, pos):
         x, y = pos
-        return self.watermap['data'][y][x]
+        return self.watermap['data'][y, x]
 
     #
     # Biome
@@ -810,11 +804,11 @@ class World(object):
     #
 
     def set_elevation(self, data, thresholds):
-        if (len(data) != self.height) or (len(data[0]) != self.width):
+        if data.shape != (self.height, self.width):
             raise Exception(
                 "Setting elevation map with wrong dimension. "
                 "Expected %d x %d, found %d x %d" % (
-                    self.width, self.height, len(data[0]), len(data)))
+                    self.width, self.height, data.shape[1], data.shape[0]))
         self.elevation = {'data': data, 'thresholds': thresholds}
 
     def set_plates(self, data):
@@ -837,20 +831,20 @@ class World(object):
         self.biome = biome
 
     def set_ocean(self, ocean):
-        if (len(ocean) != self.height) or (len(ocean[0]) != self.width):
+        if (ocean.shape[0] != self.height) or (ocean.shape[1] != self.width):
             raise Exception(
                 "Setting ocean map with wrong dimension. Expected %d x %d, "
                 "found %d x %d" % (self.width, self.height,
-                                   len(ocean[0]), len(ocean)))
+                                   ocean.shape[1], ocean.shape[0]))
 
         self.ocean = ocean
 
     def set_precipitation(self, data, thresholds):
         """"Precipitation is a value in [-1,1]"""
 
-        if len(data) != self.height:
+        if data.shape[0] != self.height:
             raise Exception("Setting data with wrong height")
-        if len(data[0]) != self.width:
+        if data.shape[1] != self.width:
             raise Exception("Setting data with wrong width")
 
         self.precipitation = {'data': data, 'thresholds': thresholds}

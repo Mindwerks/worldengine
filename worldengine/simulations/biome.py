@@ -17,7 +17,7 @@ class BiomeSimulation(object):
         biome = [[None for x in range(width)] for y in range(height)]  # TODO: replace with numpy
         for y in range(height):
             for x in range(width):
-                if ocean[y][x]:
+                if ocean[y, x]:
                     biome[y][x] = 'ocean'
                 else:
                     if w.is_temperature_polar((x, y)):

@@ -22,7 +22,7 @@ class HumiditySimulation(object):
 
         for y in range(world.height):
             for x in range(world.width):
-                humidity['data'][y][x] = (((world.precipitation['data'][y][x] * precipitationWeight - world.irrigation[y, x] * irrigationWeight)+1) * ((world.temperature_at((x, y)) * temperatureWeight + 1.0)/(temperatureWeight + 1.0)))
+                humidity['data'][y][x] = (((world.precipitation['data'][y, x] * precipitationWeight - world.irrigation[y, x] * irrigationWeight)+1) * ((world.temperature_at((x, y)) * temperatureWeight + 1.0)/(temperatureWeight + 1.0)))
 
         # These were originally evenly spaced at 12.5% each but changing them
         # to a bell curve produced better results

@@ -20,13 +20,13 @@ class IrrigationSimulation(object):
         radius = 10
 
         #create array of pre-calculated values -> less calculations
-        d = numpy.arange(-radius, radius + 1, 1, dtype=numpy.float)
+        d = numpy.arange(-radius, radius + 1, 1, dtype=float)
         x, y = numpy.meshgrid(d, d)#x/y distances to array center
         #calculate final matrix: ln(sqrt(x^2+y^2) + 1) + 1
         logs = numpy.log1p(numpy.sqrt(numpy.square(x) + numpy.square(y))) + 1
 
         #create output array
-        values = numpy.zeros((height, width), dtype=numpy.float)
+        values = numpy.zeros((height, width), dtype=float)
         
         it_all = numpy.nditer(values, flags=['multi_index'], op_flags=['readonly'])
         while not it_all.finished:
@@ -44,7 +44,7 @@ class IrrigationSimulation(object):
                 logs_relevant = logs[tl_l[1]:br_l[1]+1, tl_l[0]:br_l[0]+1]
 
                 #finish calculation
-                values[tl_v[1]:br_v[1]+1, tl_v[0]:br_v[0]+1] += numpy.divide(world.watermap['data'][y][x], logs_relevant)
+                values[tl_v[1]:br_v[1]+1, tl_v[0]:br_v[0]+1] += world.watermap['data'][y, x] / logs_relevant
 
             it_all.iternext()
 

@@ -1,4 +1,5 @@
 from worldengine.simulations.basic import find_threshold_f
+import numpy
 
 
 class WatermapSimulation(object):
@@ -17,15 +18,15 @@ class WatermapSimulation(object):
             if q < 0:
                 return
             x, y = pos
-            pos_elev = world.elevation['data'][y][x] + _watermap[y][x]
+            pos_elev = world.elevation['data'][y, x] + _watermap[y, x]
             lowers = []
             min_higher = None
             min_lower = None
             # pos_min_higher = None  # TODO: no longer used?
             tot_lowers = 0
-            for p in world.tiles_around((x, y)):
+            for p in world.tiles_around((x, y)):#TODO: switch to numpy
                 px, py = p
-                e = world.elevation['data'][py][px] + _watermap[py][px]
+                e = world.elevation['data'][py, px] + _watermap[py, px]
                 if e < pos_elev:
                     dq = int(pos_elev - e) << 2
                     if min_lower is None or e < min_lower:
@@ -48,18 +49,17 @@ class WatermapSimulation(object):
                         ql = f * s
                         # ql = q
                         going = ql > 0.05
-                        _watermap[py][px] += ql
+                        _watermap[py, px] += ql
                         if going:
                             droplet(world, p, ql, _watermap)
             else:
-                _watermap[y][x] += q
+                _watermap[y, x] += q
 
-        _watermap_data = [[0 for x in range(world.width)] for y in
-                          range(world.height)]  # TODO: replace with numpy
+        _watermap_data = numpy.zeros((world.height, world.width), dtype=float)
         for i in range(n):
             x, y = world.random_land()
-            if True and world.precipitation['data'][y][x] > 0:
-                droplet(world, (x, y), world.precipitation['data'][y][x],
+            if True and world.precipitation['data'][y, x] > 0:
+                droplet(world, (x, y), world.precipitation['data'][y, x],
                         _watermap_data)
         _watermap = dict()
         _watermap['data'] = _watermap_data

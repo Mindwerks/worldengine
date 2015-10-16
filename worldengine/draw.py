@@ -1,4 +1,5 @@
 from PIL import Image
+import numpy
 
 from worldengine.drawing_functions import draw_ancientmap, \
     draw_rivers_on_image, gradient
@@ -166,7 +167,7 @@ def draw_simple_elevation(data, width, height, sea_level, target):
     """
     for y in range(height):
         for x in range(width):
-            e = data[y][x]
+            e = data[y][x]#TODO: numpy-notation [y,x] is a little faster; all passed arrays would have to be numpy-arrays
             r, g, b = elevation_color(e, sea_level)
             target.set_pixel(x, y, (int(r * 255), int(g * 255),
                                     int(b * 255), 255))
@@ -176,9 +177,9 @@ def draw_riversmap(world, target):
     sea_color = (255, 255, 255, 255)
     land_color = (0, 0, 0, 255)
 
-    for y in range(world.height):
+    for y in range(world.height):#TODO: numpy
         for x in range(world.width):
-            if world.ocean[y][x]:
+            if world.ocean[y, x]:
                 target.set_pixel(x, y, sea_color)
             else:
                 target.set_pixel(x, y, land_color)
@@ -193,7 +194,7 @@ def draw_grayscale_heightmap(world, target):
     max_elev_land = None
     for y in range(world.height):
         for x in range(world.width):
-            e = world.elevation['data'][y][x]
+            e = world.elevation['data'][y, x]
             if world.is_land((x, y)):
                 if min_elev_land is None or e < min_elev_land:
                     min_elev_land = e
@@ -210,7 +211,7 @@ def draw_grayscale_heightmap(world, target):
 
     for y in range(world.height):
         for x in range(world.width):
-            e = world.elevation['data'][y][x]
+            e = world.elevation['data'][y, x]
             if world.is_land((x, y)):
                 c = int(((e - min_elev_land) * 127) / elev_delta_land)+128
             else:
@@ -225,34 +226,28 @@ def draw_elevation(world, shadow, target):
     data = world.elevation['data']
     ocean = world.ocean
 
-    min_elev = None
-    max_elev = None
-    for y in range(height):
-        for x in range(width):
-            if not ocean[y][x]:
-                e = data[y][x]
-                if min_elev is None or e < min_elev:
-                    min_elev = e
-                if max_elev is None or e > max_elev:
-                    max_elev = e
+    mask = numpy.ma.array(data, mask = ocean)
+
+    min_elev = mask.min()
+    max_elev = mask.max()
     elev_delta = max_elev - min_elev
 
-    for y in range(height):
+    for y in range(height):#TODO: numpy optimisation for the code below
         for x in range(width):
-            if ocean[y][x]:
+            if ocean[y, x]:
                 target.set_pixel(x, y, (0, 0, 255, 255))
             else:
-                e = data[y][x]
+                e = data[y, x]
                 c = 255 - int(((e - min_elev) * 255) / elev_delta)
                 if shadow and y > 2 and x > 2:
-                    if data[y - 1][x - 1] > e:
+                    if data[y - 1, x - 1] > e:
                         c -= 15
-                    if data[y - 2][x - 2] > e \
-                            and data[y - 2][x - 2] > data[y - 1][x - 1]:
+                    if data[y - 2, x - 2] > e \
+                            and data[y - 2, x - 2] > data[y - 1, x - 1]:
                         c -= 10
-                    if data[y - 3][x - 3] > e \
-                            and data[y - 3][x - 3] > data[y - 1][x - 1] \
-                            and data[y - 3][x - 3] > data[y - 2][x - 2]:
+                    if data[y - 3, x - 3] > e \
+                            and data[y - 3, x - 3] > data[y - 1, x - 1] \
+                            and data[y - 3, x - 3] > data[y - 2, x - 2]:
                         c -= 5
                     if c < 0:
                         c = 0
@@ -260,12 +255,11 @@ def draw_elevation(world, shadow, target):
 
 
 def draw_ocean(ocean, target):
-    width = len(ocean[0])
-    height = len(ocean)
+    height, width = ocean.shape
 
     for y in range(height):
         for x in range(width):
-            if ocean[y][x]:
+            if ocean[y, x]:
                 target.set_pixel(x, y, (0, 0, 255, 255))
             else:
                 target.set_pixel(x, y, (0, 255, 255, 255))
@@ -408,8 +402,7 @@ def draw_elevation_on_file(world, filename, shadow=True):
 
 
 def draw_ocean_on_file(ocean, filename):
-    width = len(ocean[0])
-    height = len(ocean)
+    height, width = ocean.shape
     img = ImagePixelSetter(width, height, filename)
     draw_ocean(ocean, img)
     img.complete()

@@ -81,11 +81,11 @@ def rescale_value(original, prev_min, prev_max, min, max):
     return min + ((max - min) * f)
 
 
-def anti_alias(elevation, steps):
+def anti_alias(elevation, steps):#is not only called with elevation maps
     """
     Execute the anti_alias operation steps times on the given elevation map
     """
-    width = len(elevation[0])
+    width = len(elevation[0])#TODO: use numpy when all possible input maps are converted to it
     height = len(elevation)
 
     def _anti_alias_step(original):
