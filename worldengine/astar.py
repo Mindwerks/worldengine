@@ -17,8 +17,6 @@ lists of two values [x, y].
 author:  Bret Curtis
 """
 
-import numpy
-
 
 class Path:
     """ A path object, containing the nodes and total cost."""

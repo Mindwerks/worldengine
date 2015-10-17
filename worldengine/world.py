@@ -377,10 +377,10 @@ class World(object):
         x, y = pos
         for dx in range(-radius, radius + 1):
             nx = x + dx
-            if nx >= 0 and nx < self.width:
+            if 0 <= nx < self.width:
                 for dy in range(-radius, radius + 1):
                     ny = y + dy
-                    if ny >= 0 and ny < self.height and (dx != 0 or dy != 0):
+                    if 0 <= ny < self.height and (dx != 0 or dy != 0):
                         if predicate is None or predicate((nx, ny)):
                             ps.append((nx, ny))
         return ps
