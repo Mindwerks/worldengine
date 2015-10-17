@@ -1,5 +1,4 @@
-import math
-
+import numpy
 
 class IrrigationSimulation(object):
     @staticmethod
@@ -11,22 +10,42 @@ class IrrigationSimulation(object):
 
     @staticmethod
     def _calculate(world):
+        #Notes on performance:
+        #  -method is run once per generation
+        #  -iterations        : width * height
+        #  -memory consumption: width * height * 8 Byte (numpy 1.9.2)
+
         width = world.width
         height = world.height
-
-        values = [[0 for x in range(width)] for y in range(height)]  # TODO: replace with numpy
         radius = 10
 
-        for y in range(height):
-            for x in range(width):
-                if world.is_land((x, y)):
-                    for dy in range(-radius, radius + 1):   # TODO: below can be simplified
-                        if (y + dy) >= 0 and (y + dy) < world.height:
-                            for dx in range(-radius, radius + 1):
-                                if (x + dx) >= 0 and (x + dx) < world.width:
-                                    dist = math.sqrt(dx ** 2 + dy ** 2)
-                                    values[y + dy][x + dx] += \
-                                        world.watermap['data'][y][x] / (
-                                            math.log(dist + 1) + 1)
+        #create array of pre-calculated values -> less calculations
+        d = numpy.arange(-radius, radius + 1, 1, dtype=numpy.float)
+        x, y = numpy.meshgrid(d, d)#x/y distances to array center
+        #calculate final matrix: ln(sqrt(x^2+y^2) + 1) + 1
+        logs = numpy.log1p(numpy.sqrt(numpy.square(x) + numpy.square(y))) + 1
+
+        #create output array
+        values = numpy.zeros((height, width), dtype=numpy.float)
+        
+        it_all = numpy.nditer(values, flags=['multi_index'], op_flags=['readonly'])
+        while not it_all.finished:
+            x = it_all.multi_index[1]
+            y = it_all.multi_index[0]
+            if world.is_land((x, y)):
+                #coordinates used for the values-slice (tl = top-left etc.)
+                tl_v = (max(x - radius, 0)        , max(y - radius, 0))
+                br_v = (min(x + radius, width - 1), min(y + radius, height - 1))
+                #coordinates used for the logs-slice
+                tl_l = (max(radius - x, 0)        , max(radius - y, 0))
+                br_l = (min(radius - x + width - 1, 2 * radius), min(radius - y + height - 1, 2 * radius))
+                
+                #extract the necessary parts of the arrays
+                logs_relevant = logs[tl_l[1]:br_l[1]+1, tl_l[0]:br_l[0]+1]
+
+                #finish calculation
+                values[tl_v[1]:br_v[1]+1, tl_v[0]:br_v[0]+1] += numpy.divide(world.watermap['data'][y][x], logs_relevant)
+
+            it_all.iternext()
 
         return values

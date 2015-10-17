@@ -1,4 +1,5 @@
 import pickle
+import numpy
 
 from worldengine.biome import Biome, BorealDesert, BorealDryScrub, BorealMoistForest, \
     BorealRainForest, BorealWetForest, CoolTemperateDesertScrub, CoolTemperateDesert, \
@@ -36,7 +37,17 @@ class World(object):
     #
 
     def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+        test = True
+        sd = self.__dict__
+        od = other.__dict__
+        for key, val in sd.items():
+            if type(val) is numpy.ndarray:
+                test = numpy.array_equiv(val, od[key])#interesting alternative: numpy.allclose(a, b[, rtol, atol])
+            else:
+                test = (val == od[key])
+            if not test:
+                break
+        return test
 
     #
     # Serialization/Unserialization
@@ -255,7 +266,7 @@ class World(object):
                 p_world.humidity)
 
         if len(p_world.irrigation.rows) > 0:
-            w.irrigation = World._from_protobuf_matrix(p_world.irrigation)
+            w.irrigation = numpy.array(World._from_protobuf_matrix(p_world.irrigation))
 
         if len(p_world.permeabilityData.rows) > 0:
             p = World._from_protobuf_matrix(p_world.permeabilityData)
