@@ -12,7 +12,7 @@ import os
 import sys
 
 
-def export(world, export_filetype, export_bpp, export_signed, path = 'seed_output', export_raw = False):
+def export(world, export_filetype, export_bpp, export_signed, path = 'seed_output', export_raw = True):
     try:
         gdal
     except NameError:
