@@ -6,7 +6,7 @@ import png
 #The latter one is a fork of the former one. Don't know which is better, but one will hopefully survive for a long time. :P
 
 from worldengine.drawing_functions import draw_ancientmap, \
-    draw_rivers_on_image, gradient
+    draw_rivers_on_image
 
 # -------------
 # Helper values
@@ -228,16 +228,16 @@ def draw_riversmap(world, target):
 
 def draw_grayscale_heightmap(world, target):
     #target: ImagePixelSetter object (writes 8 Bit grayscale)
-    mask = numpy.ma.array(world.elevation['data'], mask = world.ocean)
-    min_elev_land = mask.min()
-    max_elev_land = mask.max()
+    #mask = numpy.ma.array(world.elevation['data'], mask = world.ocean)
+    #min_elev_land = mask.min()
+    #max_elev_land = mask.max()
     
-    mask.mask = numpy.logical_not(mask.mask)
-    min_elev_sea = mask.min()
-    max_elev_sea = mask.max()
+    #mask.mask = numpy.logical_not(mask.mask)
+    #min_elev_sea = mask.min()
+    #max_elev_sea = mask.max()
     
-    elev_delta_land = max_elev_land - min_elev_land
-    elev_delta_sea = max_elev_sea - min_elev_sea
+    #elev_delta_land = max_elev_land - min_elev_land
+    #elev_delta_sea = max_elev_sea - min_elev_sea
     
     total_min = world.elevation['data'].min()
     total_max = world.elevation['data'].max()

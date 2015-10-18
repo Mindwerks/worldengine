@@ -10,7 +10,7 @@ def find_threshold(map_data, land_percentage, ocean=None):#never used anywhere?
         if ocean.shape != map_data.shape:
             raise Exception(
                 "Dimension of map and ocean do not match. " +
-                "Mp is %d x %d, while ocean is %d x%d" % (
+                "Map is %d x %d, while ocean is %d x%d" % (
                     width, height, ocean.shape[1], ocean.shape[0]))
         mask = numpy.ma.array(mask, mask = ocean, keep_mask = True)
 
@@ -53,7 +53,7 @@ def find_threshold_f(map_data, land_perc, ocean=None, max=1000.0, mindist=0.005)
         if ocean.shape != map_data.shape:
             raise Exception(
                 "Dimension of map_data and ocean do not match. " +
-                "Mp is %d x %d, while ocean is %d x%d" % (
+                "Map is %d x %d, while ocean is %d x%d" % (
                     width, height, ocean.shape[1], ocean.shape[0]))
         mask = numpy.ma.array(mask, mask = ocean, keep_mask = True)
 
