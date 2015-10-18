@@ -324,8 +324,7 @@ class World(object):
     #
 
     def contains(self, pos):
-        x, y = pos
-        return x >= 0 and y >= 0 and x < self.width and y < self.height
+        return (0 <= pos[0] < self.width) and (0 <= pos[1] < self.height)
 
     #
     # Land/Ocean
