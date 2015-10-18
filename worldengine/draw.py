@@ -1,5 +1,9 @@
 from PIL import Image
 import numpy
+import png
+#Documentation PyPNG: https://pythonhosted.org/pypng/png.html
+#Documentation PurePNG: http://purepng.readthedocs.org/en/latest/
+#The latter one is a fork of the former one. Don't know which is better, but one will hopefully survive for a long time. :P
 
 from worldengine.drawing_functions import draw_ancientmap, \
     draw_rivers_on_image, gradient
@@ -130,8 +134,43 @@ def elevation_color(elevation, sea_level=1.0):
 # Draw on generic target
 # ----------------------
 
+class MapToPNGPrinter(object):
+    def __init__(self, map, filename, grayscale = True):#TODO: currently only works for 16 bit grayscale, might want to adapt it to other specifications; PyPNG supposedly can handle them all
+        self.img = png.Writer(width = map.shape[1], height = map.shape[0], greyscale = grayscale, bitdepth = 16)#British spelling
+        self.map = map
+        self.filename = filename
+        self.grayscale = grayscale
 
-class ImagePixelSetter(object):
+    @classmethod
+    def from_dimensions(cls, width, height, filename, grayscale = True):
+        _map = numpy.zeros((height, width), dtype = numpy.uint16)
+        return cls(_map, filename, grayscale)
+
+    @classmethod
+    def from_map(cls, map, filename, grayscale = True, scale_to_range = True):
+        if scale_to_range:
+            max = map.max()
+            min = map.min()
+            _map = (2**16 - 1) * (map - min) / (max - min)
+        _map = _map.astype(dtype = numpy.uint16)
+        return cls(_map, filename, grayscale)
+
+    def set_pixel(self, x, y, color):#TODO: currently only works for 16 bit grayscale
+        self.map[y, x] = color
+
+    def complete(self):
+        with open(self.filename, 'wb') as f:
+            out = self.map.tolist()#convert to Python list of lists as expected by the png-writer
+            self.img.write(f, out)
+
+    def __getitem__(self, item):
+        return self.map[item]
+
+    def __setitem__(self, item, value):
+        self.map[item] = value
+
+
+class ImagePixelSetter(object):#TODO: right now only works for colored images, can probably be combined with MapToPNGPrinter-class
 
     def __init__(self, width, height, filename):
         self.img = Image.new('RGBA', (width, height))
@@ -167,7 +206,7 @@ def draw_simple_elevation(data, width, height, sea_level, target):
     """
     for y in range(height):
         for x in range(width):
-            e = data[y][x]#TODO: numpy-notation [y,x] is a little faster; all passed arrays would have to be numpy-arrays
+            e = data[y, x]
             r, g, b = elevation_color(e, sea_level)
             target.set_pixel(x, y, (int(r * 255), int(g * 255),
                                     int(b * 255), 255))
@@ -177,7 +216,7 @@ def draw_riversmap(world, target):
     sea_color = (255, 255, 255, 255)
     land_color = (0, 0, 0, 255)
 
-    for y in range(world.height):#TODO: numpy
+    for y in range(world.height):
         for x in range(world.width):
             if world.ocean[y, x]:
                 target.set_pixel(x, y, sea_color)
@@ -188,35 +227,44 @@ def draw_riversmap(world, target):
 
 
 def draw_grayscale_heightmap(world, target):
-    min_elev_sea = None
-    max_elev_sea = None
-    min_elev_land = None
-    max_elev_land = None
-    for y in range(world.height):
-        for x in range(world.width):
-            e = world.elevation['data'][y, x]
-            if world.is_land((x, y)):
-                if min_elev_land is None or e < min_elev_land:
-                    min_elev_land = e
-                if max_elev_land is None or e > max_elev_land:
-                    max_elev_land = e
-            else:
-                if min_elev_sea is None or e < min_elev_sea:
-                    min_elev_sea = e
-                if max_elev_sea is None or e > max_elev_sea:
-                    max_elev_sea = e
-
+    #target: ImagePixelSetter object (writes 8 Bit grayscale)
+    mask = numpy.ma.array(world.elevation['data'], mask = world.ocean)
+    min_elev_land = mask.min()
+    max_elev_land = mask.max()
+    
+    mask.mask = numpy.logical_not(mask.mask)
+    min_elev_sea = mask.min()
+    max_elev_sea = mask.max()
+    
     elev_delta_land = max_elev_land - min_elev_land
     elev_delta_sea = max_elev_sea - min_elev_sea
+    
+    total_min = world.elevation['data'].min()
+    total_max = world.elevation['data'].max()
+    elev_delta = total_max - total_min
+
+    bpp = 8
+    printer = False
+    if type(target) is MapToPNGPrinter:
+        bpp = 16
+        printer = True
+    halfcol = 2**(bpp - 1) - 1
 
     for y in range(world.height):
         for x in range(world.width):
             e = world.elevation['data'][y, x]
+            '''This comment is just for clarification and should be removed soon.
+            Note: The previous method (in comments) does not allow for true
+            depressions in the output *and* if depressions existed in the input,
+            the landmass will be lifted up, creating very unrealistic coasts.
+            '''
             if world.is_land((x, y)):
-                c = int(((e - min_elev_land) * 127) / elev_delta_land)+128
+                #c = int(halfcol * (e - min_elev_land) / elev_delta_land) + halfcol + 1
+                c = int((2 * halfcol + 1) * (e - total_min) / elev_delta)
             else:
-                c = int(((e - min_elev_sea) * 127) / elev_delta_sea)
-            target.set_pixel(x, y, (c, c, c, 255))
+                #c = int(halfcol * (e - min_elev_sea) / elev_delta_sea)
+                c = int((2 * halfcol + 1) * (e - total_min) / elev_delta)
+            target.set_pixel(x, y, c if printer else (c, c, c))
 
 
 def draw_elevation(world, shadow, target):
@@ -232,7 +280,7 @@ def draw_elevation(world, shadow, target):
     max_elev = mask.max()
     elev_delta = max_elev - min_elev
 
-    for y in range(height):#TODO: numpy optimisation for the code below
+    for y in range(height):
         for x in range(width):
             if ocean[y, x]:
                 target.set_pixel(x, y, (0, 0, 255, 255))
@@ -266,29 +314,24 @@ def draw_ocean(ocean, target):
 
 
 def draw_precipitation(world, target, black_and_white=False):
-    # FIXME we are drawing humidity, not precipitations
+    #TODO: FIXME we are drawing humidity, not precipitations
     width = world.width
     height = world.height
 
     if black_and_white:
-        low = None
-        high = None
-        for y in range(height):
+        floor = 0
+        ceiling = 255
+        if type(target) is MapToPNGPrinter:
+            ceiling = 65535
+
+        low = world.precipitation['data'].min()
+        high = world.precipitation['data'].max()
+        for y in range(height):#TODO: the following could easily be done on the whole array at once, but target might be of a type that cannot write a complete array
             for x in range(width):
                 p = world.precipitations_at((x, y))
-                if low is None or p < low:
-                    low = p
-                if high is None or p > high:
-                    high = p
-        for y in range(height):
-            for x in range(width):
-                p = world.precipitations_at((x, y))
-                if p <= low:
-                    target.set_pixel(x, y, (0, 0, 0, 255))
-                elif p >= high:
-                    target.set_pixel(x, y, (255, 255, 255, 255))
-                else:
-                    target.set_pixel(x, y, gradient(p, low, high, (0, 0, 0), (255, 255, 255)))
+                c = numpy.interp(p, [low, high], [floor, ceiling])
+                c = int(numpy.rint(c))#proper rounding
+                target.set_pixel(x, y, c if ceiling == 65535 else (c, c, c))
     else:
         for y in range(height):
             for x in range(width):
@@ -329,17 +372,19 @@ def draw_temperature_levels(world, target, black_and_white=False):
     height = world.height
 
     if black_and_white:
+        floor = 0
+        ceiling = 255
+        if type(target) is MapToPNGPrinter:
+            ceiling = 65535
+
         low = world.temperature_thresholds()[0][1]
         high = world.temperature_thresholds()[5][1]
-        for y in range(height):
+        for y in range(height):#TODO: the following could easily be done on the whole array at once, but target might be of a type that cannot write a complete array
             for x in range(width):
                 t = world.temperature_at((x, y))
-                if t <= low:
-                    target.set_pixel(x, y, (0, 0, 0, 255))
-                elif t >= high:
-                    target.set_pixel(x, y, (255, 255, 255, 255))
-                else:
-                    target.set_pixel(x, y, gradient(t, low, high, (0, 0, 0), (255, 255, 255)))
+                c = numpy.interp(t, [low, high], [floor, ceiling])
+                c = int(numpy.rint(c))
+                target.set_pixel(x, y, c if ceiling == 65535 else (c, c, c))
 
     else:
         for y in range(height):
@@ -390,8 +435,9 @@ def draw_riversmap_on_file(world, filename):
 
 
 def draw_grayscale_heightmap_on_file(world, filename):
-    img = ImagePixelSetter(world.width, world.height, filename)
-    draw_grayscale_heightmap(world, img)
+    img = MapToPNGPrinter.from_map(world.elevation['data'], filename, grayscale = True, scale_to_range = True)
+    #img = ImagePixelSetter(world.width, world.height, filename)
+    #draw_grayscale_heightmap(world, img)
     img.complete()
 
 
@@ -402,14 +448,16 @@ def draw_elevation_on_file(world, filename, shadow=True):
 
 
 def draw_ocean_on_file(ocean, filename):
-    height, width = ocean.shape
-    img = ImagePixelSetter(width, height, filename)
+    img = ImagePixelSetter(ocean.shape[1], ocean.shape[0], filename)
     draw_ocean(ocean, img)
     img.complete()
 
 
-def draw_precipitation_on_file(world, filename, black_and_white=False):
-    img = ImagePixelSetter(world.width, world.height, filename)
+def draw_precipitation_on_file(world, filename, black_and_white=False):#TODO: find out if 16 bit is appropriate for black_and_white output
+    if black_and_white:
+        img = MapToPNGPrinter.from_map(world.precipitation['data'], filename, grayscale = black_and_white, scale_to_range = True)
+    else:
+        img = ImagePixelSetter(world.width, world.height, filename)
     draw_precipitation(world, img, black_and_white)
     img.complete()
 
@@ -420,8 +468,11 @@ def draw_world_on_file(world, filename):
     img.complete()
 
 
-def draw_temperature_levels_on_file(world, filename, black_and_white=False):
-    img = ImagePixelSetter(world.width, world.height, filename)
+def draw_temperature_levels_on_file(world, filename, black_and_white=False):#TODO: find out if 16 bit is appropriate for black_and_white output
+    if black_and_white:
+        img = MapToPNGPrinter.from_map(world.temperature['data'], filename, grayscale = black_and_white, scale_to_range = True)
+    else:
+        img = ImagePixelSetter(world.width, world.height, filename)
     draw_temperature_levels(world, img, black_and_white)
     img.complete()
 

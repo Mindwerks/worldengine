@@ -342,7 +342,8 @@ def main():
     export_options = parser.add_argument_group(
         "Export Options", "You can specify the formats you wish the generated output to be in. ")
     export_options.add_argument("--export-type", dest="export_type",
-                                help="Export to a specific format such as: BMP or PNG",
+                                help="Export to a specific format such as: BMP or PNG" +
+                                "See http://www.gdal.org/formats_list.html for possible formats.",
                                 default="bmp")
     export_options.add_argument("--export-bpp", dest="export_bpp", type=int,
                                 help="Bits per pixel: 8, 16 and 32",
@@ -449,6 +450,7 @@ def main():
                                seed, args.number_of_plates, args.output_dir,
                                step, args.ocean_level, world_format,
                                args.verbose, black_and_white=args.black_and_white)
+
         if args.grayscale_heightmap:
             generate_grayscale_heightmap(world,
             '%s/%s_grayscale.png' % (args.output_dir, world_name))
@@ -494,7 +496,8 @@ def main():
     elif operation == 'export':
         world = load_world(args.FILE)
         print_world_info(world)
-        export(world, args.export_type, args.export_bpp, args.export_signed, args.export_normalize)
+        export(world, args.export_type, args.export_bpp, args.export_signed,
+               path = '%s/%s_elevation' % (args.output_dir, world_name))
     else:
         raise Exception(
             'Unknown operation: valid operations are %s' % OPERATIONS)
