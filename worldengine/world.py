@@ -480,7 +480,7 @@ class World(object):
         return hill_level < self.elevation['data'][y, x] < mountain_level
 
     def elevation_at(self, pos):
-        return self.elevation['data'].T[pos]
+        return self.elevation['data'].[pos[1], pos[0]]
 
     #
     # Precipitations
