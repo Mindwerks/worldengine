@@ -44,7 +44,7 @@ def _plates_simulation(name, width, height, seed, num_plates=10,
                                                         verbose=verbose)
 
     world = World(name, width, height, seed, num_plates, ocean_level, step)
-    world.set_elevation(numpy.array(array_to_matrix(e_as_array, width, height)), None)
+    world.set_elevation(numpy.array(e_as_array).reshape(height, width), None)
     world.set_plates(array_to_matrix(p_as_array, width, height))
     return world
 
