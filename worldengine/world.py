@@ -414,12 +414,6 @@ class World(object):
     def start_mountain_th(self):
         return self.elevation['thresholds'][2][1]
 
-    def max_elevation(self):
-        return self.elevation['data'].max()
-
-    def min_elevation(self):
-        return self.elevation['data'].min()
-
     def is_mountain(self, pos):
         if not self.is_land(pos):
             return False

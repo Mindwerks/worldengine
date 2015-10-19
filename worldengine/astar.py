@@ -158,10 +158,10 @@ class SQMapHandler:
     def get_node(self, location):
         x = location.x
         y = location.y
-        if (0 <= x < self.w) and (0 <= y < self.h):
-            d = self.m[(y * self.w) + x]
-            return Node(location, d, ((y * self.w) + x))
-        return None
+        if x < 0 or x >= self.w or y < 0 or y >= self.h:
+            return None
+        d = self.m[(y * self.w) + x]
+        return Node(location, d, ((y * self.w) + x))
 
     def get_adjacent_nodes(self, cur_node, destination):
         result = []

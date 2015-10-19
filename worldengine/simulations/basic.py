@@ -1,12 +1,12 @@
 import numpy
 
-def find_threshold(map, land_percentage, ocean=None):#never used anywhere?
-    height, width = map.shape
+def find_threshold(map_data, land_percentage, ocean=None):#never used anywhere?
+    height, width = map_data.shape
 
     def count(e):
-        mask = map
+        mask = map_data
         if ocean is not None:
-            mask = numpy.ma.array(map, mask = ocean)
+            mask = numpy.ma.array(map_data, mask = ocean)
         mask = numpy.ma.masked_less_equal(mask, e)
 
         return mask.count()
@@ -39,19 +39,19 @@ def find_threshold(map, land_percentage, ocean=None):#never used anywhere?
     return search(0, 255, desired_land)
 
 
-def find_threshold_f(map, land_perc, ocean=None, max=1000.0, mindist=0.005):
-    height, width = map.shape
+def find_threshold_f(map_data, land_perc, ocean=None, max=1000.0, mindist=0.005):
+    height, width = map_data.shape
     if ocean is not None:
-        if ocean.shape != map.shape:
+        if ocean.shape != map_data.shape:
             raise Exception(
-                "Dimension of map and ocean do not match. " +
+                "Dimension of map_data and ocean do not match. " +
                 "Mp is %d x %d, while ocean is %d x%d" % (
                     width, height, ocean.shape[1], ocean.shape[0]))
 
     def count(e):
-        mask = map
+        mask = map_data
         if ocean is not None:
-            mask = numpy.ma.array(map, mask = ocean)
+            mask = numpy.ma.array(map_data, mask = ocean)
         mask = numpy.ma.masked_less_equal(mask, e)
 
         return mask.count()
