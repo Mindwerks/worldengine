@@ -32,7 +32,7 @@ class IrrigationSimulation(object):
         while not it_all.finished:
             x = it_all.multi_index[1]
             y = it_all.multi_index[0]
-            if world.is_land((x, y)):
+            if world.ocean[y, x]:
                 #coordinates used for the values-slice (tl = top-left etc.)
                 tl_v = (max(x - radius, 0)        , max(y - radius, 0))
                 br_v = (min(x + radius, width - 1), min(y + radius, height - 1))

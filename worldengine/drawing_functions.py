@@ -59,7 +59,7 @@ def draw_rivers_on_image(world, target, factor=1):
         return lowest
 
     def _draw_river(world, target, pos, factor):
-        if world.is_ocean(pos):
+        if world.ocean[pos[1], pos[0]]:
             return
         x, y = pos
         for dx in range(factor):
@@ -593,7 +593,7 @@ def _draw_a_mountain(pixels, x, y, w=3, h=3):
 def _pseudo_random_land_pos(world, i):
     y = (i ** 7 + i * 23) % world.height
     x = (i ** 13 + i * 37) % world.width
-    if world.is_land((x, y)):
+    if not world.ocean[y, x]:
         return int(x), int(y)
     else:
         return _pseudo_random_land_pos(world, (i % 123456789) * 17 + 11)

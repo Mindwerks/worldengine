@@ -415,7 +415,7 @@ class World(object):
         return self.elevation['thresholds'][2][1]
 
     def is_mountain(self, pos):
-        if not self.is_land(pos):
+        if self.ocean[pos[1], pos[0]]:
             return False
         if len(self.elevation['thresholds']) == 4:
             mi = 2
@@ -437,7 +437,7 @@ class World(object):
         return self.elevation['data'][y, x] < mountain_level + 2.0
 
     def level_of_mountain(self, pos):
-        if not self.is_land(pos):
+        if self.ocean[pos[1], pos[0]]:
             return False
         if len(self.elevation['thresholds']) == 4:
             mi = 2
@@ -462,7 +462,7 @@ class World(object):
         return self.elevation['data'][y, x] > mountain_level + 4.0
 
     def is_hill(self, pos):
-        if not self.is_land(pos):
+        if self.ocean[pos[1], pos[0]]:
             return False
         if len(self.elevation['thresholds']) == 4:
             hi = 1

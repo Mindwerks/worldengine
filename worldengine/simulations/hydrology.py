@@ -44,7 +44,7 @@ class WatermapSimulation(object):
                 f = q / tot_lowers
                 for l in lowers:
                     s, p = l
-                    if world.is_land(p):
+                    if not world.ocean[p[1], p[0]]:
                         px, py = p
                         ql = f * s
                         # ql = q
