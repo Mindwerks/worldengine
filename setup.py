@@ -3,7 +3,7 @@ from setuptools import setup, Extension, Command
 # import pip.download
 
 # parse_requirements() returns generator of pip.req.InstallRequirement objects
-# install_reqs = parse_requirements("requirements2.txt",
+# install_reqs = parse_requirements("requirements.txt",
 # session=pip.download.PipSession())
 
 # reqs is a list of requirement
@@ -27,7 +27,7 @@ config = {
     },
     'install_requires': ['Pillow==2.8.2', 'PyPlatec==1.4.0',
                          'argparse==1.2.1', 'noise==1.2.2', 'protobuf>=2.6.0',
-                         'numpy==1.9.2'],
+                         'numpy>=1.9.2'],
     'license': 'MIT License'
 }
 
