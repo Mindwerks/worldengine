@@ -255,9 +255,9 @@ class World(object):
 
         # Biome
         if len(p_world.biome.rows) > 0:
-            w.set_biome(
+            w.set_biome(numpy.array(
                 World._from_protobuf_matrix(
-                    p_world.biome, biome_index_to_name))
+                    p_world.biome, biome_index_to_name), dtype = object))
 
         # Humidity
         # FIXME: use setters
@@ -480,7 +480,7 @@ class World(object):
         return hill_level < self.elevation['data'][y, x] < mountain_level
 
     def elevation_at(self, pos):
-        return self.elevation['data'].[pos[1], pos[0]]
+        return self.elevation['data'][pos[1], pos[0]]
 
     #
     # Precipitations
@@ -650,7 +650,7 @@ class World(object):
 
     def biome_at(self, pos):
         x, y = pos
-        b = Biome.by_name(self.biome[y][x])
+        b = Biome.by_name(self.biome[y, x])
         if b is None:
             raise Exception('Not found')
         return b
@@ -821,12 +821,12 @@ class World(object):
         self.plates = data
 
     def set_biome(self, biome):
-        if len(biome) != self.height:
+        if biome.shape[0] != self.height:
             raise Exception(
                 "Setting data with wrong height: biome has height %i while "
                 "the height is currently %i" % (
-                    len(biome), self.height))
-        if len(biome[0]) != self.width:
+                    biome.shape[0], self.height))
+        if biome.shape[1] != self.width:
             raise Exception("Setting data with wrong width")
 
         self.biome = biome

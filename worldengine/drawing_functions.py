@@ -102,7 +102,7 @@ def _find_land_borders(world, factor):
                 _ocean[y, x] = True
 
     def my_is_ocean(pos):
-        return _ocean.[pos[1], pos[0]]
+        return _ocean[pos[1], pos[0]]
 
     for y in range(world.height * factor):
         for x in range(world.width * factor):

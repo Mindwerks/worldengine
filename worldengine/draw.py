@@ -368,7 +368,7 @@ def draw_biome(world, target):
 
     for y in range(height):
         for x in range(width):
-            v = biome[y][x]
+            v = biome[y, x]
             target.set_pixel(x, y, _biome_colors[v])
 
 
