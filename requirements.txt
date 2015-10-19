@@ -4,4 +4,5 @@ numpy==1.9.2
 Pillow==2.8.2
 PyPlatec==1.4.0
 protobuf==3.0.0a3
+pypng==0.0.18
 six==1.10.0
