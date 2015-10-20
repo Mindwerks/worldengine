@@ -1,4 +1,5 @@
 import unittest
+import platform
 
 from worldengine.drawing_functions import draw_ancientmap, gradient, draw_rivers_on_image
 from worldengine.world import World
@@ -12,7 +13,7 @@ class TestDrawingFunctions(TestBase):
         self.w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
 
     def test_draw_ancient_map_factor1(self):
-        w_large = World.from_pickle_file("%s/seed_48956.world" % self.tests_data_dir)
+        w_large = World.from_pickle_file("%s/py%s_seed_48956.world" % (self.tests_data_dir, platform.python_version_tuple()[0]))
         target = PixelCollector(w_large.width, w_large.height)
         draw_ancientmap(w_large, target, resize_factor=1)
         self._assert_img_equal("ancientmap_48956", target)
