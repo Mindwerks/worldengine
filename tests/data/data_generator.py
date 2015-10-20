@@ -8,12 +8,13 @@ because the plate simulation steps do not provide the same results on all the pl
 """
 
 import os
+import platform
 from worldengine.plates import _plates_simulation
 
 
 def main(tests_data_dir):
     w = _plates_simulation("Foo", 300, 200, 279)
-    w.to_pickle_file("%s/plates_279.world" % tests_data_dir)
+    w.to_pickle_file("%s/py%s_plates_279.world" % (tests_data_dir, platform.python_version_tuple()[0]))
 
 
 if __name__ == '__main__':
