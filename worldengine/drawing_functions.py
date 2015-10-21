@@ -689,8 +689,8 @@ def draw_ancientmap(world, target, resize_factor=1,
 
     if verbose:
         start_time = time.time()
-    min_elev = world.elevation['data'].min()
-    max_elev = world.elevation['data'].max()
+    #min_elev = world.elevation['data'].min()
+    #max_elev = world.elevation['data'].max()
 
     # elev_delta = max_elev - min_elev  # TODO: no longer used?
     if verbose:
