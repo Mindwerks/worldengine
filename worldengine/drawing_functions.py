@@ -5,6 +5,7 @@ Jython
 """
 
 import math
+import numpy
 import random
 import sys
 import time
@@ -46,8 +47,8 @@ def draw_rivers_on_image(world, target, factor=1):
         for dx in range(-1, 1):
             for dy in range(-1, 1):
                 if dx != 0 or dy != 0:
-                    e = world.elevation['data'][y + dy][
-                        x + dx]  # +world.humidity['data'][y+dy][x+dx]/3.0
+                    e = world.elevation['data'][y + dy, 
+                        x + dx]  # +world.humidity['data'][y+dy, x+dx]/3.0
                     if (not lowest_lvl) or (e < lowest_lvl):
                         lowest_lvl = e
                         lowest = (x + dx, y + dy)
@@ -58,7 +59,7 @@ def draw_rivers_on_image(world, target, factor=1):
         return lowest
 
     def _draw_river(world, target, pos, factor):
-        if world.is_ocean(pos):
+        if world.ocean[pos[1], pos[0]]:
             return
         x, y = pos
         for dx in range(factor):
@@ -76,9 +77,9 @@ def draw_rivers_on_image(world, target, factor=1):
         cc = None
         for c in candidates:
             cx, cy = c
-            wl = world.humidity['data'][cy][cx] * \
-                world.precipitation['data'][cy][cx] * \
-                world.elevation['data'][cy][cx]
+            wl = world.humidity['data'][cy, cx] * \
+                world.precipitation['data'][cy, cx] * \
+                world.elevation['data'][cy, cx]
             if max is None or wl > max:
                 max = wl
                 cc = c
@@ -90,50 +91,48 @@ def draw_rivers_on_image(world, target, factor=1):
 # -------------------
 
 def _find_land_borders(world, factor):
-    _ocean = [[False for x in range(factor * world.width)] for y in
-              range(factor * world.height)]
-    _borders = [[False for x in range(factor * world.width)] for y in
-                range(factor * world.height)]
-    for y in range(world.height * factor):
+    _ocean = numpy.zeros((factor * world.height, factor * world.width), dtype=bool)
+    _borders = numpy.zeros((factor * world.height, factor * world.width), dtype=bool)
+
+    #scale ocean
+    for y in range(world.height * factor):#TODO: numpy
         for x in range(world.width * factor):
-            if world.ocean[int(y / factor)][int(x / factor)]:
-                _ocean[y][x] = True
+            if world.ocean[int(y / factor), int(x / factor)]:
+                _ocean[y, x] = True
 
     def my_is_ocean(pos):
-        x, y = pos
-        return _ocean[y][x]
+        return _ocean[pos[1], pos[0]]
 
     for y in range(world.height * factor):
         for x in range(world.width * factor):
-            if not _ocean[y][x] and world.tiles_around_factor(factor, (x, y), radius=1, predicate=my_is_ocean):
-                _borders[y][x] = True
+            if not _ocean[y, x] and world.tiles_around_factor(factor, (x, y), radius=1, predicate=my_is_ocean):
+                _borders[y, x] = True
     return _borders
 
 
 def _find_outer_borders(world, factor, inner_borders):
-    _ocean = [[False for x in range(factor * world.width)] for y in
-              range(factor * world.height)]
-    _borders = [[False for x in range(factor * world.width)] for y in
-                range(factor * world.height)]
-    for y in range(world.height * factor):
+    _ocean = numpy.zeros((factor * world.height, factor * world.width), dtype=bool)
+    _borders = numpy.zeros((factor * world.height, factor * world.width), dtype=bool)
+
+    #scale ocean
+    for y in range(world.height * factor):#TODO: numpy
         for x in range(world.width * factor):
             if world.ocean[int(y / factor)][int(x / factor)]:
-                _ocean[y][x] = True
+                _ocean[y, x] = True
 
     def is_inner_border(pos):
         x, y = pos
-        return inner_borders[y][x]
+        return inner_borders[y, x]
 
     for y in range(world.height * factor):
         for x in range(world.width * factor):
-            if _ocean[y][x] and not inner_borders[y][x] and world.tiles_around_factor(factor, (x, y), radius=1, predicate=is_inner_border):
-                _borders[y][x] = True
+            if _ocean[y, x] and not inner_borders[y, x] and world.tiles_around_factor(factor, (x, y), radius=1, predicate=is_inner_border):
+                _borders[y, ] = True
     return _borders
 
 
 def _find_mountains_mask(world, factor):
-    _mask = [[False for x in range(factor * world.width)] for y in
-             range(factor * world.height)]
+    _mask = numpy.zeros((factor * world.height, factor * world.width), dtype=bool)
     for y in range(factor * world.height):
         for x in range(factor * world.width):
             if world.is_mountain((int(x / factor), int(y / factor))):
@@ -141,13 +140,12 @@ def _find_mountains_mask(world, factor):
                                            radius=3,
                                            predicate=world.is_mountain))
                 if v > 32:
-                    _mask[y][x] = v / 4
+                    _mask[y, x] = v / 4
     return _mask
 
 
 def _mask(world, predicate, factor):
-    _mask = [[False for x in range(factor * world.width)] for y in
-             range(factor * world.height)]
+    _mask = numpy.zeros((factor * world.height, factor * world.width), dtype=bool)
     for y in range(factor * world.height):
         for x in range(factor * world.width):
             xf = int(x / factor)
@@ -157,7 +155,7 @@ def _mask(world, predicate, factor):
                     world.tiles_around((xf, yf), radius=1,
                                        predicate=predicate))
                 if v > 5:
-                    _mask[y][x] = v
+                    _mask[y, x] = v
     return _mask
 
 
@@ -592,7 +590,7 @@ def _draw_a_mountain(pixels, x, y, w=3, h=3):
 def _pseudo_random_land_pos(world, i):
     y = (i ** 7 + i * 23) % world.height
     x = (i ** 13 + i * 37) % world.width
-    if world.is_land((x, y)):
+    if not world.ocean[y, x]:
         return int(x), int(y)
     else:
         return _pseudo_random_land_pos(world, (i % 123456789) * 17 + 11)
@@ -638,64 +636,49 @@ def draw_ancientmap(world, target, resize_factor=1,
         rock_desert_mask = _mask(world, world.is_hot_desert, resize_factor)  # TODO: add is_desert_mask
 
     def unset_mask(pos):
-        x, y = pos
-        mountains_mask[y][x] = False
+        mountains_mask[pos[1], pos[0]] = False
 
     def unset_boreal_forest_mask(pos):
-        x, y = pos
-        boreal_forest_mask[y][x] = False
+        boreal_forest_mask[pos[1], pos[0]] = False
 
     def unset_temperate_forest_mask(pos):
-        x, y = pos
-        temperate_forest_mask[y][x] = False
+        temperate_forest_mask[pos[1], pos[0]] = False
 
     def unset_warm_temperate_forest_mask(pos):
-        x, y = pos
-        warm_temperate_forest_mask[y][x] = False
+        warm_temperate_forest_mask[pos[1], pos[0]] = False
 
     def unset_tropical_dry_forest_mask(pos):
-        x, y = pos
-        tropical_dry_forest_mask[y][x] = False
+        tropical_dry_forest_mask[pos[1], pos[0]] = False
 
     def unset_jungle_mask(pos):
-        x, y = pos
-        jungle_mask[y][x] = False
+        jungle_mask[pos[1], pos[0]] = False
 
     def unset_tundra_mask(pos):
-        x, y = pos
-        tundra_mask[y][x] = False
+        tundra_mask[pos[1], pos[0]] = False
 
     def unset_savanna_mask(pos):
-        x, y = pos
-        savanna_mask[y][x] = False
+        savanna_mask[pos[1], pos[0]] = False
 
     def unset_hot_desert_mask(pos):
-        x, y = pos
-        hot_desert_mask[y][x] = False
+        hot_desert_mask[pos[1], pos[0]] = False
 
     def unset_rock_desert_mask(pos):
-        x, y = pos
-        rock_desert_mask[y][x] = False
+        rock_desert_mask[pos[1], pos[0]] = False
 
     def unset_cold_parklands_mask(pos):
-        x, y = pos
-        cold_parklands_mask[y][x] = False
+        cold_parklands_mask[pos[1], pos[0]] = False
 
     def unset_steppe_mask(pos):
-        x, y = pos
-        steppe_mask[y][x] = False
+        steppe_mask[pos[1], pos[0]] = False
 
     def unset_cool_desert_mask(pos):
-        x, y = pos
-        cool_desert_mask[y][x] = False
+        cool_desert_mask[pos[1], pos[0]] = False
 
     def unset_chaparral_mask(pos):
-        x, y = pos
-        chaparral_mask[y][x] = False
+        chaparral_mask[pos[1], pos[0]] = False
 
     def on_border(pos):
-        x, y = pos
-        return borders[y][x]
+        return borders[pos[1], pos[0]]
 
     if verbose:
         elapsed_time = time.time() - start_time
@@ -706,15 +689,9 @@ def draw_ancientmap(world, target, resize_factor=1,
 
     if verbose:
         start_time = time.time()
-    min_elev = None
-    max_elev = None
-    for y in range(world.height):
-        for x in range(world.width):
-            e = world.elevation['data'][y][x]
-            if min_elev is None or e < min_elev:
-                min_elev = e
-            if max_elev is None or e > max_elev:
-                max_elev = e
+    #min_elev = world.elevation['data'].min()
+    #max_elev = world.elevation['data'].max()
+
     # elev_delta = max_elev - min_elev  # TODO: no longer used?
     if verbose:
         elapsed_time = time.time() - start_time
@@ -730,11 +707,11 @@ def draw_ancientmap(world, target, resize_factor=1,
         for x in range(resize_factor * world.width):
             xf = int(x / resize_factor)
             yf = int(y / resize_factor)
-            if borders[y][x]:
+            if borders[y, x]:
                 target.set_pixel(x, y, border_color)
-            elif draw_outer_land_border and outer_borders[y][x]:
+            elif draw_outer_land_border and outer_borders[y, x]:
                 target.set_pixel(x, y, outer_border_color)
-            elif world.ocean[yf][xf]:
+            elif world.ocean[yf, xf]:
                 target.set_pixel(x, y, sea_color)
             else:
                 target.set_pixel(x, y, land_color)

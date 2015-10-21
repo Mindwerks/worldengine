@@ -1,5 +1,6 @@
 import sys
 import copy
+import numpy #for the _equal method only
 
 # ----------------
 # Global variables
@@ -80,32 +81,31 @@ def rescale_value(original, prev_min, prev_max, min, max):
     return min + ((max - min) * f)
 
 
-def anti_alias(elevation, steps):
+def anti_alias(map, steps):#TODO: There is probably a bit of numpy-optimization that can be done here.
     """
-    Execute the anti_alias operation steps times on the given elevation map
+    Execute the anti_alias operation steps times on the given map
     """
-    width = len(elevation[0])
-    height = len(elevation)
+    height, width = map.shape
 
     def _anti_alias_step(original):
         anti_aliased = copy.deepcopy(original)
         for y in range(height):
             for x in range(width):
-                anti_aliased[y][x] = anti_alias_point(original, x, y)
+                anti_aliased[y, x] = anti_alias_point(original, x, y)
         return anti_aliased
 
     def anti_alias_point(original, x, y):
         n = 2
-        tot = elevation[y][x] * 2
+        tot = map[y, x] * 2
         for dy in range(-1, +2):
             py = (y + dy) % height
             for dx in range(-1, +2):
                 px = (x + dx) % width
                 n += 1
-                tot += original[py][px]
+                tot += original[py, px]
         return tot / n
 
-    current = elevation
+    current = map
     for i in range(steps):
         current = _anti_alias_step(current)
     return current
@@ -120,3 +120,33 @@ def array_to_matrix(array, width, height):
         for x in range(width):
             matrix[y].append(array[y * width + x])
     return matrix
+
+def _equal(a, b):
+    #recursion on subclasses of types: tuple, list, dict
+    #specifically checks             : float, ndarray
+    if type(a) is float and type(b) is float:#float
+        return(numpy.allclose(a, b))
+    elif type(a) is numpy.ndarray and type(b) is numpy.ndarray:#ndarray
+        return(numpy.array_equiv(a, b))#alternative for float-arrays: numpy.allclose(a, b[, rtol, atol])
+    elif isinstance(a, dict) and isinstance(b, dict):#dict
+        if len(a) != len(b):
+            return(False)
+        t = True
+        for key, val in a.items():
+            if key not in b:
+                return(False)
+            t = _equal(val, b[key])
+            if not t:
+                return(False)
+        return(t)
+    elif (isinstance(a, list) and isinstance(b, list)) or (isinstance(a, tuple) and isinstance(b, tuple)):#list, tuples
+        if len(a) != len(b):
+            return(False)
+        t = True
+        for vala, valb in zip(a, b):
+            t = _equal(vala, valb)
+            if not t:
+                return(False)
+        return(t)
+    else:#fallback
+        return(a == b)

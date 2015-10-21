@@ -1,14 +1,21 @@
-def find_threshold(elevation, land_percentage, ocean=None):
-    width = len(elevation[0])
-    height = len(elevation)
+import numpy
+
+def find_threshold(map_data, land_percentage, ocean=None):#never used anywhere?
+    height, width = map_data.shape
+
+    #maybe map was already masked when we got it; if not, this will make sure we operate on a mask
+    mask = numpy.ma.array(map_data, mask = False, keep_mask = True)
+
+    if ocean is not None:
+        if ocean.shape != map_data.shape:
+            raise Exception(
+                "Dimension of map and ocean do not match. " +
+                "Map is %d x %d, while ocean is %d x%d" % (
+                    width, height, ocean.shape[1], ocean.shape[0]))
+        mask = numpy.ma.array(mask, mask = ocean, keep_mask = True)
 
     def count(e):
-        tot = 0
-        for y in range(0, height):
-            for x in range(0, width):
-                if elevation[y][x] > e and (ocean is None or not ocean[y][x]):
-                    tot += 1
-        return tot
+        return numpy.ma.masked_less_equal(mask, e).count()
 
     def search(a, b, desired):
         if (not type(a) == int) or (not type(b) == int):
@@ -31,38 +38,32 @@ def find_threshold(elevation, land_percentage, ocean=None):
         else:
             return search(a, m, desired)
 
-    all_land = width * height
-    if ocean:
-        for y in range(0, height):
-            for x in range(0, width):
-                if ocean[y][x]:
-                    all_land -= 1
+    all_land = mask.count()
     desired_land = all_land * land_percentage
     return search(0, 255, desired_land)
 
 
-def find_threshold_f(elevation, land_perc, ocean=None):
-    width = len(elevation[0])
-    height = len(elevation)
-    if ocean:
-        if (width != len(ocean[0])) or (height != len(ocean)):
+def find_threshold_f(map_data, land_perc, ocean=None, max=1000.0, mindist=0.005):
+    height, width = map_data.shape
+    
+    #maybe map was already masked when we got it; if not, this will make sure we operate on a mask
+    mask = numpy.ma.array(map_data, mask = False, keep_mask = True)
+
+    if ocean is not None:
+        if ocean.shape != map_data.shape:
             raise Exception(
-                "Dimension of elevation and ocean do not match. " +
-                "Elevation is %d x %d, while ocean is %d x%d" % (
-                    width, height, len(ocean[0]), len(ocean)))
+                "Dimension of map_data and ocean do not match. " +
+                "Map is %d x %d, while ocean is %d x%d" % (
+                    width, height, ocean.shape[1], ocean.shape[0]))
+        mask = numpy.ma.array(mask, mask = ocean, keep_mask = True)
 
     def count(e):
-        tot = 0
-        for y in range(0, height):
-            for x in range(0, width):
-                if elevation[y][x] > e and (ocean is None or not ocean[y][x]):
-                    tot += 1
-        return tot
+        return numpy.ma.masked_less_equal(mask, e).count()
 
     def search(a, b, desired):
         if a == b:
             return a
-        if abs(b - a) < 0.005:
+        if abs(b - a) < mindist:
             ca = count(a)
             cb = count(b)
             dista = abs(desired - ca)
@@ -78,11 +79,6 @@ def find_threshold_f(elevation, land_perc, ocean=None):
         else:
             return search(a, m, desired)
 
-    all_land = width * height
-    if ocean:
-        for y in range(0, height):
-            for x in range(0, width):
-                if ocean[y][x]:
-                    all_land -= 1
+    all_land = mask.count()
     desired_land = all_land * land_perc
-    return search(-1000.0, 1000.0, desired_land)
+    return search(-1*max, max, desired_land)

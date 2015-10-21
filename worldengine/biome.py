@@ -219,6 +219,6 @@ def biome_name_to_index(biome_name):
 
 def biome_index_to_name(biome_index):
     names = sorted(_BiomeMetaclass.biomes.keys())
-    if biome_index < 0 or biome_index >= len(names):
+    if not 0 <= biome_index < len(names):
         raise Exception("Not found")
     return names[biome_index]

@@ -161,7 +161,6 @@ class SQMapHandler:
         if x < 0 or x >= self.w or y < 0 or y >= self.h:
             return None
         d = self.m[(y * self.w) + x]
-
         return Node(location, d, ((y * self.w) + x))
 
     def get_adjacent_nodes(self, cur_node, destination):
@@ -198,14 +197,6 @@ class SQMapHandler:
         return None
 
 
-def _matrix_to_array(matrix):
-    array = []
-    for row in matrix:
-        for cell in row:
-            array.append(cell)
-    return array
-
-
 class PathFinder:
     """Using the a* algorithm we will try to find the best path between two
        points.
@@ -219,10 +210,9 @@ class PathFinder:
         sx, sy = source
         dx, dy = destination
         path = []
-        width = len(height_map[0])
-        height = len(height_map)
+        height, width = height_map.shape
 
-        graph = _matrix_to_array(height_map)  # flatten array
+        graph = height_map.flatten('C') #flatten array (row-major)
 
         pathfinder = AStar(SQMapHandler(graph, width, height))
         start = SQLocation(sx, sy)
