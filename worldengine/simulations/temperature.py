@@ -30,7 +30,6 @@ class TemperatureSimulation(object):
         width = world.width
         height = world.height
 
-        random.seed(seed * 7)
         base = random.randint(0, 4096)
         temp = [[0 for x in range(width)] for y in range(height)]  # TODO: replace with numpy
 

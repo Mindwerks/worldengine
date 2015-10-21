@@ -602,7 +602,6 @@ def draw_ancientmap(world, target, resize_factor=1,
                     sea_color=(212, 198, 169, 255),
                     draw_biome = True, draw_rivers = True, draw_mountains = True,
                     draw_outer_land_border = False, verbose=get_verbose()):
-    random.seed(world.seed * 11)  
 
     if verbose:
         start_time = time.time()

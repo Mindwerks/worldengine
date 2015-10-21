@@ -32,7 +32,6 @@ class PrecipitationSimulation(object):
     def _calculate(seed, width, height):
         """Precipitation is a value in [-1,1]"""
         border = width / 4
-        random.seed(seed * 13)
         base = random.randint(0, 4096)
         precipitations = [[0 for x in range(width)] for y in range(height)]
         # TODO: replace with numpy

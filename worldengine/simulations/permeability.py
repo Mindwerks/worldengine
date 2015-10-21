@@ -19,7 +19,6 @@ class PermeabilitySimulation(object):
 
     @staticmethod
     def _calculate(seed, width, height):
-        random.seed(seed * 37)
         base = random.randint(0, 4096)
         perm = [[0 for x in range(width)] for y in range(height)]  # TODO: replace with numpy
 
