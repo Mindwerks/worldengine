@@ -391,8 +391,11 @@ def main():
 
     if args.seed is not None:
         seed = int(args.seed)
+        if not 0 <= seed <= 65535:  # platec might not be able to handle integers larger than uint16; TODO: check this
+            print("Seed has to be in the range of 0 and 65535.")
+            seed = seed % 65535
     else:
-        seed = numpy.random.randint(0, 999999)  # RNG initialization is done automatically
+        seed = numpy.random.randint(0, 65535)  # first-time RNG initialization is done automatically
     numpy.random.seed(seed)
 
     if args.world_name:
