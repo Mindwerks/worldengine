@@ -1,4 +1,3 @@
-import random
 import time
 import numpy
 from noise import snoise2
@@ -32,9 +31,10 @@ class PrecipitationSimulation(object):
     @staticmethod
     def _calculate(seed, width, height):
         """Precipitation is a value in [-1,1]"""
+        rng = numpy.random.RandomState(seed)  # create our own random generator
+        base = rng.randint(0, 4096)
+
         border = width / 4
-        random.seed(seed * 13)
-        base = random.randint(0, 4096)
         precipitations = numpy.zeros((height, width), dtype=float)
 
         octaves = 6

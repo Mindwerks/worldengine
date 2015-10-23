@@ -200,25 +200,25 @@ def generate_world(w, step):
         return w
 
     # Precipitation with thresholds
-    PrecipitationSimulation().execute(w, seed)
+    PrecipitationSimulation().execute(w, seed * 13)
 
     if not step.include_erosion:
         return w
-    ErosionSimulation().execute(w, seed)
+    ErosionSimulation().execute(w, seed)  # seed not currently used; TODO: seed should probably still be multiplied with some integer, in case it is ever used
     if get_verbose():
         print("...erosion calculated")
 
-    WatermapSimulation().execute(w, seed)
+    WatermapSimulation().execute(w, seed)  # seed not currently used; TODO: seed should probably still be multiplied with some integer, in case it is ever used
 
     # FIXME: create setters
-    IrrigationSimulation().execute(w, seed)
-    TemperatureSimulation().execute(w, seed)
-    HumiditySimulation().execute(w, seed)
+    IrrigationSimulation().execute(w, seed)  # seed not currently used; TODO: seed should probably still be multiplied with some integer, in case it is ever used
+    TemperatureSimulation().execute(w, seed * 7)
+    HumiditySimulation().execute(w, seed)  # seed not currently used; TODO: seed should probably still be multiplied with some integer, in case it is ever used
 
     
-    PermeabilitySimulation().execute(w, seed)
+    PermeabilitySimulation().execute(w, seed * 37)
 
-    cm, biome_cm = BiomeSimulation().execute(w, seed)
+    cm, biome_cm = BiomeSimulation().execute(w, seed)  # seed not currently used; TODO: seed should probably still be multiplied with some integer, in case it is ever used
     for cl in cm.keys():
         count = cm[cl]
         if get_verbose():

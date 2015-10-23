@@ -32,6 +32,7 @@ def _numpy_to_matrix(numpy_array):
 
     This is used because currently we do not know how to serialize numpy
     arrays :( with pickle. In the future we will use pytables/hdf5"""
+    # TODO: Is this still true? Pickle didn't seem to cause problems for me. /tcld
 
     width = numpy_array.shape[0]
     height = numpy_array.shape[1]

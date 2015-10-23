@@ -6,7 +6,6 @@ Jython
 
 import math
 import numpy
-import random
 import sys
 import time
 from worldengine.common import get_verbose
@@ -530,7 +529,7 @@ def _dynamic_draw_a_mountain(pixels, x, y, w=3, h=3):
         max_leftborder = int(bottomness * w * 1.33)
         if not last_leftborder == None:
             max_leftborder = min(max_leftborder, last_leftborder + 1)
-        leftborder = int(bottomness * w) + random.randint(-2, 2)/2
+        leftborder = int(bottomness * w) + numpy.random.randint(-2, 2)/2
         if leftborder < min_leftborder:
             leftborder = min_leftborder
         if leftborder > max_leftborder:
@@ -557,7 +556,7 @@ def _dynamic_draw_a_mountain(pixels, x, y, w=3, h=3):
         max_modx = int(bottomness * w * 1.33)
         if not last_modx == None:
             max_modx = min(max_modx, last_modx + 1)
-        modx = int(bottomness * w) + random.randint(-2, 2)/2
+        modx = int(bottomness * w) + numpy.random.randint(-2, 2)/2
         if modx < min_modx:
             modx = min_modx
         if modx > max_modx:
@@ -603,7 +602,7 @@ def draw_ancientmap(world, target, resize_factor=1,
                     sea_color=(212, 198, 169, 255),
                     draw_biome = True, draw_rivers = True, draw_mountains = True,
                     draw_outer_land_border = False, verbose=get_verbose()):
-    random.seed(world.seed * 11)  
+    rng = numpy.random.RandomState(world.seed)  # create our own random generator
 
     if verbose:
         start_time = time.time()
@@ -893,7 +892,7 @@ def draw_ancientmap(world, target, resize_factor=1,
                     if len(world.tiles_around_factor(resize_factor, (x, y),
                                                      radius=r,
                                                      predicate=on_border)) <= 2:
-                        if random.random() <= .5:
+                        if rng.random_sample() <= .5:
                             _draw_temperate_forest1(target, x, y, w=w, h=h)
                         else:
                             _draw_temperate_forest2(target, x, y, w=w, h=h)

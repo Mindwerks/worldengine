@@ -3,7 +3,6 @@ from argparse import ArgumentParser
 import os
 import numpy
 import pickle
-import random
 import worldengine.generation as geo
 from worldengine.common import array_to_matrix, set_verbose, print_verbose
 from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
@@ -393,8 +392,8 @@ def main():
     if args.seed is not None:
         seed = int(args.seed)
     else:
-        seed = random.randint(0, 65535)#RNG initialization is done automatically
-    random.seed(seed)
+        seed = numpy.random.randint(0, 999999)  # RNG initialization is done automatically
+    numpy.random.seed(seed)
 
     if args.world_name:
         world_name = args.world_name
