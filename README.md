@@ -10,14 +10,7 @@ You can generate worlds data (heighmap, biome, etc.) and images for your own wor
 For example:
 
 ```bash
-# WorldEngine
 worldengine world -s 1 -n seed1
-
-# Lands 0.5.1 or next
-lands world -s 1 -n seed1
-
-# Lands 0.5.0 or previous
-python lands/generator.py world -s 1 -n seed1
 ```
 
 Worlds are generated using plate simulations, erosion, rain shadows, Holdridge life zones model and plenty of other phenomenons.
@@ -27,14 +20,7 @@ Once a world it can be used for simulation civs evolution (see project [civs](ht
 For a generated world is also possible to generate additional maps, for example ancient looking map:
 
 ```bash
-# WorldEngine
 worldengine ancient_map -w seed1.world
-
-# Lands 0.5.1 or next
-lands ancient_map -w seed1.world
-
-# Lands 0.5.0 or previous
-python lands/generator.py ancient_map -w seed1.world
 ```
 
 ![](https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/examples/ancient_map_seed1.png)
@@ -147,7 +133,7 @@ _Note that options were changed in version 0.5.3_
 | Short     | Long | Description |
 |-----------|------|-------------|
 | -r FILE   | --rivers=FILE | produce a map of rivers, after the option it expects the name of the file where to generate the map  |
-| --gs=FILE  | --grayscale-heightmap=FILE | produce a grayscale heightmap, after the option it expects the name of the file where to generate the heightmap |
+| --gs  | --grayscale-heightmap | produce a grayscale heightmap |
 |   | --ocean_level=N   |  elevation cut off for sea level (default = 1.0) |
 
 ### Options valid only for ancient map operations
