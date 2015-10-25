@@ -130,10 +130,32 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
             ('plain', hl),
             ('hill', ml),
             ('mountain', None)]
+    armonize_ocean(ocean, e, ocean_level)
     world.set_ocean(ocean)
     world.set_elevation(e, e_th)
     world.sea_depth = sea_depth(world, ocean_level)
 
+
+def armonize_ocean(ocean, elevation, ocean_level):
+    """
+    The goal of this function is to make the ocean floor less noisy.
+    The underwater erosion should cause the ocean floor to be more uniform
+    """
+    width = len(elevation[0])
+    height = len(elevation)
+
+    shallow_sea = ocean_level * 0.85
+    midpoint = shallow_sea / 2.0
+
+    for y in range(height):
+        for x in range(width):
+            e = elevation[y][x]
+            if e < shallow_sea:
+                if e < midpoint:
+                    e = midpoint - ((midpoint - e) / 5.0)
+                else:
+                    e = midpoint + ((e - midpoint) / 5.0)
+                elevation[y][x] = e
 
 # ----
 # Misc
