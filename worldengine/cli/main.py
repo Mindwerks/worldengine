@@ -22,9 +22,10 @@ STEPS = 'plates|precipitations|full'
 
 
 def generate_world(world_name, width, height, seed, num_plates, output_dir,
-                   step, ocean_level, world_format='pickle', verbose=True, black_and_white=False):
+                   step, ocean_level, world_format='pickle', fade_borders=True,
+                   verbose=True, black_and_white=False):
     w = world_gen(world_name, width, height, seed, num_plates, ocean_level,
-                  step, verbose=verbose)
+                  step, fade_borders=fade_borders, verbose=verbose)
 
     print('')  # empty line
     print('Producing ouput:')
@@ -300,6 +301,9 @@ def main():
                             help='elevation cut off for sea level " +'
                                  '[default = %(default)s]',
                             metavar="N", default=1.0)
+    g_generate.add_argument('--not-fade-borders', dest='fade_borders', action="store_false",
+                               help="Not fade borders",
+                               default=True)
 
     # -----------------------------------------------------
     g_ancient_map = parser.add_argument_group(
@@ -429,6 +433,7 @@ def main():
         print(' step                 : %s' % step.name)
         print(' greyscale heightmap  : %s' % args.grayscale_heightmap)
         print(' rivers map           : %s' % args.rivers_map)
+        print(' fade borders         : %s' % args.fade_borders)
     if operation == 'ancient_map':
         print(' resize factor          : %i' % args.resize_factor)
         print(' world file             : %s' % args.world_file)
@@ -447,7 +452,8 @@ def main():
         world = generate_world(world_name, args.width, args.height,
                                seed, args.number_of_plates, args.output_dir,
                                step, args.ocean_level, world_format,
-                               args.verbose, black_and_white=args.black_and_white)
+                               fade_borders=args.fade_borders,
+                               verbose=args.verbose, black_and_white=args.black_and_white)
         if args.grayscale_heightmap:
             generate_grayscale_heightmap(world,
             '%s/%s_grayscale.png' % (args.output_dir, world_name))

@@ -49,7 +49,7 @@ def _plates_simulation(name, width, height, seed, num_plates=10,
 
 
 def world_gen(name, width, height, seed, num_plates=10, ocean_level=1.0,
-              step=Step.full(), verbose=get_verbose()):
+              step=Step.full(), fade_borders=True, verbose=get_verbose()):
     if verbose:
         start_time = time.time()
     world = _plates_simulation(name, width, height, seed, num_plates,
@@ -71,7 +71,8 @@ def world_gen(name, width, height, seed, num_plates=10, ocean_level=1.0,
 
     if verbose:
         start_time = time.time()
-    place_oceans_at_map_borders(world)
+    if fade_borders:
+        place_oceans_at_map_borders(world)
     initialize_ocean_and_thresholds(world)
     if verbose:
         elapsed_time = time.time() - start_time
