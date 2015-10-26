@@ -64,8 +64,7 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
 
     filename = '%s/%s_elevation.png' % (output_dir, world_name)
     sea_level = w.sea_level()
-    draw_simple_elevation_on_file(w.elevation['data'], filename, width=width,
-                                  height=height, sea_level=sea_level)
+    draw_simple_elevation_on_file(w, filename, sea_level=sea_level)
     print("* elevation image generated in '%s'" % filename)
     return w
 

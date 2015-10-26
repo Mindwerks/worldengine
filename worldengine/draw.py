@@ -161,14 +161,39 @@ class ImagePixelSetter(object):
         self.pixels[item] = value
 
 
-def draw_simple_elevation(data, width, height, sea_level, target):
+def draw_simple_elevation(world, sea_level, target):
     """ This function can be used on a generic canvas (either an image to save
         on disk or a canvas part of a GUI)
     """
-    for y in range(height):
-        for x in range(width):
-            e = data[y][x]#TODO: numpy-notation [y,x] is a little faster; all passed arrays would have to be numpy-arrays
-            r, g, b = elevation_color(e, sea_level)
+    min_elev_sea = None
+    max_elev_sea = None
+    min_elev_land = None
+    max_elev_land = None
+    for y in range(world.height):
+        for x in range(world.width):
+            e = world.elevation['data'][y,x]
+            if world.is_land((x, y)):
+                if min_elev_land is None or e < min_elev_land:
+                    min_elev_land = e
+                if max_elev_land is None or e > max_elev_land:
+                    max_elev_land = e
+            else:
+                if min_elev_sea is None or e < min_elev_sea:
+                    min_elev_sea = e
+                if max_elev_sea is None or e > max_elev_sea:
+                    max_elev_sea = e
+
+    elev_delta_land = (max_elev_land - min_elev_land)/11
+    elev_delta_sea = max_elev_sea - min_elev_sea
+    
+    for y in range(world.height):
+        for x in range(world.width):
+            e = world.elevation['data'][y, x]
+            if world.is_land((x, y)):
+                c = ((e - min_elev_land) / elev_delta_land) + 1
+            else:
+                c = ((e - min_elev_sea) / elev_delta_sea)
+            r, g, b = elevation_color(c, sea_level)
             target.set_pixel(x, y, (int(r * 255), int(g * 255),
                                     int(b * 255), 255))
 
@@ -377,9 +402,9 @@ def draw_biome(world, target):
 # -------------
 
 
-def draw_simple_elevation_on_file(data, filename, width, height, sea_level):
-    img = ImagePixelSetter(width, height, filename)
-    draw_simple_elevation(data, width, height, sea_level, img)
+def draw_simple_elevation_on_file(world, filename, sea_level):
+    img = ImagePixelSetter(world.width, world.height, filename)
+    draw_simple_elevation(world, sea_level, img)
     img.complete()
 
 
