@@ -332,7 +332,7 @@ class World(object):
 
     def random_land(self):
         if self.ocean.all():
-            return -1, -1  # return invalid indices if there is no land at all
+            return None, None  # return invalid indices if there is no land at all
         lands = numpy.invert(self.ocean)
         lands = numpy.transpose(lands.nonzero())  # returns a list of tuples/indices with land positions
         y, x = lands[numpy.random.randint(0, len(lands))]  # uses global RNG

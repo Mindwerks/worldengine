@@ -1,5 +1,4 @@
 import math
-import numpy
 
 
 def distance(pa, pb):
