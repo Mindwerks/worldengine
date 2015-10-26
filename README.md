@@ -135,6 +135,7 @@ _Note that options were changed in version 0.5.3_
 | -r FILE   | --rivers=FILE | produce a map of rivers, after the option it expects the name of the file where to generate the map  |
 | --gs  | --grayscale-heightmap | produce a grayscale heightmap |
 |   | --ocean_level=N   |  elevation cut off for sea level (default = 1.0) |
+|   | ---not-fade-borders   |  avoid fading borders |
 
 ### Options valid only for ancient map operations
 
