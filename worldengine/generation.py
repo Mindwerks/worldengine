@@ -141,20 +141,20 @@ def armonize_ocean(ocean, elevation, ocean_level):
     The goal of this function is to make the ocean floor less noisy.
     The underwater erosion should cause the ocean floor to be more uniform
     """
-    width, height = elevation.shape
+    height, width = elevation.shape
 
     shallow_sea = ocean_level * 0.85
     midpoint = shallow_sea / 2.0
 
     for y in range(height):
         for x in range(width):
-            e = elevation[y][x]
-            if e < shallow_sea:
+            e = elevation[y, x]
+            if ocean[y, x] and e < shallow_sea:
                 if e < midpoint:
                     e = midpoint - ((midpoint - e) / 5.0)
                 else:
                     e = midpoint + ((e - midpoint) / 5.0)
-                elevation[y][x] = e
+                elevation[y, x] = e
 
 # ----
 # Misc
