@@ -102,9 +102,8 @@ class TestDraw(TestBase):
 
     def test_draw_simple_elevation(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        data = w.elevation['data']
         target = PixelCollector(w.width, w.height)
-        draw_simple_elevation(data, w.width, w.height, w.sea_level(), target)
+        draw_simple_elevation(w, w.sea_level(), target)
         self._assert_img_equal("simple_elevation_28070", target)
 
     def test_draw_elevation_shadow(self):
