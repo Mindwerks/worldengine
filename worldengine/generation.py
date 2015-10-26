@@ -130,13 +130,13 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
             ('plain', hl),
             ('hill', ml),
             ('mountain', None)]
-    armonize_ocean(ocean, e, ocean_level)
+    harmonize_ocean(ocean, e, ocean_level)
     world.set_ocean(ocean)
     world.set_elevation(e, e_th)
     world.sea_depth = sea_depth(world, ocean_level)
 
 
-def armonize_ocean(ocean, elevation, ocean_level):
+def harmonize_ocean(ocean, elevation, ocean_level):
     """
     The goal of this function is to make the ocean floor less noisy.
     The underwater erosion should cause the ocean floor to be more uniform
