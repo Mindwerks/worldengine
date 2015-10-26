@@ -1,6 +1,7 @@
 import sys
 from argparse import ArgumentParser
 import os
+import numpy
 import pickle
 import random
 import worldengine.generation as geo
@@ -96,7 +97,7 @@ def generate_plates(seed, world_name, output_dir, width, height,
                                                    num_plates=num_plates)
 
     world = World(world_name, width, height, seed, num_plates, -1.0, "plates")
-    world.set_elevation(array_to_matrix(elevation, width, height), None)
+    world.set_elevation(numpy.array(elevation).reshape(height, width), None)
     world.set_plates(array_to_matrix(plates, width, height))
 
     # Generate images

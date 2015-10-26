@@ -66,7 +66,7 @@ class ErosionSimulation(object):
                 river_list.append(river)
                 self.cleanUpFlow(river, world)
                 rx, ry = river[-1]  # find last cell in river
-                if not world.is_ocean((rx, ry)):
+                if not world.ocean[ry, rx]:
                     lake_list.append(river[-1])  # river flowed into a lake
 
         # step four: simulate erosion and updating river map
@@ -81,8 +81,8 @@ class ErosionSimulation(object):
             lx, ly = lake
             lake_map[lx, ly] = 0.1  # TODO: make this based on rainfall/flow
 
-        world.set_rivermap(_numpy_to_matrix(river_map))
-        world.set_lakemap(_numpy_to_matrix(lake_map))
+        world.set_rivermap(river_map)
+        world.set_lakemap(lake_map)
 
     def find_water_flow(self, world, water_path):
         """Find the flow direction for each cell in heightmap"""
@@ -111,7 +111,7 @@ class ErosionSimulation(object):
         # *** 1,2 ***
         x, y = river
         new_path = []
-        lowest_elevation = world.elevation['data'][y][x]
+        lowest_elevation = world.elevation['data'][y, x]
         # lowestDirection = [0, 0]
 
         for dx, dy in DIR_NEIGHBORS:
@@ -123,7 +123,7 @@ class ErosionSimulation(object):
 
             tx, ty = overflow(tx, world.width), overflow(ty, world.height)
 
-            elevation = world.elevation['data'][ty][tx]
+            elevation = world.elevation['data'][ty, tx]
 
             if elevation < lowest_elevation:
                 if world.contains(temp_dir):
@@ -151,7 +151,7 @@ class ErosionSimulation(object):
         #     above sea level are marked as 'sources'.
         for x in range(0, world.width - 1):
             for y in range(0, world.height - 1):
-                rain_fall = world.precipitation['data'][y][x]
+                rain_fall = world.precipitation['data'][y, x]
                 water_flow[x, y] = rain_fall
 
                 if water_path[x, y] == 0:
@@ -216,7 +216,7 @@ class ErosionSimulation(object):
                         return path  # skip the rest, return path
 
             # found a sea?
-            if world.is_ocean((x, y)):
+            if world.ocean[y, x]:
                 break
 
             # find our immediate lowest elevation and flow there
@@ -304,11 +304,11 @@ class ErosionSimulation(object):
         celevation = 1.0
         for r in river:
             rx, ry = r
-            relevation = world.elevation['data'][ry][rx]
+            relevation = world.elevation['data'][ry, rx]
             if relevation <= celevation:
                 celevation = relevation
             elif relevation > celevation:
-                world.elevation['data'][ry][rx] = celevation
+                world.elevation['data'][ry, rx] = celevation
         return river
 
     def findLowerElevation(self, source, world):
@@ -317,7 +317,7 @@ class ErosionSimulation(object):
         x, y = source
         currentRadius = 1
         maxRadius = 40
-        lowestElevation = world.elevation['data'][y][x]
+        lowestElevation = world.elevation['data'][y, x]
         destination = []
         notFound = True
         isWrapped = False
@@ -342,7 +342,7 @@ class ErosionSimulation(object):
                     # if utilities.outOfBounds([x+cx, y+cy], self.size):
                     #                        print "Fixed:",x ,y,  rx, ry
 
-                    elevation = world.elevation['data'][ry][rx]
+                    elevation = world.elevation['data'][ry, rx]
                     # have we found a lower elevation?
                     if elevation < lowestElevation:
                         lowestElevation = elevation
@@ -380,8 +380,8 @@ class ErosionSimulation(object):
                         continue
                     if [x, y] in river:  # ignore river itself
                         continue
-                    if world.elevation['data'][y][x] <= \
-                            world.elevation['data'][ry][
+                    if world.elevation['data'][y, x] <= \
+                            world.elevation['data'][ry, 
                                 rx]:  # ignore areas lower than river itself
                         continue
                     if not in_circle(radius, rx, ry, x,
@@ -394,14 +394,14 @@ class ErosionSimulation(object):
                     elif adx == 2 or ady == 2:
                         curve = 0.05
 
-                    diff = world.elevation['data'][ry][rx] - \
-                        world.elevation['data'][y][x]
-                    newElevation = world.elevation['data'][y][x] + (
+                    diff = world.elevation['data'][ry, rx] - \
+                        world.elevation['data'][y, x]
+                    newElevation = world.elevation['data'][y, x] + (
                         diff * curve)
-                    if newElevation <= world.elevation['data'][ry][rx]:
+                    if newElevation <= world.elevation['data'][ry, rx]:
                         print('newElevation is <= than river, fix me...')
-                        newElevation = world.elevation['data'][r][x]
-                    world.elevation['data'][y][x] = newElevation
+                        newElevation = world.elevation['data'][r, x]
+                    world.elevation['data'][y, x] = newElevation
         return
 
     def rivermap_update(self, river, water_flow, rivermap, precipitations):
@@ -415,5 +415,5 @@ class ErosionSimulation(object):
                 rivermap[x, y] = water_flow[x, y]
                 isSeed = False
             else:
-                rivermap[x, y] = precipitations[y][x] + rivermap[px, py]
+                rivermap[x, y] = precipitations[y, x] + rivermap[px, py]
             px, py = x, y

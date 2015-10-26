@@ -5,6 +5,7 @@ Jython
 """
 
 import math
+import numpy
 import random
 import sys
 import time
@@ -46,8 +47,8 @@ def draw_rivers_on_image(world, target, factor=1):
         for dx in range(-1, 1):
             for dy in range(-1, 1):
                 if dx != 0 or dy != 0:
-                    e = world.elevation['data'][y + dy][
-                        x + dx]  # +world.humidity['data'][y+dy][x+dx]/3.0
+                    e = world.elevation['data'][y + dy, 
+                        x + dx]  # +world.humidity['data'][y+dy, x+dx]/3.0
                     if (not lowest_lvl) or (e < lowest_lvl):
                         lowest_lvl = e
                         lowest = (x + dx, y + dy)
@@ -58,7 +59,7 @@ def draw_rivers_on_image(world, target, factor=1):
         return lowest
 
     def _draw_river(world, target, pos, factor):
-        if world.is_ocean(pos):
+        if world.ocean[pos[1], pos[0]]:
             return
         x, y = pos
         for dx in range(factor):
@@ -76,9 +77,9 @@ def draw_rivers_on_image(world, target, factor=1):
         cc = None
         for c in candidates:
             cx, cy = c
-            wl = world.humidity['data'][cy][cx] * \
-                world.precipitation['data'][cy][cx] * \
-                world.elevation['data'][cy][cx]
+            wl = world.humidity['data'][cy, cx] * \
+                world.precipitation['data'][cy, cx] * \
+                world.elevation['data'][cy, cx]
             if max is None or wl > max:
                 max = wl
                 cc = c
@@ -90,32 +91,32 @@ def draw_rivers_on_image(world, target, factor=1):
 # -------------------
 
 def _find_land_borders(world, factor):
-    _ocean = [[False for x in range(factor * world.width)] for y in
-              range(factor * world.height)]
+    _ocean = numpy.zeros((factor * world.height, factor * world.width), dtype=bool)
     _borders = [[False for x in range(factor * world.width)] for y in
                 range(factor * world.height)]
-    for y in range(world.height * factor):
+
+    #scale ocean
+    for y in range(world.height * factor):#TODO: numpy
         for x in range(world.width * factor):
-            if world.ocean[int(y / factor)][int(x / factor)]:
-                _ocean[y][x] = True
+            if world.ocean[int(y / factor), int(x / factor)]:
+                _ocean[y, x] = True
 
     def my_is_ocean(pos):
-        x, y = pos
-        return _ocean[y][x]
+        return _ocean[pos[1], pos[0]]
 
     for y in range(world.height * factor):
         for x in range(world.width * factor):
-            if not _ocean[y][x] and world.tiles_around_factor(factor, (x, y), radius=1, predicate=my_is_ocean):
+            if not _ocean[y, x] and world.tiles_around_factor(factor, (x, y), radius=1, predicate=my_is_ocean):
                 _borders[y][x] = True
     return _borders
 
 
 def _find_outer_borders(world, factor, inner_borders):
-    _ocean = [[False for x in range(factor * world.width)] for y in
-              range(factor * world.height)]
+    _ocean = numpy.zeros((factor * world.height, factor * world.width), dtype=bool)
     _borders = [[False for x in range(factor * world.width)] for y in
                 range(factor * world.height)]
-    for y in range(world.height * factor):
+    #scale ocean
+    for y in range(world.height * factor):#TODO: numpy
         for x in range(world.width * factor):
             if world.ocean[int(y / factor)][int(x / factor)]:
                 _ocean[y][x] = True
@@ -126,7 +127,7 @@ def _find_outer_borders(world, factor, inner_borders):
 
     for y in range(world.height * factor):
         for x in range(world.width * factor):
-            if _ocean[y][x] and not inner_borders[y][x] and world.tiles_around_factor(factor, (x, y), radius=1, predicate=is_inner_border):
+            if _ocean[y, x] and not inner_borders[y][x] and world.tiles_around_factor(factor, (x, y), radius=1, predicate=is_inner_border):
                 _borders[y][x] = True
     return _borders
 
@@ -592,7 +593,7 @@ def _draw_a_mountain(pixels, x, y, w=3, h=3):
 def _pseudo_random_land_pos(world, i):
     y = (i ** 7 + i * 23) % world.height
     x = (i ** 13 + i * 37) % world.width
-    if world.is_land((x, y)):
+    if not world.ocean[y, x]:
         return int(x), int(y)
     else:
         return _pseudo_random_land_pos(world, (i % 123456789) * 17 + 11)
@@ -710,7 +711,7 @@ def draw_ancientmap(world, target, resize_factor=1,
     max_elev = None
     for y in range(world.height):
         for x in range(world.width):
-            e = world.elevation['data'][y][x]
+            e = world.elevation['data'][y, x]
             if min_elev is None or e < min_elev:
                 min_elev = e
             if max_elev is None or e > max_elev:
@@ -734,7 +735,7 @@ def draw_ancientmap(world, target, resize_factor=1,
                 target.set_pixel(x, y, border_color)
             elif draw_outer_land_border and outer_borders[y][x]:
                 target.set_pixel(x, y, outer_border_color)
-            elif world.ocean[yf][xf]:
+            elif world.ocean[yf, xf]:
                 target.set_pixel(x, y, sea_color)
             else:
                 target.set_pixel(x, y, land_color)

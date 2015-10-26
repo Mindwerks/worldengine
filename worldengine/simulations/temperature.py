@@ -1,5 +1,6 @@
 from worldengine.simulations.basic import find_threshold_f
 import random
+import numpy
 
 
 class TemperatureSimulation(object):
@@ -32,7 +33,7 @@ class TemperatureSimulation(object):
 
         random.seed(seed * 7)
         base = random.randint(0, 4096)
-        temp = [[0 for x in range(width)] for y in range(height)]  # TODO: replace with numpy
+        temp = numpy.zeros((height, width), dtype=float)
 
         from noise import snoise2
 
@@ -40,7 +41,7 @@ class TemperatureSimulation(object):
         octaves = 8
         freq = 16.0 * octaves
 
-        for y in range(0, height):
+        for y in range(0, height):#TODO: Check for possible numpy optimizations.
             y_scaled = float(y) / height
             latitude_factor = 1.0 - (abs(y_scaled - 0.5) * 2)
             for x in range(0, width):
@@ -54,13 +55,13 @@ class TemperatureSimulation(object):
                                    base=base) * (border - x) / border)
 
                 t = (latitude_factor * 12 + n * 1) / 13.0
-                if elevation[y][x] > mountain_level:
-                    if elevation[y][x] > (mountain_level + 29):
+                if elevation[y, x] > mountain_level:
+                    if elevation[y, x] > (mountain_level + 29):
                         altitude_factor = 0.033
                     else:
                         altitude_factor = 1.00 - (
-                            float(elevation[y][x] - mountain_level) / 30)
+                            float(elevation[y, x] - mountain_level) / 30)
                     t *= altitude_factor
-                temp[y][x] = t
+                temp[y, x] = t
 
         return temp

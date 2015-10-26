@@ -9,7 +9,8 @@ from worldengine.simulations.permeability import PermeabilitySimulation
 from worldengine.simulations.erosion import ErosionSimulation
 from worldengine.simulations.precipitation import PrecipitationSimulation
 from worldengine.simulations.biome import BiomeSimulation
-from worldengine.common import anti_alias, get_verbose, matrix_min_and_max, rescale_value
+from worldengine.common import anti_alias, get_verbose
+import numpy
 
 
 # ------------------
@@ -24,9 +25,7 @@ def center_land(world):
     y_with_min_sum = None
     latshift = 0
     for y in range(world.height):
-        sum_on_y = 0
-        for x in range(world.width):
-            sum_on_y += world.elevation['data'][y][x]
+        sum_on_y = world.elevation['data'][y].sum()
         if min_sum_on_y is None or sum_on_y < min_sum_on_y:
             min_sum_on_y = sum_on_y
             y_with_min_sum = y
@@ -36,16 +35,14 @@ def center_land(world):
     min_sum_on_x = None
     x_with_min_sum = None
     for x in range(world.width):
-        sum_on_x = 0
-        for y in range(world.height):
-            sum_on_x += world.elevation['data'][y][x]
+        sum_on_x = world.elevation['data'].T[x].sum()
         if min_sum_on_x is None or sum_on_x < min_sum_on_x:
             min_sum_on_x = sum_on_x
             x_with_min_sum = x
     if get_verbose():
         print("geo.center_land: width complete")
 
-    new_elevation_data = []
+    new_elevation_data = [] #TODO: this should fully use numpy
     new_plates = []
     for y in range(world.height):
         new_elevation_data.append([])
@@ -53,9 +50,9 @@ def center_land(world):
         src_y = (y_with_min_sum + y - latshift) % world.height
         for x in range(world.width):
             src_x = (x_with_min_sum + x) % world.width
-            new_elevation_data[y].append(world.elevation['data'][src_y][src_x])
+            new_elevation_data[y].append(world.elevation['data'][src_y, src_x])
             new_plates[y].append(world.plates[src_y][src_x])
-    world.elevation['data'] = new_elevation_data
+    world.elevation['data'] = numpy.array(new_elevation_data)
     world.plates = new_plates
     if get_verbose():
         print("geo.center_land: width complete")
@@ -69,8 +66,8 @@ def place_oceans_at_map_borders(world):
     ocean_border = int(min(30, max(world.width / 5, world.height / 5)))
 
     def place_ocean(x, y, i):
-        world.elevation['data'][y][x] = \
-            (world.elevation['data'][y][x] * i) / ocean_border
+        world.elevation['data'][y, x] = \
+            (world.elevation['data'][y, x] * i) / ocean_border
 
     for x in range(world.width):
         for i in range(ocean_border):
@@ -89,31 +86,30 @@ def add_noise_to_elevation(world, seed):
     for y in range(world.height):
         for x in range(world.width):
             n = snoise2(x / freq * 2, y / freq * 2, octaves, base=seed)
-            world.elevation['data'][y][x] += n
+            world.elevation['data'][y, x] += n
 
 
-def fill_ocean(elevation, sea_level):
-    width = len(elevation[0])
-    height = len(elevation)
+def fill_ocean(elevation, sea_level):#TODO: Make more use of numpy?
+    height, width = elevation.shape
 
-    ocean = [[False for x in range(width)] for y in range(height)]  # TODO: use numpy
+    ocean = numpy.zeros(elevation.shape, dtype=bool)
     to_expand = []
-    for x in range(width):
-        if elevation[0][x] <= sea_level:
+    for x in range(width):#handle top and bottom border of the map
+        if elevation[0, x] <= sea_level:
             to_expand.append((x, 0))
-        if elevation[height - 1][x] <= sea_level:
+        if elevation[height - 1, x] <= sea_level:
             to_expand.append((x, height - 1))
-    for y in range(height):
-        if elevation[y][0] <= sea_level:
+    for y in range(height):#handle left- and rightmost border of the map
+        if elevation[y, 0] <= sea_level:
             to_expand.append((0, y))
-        if elevation[y][width - 1] <= sea_level:
+        if elevation[y, width - 1] <= sea_level:
             to_expand.append((width - 1, y))
     for t in to_expand:
         tx, ty = t
-        if not ocean[ty][tx]:
-            ocean[ty][tx] = True
+        if not ocean[ty, tx]:
+            ocean[ty, tx] = True
             for px, py in _around(tx, ty, width, height):
-                if not ocean[py][px] and elevation[py][px] <= sea_level:
+                if not ocean[py, px] and elevation[py, px] <= sea_level:
                     to_expand.append((px, py))
 
     return ocean
@@ -144,26 +140,24 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
 # ----
 
 def sea_depth(world, sea_level):
-    sea_depth = [[sea_level - world.elevation['data'][y][x]
-                  for x in range(world.width)] for y in range(world.height)]
+    sea_depth = sea_level - world.elevation['data']
     for y in range(world.height):
         for x in range(world.width):
             if world.tiles_around((x, y), radius=1, predicate=world.is_land):
-                sea_depth[y][x] = 0
+                sea_depth[y, x] = 0
             elif world.tiles_around((x, y), radius=2, predicate=world.is_land):
-                sea_depth[y][x] *= 0.3
+                sea_depth[y, x] *= 0.3
             elif world.tiles_around((x, y), radius=3, predicate=world.is_land):
-                sea_depth[y][x] *= 0.5
+                sea_depth[y, x] *= 0.5
             elif world.tiles_around((x, y), radius=4, predicate=world.is_land):
-                sea_depth[y][x] *= 0.7
+                sea_depth[y, x] *= 0.7
             elif world.tiles_around((x, y), radius=5, predicate=world.is_land):
-                sea_depth[y][x] *= 0.9
+                sea_depth[y, x] *= 0.9
     sea_depth = anti_alias(sea_depth, 10)
-    min_depth, max_depth = matrix_min_and_max(sea_depth)
-    sea_depth = [[rescale_value(sea_depth[y][x], min_depth,
-                                max_depth, 0.0, 1.0)
-                  for x in range(world.width)] for y in
-                 range(world.height)]
+
+    min_depth = sea_depth.min()
+    max_depth = sea_depth.max()
+    sea_depth = (sea_depth - min_depth) / (max_depth - min_depth)
     return sea_depth
 
 
