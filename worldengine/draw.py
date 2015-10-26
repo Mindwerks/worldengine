@@ -172,7 +172,12 @@ def draw_simple_elevation(world, sea_level, target):
     for y in range(world.height):
         for x in range(world.width):
             e = world.elevation['data'][y,x]
-            if world.is_land((x, y)):
+            if sea_level == -1:
+                if min_elev_land is None or e < min_elev_land:
+                    min_elev_land = e
+                if max_elev_land is None or e > max_elev_land:
+                    max_elev_land = e
+            elif world.is_land((x, y)):
                 if min_elev_land is None or e < min_elev_land:
                     min_elev_land = e
                 if max_elev_land is None or e > max_elev_land:
@@ -184,12 +189,15 @@ def draw_simple_elevation(world, sea_level, target):
                     max_elev_sea = e
 
     elev_delta_land = (max_elev_land - min_elev_land)/11
-    elev_delta_sea = max_elev_sea - min_elev_sea
+    if sea_level != -1:
+        elev_delta_sea = max_elev_sea - min_elev_sea
     
     for y in range(world.height):
         for x in range(world.width):
             e = world.elevation['data'][y, x]
-            if world.is_land((x, y)):
+            if sea_level == -1:
+                c = ((e - min_elev_land) / elev_delta_land) + 1
+            elif world.is_land((x, y)):
                 c = ((e - min_elev_land) / elev_delta_land) + 1
             else:
                 c = ((e - min_elev_sea) / elev_delta_sea)
