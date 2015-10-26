@@ -12,7 +12,7 @@ from worldengine.imex import export
 from worldengine.step import Step
 from worldengine.world import World
 from worldengine.version import __version__
-from worldengine.hdf5_serialization import save_hdf5
+from worldengine.hdf5_serialization import save_world_to_hdf5
 
 VERSION = __version__
 
@@ -39,7 +39,7 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
         if world_format == 'protobuf':
             f.write(w.protobuf_serialize())
         elif world_format == 'hdf5':
-            save_hdf5(w, filename)
+            save_world_to_hdf5(w, filename)
         else:
             print("Unknown format '%s', not saving " % world_format)
     print("* world data saved in '%s'" % filename)
