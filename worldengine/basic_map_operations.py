@@ -2,13 +2,6 @@ import math
 import numpy
 
 
-def random_point(width, height, randint_substitute=None):
-    if randint_substitute is None:
-        return numpy.random.randint(0, width), numpy.random.randint(0, height)
-    else:
-        return randint_substitute(0, width), randint_substitute(0, height)
-
-
 def distance(pa, pb):
     ax, ay = pa
     bx, by = pb

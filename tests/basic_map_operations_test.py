@@ -1,21 +1,12 @@
 import numpy
 import unittest
-from worldengine.basic_map_operations import distance, index_of_nearest, random_point
+from worldengine.basic_map_operations import distance, index_of_nearest
 
 
 class TestBasicMapOperations(unittest.TestCase):
 
     def setUp(self):
         pass
-
-    def test_random_point(self):
-        numpy.random.seed(0)
-        for n in range(70):
-            x, y = random_point(100, 200)
-            self.assertTrue(x >= 0,  "x is within boundaries")
-            self.assertTrue(x < 100, "x is within boundaries")
-            self.assertTrue(y >= 0,  "y is within boundaries")
-            self.assertTrue(y < 200, "y is within boundaries")
 
     def test_distance(self):
         self.assertAlmostEquals(22.360679774997898, distance((0, 0), (10, 20)))
