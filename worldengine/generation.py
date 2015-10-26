@@ -150,6 +150,7 @@ def harmonize_ocean(ocean, elevation, ocean_level):
         for x in range(width):
             e = elevation[y, x]
             if ocean[y, x] and e < shallow_sea:
+                # TODO: use numpy to avoid the loop
                 if e < midpoint:
                     e = midpoint - ((midpoint - e) / 5.0)
                 else:
