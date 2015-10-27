@@ -1,11 +1,17 @@
 import unittest
 from worldengine.biome import Biome, Ocean, PolarDesert, SubpolarDryTundra, \
     CoolTemperateMoistForest, biome_name_to_index, biome_index_to_name
+from worldengine.simulations.biome import BiomeSimulation
+from worldengine.world import World
+import os
 
 
 class TestBiome(unittest.TestCase):
 
     def setUp(self):
+        tests_dir = os.path.dirname(os.path.realpath(__file__))
+        self.tests_data_dir = os.path.abspath(os.path.join(
+            tests_dir, "../../worldengine-data/tests/data"))
         pass
 
     def test_biome_by_name(self):
@@ -113,6 +119,10 @@ class TestBiome(unittest.TestCase):
         self.assertEqual('warm temperate rain forest', biome_index_to_name(38))
         self.assertEqual('warm temperate thorn scrub', biome_index_to_name(39))
         self.assertEqual('warm temperate wet forest', biome_index_to_name(40))
+
+    def test_locate_biomes(self):
+        w = World.open_protobuf("%s/biome_test.world" % self.tests_data_dir)
+        cm, biome_cm = BiomeSimulation().execute(w, 6908)
 
     @staticmethod
     def name():
