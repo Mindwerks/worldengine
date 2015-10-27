@@ -64,6 +64,8 @@ def _elevation_color(elevation, sea_level=1.0):
     :return:
     """
     color_step = 1.5
+    if sea_level is None:
+        sea_level = -1
     if elevation < sea_level/2:
         elevation /= sea_level
         return 0.0, 0.0, 0.75 + 0.5 * elevation
@@ -172,7 +174,7 @@ def draw_simple_elevation(world, sea_level, target):
     for y in range(world.height):
         for x in range(world.width):
             e = world.elevation['data'][y,x]
-            if sea_level == -1:
+            if sea_level is None:
                 if min_elev_land is None or e < min_elev_land:
                     min_elev_land = e
                 if max_elev_land is None or e > max_elev_land:
@@ -189,13 +191,13 @@ def draw_simple_elevation(world, sea_level, target):
                     max_elev_sea = e
 
     elev_delta_land = (max_elev_land - min_elev_land)/11
-    if sea_level != -1:
+    if sea_level != None:
         elev_delta_sea = max_elev_sea - min_elev_sea
     
     for y in range(world.height):
         for x in range(world.width):
             e = world.elevation['data'][y, x]
-            if sea_level == -1:
+            if sea_level is None:
                 c = ((e - min_elev_land) / elev_delta_land) + 1
             elif world.is_land((x, y)):
                 c = ((e - min_elev_land) / elev_delta_land) + 1
