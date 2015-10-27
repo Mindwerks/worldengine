@@ -37,6 +37,6 @@ def main(blessed_images_dir, tests_data_dir):
     img.complete()
 
 if __name__ == '__main__':
-    blessed_images_dir = os.path.dirname(os.path.realpath(__file__))
+    blessed_images_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../../worldengine-data/tests/images"))
     tests_data_dir = os.path.abspath(os.path.join(blessed_images_dir, '../data'))
     main(blessed_images_dir, tests_data_dir)
