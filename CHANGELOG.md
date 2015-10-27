@@ -3,6 +3,7 @@ Version 0.19-UNRELEASED
 * Added export support using libgdal
 * Force rivers and grayscale_heightmap to PNG to avoid ambiguity of providing a 
 filename which can introduce input error.
+* Modified color elevation routines so that all land is raised to eliminate land below sea level and then elevation is normalized.
 
 Version 0.18
 
