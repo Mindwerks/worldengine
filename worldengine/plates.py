@@ -63,7 +63,7 @@ def world_gen(name, width, height, seed, num_plates=10, ocean_level=1.0,
 
     if verbose:
         start_time = time.time()
-    add_noise_to_elevation(world, numpy.random.randint(0, 4096))
+    add_noise_to_elevation(world, numpy.random.randint(0, 4096))  # uses the global RNG; this is the very first call to said RNG - should that change, this needs to be taken care of
     if verbose:
         elapsed_time = time.time() - start_time
         print("...plates.world_gen: elevation noise added. Elapsed time " +

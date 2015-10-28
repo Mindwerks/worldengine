@@ -389,11 +389,12 @@ def main():
         if not os.path.exists(args.FILE):
             usage("The specified world file does not exist")
 
+    maxseed = 65535  # there is a hard limit somewhere so seeds outside the uint16 range are considered unsafe
     if args.seed is not None:
         seed = int(args.seed)
-        assert 0 <= seed <= 65535, "Seed has to be in the range between 0 and 65535, borders included."  # there is a hard limit somewhere so seeds outside the uint16 range are considered unsafe
+        assert 0 <= seed <= maxseed, "Seed has to be in the range between 0 and %s, borders included." % maxseed
     else:
-        seed = numpy.random.randint(0, 65535)  # first-time RNG initialization is done automatically
+        seed = numpy.random.randint(0, maxseed)  # first-time RNG initialization is done automatically
     numpy.random.seed(seed)
 
     if args.world_name:

@@ -513,7 +513,7 @@ def _draw_savanna(pixels, x, y):
 
 
 # TODO: complete and enable this one
-def _dynamic_draw_a_mountain(pixels, x, y, w=3, h=3):
+def _dynamic_draw_a_mountain(pixels, rng, x, y, w=3, h=3):
     # mcl = (0, 0, 0, 255)  # TODO: No longer used?
     # mcll = (128, 128, 128, 255)
     mcr = (75, 75, 75, 255)
@@ -528,7 +528,7 @@ def _dynamic_draw_a_mountain(pixels, x, y, w=3, h=3):
         max_leftborder = int(bottomness * w * 1.33)
         if not last_leftborder == None:
             max_leftborder = min(max_leftborder, last_leftborder + 1)
-        leftborder = int(bottomness * w) + numpy.random.randint(-2, 2)/2
+        leftborder = int(bottomness * w) + rng.randint(-2, 2)/2
         if leftborder < min_leftborder:
             leftborder = min_leftborder
         if leftborder > max_leftborder:
