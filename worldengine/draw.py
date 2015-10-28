@@ -489,9 +489,9 @@ def draw_scatter_plot(world, size, target):
 # -------------
 
 
-def draw_simple_elevation_on_file(data, filename, width, height, sea_level):
-    img = ImagePixelSetter(width, height, filename)
-    draw_simple_elevation(data, width, height, sea_level, img)
+def draw_simple_elevation_on_file(world, filename, sea_level):
+    img = ImagePixelSetter(world.width, world.height, filename)
+    draw_simple_elevation(world, sea_level, img)
     img.complete()
 
 

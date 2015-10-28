@@ -66,9 +66,6 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
     sea_level = w.sea_level()
     draw_simple_elevation_on_file(w, filename, sea_level=sea_level)
     print("* elevation image generated in '%s'" % filename)
-    filename = '%s/%s_scatter.png' % (output_dir, world_name)
-    draw_scatter_plot_on_file(w, filename)
-    print("* scatter plot image generated in '%s'" % filename)
     return w
 
 
@@ -80,6 +77,10 @@ def generate_grayscale_heightmap(world, filename):
 def generate_rivers_map(world, filename):
     draw_riversmap_on_file(world, filename)
     print("+ rivers map generated in '%s'" % filename)
+
+def draw_scatter_plot(world, filename):
+    draw_scatter_plot_on_file(world, filename)
+    print("+ scatter plot generated in '%s'" % filename)
 
 
 def generate_plates(seed, world_name, output_dir, width, height,
@@ -305,6 +306,8 @@ def main():
     g_generate.add_argument('--not-fade-borders', dest='fade_borders', action="store_false",
                                help="Not fade borders",
                                default=True)
+    g_generate.add_argument('--scatter', dest='scatter_plot',
+                            action="store_true", help="generate scatter plot")
 
     # -----------------------------------------------------
     g_ancient_map = parser.add_argument_group(
@@ -420,6 +423,9 @@ def main():
     if args.rivers_map and not generation_operation:
         usage(error="Rivers map can be produced only during world generation")
 
+    if args.scatter_plot and not generation_operation:
+        usage(error="Scatter plot can be produced only during world generation")
+
     print('Worldengine - a world generator (v. %s)' % VERSION)
     print('-----------------------')
     print(' operation         : %s generation' % operation)
@@ -434,6 +440,7 @@ def main():
         print(' step                 : %s' % step.name)
         print(' greyscale heightmap  : %s' % args.grayscale_heightmap)
         print(' rivers map           : %s' % args.rivers_map)
+        print(' scatter plot         : %s' % args.scatter_plot)
         print(' fade borders         : %s' % args.fade_borders)
     if operation == 'ancient_map':
         print(' resize factor          : %i' % args.resize_factor)
@@ -461,6 +468,9 @@ def main():
         if args.rivers_map:
             generate_rivers_map(world,
             '%s/%s_rivers.png' % (args.output_dir, world_name))
+        if args.scatter_plot:
+            draw_scatter_plot(world,
+            '%s/%s_scatter.png' % (args.output_dir, world_name))    
 
     elif operation == 'plates':
         print('')  # empty line
