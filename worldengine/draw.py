@@ -406,15 +406,92 @@ def draw_biome(world, target):
             v = biome[y, x]
             target.set_pixel(x, y, _biome_colors[v])
 
+def draw_scatter_plot(world, size, target):
+    """ This function can be used on a generic canvas (either an image to save
+        on disk or a canvas part of a GUI)
+    """
+    min_humidity = None
+    max_humidity = None
+    min_temperature = None
+    max_temperature = None
+    for y in range(world.height):
+        for x in range(world.width):
+            if world.is_land((x, y)):
+                t = world.temperature_at((x, y))
+                p = world.humidity['data'][y, x]
+                if min_temperature is None or t < min_temperature:
+                    min_temperature = t
+                if max_temperature is None or t > max_temperature:
+                    max_temperature = t
+                if min_humidity is None or p < min_humidity:
+                    min_humidity = p
+                if max_humidity is None or p > max_humidity:
+                    max_humidity = p
+    
+    temperature_delta = max_temperature - min_temperature
+    humidity_delta = max_humidity - min_humidity
+    
+    for y in range(0, size):
+        for x in range(0, size):
+            target.set_pixel(x, y, (255, 255, 255, 255))
+    for t in range(0, 6):
+        v = (size - 1) * ((world.temperature['thresholds'][t][1] - min_temperature) / temperature_delta)
+        for y in range(0, size):
+            target.set_pixel(int(v), y, (0, 0, 0, 255))
+    ranges = ['87', '75', '62', '50', '37', '25', '12']
+    for p in ranges:
+        h = (size - 1) * ((world.humidity['quantiles'][p] - min_humidity) / humidity_delta)
+        for x in range(0, size):
+            target.set_pixel(x, int(h), (0, 0, 0, 255))
+        
+    for y in range(world.height):
+        for x in range(world.width):
+            if world.is_land((x, y)):
+                t = world.temperature_at((x, y))
+                p = world.humidity['data'][y, x]
+                if world.is_temperature_polar((x, y)):
+                    r = 0
+                elif world.is_temperature_alpine((x, y)):
+                    r = 42
+                elif world.is_temperature_boreal((x, y)):
+                    r = 85
+                elif world.is_temperature_cool((x, y)):
+                    r = 128
+                elif world.is_temperature_warm((x, y)):
+                    r = 170
+                elif world.is_temperature_subtropical((x, y)):
+                    r = 213
+                elif world.is_temperature_tropical((x, y)):
+                    r = 255
+                if world.is_humidity_superarid((x, y)):
+                    b = 32
+                elif world.is_humidity_perarid((x, y)):
+                    b = 64
+                elif world.is_humidity_arid((x, y)):
+                    b = 96
+                elif world.is_humidity_semiarid((x, y)):
+                    b = 128
+                elif world.is_humidity_subhumid((x, y)):
+                    b = 160
+                elif world.is_humidity_humid((x, y)):
+                    b = 192
+                elif world.is_humidity_perhumid((x, y)):
+                    b = 224
+                elif world.is_humidity_superhumid((x, y)):
+                    b = 255
+                nx = (size - 1) * ((t - min_temperature) / temperature_delta)
+                ny = (size - 1) * ((p - min_humidity) / humidity_delta)
+                target.set_pixel(int(nx), int(ny), (r, 128, b, 255))
+    
 
 # -------------
 # Draw on files
 # -------------
 
 
-def draw_simple_elevation_on_file(world, filename, sea_level):
-    img = ImagePixelSetter(world.width, world.height, filename)
-    draw_simple_elevation(world, sea_level, img)
+def draw_simple_elevation_on_file(data, filename, width, height, sea_level):
+    img = ImagePixelSetter(width, height, filename)
+    draw_simple_elevation(data, width, height, sea_level, img)
     img.complete()
 
 
@@ -476,4 +553,9 @@ def draw_ancientmap_on_file(world, filename, resize_factor=1,
     draw_ancientmap(world, img, resize_factor, sea_color,
                     draw_biome, draw_rivers, draw_mountains, draw_outer_land_border, 
                     verbose)
+    img.complete()
+
+def draw_scatter_plot_on_file(world, filename):
+    img = ImagePixelSetter(512, 512, filename)
+    draw_scatter_plot(world, 512, img)
     img.complete()

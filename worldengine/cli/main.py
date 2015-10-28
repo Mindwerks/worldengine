@@ -8,7 +8,7 @@ import worldengine.generation as geo
 from worldengine.common import array_to_matrix, set_verbose, print_verbose
 from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
     draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
-    draw_temperature_levels_on_file, draw_riversmap_on_file
+    draw_temperature_levels_on_file, draw_riversmap_on_file, draw_scatter_plot_on_file
 from worldengine.plates import world_gen, generate_plates_simulation
 from worldengine.imex import export
 from worldengine.step import Step
@@ -66,6 +66,9 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
     sea_level = w.sea_level()
     draw_simple_elevation_on_file(w, filename, sea_level=sea_level)
     print("* elevation image generated in '%s'" % filename)
+    filename = '%s/%s_scatter.png' % (output_dir, world_name)
+    draw_scatter_plot_on_file(w, filename)
+    print("* scatter plot image generated in '%s'" % filename)
     return w
 
 

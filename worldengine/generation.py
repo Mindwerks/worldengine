@@ -199,6 +199,7 @@ def generate_world(w, step):
     if not step.include_precipitations:
         return w
 
+    TemperatureSimulation().execute(w, seed)
     # Precipitation with thresholds
     PrecipitationSimulation().execute(w, seed)
 
@@ -212,7 +213,7 @@ def generate_world(w, step):
 
     # FIXME: create setters
     IrrigationSimulation().execute(w, seed)
-    TemperatureSimulation().execute(w, seed)
+    
     HumiditySimulation().execute(w, seed)
 
     
