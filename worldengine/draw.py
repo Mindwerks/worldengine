@@ -434,6 +434,36 @@ def draw_scatter_plot(world, size, target):
     for y in range(0, size):
         for x in range(0, size):
             target.set_pixel(x, y, (255, 255, 255, 255))
+    h_min = (size - 1) * ((world.humidity['quantiles']['62'] - min_humidity) / humidity_delta)
+    h_max = (size - 1) * ((world.humidity['quantiles']['50'] - min_humidity) / humidity_delta)
+    v_max = (size - 1) * ((world.temperature['thresholds'][0][1] - min_temperature) / temperature_delta)
+    for y in range(int(h_min), int(h_max)):
+        for x in range(0, int(v_max)):
+            target.set_pixel(x, y, (128, 128, 128, 255))
+    h_min = (size - 1) * ((world.humidity['quantiles']['50'] - min_humidity) / humidity_delta)
+    h_max = (size - 1) * ((world.humidity['quantiles']['37'] - min_humidity) / humidity_delta)
+    v_max = (size - 1) * ((world.temperature['thresholds'][1][1] - min_temperature) / temperature_delta)
+    for y in range(int(h_min), int(h_max)):
+        for x in range(0, int(v_max)):
+            target.set_pixel(x, y, (128, 128, 128, 255))
+    h_min = (size - 1) * ((world.humidity['quantiles']['37'] - min_humidity) / humidity_delta)
+    h_max = (size - 1) * ((world.humidity['quantiles']['25'] - min_humidity) / humidity_delta)
+    v_max = (size - 1) * ((world.temperature['thresholds'][2][1] - min_temperature) / temperature_delta)
+    for y in range(int(h_min), int(h_max)):
+        for x in range(0, int(v_max)):
+            target.set_pixel(x, y, (128, 128, 128, 255))
+    h_min = (size - 1) * ((world.humidity['quantiles']['25'] - min_humidity) / humidity_delta)
+    h_max = (size - 1) * ((world.humidity['quantiles']['12'] - min_humidity) / humidity_delta) 
+    v_max = (size - 1) * ((world.temperature['thresholds'][3][1] - min_temperature) / temperature_delta)
+    for y in range(int(h_min), int(h_max)):
+        for x in range(0, int(v_max)):
+            target.set_pixel(x, y, (128, 128, 128, 255))
+    h_min = (size - 1) * ((world.humidity['quantiles']['12'] - min_humidity) / humidity_delta)
+    h_max = size
+    v_max = (size - 1) * ((world.temperature['thresholds'][5][1] - min_temperature) / temperature_delta)
+    for y in range(int(h_min), int(h_max)):
+        for x in range(0, int(v_max)):
+            target.set_pixel(x, y, (128, 128, 128, 255))
     for t in range(0, 6):
         v = (size - 1) * ((world.temperature['thresholds'][t][1] - min_temperature) / temperature_delta)
         for y in range(0, size):
