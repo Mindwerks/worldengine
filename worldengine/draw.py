@@ -3,7 +3,7 @@ import numpy
 import numpy.ma as ma
 
 from worldengine.drawing_functions import draw_ancientmap, \
-    draw_rivers_on_image, gradient
+    draw_rivers_on_image
 
 # -------------
 # Helper values
@@ -168,43 +168,33 @@ def draw_simple_elevation(world, sea_level, target):
     """ This function can be used on a generic canvas (either an image to save
         on disk or a canvas part of a GUI)
     """
-    min_elev_sea = None
-    max_elev_sea = None
-    min_elev_land = None
-    max_elev_land = None
-    for y in range(world.height):
-        for x in range(world.width):
-            e = world.elevation['data'][y,x]
-            if sea_level is None:
-                if min_elev_land is None or e < min_elev_land:
-                    min_elev_land = e
-                if max_elev_land is None or e > max_elev_land:
-                    max_elev_land = e
-            elif world.is_land((x, y)):
-                if min_elev_land is None or e < min_elev_land:
-                    min_elev_land = e
-                if max_elev_land is None or e > max_elev_land:
-                    max_elev_land = e
-            else:
-                if min_elev_sea is None or e < min_elev_sea:
-                    min_elev_sea = e
-                if max_elev_sea is None or e > max_elev_sea:
-                    max_elev_sea = e
+    e = world.elevation['data']
 
-    elev_delta_land = (max_elev_land - min_elev_land)/11
-    if sea_level != None:
+    c = numpy.empty(e.shape, dtype=numpy.float)
+    if sea_level is None or world.ocean is None or not world.ocean.any():  # or 'not any ocean'
+        mask = numpy.ma.array(e, mask = False)  # the whole map
+        min_elev_land = mask.min()
+        max_elev_land = mask.max()
+        elev_delta_land = (max_elev_land - min_elev_land) / 11.0
+
+        c = ((e - min_elev_land) / elev_delta_land) + 1
+    else:
+        mask = numpy.ma.array(e, mask = world.ocean)  # only land
+        min_elev_land = mask.min()
+        max_elev_land = mask.max()
+        elev_delta_land = (max_elev_land - min_elev_land) / 11.0
+
+        mask = numpy.ma.array(e, mask = numpy.logical_not(world.ocean))  # only ocean
+        min_elev_sea = mask.min()
+        max_elev_sea = mask.max()
         elev_delta_sea = max_elev_sea - min_elev_sea
-    
+
+        c[world.ocean] = ((e[world.ocean] - min_elev_sea) / elev_delta_sea)
+        c[numpy.invert(world.ocean)] = ((e[numpy.invert(world.ocean)] - min_elev_land) / elev_delta_land) + 1
+
     for y in range(world.height):
         for x in range(world.width):
-            e = world.elevation['data'][y, x]
-            if sea_level is None:
-                c = ((e - min_elev_land) / elev_delta_land) + 1
-            elif world.is_land((x, y)):
-                c = ((e - min_elev_land) / elev_delta_land) + 1
-            else:
-                c = ((e - min_elev_sea) / elev_delta_sea)
-            r, g, b = elevation_color(c, sea_level)
+            r, g, b = elevation_color(c[y, x], sea_level)
             target.set_pixel(x, y, (int(r * 255), int(g * 255),
                                     int(b * 255), 255))
 
@@ -213,46 +203,34 @@ def draw_riversmap(world, target):
     sea_color = (255, 255, 255, 255)
     land_color = (0, 0, 0, 255)
 
-    for y in range(world.height):#TODO: numpy
+    for y in range(world.height):
         for x in range(world.width):
-            if world.ocean[y, x]:
-                target.set_pixel(x, y, sea_color)
-            else:
-                target.set_pixel(x, y, land_color)
+            target.set_pixel(x, y, sea_color if world.ocean[y, x] else land_color)
 
     draw_rivers_on_image(world, target, factor=1)
 
 
 def draw_grayscale_heightmap(world, target):
-    min_elev_sea = None
-    max_elev_sea = None
-    min_elev_land = None
-    max_elev_land = None
-    for y in range(world.height):
-        for x in range(world.width):
-            e = world.elevation['data'][y, x]
-            if world.is_land((x, y)):
-                if min_elev_land is None or e < min_elev_land:
-                    min_elev_land = e
-                if max_elev_land is None or e > max_elev_land:
-                    max_elev_land = e
-            else:
-                if min_elev_sea is None or e < min_elev_sea:
-                    min_elev_sea = e
-                if max_elev_sea is None or e > max_elev_sea:
-                    max_elev_sea = e
+    e = world.elevation['data']
 
+    mask = numpy.ma.array(e, mask = world.ocean)  # only land
+    min_elev_land = mask.min()
+    max_elev_land = mask.max()
     elev_delta_land = max_elev_land - min_elev_land
+
+    mask = numpy.ma.array(e, mask = numpy.logical_not(world.ocean))  # only ocean
+    min_elev_sea = mask.min()
+    max_elev_sea = mask.max()
     elev_delta_sea = max_elev_sea - min_elev_sea
 
+    c = numpy.empty(e.shape, dtype=numpy.float)
+    c[numpy.invert(world.ocean)] = (e[numpy.invert(world.ocean)] - min_elev_land) * 127 / elev_delta_land + 128
+    c[world.ocean] = (e[world.ocean] - min_elev_sea) * 127 / elev_delta_sea
+    c = numpy.rint(c).astype(dtype=numpy.int32)  # proper rounding
+
     for y in range(world.height):
         for x in range(world.width):
-            e = world.elevation['data'][y, x]
-            if world.is_land((x, y)):
-                c = int(((e - min_elev_land) * 127) / elev_delta_land)+128
-            else:
-                c = int(((e - min_elev_sea) * 127) / elev_delta_sea)
-            target.set_pixel(x, y, (c, c, c, 255))
+            target.set_pixel(x, y, (c[y, x], c[y, x], c[y, x], 255))
 
 
 def draw_elevation(world, shadow, target):
@@ -268,7 +246,7 @@ def draw_elevation(world, shadow, target):
     max_elev = mask.max()
     elev_delta = max_elev - min_elev
 
-    for y in range(height):#TODO: numpy optimisation for the code below
+    for y in range(height):
         for x in range(width):
             if ocean[y, x]:
                 target.set_pixel(x, y, (0, 0, 255, 255))
@@ -307,24 +285,16 @@ def draw_precipitation(world, target, black_and_white=False):
     height = world.height
 
     if black_and_white:
-        low = None
-        high = None
+        low = world.precipitation['data'].min()
+        high = world.precipitation['data'].max()
+        floor = 0
+        ceiling = 255
+
+        colors = numpy.interp(world.precipitation['data'], [low, high], [floor, ceiling])
+        colors = numpy.rint(colors).astype(dtype=numpy.int32)  # proper rounding
         for y in range(height):
             for x in range(width):
-                p = world.precipitations_at((x, y))
-                if low is None or p < low:
-                    low = p
-                if high is None or p > high:
-                    high = p
-        for y in range(height):
-            for x in range(width):
-                p = world.precipitations_at((x, y))
-                if p <= low:
-                    target.set_pixel(x, y, (0, 0, 0, 255))
-                elif p >= high:
-                    target.set_pixel(x, y, (255, 255, 255, 255))
-                else:
-                    target.set_pixel(x, y, gradient(p, low, high, (0, 0, 0), (255, 255, 255)))
+                target.set_pixel(x, y, (colors[y, x], colors[y, x], colors[y, x], 255))
     else:
         for y in range(height):
             for x in range(width):
@@ -367,15 +337,14 @@ def draw_temperature_levels(world, target, black_and_white=False):
     if black_and_white:
         low = world.temperature_thresholds()[0][1]
         high = world.temperature_thresholds()[5][1]
+        floor = 0
+        ceiling = 255
+
+        colors = numpy.interp(world.temperature['data'], [low, high], [floor, ceiling])
+        colors = numpy.rint(colors).astype(dtype=numpy.int32)  # proper rounding
         for y in range(height):
             for x in range(width):
-                t = world.temperature_at((x, y))
-                if t <= low:
-                    target.set_pixel(x, y, (0, 0, 0, 255))
-                elif t >= high:
-                    target.set_pixel(x, y, (255, 255, 255, 255))
-                else:
-                    target.set_pixel(x, y, gradient(t, low, high, (0, 0, 0), (255, 255, 255)))
+                target.set_pixel(x, y, (colors[y, x], colors[y, x], colors[y, x], 255))
 
     else:
         for y in range(height):
