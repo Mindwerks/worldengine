@@ -439,40 +439,40 @@ def draw_scatter_plot(world, size, target):
     v_max = (size - 1) * ((world.temperature['thresholds'][0][1] - min_temperature) / temperature_delta)
     for y in range(int(h_min), int(h_max)):
         for x in range(0, int(v_max)):
-            target.set_pixel(x, y, (128, 128, 128, 255))
+            target.set_pixel(x, (size - 1) - y, (128, 128, 128, 255))
     h_min = (size - 1) * ((world.humidity['quantiles']['50'] - min_humidity) / humidity_delta)
     h_max = (size - 1) * ((world.humidity['quantiles']['37'] - min_humidity) / humidity_delta)
     v_max = (size - 1) * ((world.temperature['thresholds'][1][1] - min_temperature) / temperature_delta)
     for y in range(int(h_min), int(h_max)):
         for x in range(0, int(v_max)):
-            target.set_pixel(x, y, (128, 128, 128, 255))
+            target.set_pixel(x, (size - 1) - y, (128, 128, 128, 255))
     h_min = (size - 1) * ((world.humidity['quantiles']['37'] - min_humidity) / humidity_delta)
     h_max = (size - 1) * ((world.humidity['quantiles']['25'] - min_humidity) / humidity_delta)
     v_max = (size - 1) * ((world.temperature['thresholds'][2][1] - min_temperature) / temperature_delta)
     for y in range(int(h_min), int(h_max)):
         for x in range(0, int(v_max)):
-            target.set_pixel(x, y, (128, 128, 128, 255))
+            target.set_pixel(x, (size - 1) - y, (128, 128, 128, 255))
     h_min = (size - 1) * ((world.humidity['quantiles']['25'] - min_humidity) / humidity_delta)
     h_max = (size - 1) * ((world.humidity['quantiles']['12'] - min_humidity) / humidity_delta) 
     v_max = (size - 1) * ((world.temperature['thresholds'][3][1] - min_temperature) / temperature_delta)
     for y in range(int(h_min), int(h_max)):
         for x in range(0, int(v_max)):
-            target.set_pixel(x, y, (128, 128, 128, 255))
+            target.set_pixel(x, (size - 1) - y, (128, 128, 128, 255))
     h_min = (size - 1) * ((world.humidity['quantiles']['12'] - min_humidity) / humidity_delta)
     h_max = size
     v_max = (size - 1) * ((world.temperature['thresholds'][5][1] - min_temperature) / temperature_delta)
     for y in range(int(h_min), int(h_max)):
         for x in range(0, int(v_max)):
-            target.set_pixel(x, y, (128, 128, 128, 255))
+            target.set_pixel(x, (size - 1) - y, (128, 128, 128, 255))
     for t in range(0, 6):
         v = (size - 1) * ((world.temperature['thresholds'][t][1] - min_temperature) / temperature_delta)
         for y in range(0, size):
-            target.set_pixel(int(v), y, (0, 0, 0, 255))
+            target.set_pixel(int(v), (size - 1) - y, (0, 0, 0, 255))
     ranges = ['87', '75', '62', '50', '37', '25', '12']
     for p in ranges:
         h = (size - 1) * ((world.humidity['quantiles'][p] - min_humidity) / humidity_delta)
         for x in range(0, size):
-            target.set_pixel(x, int(h), (0, 0, 0, 255))
+            target.set_pixel(x, (size - 1) - int(h), (0, 0, 0, 255))
         
     for y in range(world.height):
         for x in range(world.width):
@@ -511,7 +511,7 @@ def draw_scatter_plot(world, size, target):
                     b = 255
                 nx = (size - 1) * ((t - min_temperature) / temperature_delta)
                 ny = (size - 1) * ((p - min_humidity) / humidity_delta)
-                target.set_pixel(int(nx), int(ny), (r, 128, b, 255))
+                target.set_pixel(int(nx), (size - 1) - int(ny), (r, 128, b, 255))
     
 
 # -------------
