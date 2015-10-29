@@ -105,8 +105,6 @@ def generate_plates(seed, world_name, output_dir, width, height,
 
     # Generate images
     filename = '%s/plates_%s.png' % (output_dir, world_name)
-    # TODO calculate appropriate sea_level
-    sea_level = 1.0
     draw_simple_elevation_on_file(world, filename, None)
     print("+ plates image generated in '%s'" % filename)
     geo.center_land(world)

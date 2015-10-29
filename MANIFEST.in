@@ -10,3 +10,4 @@ prune tests
 prune tox.ini
 prune *.yml
 prune *.cfg
+recursive-exclude docs *.html
