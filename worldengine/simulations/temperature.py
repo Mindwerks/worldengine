@@ -15,12 +15,12 @@ class TemperatureSimulation(object):
 
         t = self._calculate(world, seed, e, ml)
         t_th = [
-            ('polar', find_threshold_f(t, 0.874, ocean)),
-            ('alpine', find_threshold_f(t, 0.765, ocean)),
-            ('boreal', find_threshold_f(t, 0.594, ocean)),
-            ('cool', find_threshold_f(t, 0.439, ocean)),
-            ('warm', find_threshold_f(t, 0.366, ocean)),
-            ('subtropical', find_threshold_f(t, 0.124, ocean)),
+            ('polar', find_threshold_f(t, world.temps[0], ocean)),
+            ('alpine', find_threshold_f(t, world.temps[1], ocean)),
+            ('boreal', find_threshold_f(t, world.temps[2], ocean)),
+            ('cool', find_threshold_f(t, world.temps[3], ocean)),
+            ('warm', find_threshold_f(t, world.temps[4], ocean)),
+            ('subtropical', find_threshold_f(t, world.temps[5], ocean)),
             ('tropical', None)
         ]
         world.set_temperature(t, t_th)

@@ -23,7 +23,8 @@ class World(object):
     """
 
     def __init__(self, name, width, height, seed, num_plates, ocean_level,
-                 step):
+                 step, temps=[0.874, 0.765, 0.594, 0.439, 0.366, 0.124],
+                 humids = [.941, .778, .507, .236, 0.073, .014, .002]):
         self.name = name
         self.width = width
         self.height = height
@@ -31,6 +32,8 @@ class World(object):
         self.n_plates = num_plates
         self.ocean_level = ocean_level
         self.step = step
+        self.temps = temps
+        self.humids = humids
 
     #
     # General methods
