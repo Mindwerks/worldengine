@@ -302,12 +302,12 @@ def main():
     g_generate.add_argument('--temps', dest='temps', 
                         help="Provide alternate ranges for temperatures. " +
                              "If not provided, the default values will be used. \n" +
-                             "[default = 0.874/0.765/0.594/0.439/0.366/0.124]",
+                             "[default = .126/.235/.406/.561/.634/.876]",
                             metavar="#/#/#/#/#/#")
     g_generate.add_argument('--humidity', dest='humids', 
                         help="Provide alternate ranges for humidities. " +
                              "If not provided, the default values will be used. \n" +
-                            "[default = .941/.778/.507/.236/.073/.014/.002]",
+                            "[default = .059/.222/.493/.764/.927/.986/.998]",
                             metavar="#/#/#/#/#/#/#")
     g_generate.add_argument('--not-fade-borders', dest='fade_borders', action="store_false",
                                help="Not fade borders",
@@ -439,7 +439,7 @@ def main():
     if args.temps:
         temps = args.temps.split('/')
         for x in range(0,6):
-            temps[x] = float(temps[x])
+            temps[x] = 1 - float(temps[x])
 
     if args.humids and not generation_operation:
         usage(error="humidity can be assigned only during world generation")
@@ -451,7 +451,7 @@ def main():
     if args.humids:
         humids = args.humids.split('/')
         for x in range(0,7):
-            humids[x] = float(humids[x])
+            humids[x] = 1 - float(humids[x])
 
     print('Worldengine - a world generator (v. %s)' % VERSION)
     print('-----------------------')
@@ -469,9 +469,9 @@ def main():
         print(' rivers map           : %s' % args.rivers_map)
         print(' fade borders         : %s' % args.fade_borders)
     if args.temps:
-        print(' temperature ranges   : %s' % temps)
+        print(' temperature ranges   : %s' % args.temps)
     if args.humids:
-        print(' humidity ranges      : %s' % humids)
+        print(' humidity ranges      : %s' % args.humids)
     if operation == 'ancient_map':
         print(' resize factor          : %i' % args.resize_factor)
         print(' world file             : %s' % args.world_file)
