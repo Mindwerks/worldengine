@@ -22,9 +22,10 @@ STEPS = 'plates|precipitations|full'
 
 
 def generate_world(world_name, width, height, seed, num_plates, output_dir,
-                   step, ocean_level, world_format='pickle', fade_borders=True,
+                   step, ocean_level, temps, humids,
+                   world_format='pickle', fade_borders=True,
                    verbose=True, black_and_white=False):
-    w = world_gen(world_name, width, height, seed, num_plates, ocean_level,
+    w = world_gen(world_name, width, height, seed, temps, humids, num_plates, ocean_level,
                   step, fade_borders=fade_borders, verbose=verbose)
 
     print('')  # empty line
@@ -298,6 +299,16 @@ def main():
                             help='elevation cut off for sea level " +'
                                  '[default = %(default)s]',
                             metavar="N", default=1.0)
+    g_generate.add_argument('--temps', dest='temps', 
+                        help="Provide alternate ranges for temperatures. " +
+                             "If not provided, the default values will be used. \n" +
+                             "[default = .126/.235/.406/.561/.634/.876]",
+                            metavar="#/#/#/#/#/#")
+    g_generate.add_argument('--humidity', dest='humids', 
+                        help="Provide alternate ranges for humidities. " +
+                             "If not provided, the default values will be used. \n" +
+                            "[default = .059/.222/.493/.764/.927/.986/.998]",
+                            metavar="#/#/#/#/#/#/#")
     g_generate.add_argument('--not-fade-borders', dest='fade_borders', action="store_false",
                                help="Not fade borders",
                                default=True)
@@ -418,6 +429,30 @@ def main():
     if args.rivers_map and not generation_operation:
         usage(error="Rivers map can be produced only during world generation")
 
+    if args.temps and not generation_operation:
+        usage(error="temps can be assigned only during world generation")
+
+    if args.temps and len(args.temps.split('/')) is not 6:
+        usage(error="temps must have exactly 6 values")
+
+    temps =[.874, .765, .594, .439, .366, .124]
+    if args.temps:
+        temps = args.temps.split('/')
+        for x in range(0,6):
+            temps[x] = 1 - float(temps[x])
+
+    if args.humids and not generation_operation:
+        usage(error="humidity can be assigned only during world generation")
+
+    if args.humids and len(args.humids.split('/')) is not 7:
+        usage(error="humidity must have exactly 7 values")
+
+    humids = [.941, .778, .507, .236, 0.073, .014, .002]
+    if args.humids:
+        humids = args.humids.split('/')
+        for x in range(0,7):
+            humids[x] = 1 - float(humids[x])
+
     print('Worldengine - a world generator (v. %s)' % VERSION)
     print('-----------------------')
     print(' operation         : %s generation' % operation)
@@ -433,6 +468,10 @@ def main():
         print(' greyscale heightmap  : %s' % args.grayscale_heightmap)
         print(' rivers map           : %s' % args.rivers_map)
         print(' fade borders         : %s' % args.fade_borders)
+    if args.temps:
+        print(' temperature ranges   : %s' % args.temps)
+    if args.humids:
+        print(' humidity ranges      : %s' % args.humids)
     if operation == 'ancient_map':
         print(' resize factor          : %i' % args.resize_factor)
         print(' world file             : %s' % args.world_file)
@@ -450,7 +489,7 @@ def main():
 
         world = generate_world(world_name, args.width, args.height,
                                seed, args.number_of_plates, args.output_dir,
-                               step, args.ocean_level, world_format,
+                               step, args.ocean_level, temps, humids, world_format,
                                fade_borders=args.fade_borders,
                                verbose=args.verbose, black_and_white=args.black_and_white)
         if args.grayscale_heightmap:
