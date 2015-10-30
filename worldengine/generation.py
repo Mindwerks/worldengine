@@ -213,6 +213,7 @@ def generate_world(w, step):
                  '':                        sub_seeds[99]
     }
 
+    TemperatureSimulation().execute(w, seed_dict['TemperatureSimulation'])
     # Precipitation with thresholds
     PrecipitationSimulation().execute(w, seed_dict['PrecipitationSimulation'])
 
@@ -226,7 +227,6 @@ def generate_world(w, step):
 
     # FIXME: create setters
     IrrigationSimulation().execute(w, seed_dict['IrrigationSimulation'])  # seed not currently used
-    TemperatureSimulation().execute(w, seed_dict['TemperatureSimulation'])
     HumiditySimulation().execute(w, seed_dict['HumiditySimulation'])  # seed not currently used
 
     
