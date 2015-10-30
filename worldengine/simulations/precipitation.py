@@ -45,10 +45,12 @@ class PrecipitationSimulation(object):
         octaves = 6
         freq = 64.0 * octaves
 
+        n_scale = 1024 / float(height) #This is a variable I am adding. It exists
+                                       #so that worlds sharing a common seed but
+                                       #different sizes will have similar patterns
+
         for y in range(height):#TODO: numpy
             y_scaled = float(y) / height
-            n_scale = 1024 / float(height)
-            latitude_factor = 1.0 - (abs(y_scaled - 0.5) * 2)
             for x in range(width):
                 n = snoise2((x * n_scale) / freq, (y * n_scale) / freq, octaves, base=base)
 
@@ -60,48 +62,29 @@ class PrecipitationSimulation(object):
                                 base=base) * (border - x) / border)
 
                 precipitations[y, x] = n
-        min_precip = None
-        max_precip = None
-        min_temp = None
-        max_temp = None
 
         #find ranges
-        for y in range(height):#TODO: numpy
-            for x in range(width):
-                t = world.temperature_at((x, y))
-                p = precipitations[y, x]
-                if min_precip is None or p < min_precip:
-                    min_precip = p
-                if max_precip is None or p > max_precip:
-                    max_precip = p
-                if min_temp is None or t < min_temp:
-                    min_temp = t
-                if max_temp is None or t > max_temp:
-                    max_temp = t
+        min_precip = numpy.amin(precipitations)
+        max_precip = numpy.amax(precipitations)
+        min_temp = world.temperature['data'].min()
+        max_temp = world.temperature['data'].max()
         precip_delta = (max_precip - min_precip)
         temp_delta = (max_temp - min_temp)
-
+        
+        #normalize temperature and precipitation arrays
+        t = numpy.divide(numpy.subtract(world.temperature['data'],min_temp),temp_delta)
+        p = numpy.divide(numpy.subtract(precipitations,min_precip),precip_delta)
+        
         #modify precipitation based on temperature
-        for y in range(height):
-            for x in range(width):
-                t = (world.temperature_at((x, y)) - min_temp) / temp_delta
-                p = (precipitations[y, x] - min_precip) / precip_delta
-                precipitations[y, x] = (2 * p * (math.pow((t),curve_gamma) + curve_bonus))
+        precipitations = numpy.add(numpy.multiply(numpy.multiply(numpy.power(t,curve_gamma),2),p),curve_bonus)
 
-        #Renormalize temperatures because the temperature 
+        #Renormalize precipitation because the precipitation 
         #changes will probably not fully extend from -1 to 1.
-        min_temp = None
-        max_temp = None
-        for y in range(height):
-            for x in range(width):
-                p = precipitations[y, x]
-                if min_precip is None or p < min_precip:
-                    min_precip = p
-                if max_precip is None or p > max_precip:
-                    max_precip = p
+        min_precip = numpy.amin(precipitations)
+        max_precip = numpy.amax(precipitations)
         precip_delta = (max_precip - min_precip)
-        for y in range(height):
-            for x in range(width):
-                precipitations[y, x] = (2 * ((precipitations[y, x] - min_precip) / precip_delta)) - 1
-                
+        precipitations = numpy.subtract(numpy.divide(numpy.subtract(precipitations,min_precip),(precip_delta/2)),1)
+        min_precip = numpy.amin(precipitations)
+        max_precip = numpy.amax(precipitations)
+        
         return precipitations
