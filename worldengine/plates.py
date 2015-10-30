@@ -36,24 +36,24 @@ def generate_plates_simulation(seed, width, height, sea_level=0.65,
     return hm, pm
 
 
-def _plates_simulation(name, width, height, seed, num_plates=10,
+def _plates_simulation(name, width, height, seed, temps, humids, num_plates=10,
                        ocean_level=1.0, step=Step.full(),
                        verbose=get_verbose()):
     e_as_array, p_as_array = generate_plates_simulation(seed, width, height,
                                                         num_plates=num_plates,
                                                         verbose=verbose)
 
-    world = World(name, width, height, seed, num_plates, ocean_level, step)
+    world = World(name, width, height, seed, num_plates, ocean_level, step, temps, humids)
     world.set_elevation(numpy.array(e_as_array).reshape(height, width), None)
     world.set_plates(array_to_matrix(p_as_array, width, height))
     return world
 
 
-def world_gen(name, width, height, seed, num_plates=10, ocean_level=1.0,
+def world_gen(name, width, height, seed, temps, humids, num_plates=10, ocean_level=1.0,
               step=Step.full(), fade_borders=True, verbose=get_verbose()):
     if verbose:
         start_time = time.time()
-    world = _plates_simulation(name, width, height, seed, num_plates,
+    world = _plates_simulation(name, width, height, seed, temps, humids, num_plates,
                                ocean_level, step, verbose)
 
     center_land(world)
