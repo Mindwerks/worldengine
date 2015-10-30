@@ -12,7 +12,6 @@ from worldengine.biome import Biome, BorealDesert, BorealDryScrub, BorealMoistFo
     WarmTemperateWetForest, TropicalDesert, TropicalDesertScrub, TropicalDryForest, \
     TropicalMoistForest, TropicalRainForest, TropicalThornWoodland, TropicalWetForest, \
     TropicalVeryDryForest, biome_index_to_name, biome_name_to_index
-from worldengine.basic_map_operations import random_point
 import worldengine.protobuf.World_pb2 as Protobuf
 from worldengine.step import Step
 from worldengine.common import _equal
@@ -335,11 +334,12 @@ class World(object):
     #
 
     def random_land(self):
-        x, y = random_point(self.width, self.height)
-        if self.ocean[y, x]:#TODO: this method should get a safer/quicker way of finding land!
-            return self.random_land()
-        else:
-            return x, y
+        if self.ocean.all():
+            return None, None  # return invalid indices if there is no land at all
+        lands = numpy.invert(self.ocean)
+        lands = numpy.transpose(lands.nonzero())  # returns a list of tuples/indices with land positions
+        y, x = lands[numpy.random.randint(0, len(lands))]  # uses global RNG
+        return x, y
 
     def is_land(self, pos):
         return not self.ocean[pos[1], pos[0]]#faster than reversing pos or transposing ocean

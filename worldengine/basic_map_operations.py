@@ -1,9 +1,4 @@
 import math
-import random
-
-
-def random_point(width, height):
-    return random.randrange(0, width), random.randrange(0, height)
 
 
 def distance(pa, pb):
