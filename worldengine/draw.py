@@ -416,13 +416,10 @@ def draw_scatter_plot(world, size, target):
     #normalize temperature and humidity to the chart
     humid = ma.masked_array(world.humidity['data'], mask=world.ocean)
     temp = ma.masked_array(world.temperature['data'], mask=world.ocean)
-    min_humidity = numpy.amin(humid)
-    max_humidity = numpy.amax(humid)
-    min_temperature = numpy.amin(temp)
-    max_temperature = numpy.amax(temp)
-    temperature_delta = max_temperature - min_temperature
-    humidity_delta = max_humidity - min_humidity
-    
+    min_humidity = humid.min()
+    max_humidity = humid.max()
+    min_temperature = temp.min()
+    max_temperature = temp.max()
     temperature_delta = max_temperature - min_temperature
     humidity_delta = max_humidity - min_humidity
     
@@ -470,10 +467,6 @@ def draw_scatter_plot(world, size, target):
 
     #examine all cells in the map and if it is land get the temperature and
     #humidity for the cell.
-    min_x = None
-    max_x = None
-    min_y = None
-    max_y = None
     for y in range(world.height):
         for x in range(world.width):
             if world.is_land((x, y)):
