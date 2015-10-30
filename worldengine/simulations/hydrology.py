@@ -57,8 +57,8 @@ class WatermapSimulation(object):
 
         _watermap_data = numpy.zeros((world.height, world.width), dtype=float)
         for i in range(n):
-            x, y = world.random_land()
-            if True and world.precipitation['data'][y, x] > 0:
+            x, y = world.random_land()  # will return None for x and y if no land exists
+            if x is not None and world.precipitation['data'][y, x] > 0:
                 droplet(world, (x, y), world.precipitation['data'][y, x],
                         _watermap_data)
         _watermap = dict()

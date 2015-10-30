@@ -1,5 +1,4 @@
 from worldengine.simulations.basic import find_threshold_f
-import random
 import numpy
 
 
@@ -31,8 +30,8 @@ class TemperatureSimulation(object):
         width = world.width
         height = world.height
 
-        random.seed(seed * 7)
-        base = random.randint(0, 4096)
+        rng = numpy.random.RandomState(seed)  # create our own random generator
+        base = rng.randint(0, 4096)
         temp = numpy.zeros((height, width), dtype=float)
 
         from noise import snoise2
