@@ -54,7 +54,7 @@ class TestCLI(TestBase):
         # everything without it exploding?
         backup_argv = sys.argv
         sys.argv = ["python", "--width", "16", "--height", "16",
-                    "-r", "-v", "--gs", "--temps",
+                    "-r", "-v", "--gs", "--scatter", "--temps",
                     ".126/.235/.406/.561/.634/.876", "--humidity",
                     ".059/.222/.493/.764/.927/.986/.998"]
         try:
