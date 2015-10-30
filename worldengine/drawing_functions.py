@@ -65,7 +65,8 @@ def _find_land_borders(world, factor):
                 _ocean[y, x] = True
 
     def my_is_ocean(pos):
-        return _ocean[pos[1], pos[0]]
+        x, y = pos
+        return _ocean[y, x]
 
     for y in range(world.height * factor):
         for x in range(world.width * factor):
@@ -592,49 +593,64 @@ def draw_ancientmap(world, target, resize_factor=1,
         rock_desert_mask = _mask(world, world.is_hot_desert, resize_factor)  # TODO: add is_desert_mask
 
     def unset_mask(pos):
-        mountains_mask[pos[1], pos[0]] = 0
+        x, y = pos
+        mountains_mask[y, x] = 0
 
     def unset_boreal_forest_mask(pos):
-        boreal_forest_mask[pos[1], pos[0]] = 0
+        x, y = pos
+        boreal_forest_mask[y, x] = 0
 
     def unset_temperate_forest_mask(pos):
-        temperate_forest_mask[pos[1], pos[0]] = 0
+        x, y = pos
+        temperate_forest_mask[y, x] = 0
 
     def unset_warm_temperate_forest_mask(pos):
-        warm_temperate_forest_mask[pos[1], pos[0]] = 0
+        x, y = pos
+        warm_temperate_forest_mask[y, x] = 0
 
     def unset_tropical_dry_forest_mask(pos):
-        tropical_dry_forest_mask[pos[1], pos[0]] = 0
+        x, y = pos
+        tropical_dry_forest_mask[y, x] = 0
 
     def unset_jungle_mask(pos):
-        jungle_mask[pos[1], pos[0]] = 0
+        x, y = pos
+        jungle_mask[y, x] = 0
 
     def unset_tundra_mask(pos):
-        tundra_mask[pos[1], pos[0]] = 0
+        x, y = pos
+        tundra_mask[y, x] = 0
 
     def unset_savanna_mask(pos):
-        savanna_mask[pos[1], pos[0]] = 0
+        x, y = pos
+        savanna_mask[y, x] = 0
 
     def unset_hot_desert_mask(pos):
-        hot_desert_mask[pos[1], pos[0]] = 0
+        x, y = pos
+        hot_desert_mask[y, x] = 0
 
     def unset_rock_desert_mask(pos):
-        rock_desert_mask[pos[1], pos[0]] = 0
+        x, y = pos
+        rock_desert_mask[y, x] = 0
 
     def unset_cold_parklands_mask(pos):
-        cold_parklands_mask[pos[1], pos[0]] = 0
+        x, y = pos
+        cold_parklands_mask[y, x] = 0
 
     def unset_steppe_mask(pos):
-        steppe_mask[pos[1], pos[0]] = 0
+        x, y = pos
+        steppe_mask[y, x] = 0
 
     def unset_cool_desert_mask(pos):
-        cool_desert_mask[pos[1], pos[0]] = 0
+        x, y = pos
+        cool_desert_mask[y, x] = 0
 
     def unset_chaparral_mask(pos):
-        chaparral_mask[pos[1], pos[0]] = 0
+        x, y = pos
+        chaparral_mask[y, x] = 0
 
     def on_border(pos):
-        return borders[pos[1], pos[0]]
+        x, y = pos
+        return borders[y, x]
 
     if verbose:
         elapsed_time = time.time() - start_time
@@ -642,17 +658,6 @@ def draw_ancientmap(world, target, resize_factor=1,
             "...drawing_functions.draw_oldmap_on_pixel: init Elapsed time " +
             str(elapsed_time) + " seconds.")
         sys.stdout.flush()
-
-    if verbose:
-        start_time = time.time()
-    #min_elev = world.elevation['data'].min()
-    #max_elev = world.elevation['data'].max()
-    #elev_delta = max_elev - min_elev  # TODO: no longer used?
-    if verbose:
-        elapsed_time = time.time() - start_time
-        print(
-            "...drawing_functions.draw_oldmap_on_pixel: max, min elevation " +
-            "Elapsed time " + str(elapsed_time) + "  seconds.")
 
     if verbose:
         start_time = time.time()
