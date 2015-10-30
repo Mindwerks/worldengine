@@ -1,6 +1,5 @@
 import time
 import numpy
-import math
 from noise import snoise2
 
 from worldengine.simulations.basic import find_threshold_f
