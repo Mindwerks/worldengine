@@ -40,8 +40,6 @@ class PrecipitationSimulation(object):
         height = world.height
         width = world.width
         border = width / 4
-        random.seed(seed * 13)
-        base = random.randint(0, 4096)
         precipitations = numpy.zeros((height, width), dtype=float)
 
         octaves = 6
