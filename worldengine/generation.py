@@ -194,31 +194,45 @@ def _around(x, y, width, height):
 def generate_world(w, step):
     if isinstance(step, str):
         step = Step.get_by_name(step)
-    seed = w.seed
 
     if not step.include_precipitations:
         return w
 
+    # Prepare sufficient seeds for the different steps of the generation
+    rng = numpy.random.RandomState(w.seed)  # create a fresh RNG in case the global RNG is compromised (i.e. has been queried an indefinite amount of times before generate_world() was called)
+    sub_seeds = rng.randint(0, 4294967295, size=100)  # sys.maxsize didn't quite work
+    seed_dict = {
+                 'PrecipitationSimulation': sub_seeds[ 0],  # after 0.19.0 do not ever switch out the seeds here to maximize seed-compatibility
+                 'ErosionSimulation':       sub_seeds[ 1],
+                 'WatermapSimulation':      sub_seeds[ 2],
+                 'IrrigationSimulation':    sub_seeds[ 3],
+                 'TemperatureSimulation':   sub_seeds[ 4],
+                 'HumiditySimulation':      sub_seeds[ 5],
+                 'PermeabilitySimulation':  sub_seeds[ 6],
+                 'BiomeSimulation':         sub_seeds[ 7],
+                 '':                        sub_seeds[99]
+    }
+
     # Precipitation with thresholds
-    PrecipitationSimulation().execute(w, seed)
+    PrecipitationSimulation().execute(w, seed_dict['PrecipitationSimulation'])
 
     if not step.include_erosion:
         return w
-    ErosionSimulation().execute(w, seed)
+    ErosionSimulation().execute(w, seed_dict['ErosionSimulation'])  # seed not currently used
     if get_verbose():
         print("...erosion calculated")
 
-    WatermapSimulation().execute(w, seed)
+    WatermapSimulation().execute(w, seed_dict['WatermapSimulation'])  # seed not currently used
 
     # FIXME: create setters
-    IrrigationSimulation().execute(w, seed)
-    TemperatureSimulation().execute(w, seed)
-    HumiditySimulation().execute(w, seed)
+    IrrigationSimulation().execute(w, seed_dict['IrrigationSimulation'])  # seed not currently used
+    TemperatureSimulation().execute(w, seed_dict['TemperatureSimulation'])
+    HumiditySimulation().execute(w, seed_dict['HumiditySimulation'])  # seed not currently used
 
     
-    PermeabilitySimulation().execute(w, seed)
+    PermeabilitySimulation().execute(w, seed_dict['PermeabilitySimulation'])
 
-    cm, biome_cm = BiomeSimulation().execute(w, seed)
+    cm, biome_cm = BiomeSimulation().execute(w, seed_dict['BiomeSimulation'])  # seed not currently used
     for cl in cm.keys():
         count = cm[cl]
         if get_verbose():

@@ -3,7 +3,6 @@ from argparse import ArgumentParser
 import os
 import numpy
 import pickle
-import random
 import worldengine.generation as geo
 from worldengine.common import array_to_matrix, set_verbose, print_verbose
 from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
@@ -390,11 +389,13 @@ def main():
         if not os.path.exists(args.FILE):
             usage("The specified world file does not exist")
 
+    maxseed = 65535  # there is a hard limit somewhere so seeds outside the uint16 range are considered unsafe
     if args.seed is not None:
         seed = int(args.seed)
+        assert 0 <= seed <= maxseed, "Seed has to be in the range between 0 and %s, borders included." % maxseed
     else:
-        seed = random.randint(0, 65535)#RNG initialization is done automatically
-    random.seed(seed)
+        seed = numpy.random.randint(0, maxseed)  # first-time RNG initialization is done automatically
+    numpy.random.seed(seed)
 
     if args.world_name:
         world_name = args.world_name
