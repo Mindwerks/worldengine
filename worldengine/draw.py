@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy
+import numpy.ma as ma
 
 from worldengine.drawing_functions import draw_ancientmap, \
     draw_rivers_on_image, gradient
@@ -410,75 +411,76 @@ def draw_scatter_plot(world, size, target):
     """ This function can be used on a generic canvas (either an image to save
         on disk or a canvas part of a GUI)
     """
-    min_humidity = None
-    max_humidity = None
-    min_temperature = None
-    max_temperature = None
-    for y in range(world.height):
-        for x in range(world.width):
-            if world.is_land((x, y)):
-                t = world.temperature_at((x, y))
-                p = world.humidity['data'][y, x]
-                if min_temperature is None or t < min_temperature:
-                    min_temperature = t
-                if max_temperature is None or t > max_temperature:
-                    max_temperature = t
-                if min_humidity is None or p < min_humidity:
-                    min_humidity = p
-                if max_humidity is None or p > max_humidity:
-                    max_humidity = p
+
+    #Find min and max values of humidity and temperature on land so we can
+    #normalize temperature and humidity to the chart
+    humid = ma.masked_array(world.humidity['data'], mask=world.ocean)
+    temp = ma.masked_array(world.temperature['data'], mask=world.ocean)
+    min_humidity = numpy.amin(humid)
+    max_humidity = numpy.amax(humid)
+    min_temperature = numpy.amin(temp)
+    max_temperature = numpy.amax(temp)
+    temperature_delta = max_temperature - min_temperature
+    humidity_delta = max_humidity - min_humidity
     
     temperature_delta = max_temperature - min_temperature
     humidity_delta = max_humidity - min_humidity
     
+    #set all pixels white
     for y in range(0, size):
         for x in range(0, size):
             target.set_pixel(x, y, (255, 255, 255, 255))
-    h_min = (size - 1) * ((world.humidity['quantiles']['62'] - min_humidity) / humidity_delta)
-    h_max = (size - 1) * ((world.humidity['quantiles']['50'] - min_humidity) / humidity_delta)
-    v_max = (size - 1) * ((world.temperature['thresholds'][0][1] - min_temperature) / temperature_delta)
-    for y in range(int(h_min), int(h_max)):
-        for x in range(0, int(v_max)):
-            target.set_pixel(x, (size - 1) - y, (128, 128, 128, 255))
-    h_min = (size - 1) * ((world.humidity['quantiles']['50'] - min_humidity) / humidity_delta)
-    h_max = (size - 1) * ((world.humidity['quantiles']['37'] - min_humidity) / humidity_delta)
-    v_max = (size - 1) * ((world.temperature['thresholds'][1][1] - min_temperature) / temperature_delta)
-    for y in range(int(h_min), int(h_max)):
-        for x in range(0, int(v_max)):
-            target.set_pixel(x, (size - 1) - y, (128, 128, 128, 255))
-    h_min = (size - 1) * ((world.humidity['quantiles']['37'] - min_humidity) / humidity_delta)
-    h_max = (size - 1) * ((world.humidity['quantiles']['25'] - min_humidity) / humidity_delta)
-    v_max = (size - 1) * ((world.temperature['thresholds'][2][1] - min_temperature) / temperature_delta)
-    for y in range(int(h_min), int(h_max)):
-        for x in range(0, int(v_max)):
-            target.set_pixel(x, (size - 1) - y, (128, 128, 128, 255))
-    h_min = (size - 1) * ((world.humidity['quantiles']['25'] - min_humidity) / humidity_delta)
-    h_max = (size - 1) * ((world.humidity['quantiles']['12'] - min_humidity) / humidity_delta) 
-    v_max = (size - 1) * ((world.temperature['thresholds'][3][1] - min_temperature) / temperature_delta)
-    for y in range(int(h_min), int(h_max)):
-        for x in range(0, int(v_max)):
-            target.set_pixel(x, (size - 1) - y, (128, 128, 128, 255))
-    h_min = (size - 1) * ((world.humidity['quantiles']['12'] - min_humidity) / humidity_delta)
-    h_max = size
-    v_max = (size - 1) * ((world.temperature['thresholds'][5][1] - min_temperature) / temperature_delta)
-    for y in range(int(h_min), int(h_max)):
-        for x in range(0, int(v_max)):
-            target.set_pixel(x, (size - 1) - y, (128, 128, 128, 255))
+
+    #fill in 'bad' boxes with grey
+    h_values = ['62', '50', '37', '25', '12']
+    t_values = [   0,    1,    2,   3,    5 ]
+    for loop in range(0,5):
+        h_min = (size - 1) * ((world.humidity['quantiles'][h_values[loop]] - min_humidity) / humidity_delta)
+        if loop != 4:
+            h_max = (size - 1) * ((world.humidity['quantiles'][h_values[loop + 1]] - min_humidity) / humidity_delta)
+        else:
+            h_max = size
+        v_max = (size - 1) * ((world.temperature['thresholds'][t_values[loop]][1] - min_temperature) / temperature_delta)
+        if h_min < 0:
+            h_min = 0
+        if h_max > size:
+            h_max = size
+        if v_max < 0:
+            v_max = 0
+        if v_max > (size - 1):
+            v_max = size - 1
+            
+        if h_max > 0 and h_min < size and v_max > 0:
+            for y in range(int(h_min), int(h_max)):
+                for x in range(0, int(v_max)):
+                    target.set_pixel(x, (size - 1) - y, (128, 128, 128, 255))
+                    
+    #draw lines based on thresholds
     for t in range(0, 6):
         v = (size - 1) * ((world.temperature['thresholds'][t][1] - min_temperature) / temperature_delta)
-        for y in range(0, size):
-            target.set_pixel(int(v), (size - 1) - y, (0, 0, 0, 255))
+        if v > 0 and v < size:
+            for y in range(0, size):
+                target.set_pixel(int(v), (size - 1) - y, (0, 0, 0, 255))
     ranges = ['87', '75', '62', '50', '37', '25', '12']
     for p in ranges:
         h = (size - 1) * ((world.humidity['quantiles'][p] - min_humidity) / humidity_delta)
-        for x in range(0, size):
-            target.set_pixel(x, (size - 1) - int(h), (0, 0, 0, 255))
-        
+        if h > 0 and h < size:
+            for x in range(0, size):
+                target.set_pixel(x, (size - 1) - int(h), (0, 0, 0, 255))
+
+    #examine all cells in the map and if it is land get the temperature and
+    #humidity for the cell.
+    min_x = None
+    max_x = None
+    min_y = None
+    max_y = None
     for y in range(world.height):
         for x in range(world.width):
             if world.is_land((x, y)):
                 t = world.temperature_at((x, y))
                 p = world.humidity['data'][y, x]
+
+    #get red and blue values depending on temperature and humidity                
                 if world.is_temperature_polar((x, y)):
                     r = 0
                 elif world.is_temperature_alpine((x, y)):
@@ -509,8 +511,11 @@ def draw_scatter_plot(world, size, target):
                     b = 224
                 elif world.is_humidity_superhumid((x, y)):
                     b = 255
+
+    #calculate x and y position based on normalized temperature and humidity
                 nx = (size - 1) * ((t - min_temperature) / temperature_delta)
                 ny = (size - 1) * ((p - min_humidity) / humidity_delta)
+                    
                 target.set_pixel(int(nx), (size - 1) - int(ny), (r, 128, b, 255))
     
 
