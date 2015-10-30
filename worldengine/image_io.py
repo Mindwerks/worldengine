@@ -19,6 +19,7 @@ import png
 #Documentation PurePNG: http://purepng.readthedocs.org/en/latest/
 #The latter one is a fork of the former one. It is yet to be seen which one is better.
 
+
 class PNGWriter(object):
     """
     From https://pythonhosted.org/pypng/png.html#module-png :
@@ -76,6 +77,8 @@ class PNGWriter(object):
         self.filename = filename
         self.channel_bitdepth = channel_bitdepth
         self.channels = channels
+        self.height = array.shape[0]
+        self.width = array.shape[1]
 
     @classmethod
     def from_dimensions(cls, width, height, filename, channels,
@@ -87,7 +90,12 @@ class PNGWriter(object):
         The image will be filled with black, transparent pixels.
         """
         assert 1 <= channels <= 4, "PNG only supports 1 to 4 channels per pixel. Error writing %s." % filename
-        _array = numpy.zeros((height, width, channels), dtype=PNGWriter.get_dtype(channel_bitdepth))
+
+        dimensions = (height, width, channels)
+        if channels == 1:
+            dimensions = (height, width)  # keep the array 2-dimensional when possible
+
+        _array = numpy.zeros(dimensions, dtype=PNGWriter.get_dtype(channel_bitdepth))
         return cls(_array, filename,
                    grayscale=grayscale, channel_bitdepth=channel_bitdepth,
                    has_alpha=has_alpha, palette=palette, channels=channels)
@@ -108,9 +116,7 @@ class PNGWriter(object):
             _array = (2**channel_bitdepth - 1) * (array - amin) / (amax - amin)
         else:
             _array = array
-        _array = _array.astype(dtype=PNGWriter.get_dtype(channel_bitdepth))
-#        if len(_array.shape) == 2:
-#            _array = _array.reshape(_array.shape[0], _array.shape[1], 1)  # make all arrays 3-dimensional
+        _array = numpy.rint(_array).astype(dtype=PNGWriter.get_dtype(channel_bitdepth))  # proper rounding
         return cls(_array, filename, channels=channels,
                    grayscale=grayscale, channel_bitdepth=channel_bitdepth,
                    has_alpha=has_alpha, palette=palette)
@@ -130,21 +136,29 @@ class PNGWriter(object):
         might result in a very noticeable performance penalty.
         """
         try:  # these checks are for convenience, not for safety
-            if len(color) < self.channels:  # color has at least two elements
-                color = [color[i] for i in range(0, len(color))]  # convert to list for easy appending
-                if self.channels == 4:
-                    if len(color) == 2:
-                        color.append(0)
-                    color.append(255)  # alpha
-                elif self.channels == 3:
-                    color.append(0)
+            if len(color) < self.channels:  # color is a a tuple (length >= 1)
+                if len(color) == 1:
+                    if self.channels == 2:
+                        color = [color[0], 255]
+                    elif self.channels == 3:
+                        color = [color[0], color[0], color[0]]
+                    elif self.channels == 4:
+                        color = [color[0], color[0], color[0], 255]
+                elif len(color) == 2:
+                    if self.channels == 3:
+                        color = [color[0], color[1], 0]
+                    elif self.channels == 4:
+                        color = [color[0], color[1], 0, 255]
+                elif len(color) == 3:
+                    if self.channels == 4:
+                        color = [color[0], color[1], color[2], 255]
         except TypeError:  # color is not an iterable
             if self.channels > 1:
                 if self.channels == 2:
                     color = [color, 255]
                 elif self.channels == 3:
                     color = [color, color, color]
-                else:
+                else:  # only values 1..4 are allowed
                     color = [color, color, color, 255]
         self.array[y, x] = color
 
@@ -195,15 +209,15 @@ class PNGReader(object):
     def __init__(self, filename):
         self.filename = filename
 
-        reader = png.Reader(filename = filename)
-        pngdata = self.reader.asDirect()  # https://pythonhosted.org/pypng/png.html#png.Reader.asDirect -> 'boxed row, flat pixel', returns (width, height, pixels, meta)
+        reader = png.Reader(filename=filename)
+        pngdata = reader.asDirect()  # returns (width, height, pixels, meta), pixels as 'boxed row, flat pixel'
 
         self.width = pngdata[0]
         self.height = pngdata[1]
 
         self.array = numpy.vstack(map(numpy.uint16, pngdata[2]))  # creates a 2-dimensional array (flat pixels)
         if pngdata[3]['planes'] > 1:  # 'unflatten' the pixels
-            self.array = self.array.reshape(self.height, self.width, -1)  # height, width, depth (-1: value will be determined automatically)
+            self.array = self.array.reshape(self.height, self.width, -1)  # height, width, depth (-1 = automatic)
 
     def __getitem__(self, item):
         return self.array[item]

@@ -4,6 +4,7 @@ import numpy.ma as ma
 
 from worldengine.drawing_functions import draw_ancientmap, \
     draw_rivers_on_image
+from worldengine.image_io import PNGWriter
 
 # -------------
 # Helper values
@@ -772,8 +773,8 @@ def draw_riversmap_on_file(world, filename):
 
 
 def draw_grayscale_heightmap_on_file(world, filename):
-    img = ImagePixelSetter(world.width, world.height, filename)
-    draw_grayscale_heightmap(world, img)
+    img = PNGWriter.grayscale_from_array(world.elevation['data'], filename, scale_to_range=True)
+    #draw_grayscale_heightmap(world, img)
     img.complete()
 
 
