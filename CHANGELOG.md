@@ -3,6 +3,9 @@ Version 0.19-UNRELEASED
 * Added export support using libgdal
 * Force rivers and grayscale_heightmap to PNG to avoid ambiguity of providing a 
 filename which can introduce input error.
+* Modified color elevation routines so that depressions are still represented as land instead of ocean and heights are normalied.
+* Added the ability to modify temperature and humidity ranges.
+* Added the ability to generate scatter plots showing temperature and humidity of all terrestrial cells. 
 
 Version 0.18
 
