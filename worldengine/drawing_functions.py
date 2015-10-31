@@ -553,15 +553,6 @@ def _draw_a_mountain(pixels, x, y, w=3, h=3):
         pixels[x + modx, y + mody] = mcr        
 
 
-def _pseudo_random_land_pos(world, i):
-    y = (i ** 7 + i * 23) % world.height
-    x = (i ** 13 + i * 37) % world.width
-    if not world.ocean[y, x]:
-        return int(x), int(y)
-    else:
-        return _pseudo_random_land_pos(world, (i % 123456789) * 17 + 11)
-
-
 def draw_ancientmap(world, target, resize_factor=1,
                     sea_color=(212, 198, 169, 255),
                     draw_biome = True, draw_rivers = True, draw_mountains = True,
