@@ -4,7 +4,6 @@ so no references to PIL are necessary and the module can be used also through
 Jython
 """
 
-import math
 import numpy
 import sys
 import time
