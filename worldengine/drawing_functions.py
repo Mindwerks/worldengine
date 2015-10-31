@@ -39,50 +39,16 @@ def draw_rivers_on_image(world, target, factor=1):
     """Draw only the rivers, it expect the background to be in place
     """
 
-    def _lowest_neighbour(world, pos):
-        x, y = pos
-        lowest = None
-        lowest_lvl = None
-        for dx in range(-1, 1):
-            for dy in range(-1, 1):
-                if dx != 0 or dy != 0:
-                    e = world.elevation['data'][y + dy, 
-                        x + dx]  # +world.humidity['data'][y+dy, x+dx]/3.0
-                    if (not lowest_lvl) or (e < lowest_lvl):
-                        lowest_lvl = e
-                        lowest = (x + dx, y + dy)
-                    elif (e == lowest_lvl) and ((x + y + dx + dy) % 2 == 0):
-                        lowest_lvl = e
-                        lowest = (x + dx, y + dy)
-
-        return lowest
-
-    def _draw_river(world, target, pos, factor):
-        if world.ocean[pos[1], pos[0]]:
-            return
-        x, y = pos
-        for dx in range(factor):
-            for dy in range(factor):
-                target.set_pixel(x * factor + dx, y * factor + dy,
-                                 (0, 0, 128, 255))
-        _draw_river(world, target, _lowest_neighbour(world, pos), factor)
-
-    n_rivers = int(math.sqrt(world.width * world.height))
-    for i in range(1, n_rivers):
-        candidates = []
-        for j in range(1, 10):
-            candidates.append(_pseudo_random_land_pos(world, i * j + j))
-        max = None
-        cc = None
-        for c in candidates:
-            cx, cy = c
-            wl = world.humidity['data'][cy, cx] * \
-                world.precipitation['data'][cy, cx] * \
-                world.elevation['data'][cy, cx]
-            if max is None or wl > max:
-                max = wl
-                cc = c
-        _draw_river(world, target, cc, factor)
+    for y in range(world.height):
+        for x in range(world.width):
+            if world.is_land((x, y)) and (world.river_map[x, y] > 0.0):
+                for dx in range(factor):
+                    for dy in range(factor):
+                        target.set_pixel(x * factor + dx, y * factor + dy, (0, 0, 128, 255))
+            if world.is_land((x, y)) and (world.lake_map[x, y] != 0):
+                for dx in range(factor):
+                    for dy in range(factor):
+                        target.set_pixel(x * factor + dx, y * factor + dy, (0, 100, 128, 255))
 
 
 # -------------------

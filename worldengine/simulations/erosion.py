@@ -18,6 +18,7 @@ DIR_NEIGHBORS_CENTER = [CENTER, NORTH, EAST, SOUTH, WEST]
 
 RIVER_TH = 0.02
 
+
 def overflow(value, max_value):
     return value % max_value
 
