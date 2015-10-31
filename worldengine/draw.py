@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy
+import numpy.ma as ma
 
 from worldengine.drawing_functions import draw_ancientmap, \
     draw_rivers_on_image, gradient
@@ -406,6 +407,110 @@ def draw_biome(world, target):
             v = biome[y, x]
             target.set_pixel(x, y, _biome_colors[v])
 
+def draw_scatter_plot(world, size, target):
+    """ This function can be used on a generic canvas (either an image to save
+        on disk or a canvas part of a GUI)
+    """
+
+    #Find min and max values of humidity and temperature on land so we can
+    #normalize temperature and humidity to the chart
+    humid = ma.masked_array(world.humidity['data'], mask=world.ocean)
+    temp = ma.masked_array(world.temperature['data'], mask=world.ocean)
+    min_humidity = humid.min()
+    max_humidity = humid.max()
+    min_temperature = temp.min()
+    max_temperature = temp.max()
+    temperature_delta = max_temperature - min_temperature
+    humidity_delta = max_humidity - min_humidity
+    
+    #set all pixels white
+    for y in range(0, size):
+        for x in range(0, size):
+            target.set_pixel(x, y, (255, 255, 255, 255))
+
+    #fill in 'bad' boxes with grey
+    h_values = ['62', '50', '37', '25', '12']
+    t_values = [   0,    1,    2,   3,    5 ]
+    for loop in range(0,5):
+        h_min = (size - 1) * ((world.humidity['quantiles'][h_values[loop]] - min_humidity) / humidity_delta)
+        if loop != 4:
+            h_max = (size - 1) * ((world.humidity['quantiles'][h_values[loop + 1]] - min_humidity) / humidity_delta)
+        else:
+            h_max = size
+        v_max = (size - 1) * ((world.temperature['thresholds'][t_values[loop]][1] - min_temperature) / temperature_delta)
+        if h_min < 0:
+            h_min = 0
+        if h_max > size:
+            h_max = size
+        if v_max < 0:
+            v_max = 0
+        if v_max > (size - 1):
+            v_max = size - 1
+            
+        if h_max > 0 and h_min < size and v_max > 0:
+            for y in range(int(h_min), int(h_max)):
+                for x in range(0, int(v_max)):
+                    target.set_pixel(x, (size - 1) - y, (128, 128, 128, 255))
+                    
+    #draw lines based on thresholds
+    for t in range(0, 6):
+        v = (size - 1) * ((world.temperature['thresholds'][t][1] - min_temperature) / temperature_delta)
+        if v > 0 and v < size:
+            for y in range(0, size):
+                target.set_pixel(int(v), (size - 1) - y, (0, 0, 0, 255))
+    ranges = ['87', '75', '62', '50', '37', '25', '12']
+    for p in ranges:
+        h = (size - 1) * ((world.humidity['quantiles'][p] - min_humidity) / humidity_delta)
+        if h > 0 and h < size:
+            for x in range(0, size):
+                target.set_pixel(x, (size - 1) - int(h), (0, 0, 0, 255))
+
+    #examine all cells in the map and if it is land get the temperature and
+    #humidity for the cell.
+    for y in range(world.height):
+        for x in range(world.width):
+            if world.is_land((x, y)):
+                t = world.temperature_at((x, y))
+                p = world.humidity['data'][y, x]
+
+    #get red and blue values depending on temperature and humidity                
+                if world.is_temperature_polar((x, y)):
+                    r = 0
+                elif world.is_temperature_alpine((x, y)):
+                    r = 42
+                elif world.is_temperature_boreal((x, y)):
+                    r = 85
+                elif world.is_temperature_cool((x, y)):
+                    r = 128
+                elif world.is_temperature_warm((x, y)):
+                    r = 170
+                elif world.is_temperature_subtropical((x, y)):
+                    r = 213
+                elif world.is_temperature_tropical((x, y)):
+                    r = 255
+                if world.is_humidity_superarid((x, y)):
+                    b = 32
+                elif world.is_humidity_perarid((x, y)):
+                    b = 64
+                elif world.is_humidity_arid((x, y)):
+                    b = 96
+                elif world.is_humidity_semiarid((x, y)):
+                    b = 128
+                elif world.is_humidity_subhumid((x, y)):
+                    b = 160
+                elif world.is_humidity_humid((x, y)):
+                    b = 192
+                elif world.is_humidity_perhumid((x, y)):
+                    b = 224
+                elif world.is_humidity_superhumid((x, y)):
+                    b = 255
+
+    #calculate x and y position based on normalized temperature and humidity
+                nx = (size - 1) * ((t - min_temperature) / temperature_delta)
+                ny = (size - 1) * ((p - min_humidity) / humidity_delta)
+                    
+                target.set_pixel(int(nx), (size - 1) - int(ny), (r, 128, b, 255))
+    
 
 # -------------
 # Draw on files
@@ -476,4 +581,9 @@ def draw_ancientmap_on_file(world, filename, resize_factor=1,
     draw_ancientmap(world, img, resize_factor, sea_color,
                     draw_biome, draw_rivers, draw_mountains, draw_outer_land_border, 
                     verbose)
+    img.complete()
+
+def draw_scatter_plot_on_file(world, filename):
+    img = ImagePixelSetter(512, 512, filename)
+    draw_scatter_plot(world, 512, img)
     img.complete()

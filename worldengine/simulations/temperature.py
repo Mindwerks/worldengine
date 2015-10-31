@@ -39,18 +39,19 @@ class TemperatureSimulation(object):
         border = width / 4
         octaves = 8
         freq = 16.0 * octaves
+        n_scale = 1024 / float(height)
 
         for y in range(0, height):#TODO: Check for possible numpy optimizations.
             y_scaled = float(y) / height
             latitude_factor = 1.0 - (abs(y_scaled - 0.5) * 2)
             for x in range(0, width):
-                n = snoise2(x / freq, y / freq, octaves, base=base)
+                n = snoise2((x * n_scale) / freq, (y * n_scale) / freq, octaves, base=base)
 
                 # Added to allow noise pattern to wrap around right and left.
                 if x <= border:
-                    n = (snoise2(x / freq, y / freq, octaves,
+                    n = (snoise2((x * n_scale) / freq, (y * n_scale)/ freq, octaves,
                                  base=base) * x / border) \
-                        + (snoise2((x + width) / freq, y / freq, octaves,
+                        + (snoise2(((x * n_scale) + width) / freq, (y * n_scale) / freq, octaves,
                                    base=base) * (border - x) / border)
 
                 t = (latitude_factor * 12 + n * 1) / 13.0
