@@ -6,8 +6,8 @@ recursive-include worldengine *.py
 recursive-include worldengine *.sh
 recursive-include worldengine *.proto
 prune appveyor
+prune docs
 prune tests
 prune tox.ini
 prune *.yml
 prune *.cfg
-recursive-exclude docs *.html
