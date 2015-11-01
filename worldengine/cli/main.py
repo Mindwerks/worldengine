@@ -186,7 +186,7 @@ def __seems_protobuf_worldfile__(world_filename):
 
 def __seems_pickle_file__(world_filename):
     last_byte = __get_last_byte__(world_filename)
-    return last_byte == ord('.')
+    return str(last_byte) == '.'
 
 
 def load_world(world_filename):
@@ -463,7 +463,7 @@ def main():
 
     print('Worldengine - a world generator (v. %s)' % VERSION)
     print('-----------------------')
-    print(' operation         : %s generation' % operation)
+    print(' operation              : %s generation' % operation)
     if generation_operation:
         print(' seed                 : %i' % seed)
         print(' name                 : %s' % world_name)
