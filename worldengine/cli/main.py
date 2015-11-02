@@ -456,7 +456,7 @@ def main():
 
     print('Worldengine - a world generator (v. %s)' % VERSION)
     print('-----------------------')
-    print(' operation              : %s generation' % operation)
+    print(' operation            : %s generation' % operation)
     if generation_operation:
         print(' seed                 : %i' % seed)
         print(' name                 : %s' % world_name)
