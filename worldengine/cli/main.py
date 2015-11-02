@@ -356,18 +356,13 @@ def main():
     # -----------------------------------------------------
     export_options = parser.add_argument_group(
         "Export Options", "You can specify the formats you wish the generated output to be in. ")
-    export_options.add_argument("--export-type", dest="export_type",
-                                help="Export to a specific format such as: BMP or PNG",
-                                default="bmp")
-    export_options.add_argument("--export-bpp", dest="export_bpp", type=int,
-                                help="Bits per pixel: 8, 16 and 32",
-                                default=8)
-    export_options.add_argument("--export-signed", dest="export_signed", action="store_true",
-                                help="Used signed bits or not.",
-                                default=False)
-    export_options.add_argument("--normalize", dest="export_normalize", action="store_true",
-                                help="Normalize data to the min and max of your bpp choice.",
-                                default=False)
+    export_options.add_argument("--export-format", dest="export_format", type=str,
+                                help="Export to a specific format such as BMP or PNG. " +
+                                "See http://www.gdal.org/formats_list.html for possible formats.",
+                                default="PNG")
+    export_options.add_argument("--export-datatype", dest="export_datatype", type=str,
+                                help="Type of stored data, e.g. uint16, int32, float32 etc.",
+                                default="uint16")
 
     args = parser.parse_args()
 
@@ -386,7 +381,7 @@ def main():
     sys.setrecursionlimit(args.recursion_limit)
 
     if args.number_of_plates < 1 or args.number_of_plates > 100:
-        usage(error="Number of plates should be a in [1, 100]")
+        usage(error="Number of plates should be in [1, 100]")
 
     operation = "world"
     if args.OPERATOR is None:
@@ -547,7 +542,8 @@ def main():
     elif operation == 'export':
         world = load_world(args.FILE)
         print_world_info(world)
-        export(world, args.export_type, args.export_bpp, args.export_signed, args.export_normalize)
+        export(world, args.export_format, args.export_datatype,
+               path = '%s/%s_elevation' % (args.output_dir, world_name))
     else:
         raise Exception(
             'Unknown operation: valid operations are %s' % OPERATIONS)
