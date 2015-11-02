@@ -22,6 +22,7 @@ def generate_plates_simulation(seed, width, height, sea_level=0.65,
     p = platec.create(seed, width, height, sea_level, erosion_period,
                       folding_ratio, aggr_overlap_abs, aggr_overlap_rel,
                       cycle_count, num_plates)
+    # Note: To rescale the worlds heightmap to roughly Earths scale, multiply by 2000.
 
     while platec.is_finished(p) == 0:
         # TODO: add a if verbose: message here?

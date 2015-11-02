@@ -326,8 +326,7 @@ class World(object):
     #
 
     def contains(self, pos):
-        x, y = pos
-        return x >= 0 and y >= 0 and x < self.width and y < self.height
+        return 0 <= pos[0] < self.width and 0 <= pos[1] < self.height
 
     #
     # Land/Ocean
@@ -354,7 +353,7 @@ class World(object):
     # Tiles around
     #
 
-    def on_tiles_around_factor(self, factor, pos, radius=1, action=None):
+    def on_tiles_around_factor(self, factor, pos, action, radius=1):
         x, y = pos
         for dx in range(-radius, radius + 1):
             nx = x + dx
@@ -365,7 +364,7 @@ class World(object):
                                     dx != 0 or dy != 0):
                         action((nx, ny))
 
-    def on_tiles_around(self, pos, radius=1, action=None):
+    def on_tiles_around(self, pos, action, radius=1):
         x, y = pos
         for dx in range(-radius, radius + 1):
             nx = x + dx
