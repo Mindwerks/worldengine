@@ -24,7 +24,8 @@ class World(object):
 
     def __init__(self, name, width, height, seed, num_plates, ocean_level,
                  step, temps=[0.874, 0.765, 0.594, 0.439, 0.366, 0.124],
-                 humids = [.941, .778, .507, .236, 0.073, .014, .002]):
+                 humids = [.941, .778, .507, .236, 0.073, .014, .002],
+                 gamma_curve=1.25, curve_offset=.2):
         self.name = name
         self.width = width
         self.height = height
@@ -34,6 +35,8 @@ class World(object):
         self.step = step
         self.temps = temps
         self.humids = humids
+        self.gamma_curve = gamma_curve
+        self.curve_offset = curve_offset
 
     #
     # General methods

@@ -11,7 +11,7 @@ class TestSerialization(unittest.TestCase):
         self.maxDiff = None
 
     def test_pickle_serialize_unserialize(self):
-        w = world_gen("Dummy", 32, 16, 1, [.874, .765, .594, .439, .366, .124], [.941, .778, .507, .236, 0.073, .014, .002], step=Step.get_by_name("full"))
+        w = world_gen("Dummy", 32, 16, 1, step=Step.get_by_name("full"))
         f = tempfile.NamedTemporaryFile(delete=False).name
         w.to_pickle_file(f)
         unserialized = World.from_pickle_file(f)
@@ -37,7 +37,7 @@ class TestSerialization(unittest.TestCase):
         self.assertEqual(w, unserialized)
 
     def test_protobuf_serialize_unserialize(self):
-        w = world_gen("Dummy", 32, 16, 1, [.874, .765, .594, .439, .366, .124], [.941, .778, .507, .236, 0.073, .014, .002], step=Step.get_by_name("full"))
+        w = world_gen("Dummy", 32, 16, 1, step=Step.get_by_name("full"))
         serialized = w.protobuf_serialize()
         unserialized = World.protobuf_unserialize(serialized)
         self.assertTrue(_equal(w.elevation['data'], unserialized.elevation['data']))
