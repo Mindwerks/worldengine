@@ -169,28 +169,27 @@ def draw_simple_elevation(world, sea_level, target):
         on disk or a canvas part of a GUI)
     """
     e = world.elevation['data']
-
     c = numpy.empty(e.shape, dtype=numpy.float)
-    if sea_level is None or world.ocean is None or not world.ocean.any():  # or 'not any ocean'
-        mask = numpy.ma.array(e, mask = False)  # the whole map
-        min_elev_land = mask.min()
-        max_elev_land = mask.max()
-        elev_delta_land = (max_elev_land - min_elev_land) / 11.0
 
-        c = ((e - min_elev_land) / elev_delta_land) + 1
-    else:
-        mask = numpy.ma.array(e, mask = world.ocean)  # only land
-        min_elev_land = mask.min()
-        max_elev_land = mask.max()
-        elev_delta_land = (max_elev_land - min_elev_land) / 11.0
+    has_ocean = not (sea_level is None or world.ocean is None or not world.ocean.any())  # or 'not any ocean'
+    mask_land = numpy.ma.array(e, mask=world.ocean if has_ocean else False)  # only land
 
-        mask = numpy.ma.array(e, mask = numpy.logical_not(world.ocean))  # only ocean
-        min_elev_sea = mask.min()
-        max_elev_sea = mask.max()
+    min_elev_land = mask_land.min()
+    max_elev_land = mask_land.max()
+    elev_delta_land = (max_elev_land - min_elev_land) / 11.0
+
+    if has_ocean:
+        mask_ocean = numpy.ma.array(e, mask=numpy.logical_not(world.ocean))  # only ocean
+        min_elev_sea = mask_ocean.min()
+        max_elev_sea = mask_ocean.max()
         elev_delta_sea = max_elev_sea - min_elev_sea
 
         c[world.ocean] = ((e[world.ocean] - min_elev_sea) / elev_delta_sea)
-        c[numpy.invert(world.ocean)] = ((e[numpy.invert(world.ocean)] - min_elev_land) / elev_delta_land) + 1
+
+        land = numpy.invert(world.ocean)
+        c[land] = ((e[land] - min_elev_land) / elev_delta_land) + 1
+    else:
+        c = ((e - min_elev_land) / elev_delta_land) + 1
 
     for y in range(world.height):
         for x in range(world.width):
@@ -205,7 +204,7 @@ def draw_riversmap(world, target):
 
     for y in range(world.height):
         for x in range(world.width):
-            target.set_pixel(x, y, sea_color if world.ocean[y, x] else land_color)
+            target.set_pixel(x, y, sea_color if world.is_ocean((x, y)) else land_color)
 
     draw_rivers_on_image(world, target, factor=1)
 
@@ -213,12 +212,12 @@ def draw_riversmap(world, target):
 def draw_grayscale_heightmap(world, target):
     e = world.elevation['data']
 
-    mask = numpy.ma.array(e, mask = world.ocean)  # only land
+    mask = numpy.ma.array(e, mask=world.ocean)  # only land
     min_elev_land = mask.min()
     max_elev_land = mask.max()
     elev_delta_land = max_elev_land - min_elev_land
 
-    mask = numpy.ma.array(e, mask = numpy.logical_not(world.ocean))  # only ocean
+    mask = numpy.ma.array(e, mask=numpy.logical_not(world.ocean))  # only ocean
     min_elev_sea = mask.min()
     max_elev_sea = mask.max()
     elev_delta_sea = max_elev_sea - min_elev_sea
@@ -240,7 +239,7 @@ def draw_elevation(world, shadow, target):
     data = world.elevation['data']
     ocean = world.ocean
 
-    mask = numpy.ma.array(data, mask = ocean)
+    mask = numpy.ma.array(data, mask=ocean)
 
     min_elev = mask.min()
     max_elev = mask.max()
@@ -376,6 +375,7 @@ def draw_biome(world, target):
             v = biome[y, x]
             target.set_pixel(x, y, _biome_colors[v])
 
+
 def draw_scatter_plot(world, size, target):
     """ This function can be used on a generic canvas (either an image to save
         on disk or a canvas part of a GUI)
@@ -400,7 +400,7 @@ def draw_scatter_plot(world, size, target):
     #fill in 'bad' boxes with grey
     h_values = ['62', '50', '37', '25', '12']
     t_values = [   0,    1,    2,   3,    5 ]
-    for loop in range(0,5):
+    for loop in range(0, 5):
         h_min = (size - 1) * ((world.humidity['quantiles'][h_values[loop]] - min_humidity) / humidity_delta)
         if loop != 4:
             h_max = (size - 1) * ((world.humidity['quantiles'][h_values[loop + 1]] - min_humidity) / humidity_delta)
@@ -424,13 +424,13 @@ def draw_scatter_plot(world, size, target):
     #draw lines based on thresholds
     for t in range(0, 6):
         v = (size - 1) * ((world.temperature['thresholds'][t][1] - min_temperature) / temperature_delta)
-        if v > 0 and v < size:
+        if 0 < v < size:
             for y in range(0, size):
                 target.set_pixel(int(v), (size - 1) - y, (0, 0, 0, 255))
     ranges = ['87', '75', '62', '50', '37', '25', '12']
     for p in ranges:
         h = (size - 1) * ((world.humidity['quantiles'][p] - min_humidity) / humidity_delta)
-        if h > 0 and h < size:
+        if 0 < h < size:
             for x in range(0, size):
                 target.set_pixel(x, (size - 1) - int(h), (0, 0, 0, 255))
 
@@ -551,6 +551,7 @@ def draw_ancientmap_on_file(world, filename, resize_factor=1,
                     draw_biome, draw_rivers, draw_mountains, draw_outer_land_border, 
                     verbose)
     img.complete()
+
 
 def draw_scatter_plot_on_file(world, filename):
     img = ImagePixelSetter(512, 512, filename)
