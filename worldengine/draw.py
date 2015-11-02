@@ -179,14 +179,13 @@ def draw_simple_elevation(world, sea_level, target):
     elev_delta_land = (max_elev_land - min_elev_land) / 11.0
 
     if has_ocean:
-        mask_ocean = numpy.ma.array(e, mask=numpy.logical_not(world.ocean))  # only ocean
+        land = numpy.logical_not(world.ocean)
+        mask_ocean = numpy.ma.array(e, mask=land)  # only ocean
         min_elev_sea = mask_ocean.min()
         max_elev_sea = mask_ocean.max()
         elev_delta_sea = max_elev_sea - min_elev_sea
 
         c[world.ocean] = ((e[world.ocean] - min_elev_sea) / elev_delta_sea)
-
-        land = numpy.invert(world.ocean)
         c[land] = ((e[land] - min_elev_land) / elev_delta_land) + 1
     else:
         c = ((e - min_elev_land) / elev_delta_land) + 1
