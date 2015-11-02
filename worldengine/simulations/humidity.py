@@ -16,7 +16,6 @@ class HumiditySimulation(object):
     def _calculate(world):
         humids = world.humids
         humidity = dict()
-        temperatureWeight = 2.3
         precipitationWeight = 1.0
         irrigationWeight = 3
         humidity['data'] = numpy.zeros((world.height, world.width), dtype=float)
