@@ -819,8 +819,7 @@ def draw_ancientmap_on_file(world, filename, resize_factor=1,
                             sea_color=(212, 198, 169, 255),
                             draw_biome=True, draw_rivers=True, draw_mountains=True, 
                             draw_outer_land_border=False, verbose=False):
-    img = ImagePixelSetter(world.width * resize_factor,
-                           world.height * resize_factor, filename)
+    img = PNGWriter.rgba_from_dimensions(world.width * resize_factor, world.height * resize_factor, filename)
     draw_ancientmap(world, img, resize_factor, sea_color,
                     draw_biome, draw_rivers, draw_mountains, draw_outer_land_border, 
                     verbose)
