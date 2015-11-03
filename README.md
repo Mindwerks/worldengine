@@ -135,6 +135,10 @@ _Note that options were changed in version 0.5.3_
 | -r FILE   | --rivers=FILE | produce a map of rivers, after the option it expects the name of the file where to generate the map  |
 | --gs  | --grayscale-heightmap | produce a grayscale heightmap |
 |   | --ocean_level=N   |  elevation cut off for sea level (default = 1.0) |
+|   | --temps #/#/#/#/#/#|  Provide alternate ranges for temperatures. [default =                 .126/.235/.406/.561/.634/.876] |
+|   | --humidity #/#/#/#/#/#/# | Provide alternate ranges for humidities. [default =                        .059/.222/.493/.764/.927/.986/.998] |
+| -gv N | --gamma-value N | N = Gamma value for temperature/precipitation gamma correction curve. [default = 1.25] |
+| -go N | --gamma-offset N | N = Adjustment value for temperature/precipitation gamma correction curve. [default = .2] |
 |   | ---not-fade-borders   |  avoid fading borders |
 
 ### Options valid only for ancient map operations
@@ -148,7 +152,7 @@ _Note that options were changed in version 0.5.3_
 For example these commands:
 
 ```python
-worldengine -b -s 4 -n an_example -q 25 -x 2048 -y 2048
+worldengine -s 4 -n an_example -q 25 -x 2048 -y 2048
 ```
 
 Produce this output
@@ -156,7 +160,7 @@ Produce this output
 ```
 Worldengine - a world generator (v. 0.18.0)
 -----------------------
- operation              : world generation
+ operation            : world generation
  seed                 : 4
  name                 : an_example
  width                : 2048
@@ -180,8 +184,6 @@ Producing ouput:
 * biome image generated in './an_example_biome.png'
 * elevation image generated in './an_example_elevation.png'
 ...done
-
-
 ```
 
 This is the corresponding ancient map
