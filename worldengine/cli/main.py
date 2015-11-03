@@ -443,6 +443,12 @@ def main():
     if args.temps and len(args.temps.split('/')) is not 6:
         usage(error="temps must have exactly 6 values")
 
+    if args.go >= 1 or args.go < 0:
+        usage(error="Gamma offset must be greater than or equal to 0 and less than 1")
+
+    if args.gv <= 0:
+        usage(error="Gamma value must be greater than 0")
+
     temps = [.874, .765, .594, .439, .366, .124]
     if args.temps:
         temps = args.temps.split('/')
@@ -493,6 +499,26 @@ def main():
         print(' draw rivers            : %s' % args.draw_rivers)
         print(' draw mountains         : %s' % args.draw_mountains)
         print(' draw land outer border : %s' % args.draw_outer_border)
+        
+    #Warning messages
+    warnings = []
+    if temps != sorted(temps, reverse=True):
+        warnings.append("WARNING: Temperature array not in ascending order")
+    if numpy.amin(temps) < 0:
+        warnings.append("WARNING: Maximum value in temperature array greater than 1")
+    if numpy.amax(temps) > 1:
+        warnings.append("WARNING: Minimum value in temperature array less than 0")
+    if humids != sorted(humids, reverse=True):
+        warnings.append("WARNING: Humidity array not in ascending order")
+    if numpy.amin(humids) < 0:
+        warnings.append("WARNING: Maximum value in humidity array greater than 1")
+    if numpy.amax(humids) > 1:
+        warnings.append("WARNING: Minimum value in temperature array less than 0")
+
+    if warnings:
+        print("\n")
+        for x in range(len(warnings)):
+            print(warnings[x])
 
     set_verbose(args.verbose)
 
