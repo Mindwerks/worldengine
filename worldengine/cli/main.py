@@ -471,8 +471,8 @@ def main():
 
     print('Worldengine - a world generator (v. %s)' % VERSION)
     print('-----------------------')
-    print(' operation            : %s generation' % operation)
     if generation_operation:
+        print(' operation            : %s generation' % operation)
         print(' seed                 : %i' % seed)
         print(' name                 : %s' % world_name)
         print(' width                : %i' % args.width)
@@ -485,13 +485,14 @@ def main():
         print(' rivers map           : %s' % args.rivers_map)
         print(' scatter plot         : %s' % args.scatter_plot)
         print(' fade borders         : %s' % args.fade_borders)
-    if args.temps:
-        print(' temperature ranges   : %s' % args.temps)
-    if args.humids:
-        print(' humidity ranges      : %s' % args.humids)
-    print(' gamma value          : %s' % args.gv)
-    print(' gamma offset         : %s' % args.go)
+        if args.temps:
+            print(' temperature ranges   : %s' % args.temps)
+        if args.humids:
+            print(' humidity ranges      : %s' % args.humids)
+        print(' gamma value          : %s' % args.gv)
+        print(' gamma offset         : %s' % args.go)
     if operation == 'ancient_map':
+        print(' operation              : %s generation' % operation)
         print(' resize factor          : %i' % args.resize_factor)
         print(' world file             : %s' % args.world_file)
         print(' sea color              : %s' % args.sea_color)
