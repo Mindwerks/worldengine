@@ -22,11 +22,12 @@ STEPS = 'plates|precipitations|full'
 
 
 def generate_world(world_name, width, height, seed, num_plates, output_dir,
-                   step, ocean_level, temps, humids,
-                   world_format='pickle', fade_borders=True,
+                   step, ocean_level, temps, humids, world_format='pickle',
+                   gamma_curve=1.25, curve_offset=.2, fade_borders=True,
                    verbose=True, black_and_white=False):
     w = world_gen(world_name, width, height, seed, temps, humids, num_plates, ocean_level,
-                  step, fade_borders=fade_borders, verbose=verbose)
+                  step, gamma_curve=gamma_curve, curve_offset=curve_offset,
+                  fade_borders=fade_borders, verbose=verbose)
 
     print('')  # empty line
     print('Producing ouput:')
@@ -311,6 +312,14 @@ def main():
                              "If not provided, the default values will be used. \n" +
                             "[default = .059/.222/.493/.764/.927/.986/.998]",
                             metavar="#/#/#/#/#/#/#")
+    g_generate.add_argument('-gv', '--gamma-value', dest='gv', type=float,
+                        help="N = Gamma value for temperature/precipitation " +
+                             "gamma correction curve. [default = %(default)s]",
+                        metavar="N", default='1.25')
+    g_generate.add_argument('-go', '--gamma-offset', dest='go', type=float,
+                        help="N = Adjustment value for temperature/precipitation " +
+                             "gamma correction curve. [default = %(default)s]",
+                        metavar="N", default='.2')
     g_generate.add_argument('--not-fade-borders', dest='fade_borders', action="store_false",
                                help="Not fade borders",
                                default=True)
@@ -434,10 +443,16 @@ def main():
     if args.temps and len(args.temps.split('/')) is not 6:
         usage(error="temps must have exactly 6 values")
 
-    temps =[.874, .765, .594, .439, .366, .124]
+    if args.go >= 1 or args.go < 0:
+        usage(error="Gamma offset must be greater than or equal to 0 and less than 1")
+
+    if args.gv <= 0:
+        usage(error="Gamma value must be greater than 0")
+
+    temps = [.874, .765, .594, .439, .366, .124]
     if args.temps:
         temps = args.temps.split('/')
-        for x in range(0,6):
+        for x in range(0,len(temps)):
             temps[x] = 1 - float(temps[x])
 
     if args.humids and not generation_operation:
@@ -449,15 +464,15 @@ def main():
     humids = [.941, .778, .507, .236, 0.073, .014, .002]
     if args.humids:
         humids = args.humids.split('/')
-        for x in range(0,7):
+        for x in range(0,len(humids)):
             humids[x] = 1 - float(humids[x])
     if args.scatter_plot and not generation_operation:
         usage(error="Scatter plot can be produced only during world generation")
 
     print('Worldengine - a world generator (v. %s)' % VERSION)
     print('-----------------------')
-    print(' operation            : %s generation' % operation)
     if generation_operation:
+        print(' operation            : %s generation' % operation)
         print(' seed                 : %i' % seed)
         print(' name                 : %s' % world_name)
         print(' width                : %i' % args.width)
@@ -470,11 +485,14 @@ def main():
         print(' rivers map           : %s' % args.rivers_map)
         print(' scatter plot         : %s' % args.scatter_plot)
         print(' fade borders         : %s' % args.fade_borders)
-    if args.temps:
-        print(' temperature ranges   : %s' % args.temps)
-    if args.humids:
-        print(' humidity ranges      : %s' % args.humids)
+        if args.temps:
+            print(' temperature ranges   : %s' % args.temps)
+        if args.humids:
+            print(' humidity ranges      : %s' % args.humids)
+        print(' gamma value          : %s' % args.gv)
+        print(' gamma offset         : %s' % args.go)
     if operation == 'ancient_map':
+        print(' operation              : %s generation' % operation)
         print(' resize factor          : %i' % args.resize_factor)
         print(' world file             : %s' % args.world_file)
         print(' sea color              : %s' % args.sea_color)
@@ -482,6 +500,26 @@ def main():
         print(' draw rivers            : %s' % args.draw_rivers)
         print(' draw mountains         : %s' % args.draw_mountains)
         print(' draw land outer border : %s' % args.draw_outer_border)
+        
+    #Warning messages
+    warnings = []
+    if temps != sorted(temps, reverse=True):
+        warnings.append("WARNING: Temperature array not in ascending order")
+    if numpy.amin(temps) < 0:
+        warnings.append("WARNING: Maximum value in temperature array greater than 1")
+    if numpy.amax(temps) > 1:
+        warnings.append("WARNING: Minimum value in temperature array less than 0")
+    if humids != sorted(humids, reverse=True):
+        warnings.append("WARNING: Humidity array not in ascending order")
+    if numpy.amin(humids) < 0:
+        warnings.append("WARNING: Maximum value in humidity array greater than 1")
+    if numpy.amax(humids) > 1:
+        warnings.append("WARNING: Minimum value in temperature array less than 0")
+
+    if warnings:
+        print("\n")
+        for x in range(len(warnings)):
+            print(warnings[x])
 
     set_verbose(args.verbose)
 
@@ -492,6 +530,7 @@ def main():
         world = generate_world(world_name, args.width, args.height,
                                seed, args.number_of_plates, args.output_dir,
                                step, args.ocean_level, temps, humids, world_format,
+                               gamma_curve=args.gv,curve_offset=args.go,
                                fade_borders=args.fade_borders,
                                verbose=args.verbose, black_and_white=args.black_and_white)
         if args.grayscale_heightmap:

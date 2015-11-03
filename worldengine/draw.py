@@ -433,6 +433,14 @@ def draw_scatter_plot(world, size, target):
             for x in range(0, size):
                 target.set_pixel(x, (size - 1) - int(h), (0, 0, 0, 255))
 
+    #draw gamma curve
+    curve_gamma = world.gamma_curve
+    curve_bonus = world.curve_offset
+    
+    for x in range(0, size):
+        y = (size - 1) * ((numpy.power((float(x) / (size - 1)), curve_gamma) * (1 - curve_bonus)) + curve_bonus)
+        target.set_pixel(x, (size - 1) - int(y), (255, 0, 0, 255))
+
     #examine all cells in the map and if it is land get the temperature and
     #humidity for the cell.
     for y in range(world.height):

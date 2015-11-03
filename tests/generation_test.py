@@ -14,7 +14,7 @@ class TestGeneration(TestBase):
     def test_world_gen_does_not_explode_badly(self):
         # FIXME remove me when proper tests are in place
         # Very stupid test that just verify nothing explode badly
-        world_gen("Dummy", 32, 16, 1, [.874, .765, .594, .439, .366, .124], [.941, .778, .507, .236, 0.073, .014, .002], step=Step.get_by_name("full"))
+        world_gen("Dummy", 32, 16, 1, step=Step.get_by_name("full"))
 
     @staticmethod
     def _mean_elevation_at_borders(world):
