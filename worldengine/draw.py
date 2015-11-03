@@ -313,16 +313,22 @@ def draw_satellite(world, target):
 
     noise_range = 10 # a random value between -noise_range and noise_range will be added to the rgb of each pixel
 
+    # These are arbitrarily-chosen elevation cutoffs for 4 different height levels. 
+    # Some color modifiers will be applied at each level
     high_mountain_elev = 215
     mountain_elev      = 175
     high_hill_elev     = 160
     hill_elev          = 145
 
+    # These are rgb color values which will be added to the noise, if the elevation is greater than the height specified
+    # These are not cumulative
     high_mountain_noise_modifier = (10, 6,   10)
     mountain_noise_modifier =      (-4, -12, -4)
     high_hill_noise_modifier =     (-3, -10, -3)
     hill_noise_modifier =          (-2, -6, -2)
 
+    # This is the base "mountain color". Elevations above this size will have their colors interpolated with this 
+    # color in order to give a more mountainous appearance
     mountain_color = (50, 57, 28)
 
     ## Second loop - this sets each pixel's color based on colors defined in _biome_satellite_colors
