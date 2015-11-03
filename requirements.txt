@@ -5,3 +5,4 @@ Pillow==2.8.2
 PyPlatec==1.4.0
 protobuf==3.0.0a3
 six==1.10.0
+tmxlib==0.2.1
