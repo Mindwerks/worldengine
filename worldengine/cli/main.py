@@ -7,7 +7,7 @@ import worldengine.generation as geo
 from worldengine.common import array_to_matrix, set_verbose, print_verbose
 from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
     draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
-    draw_temperature_levels_on_file, draw_riversmap_on_file, draw_scatter_plot_on_file
+    draw_temperature_levels_on_file, draw_riversmap_on_file, draw_scatter_plot_on_file, draw_satellite_on_file
 from worldengine.plates import world_gen, generate_plates_simulation
 from worldengine.imex import export
 from worldengine.step import Step
@@ -73,7 +73,6 @@ def generate_grayscale_heightmap(world, filename):
     draw_grayscale_heightmap_on_file(world, filename)
     print("+ grayscale heightmap generated in '%s'" % filename)
 
-
 def generate_rivers_map(world, filename):
     draw_riversmap_on_file(world, filename)
     print("+ rivers map generated in '%s'" % filename)
@@ -82,6 +81,9 @@ def draw_scatter_plot(world, filename):
     draw_scatter_plot_on_file(world, filename)
     print("+ scatter plot generated in '%s'" % filename)
 
+def draw_satellite_map(world, filename):
+    draw_satellite_on_file(world, filename)
+    print("+ satellite map generated in '%s'" % filename)
 
 def generate_plates(seed, world_name, output_dir, width, height,
                     num_plates=10):
@@ -105,6 +107,8 @@ def generate_plates(seed, world_name, output_dir, width, height,
 
     # Generate images
     filename = '%s/plates_%s.png' % (output_dir, world_name)
+    # TODO calculate appropriate sea_level
+    sea_level = 1.0
     draw_simple_elevation_on_file(world, filename, None)
     print("+ plates image generated in '%s'" % filename)
     geo.center_land(world)
@@ -317,6 +321,9 @@ def main():
     g_generate.add_argument('--scatter', dest='scatter_plot',
                             action="store_true", help="generate scatter plot")
 
+    g_generate.add_argument('--sat', dest='satelite_map',
+                            action="store_true", help="generate satellite map")
+
     # -----------------------------------------------------
     g_ancient_map = parser.add_argument_group(
         "Ancient Map Options", "These options are only useful in " +
@@ -356,13 +363,18 @@ def main():
     # -----------------------------------------------------
     export_options = parser.add_argument_group(
         "Export Options", "You can specify the formats you wish the generated output to be in. ")
-    export_options.add_argument("--export-format", dest="export_format", type=str,
-                                help="Export to a specific format such as BMP or PNG. " +
-                                "See http://www.gdal.org/formats_list.html for possible formats.",
-                                default="PNG")
-    export_options.add_argument("--export-datatype", dest="export_datatype", type=str,
-                                help="Type of stored data, e.g. uint16, int32, float32 etc.",
-                                default="uint16")
+    export_options.add_argument("--export-type", dest="export_type",
+                                help="Export to a specific format such as: BMP or PNG",
+                                default="bmp")
+    export_options.add_argument("--export-bpp", dest="export_bpp", type=int,
+                                help="Bits per pixel: 8, 16 and 32",
+                                default=8)
+    export_options.add_argument("--export-signed", dest="export_signed", action="store_true",
+                                help="Used signed bits or not.",
+                                default=False)
+    export_options.add_argument("--normalize", dest="export_normalize", action="store_true",
+                                help="Normalize data to the min and max of your bpp choice.",
+                                default=False)
 
     args = parser.parse_args()
 
@@ -381,7 +393,7 @@ def main():
     sys.setrecursionlimit(args.recursion_limit)
 
     if args.number_of_plates < 1 or args.number_of_plates > 100:
-        usage(error="Number of plates should be in [1, 100]")
+        usage(error="Number of plates should be a in [1, 100]")
 
     operation = "world"
     if args.OPERATOR is None:
@@ -456,7 +468,7 @@ def main():
 
     print('Worldengine - a world generator (v. %s)' % VERSION)
     print('-----------------------')
-    print(' operation            : %s generation' % operation)
+    print(' operation              : %s generation' % operation)
     if generation_operation:
         print(' seed                 : %i' % seed)
         print(' name                 : %s' % world_name)
@@ -469,6 +481,7 @@ def main():
         print(' greyscale heightmap  : %s' % args.grayscale_heightmap)
         print(' rivers map           : %s' % args.rivers_map)
         print(' scatter plot         : %s' % args.scatter_plot)
+        print(' satellite map        : %s' % args.satelite_map)
         print(' fade borders         : %s' % args.fade_borders)
     if args.temps:
         print(' temperature ranges   : %s' % args.temps)
@@ -503,6 +516,10 @@ def main():
         if args.scatter_plot:
             draw_scatter_plot(world,
             '%s/%s_scatter.png' % (args.output_dir, world_name))    
+        if args.satelite_map:
+            draw_satellite_map(world,
+            '%s/%s_satellite.png' % (args.output_dir, world_name))    
+
 
     elif operation == 'plates':
         print('')  # empty line
@@ -542,8 +559,7 @@ def main():
     elif operation == 'export':
         world = load_world(args.FILE)
         print_world_info(world)
-        export(world, args.export_format, args.export_datatype,
-               path = '%s/%s_elevation' % (args.output_dir, world_name))
+        export(world, args.export_type, args.export_bpp, args.export_signed, args.export_normalize)
     else:
         raise Exception(
             'Unknown operation: valid operations are %s' % OPERATIONS)
