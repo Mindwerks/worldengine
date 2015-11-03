@@ -39,6 +39,16 @@ class TestCLI(TestBase):
         sys.argv = ["python", "plates", "--number-of-plates", "101"]
         self.assertRaises(SystemExit, main)
 
+    def test_warnings(self):
+        backup_argv = sys.argv
+        sys.argv = ["python", "--width", "16", "--height", "16",
+                    "--temps", "1.1/.235/.406/.561/.634/-.1", "--humidity",
+                    "1.1/.222/.493/.764/.927/.986/-.1"]
+        try:
+            main()
+        except Exception as e:
+            raise e
+
     def test_smoke_info(self):
         backup_argv = sys.argv
         sys.argv = ["python", "info", self.world]
@@ -56,7 +66,8 @@ class TestCLI(TestBase):
         sys.argv = ["python", "--width", "16", "--height", "16",
                     "-r", "-v", "--gs", "--scatter", "--temps",
                     ".126/.235/.406/.561/.634/.876", "--humidity",
-                    ".059/.222/.493/.764/.927/.986/.998"]
+                    ".059/.222/.493/.764/.927/.986/.998", "-go", ".2",
+                    "-gv", "1.25"]
         try:
             main()
         except Exception as e:

@@ -36,7 +36,9 @@ def generate_plates_simulation(seed, width, height, sea_level=0.65,
     return hm, pm
 
 
-def _plates_simulation(name, width, height, seed, temps, humids, gamma_curve=1.25,
+def _plates_simulation(name, width, height, seed, temps=
+                       [.874, .765, .594, .439, .366, .124], humids=
+                       [.941, .778, .507, .236, 0.073, .014, .002], gamma_curve=1.25,
                        curve_offset=.2, num_plates=10, ocean_level=1.0,
                        step=Step.full(), verbose=get_verbose()):
     e_as_array, p_as_array = generate_plates_simulation(seed, width, height,
