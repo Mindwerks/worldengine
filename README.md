@@ -135,6 +135,10 @@ _Note that options were changed in version 0.5.3_
 | -r FILE   | --rivers=FILE | produce a map of rivers, after the option it expects the name of the file where to generate the map  |
 | --gs  | --grayscale-heightmap | produce a grayscale heightmap |
 |   | --ocean_level=N   |  elevation cut off for sea level (default = 1.0) |
+|   | --temps #/#/#/#/#/#|  Provide alternate ranges for temperatures. [default =                 .126/.235/.406/.561/.634/.876] |
+|   | --humidity #/#/#/#/#/#/# | Provide alternate ranges for humidities. [default =                        .059/.222/.493/.764/.927/.986/.998] |
+| -gv N | --gamma-value N | N = Gamma value for temperature/precipitation gamma correction curve. [default = 1.25] |
+| -go N | --gamma-offset N | N = Adjustment value for temperature/precipitation gamma correction curve. [default = .2] |
 |   | ---not-fade-borders   |  avoid fading borders |
 
 ### Options valid only for ancient map operations
@@ -148,73 +152,29 @@ _Note that options were changed in version 0.5.3_
 For example these commands:
 
 ```python
-worldengine world -s 4 -n an_example -p 2048 -q 25 -x 2048 -y 2048
+worldengine -s 4 -n an_example -q 25 -x 2048 -y 2048
 ```
 
 Produce this output
 
 ```
-Worldengine - world generator
+Worldengine - a world generator (v. 0.18.0)
 -----------------------
- seed              : 4
- name              : seed3
- width             : 2048
- height            : 2048
- plates resolution : 2048
- number of plates  : 25
- operation         : world generation
- step              : full
+ operation            : world generation
+ seed                 : 4
+ name                 : an_example
+ width                : 2048
+ height               : 2048
+ number of plates     : 25
+ world format         : protobuf
+ black and white maps : False
+ step                 : full
+ greyscale heightmap  : False
+ rivers map           : False
+ scatter plot         : False
+ fade borders         : True
 
 starting (it could take a few minutes) ...
-...plates simulated
-...elevation noise added
-...elevation level calculated
-...precipations calculated
-...erosion calculated
-...humidity calculated
-...permeability level calculated
-
-Biome obtained:
-     subtropical thorn woodland =   16353
-                tropical desert =     188
-             boreal rain forest =   69472
-        tropical thorn woodland =   19680
-            subpolar dry tundra =    6316
-      warm temperate wet forest =   17799
-            subpolar wet tundra =   24453
-          subpolar moist tundra =   15104
-            tropical wet forest =   18441
-           subpolar rain tundra =   79723
-           tropical rain forest =    5906
-                            ice =   85254
-          tropical moist forest =   28871
-        subtropical rain forest =   14733
-            boreal moist forest =   24395
-              boreal wet forest =   35212
-         subtropical dry forest =   26259
-       subtropical desert scrub =    3256
-       subtropical moist forest =   25220
-    cool temperate desert scrub =   11162
-          cool temperate steppe =   25604
-               boreal dry scrub =   13403
-            tropical dry forest =   22415
-       tropical very dry forest =   27033
-          tropical desert scrub =    2473
-    warm temperate moist forest =   27704
-    warm temperate desert scrub =    4861
-     warm temperate rain forest =   10774
-    cool temperate moist forest =   42770
-      cool temperate wet forest =   52813
-      warm temperate dry forest =   29992
-                          ocean = 3314282
-          cool temperate desert =    2950
-             subtropical desert =     287
-          warm temperate desert =     709
-     cool temperate rain forest =   46844
-         subtropical wet forest =   18280
-                  boreal desert =    5445
-     warm temperate thorn scrub =   16175
-                   polar desert =    1693
 
 Producing ouput:
 * world data saved in './an_example.world'
@@ -224,7 +184,6 @@ Producing ouput:
 * biome image generated in './an_example_biome.png'
 * elevation image generated in './an_example_elevation.png'
 ...done
-
 ```
 
 This is the corresponding ancient map
