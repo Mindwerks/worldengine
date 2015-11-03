@@ -5,3 +5,4 @@ pypng==0.0.18
 PyPlatec==1.4.0
 protobuf==3.0.0a3
 six==1.10.0
+tmxlib==0.2.1

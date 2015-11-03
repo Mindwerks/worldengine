@@ -18,10 +18,11 @@ try:
     HDF5_AVAILABLE = True
 except:
     HDF5_AVAILABLE = False
+from worldengine.tmx import export_to_tmx
 
 VERSION = __version__
 
-OPERATIONS = 'world|plates|ancient_map|info|export'
+OPERATIONS = 'world|plates|ancient_map|info|export|export_tmx'
 SEA_COLORS = 'blue|brown'
 STEPS = 'plates|precipitations|full'
 
@@ -592,6 +593,14 @@ def main():
         print_world_info(world)
         export(world, args.export_format, args.export_datatype,
                path = '%s/%s_elevation' % (args.output_dir, world_name))
+    elif operation == 'export_tmx':
+        if not args.world_file:
+            usage("For exporting to TMX is necessary to specify the world to be used (-w option)")
+        world = load_world(args.world_file)
+        if not args.generated_file:
+            args.generated_file = "tiled_%s.tmx" % world.name
+
+        export_to_tmx(world, args.generated_file)
     else:
         raise Exception(
             'Unknown operation: valid operations are %s' % OPERATIONS)
