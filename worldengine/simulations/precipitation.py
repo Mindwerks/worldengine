@@ -49,7 +49,6 @@ class PrecipitationSimulation(object):
                                        #different sizes will have similar patterns
 
         for y in range(height):#TODO: numpy
-            y_scaled = float(y) / height
             for x in range(width):
                 n = snoise2((x * n_scale) / freq, (y * n_scale) / freq, octaves, base=base)
 

@@ -43,7 +43,7 @@ For Windows, Linux and Mac are available on the [releases page](https://github.c
 Gui
 ===
 
-An experimental (and limited!) GUI is available as a separate project: [https://github.com/Mindwerks/worldengine-gui](worldengine-gui).
+An experimental (and limited!) GUI is available as a separate project: [https://github.com/Mindwerks/worldengine-gui](https://github.com/Mindwerks/worldengine-gui).
 
 Install
 =======
