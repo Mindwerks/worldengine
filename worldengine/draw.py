@@ -1,6 +1,7 @@
 from PIL import Image
 import numpy
 import numpy.ma as ma
+import random
 
 from worldengine.drawing_functions import draw_ancientmap, \
     draw_rivers_on_image
