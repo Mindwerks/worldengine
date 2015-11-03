@@ -2,3 +2,6 @@
 nose
 pytest
 pdbpp
+# for the documentation
+sphinx 
+sphinx-autobuild
