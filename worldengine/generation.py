@@ -200,7 +200,7 @@ def generate_world(w, step):
 
     # Prepare sufficient seeds for the different steps of the generation
     rng = numpy.random.RandomState(w.seed)  # create a fresh RNG in case the global RNG is compromised (i.e. has been queried an indefinite amount of times before generate_world() was called)
-    sub_seeds = rng.randint(0, 4294967295, size=100)  # sys.maxsize didn't quite work
+    sub_seeds = rng.randint(0, 2147483647, size=100)  # sys.maxsize didn't quite work
     seed_dict = {
                  'PrecipitationSimulation': sub_seeds[ 0],  # after 0.19.0 do not ever switch out the seeds here to maximize seed-compatibility
                  'ErosionSimulation':       sub_seeds[ 1],
