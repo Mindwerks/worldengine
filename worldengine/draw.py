@@ -54,7 +54,12 @@ _biome_colors = {
     'tropical very dry forest': (160, 255, 128),
 }
 
-
+# These colors are used when drawing the satellite view map
+# The rgb values were hand-picked from an actual high-resolution 
+# satellite map of earth. However, many values are either too similar
+# to each other or otherwise need to be updated. It is recommended that
+# further research go into these values, making sure that each rgb is
+# actually picked from a region on earth that has the matching biome
 _biome_satellite_colors = {
     'ocean': (23, 94, 145),
     'sea': (23, 94, 145),
