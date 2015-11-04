@@ -1,7 +1,6 @@
 from PIL import Image
 import numpy
 import numpy.ma as ma
-import random
 
 from worldengine.drawing_functions import draw_ancientmap, \
     draw_rivers_on_image
@@ -259,9 +258,9 @@ def get_biome_color_based_on_elevation(world, elev, x, y):
         ## Generate some random noise to apply to this pixel
         #  There is noise for each element of the rgb value
         #  This noise will be further modified by the height of this tile
-        noise = (random.randint(-NOISE_RANGE, NOISE_RANGE), 
-                 random.randint(-NOISE_RANGE, NOISE_RANGE), 
-                 random.randint(-NOISE_RANGE, NOISE_RANGE))
+        noise = (numpy.randint(-NOISE_RANGE, NOISE_RANGE), 
+                 numpy.randint(-NOISE_RANGE, NOISE_RANGE), 
+                 numpy.randint(-NOISE_RANGE, NOISE_RANGE))
 
         ####### Case 1 - elevation is very high ########
         if elev > HIGH_MOUNTAIN_ELEV:     
