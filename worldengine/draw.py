@@ -408,8 +408,8 @@ def draw_satellite(world, target):
 
     ## The first loop sets each pixel's color based on colors defined in _biome_satellite_colors
     #  and additional "business logic" defined in get_biome_color_based_on_elevation
-    for y in xrange(world.height):
-        for x in xrange(world.width):
+    for y in range(world.height):
+        for x in range(world.width):
             # Get the normalized elevation at this pixel
             elev = elevation_mask[y, x]
             
@@ -422,8 +422,8 @@ def draw_satellite(world, target):
 
 
     # Loop through and average a pixel with its neighbors to smooth transitions between biomes
-    for y in xrange(1, world.height-1):
-        for x in xrange(1, world.width-1):
+    for y in range(1, world.height-1):
+        for x in range(1, world.width-1):
             ## Only smooth land tiles
             if world.is_land((x, y)):
                 # Lists to hold the separated rgb values of the neighboring pixels
@@ -432,8 +432,8 @@ def draw_satellite(world, target):
                 all_b = []
 
                 # Loop through this pixel and all neighboring pixels
-                for j in xrange(y-1, y+2):
-                    for i in xrange(x-1, x+2):
+                for j in range(y-1, y+2):
+                    for i in range(x-1, x+2):
                         # Don't include ocean in the smoothing, if this tile happens to border an ocean
                         if world.is_land((i, j)):
                             # Grab each rgb value and append to the list
@@ -452,14 +452,14 @@ def draw_satellite(world, target):
                     target.set_pixel(x, y, (avg_r, avg_g, avg_b, 255))
 
     # "Shade" the map by sending beams of light west to east, and increasing or decreasing value of pixel based on elevation difference
-    for y in xrange(SAT_SHADOW_SIZE-1, world.height-SAT_SHADOW_SIZE-1):
-        for x in xrange(SAT_SHADOW_SIZE-1, world.width-SAT_SHADOW_SIZE-1):
+    for y in range(SAT_SHADOW_SIZE-1, world.height-SAT_SHADOW_SIZE-1):
+        for x in range(SAT_SHADOW_SIZE-1, world.width-SAT_SHADOW_SIZE-1):
             if world.is_land((x, y)):
                 r, g, b, a = target.pixels[x, y]
                 
                 # Build up list of elevations in the previous n tiles, where n is the shadow size.
                 # This goes left to right, so it would be the previous tiles on the same y level  
-                prev_elevs = [ world.elevation['data'][y-n, x-n] for n in xrange(1, SAT_SHADOW_SIZE+1) ]
+                prev_elevs = [ world.elevation['data'][y-n, x-n] for n in range(1, SAT_SHADOW_SIZE+1) ]
 
                 # Take the average of the height of the previous n tiles
                 avg_prev_elev = int( sum(prev_elevs) / len(prev_elevs) )
