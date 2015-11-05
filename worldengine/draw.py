@@ -1,5 +1,4 @@
 import numpy
-import numpy.ma as ma
 
 from worldengine.drawing_functions import draw_ancientmap, \
     draw_rivers_on_image
@@ -252,7 +251,7 @@ def get_normalized_elevation_array(world):
     return c
 
 
-def get_biome_color_based_on_elevation(world, elev, x, y):
+def get_biome_color_based_on_elevation(world, elev, x, y, rng):
     ''' This is the "business logic" for determining the base biome color in satellite view.
         This includes generating some "noise" at each spot in a pixel's rgb value, potentially 
         modifying the noise based on elevation, and finally incorporating this with the base biome color. 
@@ -265,7 +264,9 @@ def get_biome_color_based_on_elevation(world, elev, x, y):
 
         The biome's base color may be interpolated with a predefined mountain brown color if the elevation is high enough.
 
-        Finally, the noise plus the biome color are added and returned
+        Finally, the noise plus the biome color are added and returned.
+
+        rng refers to an instance of a random number generator used to draw the random samples needed by this function.
     '''
     v = world.biome[y, x]
     biome_color = _biome_satellite_colors[v]
@@ -277,9 +278,8 @@ def get_biome_color_based_on_elevation(world, elev, x, y):
         ## Generate some random noise to apply to this pixel
         #  There is noise for each element of the rgb value
         #  This noise will be further modified by the height of this tile
-        noise = (numpy.random.randint(-NOISE_RANGE, NOISE_RANGE), 
-                 numpy.random.randint(-NOISE_RANGE, NOISE_RANGE), 
-                 numpy.random.randint(-NOISE_RANGE, NOISE_RANGE))
+
+        noise = rng.randint(-NOISE_RANGE, NOISE_RANGE, size=3)  # draw three random numbers at once
 
         ####### Case 1 - elevation is very high ########
         if elev > HIGH_MOUNTAIN_ELEV:     
@@ -307,7 +307,7 @@ def get_biome_color_based_on_elevation(world, elev, x, y):
     modification_amount = int(elev / BASE_ELEVATION_INTENSITY_MODIFIER)
     base_elevation_modifier = (modification_amount, modification_amount, modification_amount)
 
-    this_tile_color = add_colors(biome_color, noise, base_elevation_modifier)
+    this_tile_color = add_colors(biome_color, noise, base_elevation_modifier)  # this can lead to an overflow, i.e. a value above 255
 
     return this_tile_color
 # ----------------------
@@ -353,7 +353,7 @@ def draw_riversmap(world, target):
 
     for y in range(world.height):
         for x in range(world.width):
-            target.set_pixel(x, y, sea_color if world.is_ocean((x, y)) else land_color)    
+            target.set_pixel(x, y, sea_color if world.is_ocean((x, y)) else land_color)
 
     draw_rivers_on_image(world, target, factor=1)
 
@@ -372,6 +372,8 @@ def draw_satellite(world, target):
     # Get an elevation mask where heights are normalized between 0 and 255
     elevation_mask = get_normalized_elevation_array(world)
 
+    rng = numpy.random.RandomState(world.seed)  # create our own random generator; necessary for now to make the tests reproducible, even though it is a bit ugly
+
     ## The first loop sets each pixel's color based on colors defined in _biome_satellite_colors
     #  and additional "business logic" defined in get_biome_color_based_on_elevation
     for y in range(world.height):
@@ -380,7 +382,7 @@ def draw_satellite(world, target):
             elev = elevation_mask[y, x]
             
             # Get a rgb noise value, with some logic to modify it based on the elevation of the tile
-            r, g, b = get_biome_color_based_on_elevation(world, elev, x, y)
+            r, g, b = get_biome_color_based_on_elevation(world, elev, x, y, rng)
 
             # Set pixel to this color. This initial color will be accessed and modified later when 
             # the map is smoothed and shaded.
@@ -617,8 +619,8 @@ def draw_scatter_plot(world, size, target):
 
     #Find min and max values of humidity and temperature on land so we can
     #normalize temperature and humidity to the chart
-    humid = ma.masked_array(world.humidity['data'], mask=world.ocean)
-    temp = ma.masked_array(world.temperature['data'], mask=world.ocean)
+    humid = numpy.ma.masked_array(world.humidity['data'], mask=world.ocean)
+    temp = numpy.ma.masked_array(world.temperature['data'], mask=world.ocean)
     min_humidity = humid.min()
     max_humidity = humid.max()
     min_temperature = temp.min()
