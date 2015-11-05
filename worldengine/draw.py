@@ -10,7 +10,7 @@ from worldengine.drawing_functions import draw_ancientmap, \
 # -------------
 
 ### For draw_satellite ###
-NOISE_RANGE = 10 # a random value between -NOISE_RANGE and NOISE_RANGE will be added to the rgb of each pixel
+NOISE_RANGE = 15 # a random value between -NOISE_RANGE and NOISE_RANGE will be added to the rgb of each pixel
 
 # These are arbitrarily-chosen elevation cutoffs for 4 different height levels. 
 # Some color modifiers will be applied at each level
@@ -24,11 +24,18 @@ HILL_ELEV          = 145
 HIGH_MOUNTAIN_NOISE_MODIFIER = (10, 6,   10)
 MOUNTAIN_NOISE_MODIFIER =      (-4, -12, -4)
 HIGH_HILL_NOISE_MODIFIER =     (-3, -10, -3)
-HILL_NOISE_MODIFIER =          (-2, -6, -2)
+HILL_NOISE_MODIFIER =          (-2, -6,  -2)
 
 # This is the base "mountain color". Elevations above this size will have their colors interpolated with this 
 # color in order to give a more mountainous appearance
 MOUNTAIN_COLOR = (50, 57, 28)
+
+# If a tile is a river or a lake, the color of the tile will change by this amount
+RIVER_COLOR_CHANGE = (-12, -12, 4)
+LAKE_COLOR_CHANGE = (-12, -12, 10)
+
+# The normalized (0-255) value of an elevation of a tile gets divided by this amount, and added to a tile's color
+BASE_ELEVATION_INTENSITY_MODIFIER = 10
 
 # How many tiles to average together when comparing this tile's elevation to the previous tiles.
 SAT_SHADOW_SIZE = 5
@@ -208,10 +215,22 @@ def _sature_color(color):
 def elevation_color(elevation, sea_level=1.0):
     return _sature_color(_elevation_color(elevation, sea_level))
 
+def add_colors(*args):
+    ''' Do some *args magic to return a tuple, which has the sums of all tuples in *args '''
+    # Adapted from an answer here: http://stackoverflow.com/questions/14180866/sum-each-value-in-a-list-of-tuples
+    return tuple([sum(x) for x in zip(*args)])
 
-def get_normalized_elevation_mask(world):
+def average_colors(c1, c2):
+    ''' Average the values of two colors together '''
+    r = int((c1[0] + c2[0])/2)
+    g = int((c1[1] + c2[1])/2)
+    b = int((c1[2] + c2[2])/2)
+
+    return (r, g, b)
+
+def get_normalized_elevation_array(world):
     ''' Convert raw elevation into normalized values between 0 and 255,
-        and return a numpy arrawy of these values '''
+        and return a numpy array of these values '''
 
     e = world.elevation['data']
 
@@ -249,7 +268,7 @@ def get_biome_color_based_on_elevation(world, elev, x, y):
         Finally, the noise plus the biome color are added and returned
     '''
     v = world.biome[y, x]
-    biome_r, biome_g, biome_b = _biome_satellite_colors[v]
+    biome_color = _biome_satellite_colors[v]
 
     # Default is no noise - will be overwritten if this tile is land
     noise = (0, 0, 0)
@@ -258,60 +277,39 @@ def get_biome_color_based_on_elevation(world, elev, x, y):
         ## Generate some random noise to apply to this pixel
         #  There is noise for each element of the rgb value
         #  This noise will be further modified by the height of this tile
-        noise = (numpy.randint(-NOISE_RANGE, NOISE_RANGE), 
-                 numpy.randint(-NOISE_RANGE, NOISE_RANGE), 
-                 numpy.randint(-NOISE_RANGE, NOISE_RANGE))
+        noise = (numpy.random.randint(-NOISE_RANGE, NOISE_RANGE), 
+                 numpy.random.randint(-NOISE_RANGE, NOISE_RANGE), 
+                 numpy.random.randint(-NOISE_RANGE, NOISE_RANGE))
 
         ####### Case 1 - elevation is very high ########
         if elev > HIGH_MOUNTAIN_ELEV:     
-            # Take the random noise, and color it based on the mountain's modifier.
-            # In this case, it makes the area slightly brighter to simulate snow-topped mountains.
-            noise = noise[0] + HIGH_MOUNTAIN_NOISE_MODIFIER[0], \
-                    noise[1] + HIGH_MOUNTAIN_NOISE_MODIFIER[1], \
-                    noise[2] + HIGH_MOUNTAIN_NOISE_MODIFIER[2]
-
+            # Modify the noise to make the area slightly brighter to simulate snow-topped mountains.
+            noise = add_colors(noise, HIGH_MOUNTAIN_NOISE_MODIFIER)
             # Average the biome's color with the MOUNTAIN_COLOR to tint the terrain
-            biome_r = int((biome_r + MOUNTAIN_COLOR[0])/2)
-            biome_g = int((biome_g + MOUNTAIN_COLOR[1])/2)
-            biome_b = int((biome_b + MOUNTAIN_COLOR[2])/2)
-        #################################################
+            biome_color = average_colors(biome_color, MOUNTAIN_COLOR)
 
-        ####### Case 1 - elevation is high ########
+        ####### Case 2 - elevation is high ########
         elif elev > MOUNTAIN_ELEV:   
-            # Take the random noise, and color it based on the mountain's modifier.
-            # In this case, it makes the area slightly darker, especially draining the green
-            noise = noise[0] + MOUNTAIN_NOISE_MODIFIER[0], \
-                    noise[1] + MOUNTAIN_NOISE_MODIFIER[1], \
-                    noise[2] + MOUNTAIN_NOISE_MODIFIER[2]
-
+            # Modify the noise to make this tile slightly darker, especially draining the green
+            noise = add_colors(noise, MOUNTAIN_NOISE_MODIFIER)
             # Average the biome's color with the MOUNTAIN_COLOR to tint the terrain
-            biome_r = int((biome_r + MOUNTAIN_COLOR[0])/2)
-            biome_g = int((biome_g + MOUNTAIN_COLOR[1])/2)
-            biome_b = int((biome_b + MOUNTAIN_COLOR[2])/2)
-        #################################################
+            biome_color = average_colors(biome_color, MOUNTAIN_COLOR)
 
         ####### Case 3 - elevation is somewhat high ########
         elif elev > HIGH_HILL_ELEV:   
-            # Make the random noise somewhat darker, and drain a little bit of green
-            noise = noise[0] - HIGH_HILL_NOISE_MODIFIER[0], \
-                    noise[1] - HIGH_HILL_NOISE_MODIFIER[1], \
-                    noise[2] - HIGH_HILL_NOISE_MODIFIER[2]
+            noise = add_colors(noise, HIGH_HILL_NOISE_MODIFIER)
 
-        ####### Case 3 - elevation is a little bit high ########
+        ####### Case 4 - elevation is a little bit high ########
         elif elev > HILL_ELEV:   
-            # Make the random noise just a little bit darker, and drain a little bit of green
-            noise = noise[0] - HILL_NOISE_MODIFIER[0], \
-                    noise[1] - HILL_NOISE_MODIFIER[1], \
-                    noise[2] - HILL_NOISE_MODIFIER[2]
+            noise = add_colors(noise, HILL_NOISE_MODIFIER)
 
     # There is also a minor base modifier to the pixel's rgb value based on height
-    base_elevation_modifier = int(elev / 10)
+    modification_amount = int(elev / BASE_ELEVATION_INTENSITY_MODIFIER)
+    base_elevation_modifier = (modification_amount, modification_amount, modification_amount)
 
-    biome_color = (biome_r + noise[0] + base_elevation_modifier, \
-                   biome_g + noise[1] + base_elevation_modifier, \
-                   biome_b + noise[2] + base_elevation_modifier)
+    this_tile_color = add_colors(biome_color, noise, base_elevation_modifier)
 
-    return biome_color
+    return this_tile_color
 # ----------------------
 # Draw on generic target
 # ----------------------
@@ -386,13 +384,11 @@ def draw_riversmap(world, target):
 
     for y in range(world.height):
         for x in range(world.width):
-            target.set_pixel(x, y, sea_color if world.is_ocean((x, y)) else land_color)
-
-    draw_rivers_on_image(world, target, factor=1)
+            target.set_pixel(x, y, sea_color if world.is_ocean((x, y)) else land_color)    
 
 
 def draw_grayscale_heightmap(world, target):
-    c = get_normalized_elevation_mask(world)
+    c = get_normalized_elevation_array(world)
 
     for y in range(world.height):
         for x in range(world.width):
@@ -403,7 +399,7 @@ def draw_satellite(world, target):
     ''' This draws a "satellit map" - a view of the generated planet as it may look from space '''
 
     # Get an elevation mask where heights are normalized between 0 and 255
-    elevation_mask = get_normalized_elevation_mask(world)
+    elevation_mask = get_normalized_elevation_array(world)
 
     ## The first loop sets each pixel's color based on colors defined in _biome_satellite_colors
     #  and additional "business logic" defined in get_biome_color_based_on_elevation
@@ -442,13 +438,32 @@ def draw_satellite(world, target):
                             all_b.append(b)
 
                 # Making sure there is at least one valid tile to be smoothed before we attempt to average the values
-                if all_r:
+                if len(all_r) > 0:
                     avg_r = int(sum(all_r) / len(all_r))
                     avg_g = int(sum(all_g) / len(all_g))
                     avg_b = int(sum(all_b) / len(all_b))
 
                     ## Setting color of the pixel again - this will be once more modified by the shading algorithm
                     target.set_pixel(x, y, (avg_r, avg_g, avg_b, 255))
+
+
+    ## After smoothing, draw rivers
+    for y in range(world.height):
+        for x in range(world.width):
+            ## Color rivers
+            if world.is_land((x, y)) and (world.river_map[x, y] > 0.0):
+                base_color = target.pixels[x, y]
+
+                r, g, b = add_colors(base_color, RIVER_COLOR_CHANGE)
+                target.set_pixel(x, y, (r, g, b, 255))
+
+            ## Color lakes
+            if world.is_land((x, y)) and (world.lake_map[x, y] != 0):
+                base_color = target.pixels[x, y]
+
+                r, g, b = add_colors(base_color, LAKE_COLOR_CHANGE)
+                target.set_pixel(x, y, (r, g, b, 255))
+
 
     # "Shade" the map by sending beams of light west to east, and increasing or decreasing value of pixel based on elevation difference
     for y in range(SAT_SHADOW_SIZE-1, world.height-SAT_SHADOW_SIZE-1):
@@ -457,7 +472,7 @@ def draw_satellite(world, target):
                 r, g, b, a = target.pixels[x, y]
                 
                 # Build up list of elevations in the previous n tiles, where n is the shadow size.
-                # This goes left to right, so it would be the previous tiles on the same y level  
+                # This goes northwest to southeast
                 prev_elevs = [ world.elevation['data'][y-n, x-n] for n in range(1, SAT_SHADOW_SIZE+1) ]
 
                 # Take the average of the height of the previous n tiles
@@ -478,7 +493,6 @@ def draw_satellite(world, target):
 
                 # Set the final color for this pixel
                 target.set_pixel(x, y, (r, g, b, 255))
-
 
 
 def draw_elevation(world, shadow, target):
