@@ -191,10 +191,18 @@ def export_to_tmx(world, tmx_filename):
                             indexes = [TLAND, TLAND, TLAND]
                         else:
                             indexes = [TLAND, TLAND, TLAND]
+                            if not around[5]:
+                                indexes[0] = TLAND_BUT_SW
+                            if not around[7]:
+                                indexes[2] = TLAND_BUT_SE
                     elif around[1] and around[3] and around[4] and not around[6]:
                         # Coast north
                         if dy == 0:
                             indexes = [TLAND, TLAND, TLAND]
+                            if not around[0]:
+                                indexes[0] = TLAND_BUT_NW
+                            if not around[2]:
+                                indexes[2] = TLAND_BUT_NE
                         elif dy == 1:
                             indexes = [TLAND, TLAND, TLAND]
                         else:
@@ -227,6 +235,8 @@ def export_to_tmx(world, tmx_filename):
                         # Land is North and West
                         if dy == 0:
                             indexes = [TLAND, TLAND, TLAND_COAST_W]
+                            if not around[0]:
+                                indexes[0] = TLAND_BUT_NW
                         elif dy == 1:
                             indexes = [TLAND, TLAND_BUT_SE, TLAND_NW_N_W]
                         else:
@@ -239,6 +249,26 @@ def export_to_tmx(world, tmx_filename):
                             indexes = [TLAND_N_NE_E, TLAND_BUT_SW, TLAND]
                         else:
                             indexes = [TOCEAN, TLAND_N_NE_E, TLAND_COAST_N]
+                    elif not around[1] and around[3] and not around[4] and around[6]:
+                        # Land is South and West
+                        if dy == 0:
+                            indexes = [TLAND_COAST_S, TLAND_W_SW_S, TOCEAN]
+                        elif dy == 1:
+                            indexes = [TLAND, TLAND_BUT_NE, TLAND_W_SW_S]
+                        else:
+                            indexes = [TLAND, TLAND, TLAND_COAST_W]
+                            if not around[5]:
+                                indexes[0] = TLAND_BUT_SW
+                    elif not around[1] and not around[3] and around[4] and around[6]:
+                        # Land is South and East
+                        if dy == 0:
+                            indexes = [TOCEAN, TLAND_E_S_SE, TLAND_COAST_S]
+                        elif dy == 1:
+                            indexes = [TLAND_E_S_SE, TLAND_BUT_NW, TLAND]
+                        else:
+                            indexes = [TLAND_COAST_E, TLAND, TLAND]
+                            if not around[7]:
+                                indexes[2] = TLAND_BUT_SE
                     elif not around[1] and around[3] and not around[4] and not around[6]:
                         # Peninsula going east
                         if dy == 0:
@@ -271,6 +301,22 @@ def export_to_tmx(world, tmx_filename):
                             indexes = [TOCEAN, TOCEAN, TOCEAN]
                         else:
                             indexes = [TLAND_E_S_SE, TLAND_COAST_S, TLAND_W_SW_S]
+                    elif not around[1] and around[3] and around[4] and not around[6]:
+                        # Horizontal bridge
+                        if dy == 0:
+                            indexes = [TLAND_COAST_S, TLAND_COAST_S, TLAND_COAST_S]
+                        elif dy == 1:
+                            indexes = [TLAND, TLAND, TLAND]
+                        else:
+                            indexes = [TLAND_COAST_N, TLAND_COAST_N, TLAND_COAST_N]
+                    elif around[1] and not around[3] and not around[4] and around[6]:
+                        # Vertical bridge
+                        if dy == 0:
+                            indexes = [TLAND_COAST_E, TLAND, TLAND_COAST_W]
+                        elif dy == 1:
+                            indexes = [TLAND_COAST_E, TLAND, TLAND_COAST_W]
+                        else:
+                            indexes = [TLAND_COAST_E, TLAND, TLAND_COAST_W]
                     elif around[1] and around[3] and around[4] and around[6]:
                         # This could have just water in diagonal. In that case it needs to use a different
                         # tile in the corner
@@ -292,8 +338,10 @@ def export_to_tmx(world, tmx_filename):
                             if not around[7]:
                                 last_cell = TLAND_BUT_SE
                             indexes = [first_cell, TLAND, last_cell]
-                    else:
+                    elif around==[True,True,True,True,True,True,True,True]:
                         indexes = [TLAND, TLAND, TLAND]
+                    else:
+                        raise Exception(str(around))
                 tmx_file.write(str(indexes[0]))
                 tmx_file.write(',')
                 tmx_file.write(str(indexes[1]))
