@@ -339,6 +339,8 @@ We would like to thank you great people who helped us while working on WorldEngi
 
 * [Russell Brinkmann](https://github.com/rbb) helped saving the generation parameters in the generated world (so that we can use it to generate the same world again, for example), improved the command line options and added tracing information (useful for understanding the performance of the various generation steps)
 
+* [Joshua Coppola](https://github.com/pangal) implemented the satellite view. Thanks a lot, it looks gorgeous!
+
 History
 =======
 
