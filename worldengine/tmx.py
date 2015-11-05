@@ -45,6 +45,23 @@ def get_land_around(world, x, y):
     return [world.is_land((w,n)),world.is_land((x,n)),world.is_land((e,n)),world.is_land((w,y)),world.is_land((e,y)),world.is_land((w,s)),world.is_land((x,s)),world.is_land((e,s))]
 
 
+def get_river_around(world, x, y):
+    s = y + 1
+    if s == world.height:
+        s = 0
+    n = y - 1
+    if n == -1:
+        n = world.height - 1
+    e = x + 1
+    if e == world.width:
+        e = 0
+    w = x - 1
+    if w == -1:
+        w = world.width - 1
+    return [world.river_map[w,n],world.river_map[x,n],world.river_map[e,n],world.river_map[w,y],world.river_map[e,y],world.river_map[w,s],world.river_map[x,s],world.river_map[e,s]]
+
+
+
                     # around = get_land_around(world,x,y)
                     # if around == [False, False, False, False, True, False, True, True] \
                     #         or around == [False, False, True, False, True, False, True, True] \
@@ -157,6 +174,127 @@ def export_to_tmx(world, tmx_filename):
                 pos = (x, y)
                 if world.is_ocean(pos):
                     indexes = [TOCEAN, TOCEAN, TOCEAN]
+                elif world.river_map[x, y] > 0:
+                    around = get_river_around(world,x,y)
+                    if not around[1] and not around[3] and not around[4] and around[6]:
+                        # north source
+                        if dy == 0:
+                            indexes = [TLAND_BUT_SE, TLAND_COAST_N, TLAND_BUT_SW]
+                        elif dy == 1:
+                            indexes = [TLAND_COAST_W, TOCEAN, TLAND_COAST_E]
+                        else:
+                            indexes = [TLAND_COAST_W, TOCEAN, TLAND_COAST_E]
+                    elif around[1] and not around[3] and not around[4] and not around[6]:
+                        # south source
+                        if dy == 0:
+                            indexes = [TLAND_COAST_W, TOCEAN, TLAND_COAST_E]
+                        elif dy == 1:
+                            indexes = [TLAND_COAST_W, TOCEAN, TLAND_COAST_E]
+                        else:
+                            indexes = [TLAND_BUT_NE, TLAND_COAST_S, TLAND_BUT_NW]
+                    elif not around[1] and around[3] and not around[4] and not around[6]:
+                        # east source
+                        if dy == 0:
+                            indexes = [TLAND_COAST_N, TLAND_COAST_N, TLAND_BUT_SW]
+                        elif dy == 1:
+                            indexes = [TOCEAN, TOCEAN, TLAND_COAST_E]
+                        else:
+                            indexes = [TLAND_COAST_S, TLAND_COAST_S, TLAND_BUT_NW]
+                    elif not around[1] and not around[3] and around[4] and not around[6]:
+                        # west source
+                        if dy == 0:
+                            indexes = [TLAND_BUT_SE, TLAND_COAST_N, TLAND_COAST_N]
+                        elif dy == 1:
+                            indexes = [TLAND_COAST_W, TOCEAN, TOCEAN]
+                        else:
+                            indexes = [TLAND_BUT_NE, TLAND_COAST_S, TLAND_COAST_S]
+                    elif not around[1] and around[3] and around[4] and around[6]:
+                        # triangle to south
+                        if dy == 0:
+                            indexes = [TLAND_COAST_N, TLAND_COAST_N, TLAND_COAST_N]
+                        elif dy == 1:
+                            indexes = [TOCEAN, TOCEAN, TOCEAN]
+                        else:
+                            indexes = [TLAND_W_SW_S, TOCEAN, TLAND_E_S_SE]
+                    elif around[1] and around[3] and around[4] and not around[6]:
+                        # triangle to north
+                        if dy == 0:
+                            indexes = [TLAND_NW_N_W, TOCEAN, TLAND_N_NE_E]
+                        elif dy == 1:
+                            indexes = [TOCEAN, TOCEAN, TOCEAN]
+                        else:
+                            indexes = [TLAND_COAST_S, TLAND_COAST_S, TLAND_COAST_S]
+                    elif around[1] and around[3] and not around[4] and around[6]:
+                        # triangle to west
+                        if dy == 0:
+                            indexes = [TLAND_NW_N_W, TOCEAN, TLAND_COAST_E]
+                        elif dy == 1:
+                            indexes = [TOCEAN, TOCEAN, TLAND_COAST_E]
+                        else:
+                            indexes = [TLAND_W_SW_S, TOCEAN, TLAND_COAST_E]
+                    elif around[1] and not around[3] and around[4] and around[6]:
+                        # triangle to east
+                        if dy == 0:
+                            indexes = [TLAND_COAST_W, TOCEAN, TLAND_N_NE_E]
+                        elif dy == 1:
+                            indexes = [TLAND_COAST_W, TOCEAN, TOCEAN]
+                        else:
+                            indexes = [TLAND_COAST_W, TOCEAN, TLAND_E_S_SE]
+                    elif around[1] and not around[3] and not around[4] and around[6]:
+                        #vertical bridge
+                        if dy == 0:
+                            indexes = [TLAND_COAST_W, TOCEAN, TLAND_COAST_E]
+                        elif dy == 1:
+                            indexes = [TLAND_COAST_W, TOCEAN, TLAND_COAST_E]
+                        else:
+                            indexes = [TLAND_COAST_W, TOCEAN, TLAND_COAST_E]
+                    elif not around[1] and around[3] and around[4] and not around[6]:
+                        #horizontal bridge
+                        if dy == 0:
+                            indexes = [TLAND_COAST_N, TLAND_COAST_N, TLAND_COAST_N]
+                        elif dy == 1:
+                            indexes = [TOCEAN, TOCEAN, TOCEAN]
+                        else:
+                            indexes = [TLAND_COAST_S, TLAND_COAST_S, TLAND_COAST_S]
+                    elif around[1] and not around[3] and around[4] and not around[6]:
+                        #curve n -> e
+                        if dy == 0:
+                            indexes = [TLAND_COAST_W, TOCEAN, TLAND_N_NE_E]
+                        elif dy == 1:
+                            indexes = [TLAND_COAST_W, TOCEAN, TOCEAN]
+                        else:
+                            indexes = [TLAND_BUT_NE, TLAND_COAST_S, TLAND_COAST_S]
+                    elif around[1] and around[3] and not around[4] and not around[6]:
+                        #curve n -> w
+                        if dy == 0:
+                            indexes = [TLAND_NW_N_W, TOCEAN, TLAND_COAST_E]
+                        elif dy == 1:
+                            indexes = [TOCEAN, TOCEAN, TLAND_COAST_E]
+                        else:
+                            indexes = [TLAND_COAST_S, TLAND_COAST_S, TLAND_BUT_NW]
+                    elif not around[1] and around[3] and not around[4] and around[6]:
+                        #curve w -> s
+                        if dy == 0:
+                            indexes = [TLAND_COAST_N, TLAND_COAST_N, TLAND_BUT_SW]
+                        elif dy == 1:
+                            indexes = [TOCEAN, TOCEAN, TLAND_COAST_E]
+                        else:
+                            indexes = [TLAND_W_SW_S, TOCEAN, TLAND_COAST_E]
+                    elif not around[1] and not around[3] and around[4] and around[6]:
+                        #curve e -> s
+                        if dy == 0:
+                            indexes = [TLAND_BUT_SE, TLAND_COAST_N, TLAND_COAST_N]
+                        elif dy == 1:
+                            indexes = [TLAND_COAST_W, TOCEAN, TOCEAN]
+                        else:
+                            indexes = [TLAND_COAST_W, TOCEAN, TLAND_E_S_SE]
+                    else:
+                        if dy == 0:
+                            indexes = [TOCEAN, TOCEAN, TOCEAN]
+                        elif dy == 1:
+                            indexes = [TOCEAN, TOCEAN, TOCEAN]
+                        else:
+                            indexes = [TOCEAN, TOCEAN, TOCEAN]
                 else:
                     around = get_land_around(world,x,y)
                     if not around[1] and not around[3] and not around[4] and not around[6]:
