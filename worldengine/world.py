@@ -643,6 +643,10 @@ class World(object):
         x, y = pos
         return self.watermap['data'][y, x]
 
+    def is_river(self, pos):
+        x, y = pos
+        return self.river_map[x, y] > 0
+
     #
     # Biome
     #
