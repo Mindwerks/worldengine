@@ -30,6 +30,9 @@ TLAND_COAST_S = 344
 T_ISLAND = 277
 TRIVER = 363
 
+TMOUNTAIN = 484
+TFOREST = 485
+
 def get_land_around(world, x, y):
     s = y + 1
     if s == world.height:
@@ -178,6 +181,14 @@ def export_to_tmx(world, tmx_filename):
     tmx_file.write('<map version="1.0" orientation="orthogonal" renderorder="right-down" width="%i" height="%i" tilewidth="32" tileheight="32" nextobjectid="1">\n' % (world.width*3, world.height*3))
     tmx_file.write('<tileset firstgid="1" name="T2" tilewidth="32" tileheight="32" tilecount="483">\n')
     tmx_file.write('<image source="terrain_2.png" width="672" height="736"/>\n')
+    tmx_file.write('</tileset>\n')
+    tmx_file.write('<tileset firstgid="484" name="Mountain" tilewidth="96" tileheight="96" tilecount="1">\n')
+    tmx_file.write('<tile id="0">\n')
+    tmx_file.write('<image width="96" height="96" source="m.png"/>\n')
+    tmx_file.write('</tile>\n')
+    tmx_file.write('<tile id="1">\n')
+    tmx_file.write('<image width="96" height="96" source="tree.png"/>\n')
+    tmx_file.write('</tile>\n')
     tmx_file.write('</tileset>\n')
 
     # tmx_file.write('<map version="1.0" orientation="orthogonal" renderorder="right-down" width="%i" height="%i" tilewidth="64" tileheight="64" nextobjectid="1">\n' % (world.width, world.height))
@@ -581,6 +592,8 @@ def export_to_tmx(world, tmx_filename):
                             indexes = [TLAND_COAST_E, TLAND, TLAND_COAST_W]
                         else:
                             indexes = [TLAND_COAST_E, TLAND, TLAND_COAST_W]
+                    elif around==[True, True, True, True, True, True, True, True]:
+                        indexes = [TLAND, TLAND, TLAND]
                     elif around[1] and around[3] and around[4] and around[6]:
                         # This could have just water in diagonal. In that case it needs to use a different
                         # tile in the corner
@@ -602,9 +615,8 @@ def export_to_tmx(world, tmx_filename):
                             if not around[7]:
                                 last_cell = TLAND_BUT_SE
                             indexes = [first_cell, TLAND, last_cell]
-                    elif around==[True,True,True,True,True,True,True,True]:
-                        indexes = [TLAND, TLAND, TLAND]
                     else:
+                        print(around)
                         raise Exception(str(around))
                 tmx_file.write(str(indexes[0]))
                 tmx_file.write(',')
@@ -616,5 +628,40 @@ def export_to_tmx(world, tmx_filename):
             tmx_file.write('\n')
     tmx_file.write('    </data>\n')
     tmx_file.write('  </layer>\n')
+
+
+    tmx_file.write('  <layer name="mountains" width="%i" height="%i">\n' % (world.width*3, world.height*3))
+    tmx_file.write('    <data encoding="csv">\n')
+
+    unkwown = sets.Set()
+    for y in range(world.height):
+        for dy in range(3):
+            for x in range(world.width):
+                pos = (x, y)
+                indexes = [0, 0, 0]
+                land_around = get_land_around(world,x,y)
+                if land_around==[True,True,True,True,True,True,True,True] and world.river_map[x, y] == 0.0:
+                    if world.is_mountain(pos):
+                        if dy == 1:
+                            indexes = [TMOUNTAIN, 0, 0]
+                    elif world.is_temperate_forest((x,y)):
+                        if dy == 0:
+                            indexes = [0, TFOREST, 0]
+                        elif dy == 1:
+                            indexes = [TFOREST, 0, TFOREST]
+                        else:
+                            indexes = [0, TFOREST, 0]
+                tmx_file.write(str(indexes[0]))
+                tmx_file.write(',')
+                tmx_file.write(str(indexes[1]))
+                tmx_file.write(',')
+                tmx_file.write(str(indexes[2]))
+                if y != (world.height - 1) or (x != world.width - 1) or dy != 2:
+                    tmx_file.write(',')
+            tmx_file.write('\n')
+
+    tmx_file.write('    </data>\n')
+    tmx_file.write('  </layer>\n')
+
     tmx_file.write('</map>\n')
     tmx_file.close()
