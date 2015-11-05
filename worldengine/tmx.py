@@ -1,5 +1,7 @@
 from biome import Biome, biome_name_to_index
 
+import numpy
+
 TOCEAN = 366
 TLAND  = 244
 TLAND_E_S_SE = 260
@@ -94,405 +96,266 @@ def _transform_for_tmx(world):
                     world.ocean[y, x] = True
 
 
-def land_tile_for_row(world, pos, dy):
+WG_LAND  = 0
+WG_OCEAN = 1
+WG_RIVER = 2
+
+
+def water_cell_grid(world, pos):
+    """
+    Given a position calculate a grid 3x3 to determine where there should be water and
+    where it should not be water
+    :param world:
+    :param pos:
+    :return:
+    """
     x, y = pos
+
     if world.is_ocean(pos):
-        indexes = [TOCEAN, TOCEAN, TOCEAN]
-    elif world.river_map[x, y] > 0:
-        ocean_around = [(not v) for v in get_land_around(world,x,y)]
-        around = get_river_around(world,x,y)
-        if not around[1] and not around[3] and not around[4] and around[6]:
-            # north source
-            if dy == 0:
-                indexes = [TLAND_BUT_SE, TLAND_COAST_N, TLAND_BUT_SW]
-            elif dy == 1:
-                indexes = [TLAND_COAST_W, TRIVER, TLAND_COAST_E]
-            else:
-                indexes = [TLAND_COAST_W, TRIVER, TLAND_COAST_E]
-                if ocean_around[6]:
-                    indexes[0] = TLAND_NW_N_W
-                    indexes[2] = TLAND_N_NE_E
-        elif around[1] and not around[3] and not around[4] and not around[6]:
-            # south source
-            if dy == 0:
-                indexes = [TLAND_COAST_W, TRIVER, TLAND_COAST_E]
-                if ocean_around[1]:
-                    indexes[0] = TLAND_W_SW_S
-                    indexes[2] = TLAND_E_S_SE
-                if ocean_around[2]:
-                    indexes[2] = TLAND_E_S_SE
-            elif dy == 1:
-                indexes = [TLAND_COAST_W, TRIVER, TLAND_COAST_E]
-            else:
-                indexes = [TLAND_BUT_NE, TLAND_COAST_S, TLAND_BUT_NW]
-        elif not around[1] and around[3] and not around[4] and not around[6]:
-            # east source
-            if dy == 0:
-                indexes = [TLAND_COAST_N, TLAND_COAST_N, TLAND_BUT_SW]
-                if ocean_around[3]:
-                    indexes[0] = TLAND_N_NE_E
-                if ocean_around[1]:
-                    indexes = [TOCEAN,TOCEAN,TOCEAN]
-            elif dy == 1:
-                indexes = [TRIVER, TRIVER, TLAND_COAST_E]
-                if ocean_around[1]:
-                    indexes[2] = TOCEAN
-            else:
-                indexes = [TLAND_COAST_S, TLAND_COAST_S, TLAND_BUT_NW]
-                if ocean_around[3]:
-                    indexes[0] = TLAND_E_S_SE
-                if ocean_around[4]:
-                    indexes[2] = TLAND_W_SW_S
-        elif not around[1] and not around[3] and around[4] and not around[6]:
-            # west source
-            if dy == 0:
-                indexes = [TLAND_BUT_SE, TLAND_COAST_N, TLAND_COAST_N]
-                if ocean_around[4]:
-                    indexes[2] = TLAND_NW_N_W
-            elif dy == 1:
-                indexes = [TLAND_COAST_W, TRIVER, TRIVER]
-            else:
-                indexes = [TLAND_BUT_NE, TLAND_COAST_S, TLAND_COAST_S]
-                if ocean_around[4]:
-                    indexes[2] = TLAND_W_SW_S
-        elif not around[1] and around[3] and around[4] and around[6]:
-            # triangle to south
-            if dy == 0:
-                indexes = [TLAND_COAST_N, TLAND_COAST_N, TLAND_COAST_N]
-                if ocean_around[4]:
-                    indexes[2] = TLAND_NW_N_W
-            elif dy == 1:
-                indexes = [TRIVER, TRIVER, TRIVER]
-            else:
-                indexes = [TLAND_W_SW_S, TRIVER, TLAND_E_S_SE]
-                if around[5]:
-                    indexes[0] = TRIVER
-                if around[7]:
-                    indexes[2] = TRIVER
-                if ocean_around[4]:
-                    indexes[2] = TOCEAN
-        elif around[1] and around[3] and around[4] and not around[6]:
-            # triangle to north
-            if dy == 0:
-                indexes = [TLAND_NW_N_W, TRIVER, TLAND_N_NE_E]
-            elif dy == 1:
-                indexes = [TRIVER, TRIVER, TRIVER]
-            else:
-                indexes = [TLAND_COAST_S, TLAND_COAST_S, TLAND_COAST_S]
-                if ocean_around[5]:
-                    indexes[0] = TLAND_E_S_SE
-        elif around[1] and around[3] and not around[4] and around[6]:
-            # triangle to west
-            if dy == 0:
-                indexes = [TLAND_NW_N_W, TRIVER, TLAND_COAST_E]
-                if around[2]:
-                    indexes[2] = TLAND_E_S_SE
-                if ocean_around[3]:
-                    indexes[0] = TOCEAN
-            elif dy == 1:
-                indexes = [TRIVER, TRIVER, TLAND_COAST_E]
-            else:
-                indexes = [TLAND_W_SW_S, TRIVER, TLAND_COAST_E]
-                if around[7]:
-                    indexes[2] = TLAND_N_NE_E
-                if ocean_around[6]:
-                    indexes[2] = TLAND_N_NE_E
-                if ocean_around[3]:
-                    indexes[0] = TOCEAN
-        elif around[1] and not around[3] and around[4] and around[6]:
-            # triangle to east
-            if dy == 0:
-                indexes = [TLAND_COAST_W, TRIVER, TLAND_N_NE_E]
-            elif dy == 1:
-                indexes = [TLAND_COAST_W, TRIVER, TRIVER]
-            else:
-                indexes = [TLAND_COAST_W, TRIVER, TLAND_E_S_SE]
-        elif around[1] and not around[3] and not around[4] and around[6]:
-            #vertical pipe
-            if dy == 0:
-                indexes = [TLAND_COAST_W, TRIVER, TLAND_COAST_E]
-                if ocean_around[0]:
-                    indexes[0] = TLAND_W_SW_S
-                if ocean_around[1]:
-                    indexes[2] = TLAND_E_S_SE
-                if ocean_around[3]:
-                    indexes[0] = TOCEAN
-            elif dy == 1:
-                indexes = [TLAND_COAST_W, TRIVER, TLAND_COAST_E]
-                if ocean_around[3]:
-                    indexes[0] = TOCEAN
-            else:
-                indexes = [TLAND_COAST_W, TRIVER, TLAND_COAST_E]
-                if ocean_around[6]:
-                    indexes[0] = TLAND_NW_N_W
-                    indexes[2] = TLAND_N_NE_E
-                if ocean_around[3]:
-                    indexes[0] = TOCEAN
-        elif not around[1] and around[3] and around[4] and not around[6]:
-            #horizontal pipe
-            if dy == 0:
-                indexes = [TLAND_COAST_N, TLAND_COAST_N, TLAND_COAST_N]
-                if ocean_around[0]:
-                    indexes[0] = TLAND_N_NE_E
-                if ocean_around[3]:
-                    indexes[0] = TLAND_N_NE_E
-                if ocean_around[1]:
-                    indexes[0] = TOCEAN
-                    indexes[1] = TOCEAN
-                    indexes[2] = TOCEAN
-            elif dy == 1:
-                indexes = [TRIVER, TRIVER, TRIVER]
-            else:
-                indexes = [TLAND_COAST_S, TLAND_COAST_S, TLAND_COAST_S]
-                if ocean_around[3]:
-                    indexes[0] = TLAND_E_S_SE
-        elif around[1] and not around[3] and around[4] and not around[6]:
-            #curve n -> e
-            if dy == 0:
-                indexes = [TLAND_COAST_W, TRIVER, TLAND_N_NE_E]
-                if ocean_around[4]:
-                    indexes[2] = TOCEAN
-            elif dy == 1:
-                indexes = [TLAND_COAST_W, TRIVER, TRIVER]
-            else:
-                indexes = [TLAND_BUT_NE, TLAND_COAST_S, TLAND_COAST_S]
-                if ocean_around[4]:
-                    indexes[2] = TLAND_W_SW_S
-        elif around[1] and around[3] and not around[4] and not around[6]:
-            #curve n -> w
-            if dy == 0:
-                indexes = [TLAND_NW_N_W, TRIVER, TLAND_COAST_E]
-            elif dy == 1:
-                indexes = [TRIVER, TRIVER, TLAND_COAST_E]
-            else:
-                indexes = [TLAND_COAST_S, TLAND_COAST_S, TLAND_BUT_NW]
-        elif not around[1] and around[3] and not around[4] and around[6]:
-            #curve w -> s
-            if dy == 0:
-                indexes = [TLAND_COAST_N, TLAND_COAST_N, TLAND_BUT_SW]
-            elif dy == 1:
-                indexes = [TRIVER, TRIVER, TLAND_COAST_E]
-            else:
-                indexes = [TLAND_W_SW_S, TRIVER, TLAND_COAST_E]
-                if ocean_around[5]:
-                    indexes[0] = TOCEAN
-                if ocean_around[6]:
-                    indexes[2] = TLAND_N_NE_E
-                if ocean_around[7]:
-                    indexes[2] = TLAND_N_NE_E
-        elif not around[1] and not around[3] and around[4] and around[6]:
-            #curve e -> s
-            if dy == 0:
-                indexes = [TLAND_BUT_SE, TLAND_COAST_N, TLAND_COAST_N]
-            elif dy == 1:
-                indexes = [TLAND_COAST_W, TRIVER, TRIVER]
-            else:
-                indexes = [TLAND_COAST_W, TRIVER, TLAND_E_S_SE]
-                #if around[7]:
-                #    indexes[2] = TRIVER
-                if ocean_around[6]:
-                    indexes[0] = TLAND_NW_N_W
-                    indexes[2] = TOCEAN
-        else:
-            if dy == 0:
-                indexes = [TRIVER, TRIVER, TRIVER]
-            elif dy == 1:
-                indexes = [TRIVER, TRIVER, TRIVER]
-            else:
-                indexes = [TRIVER, TRIVER, TRIVER]
+        return [[WG_OCEAN, WG_OCEAN, WG_OCEAN], [WG_OCEAN, WG_OCEAN, WG_OCEAN], [WG_OCEAN, WG_OCEAN, WG_OCEAN]]
+    elif world.is_river(pos):
+        ocean_around = [(not v) for v in get_land_around(world, x, y)]
+        river_around = get_river_around(world, x, y)
+        top = [WG_LAND, WG_LAND, WG_LAND]
+        if river_around[1]:
+            top[1] = WG_RIVER
+        middle = [WG_LAND, WG_RIVER, WG_LAND]
+        if river_around[3]:
+            middle[0] = WG_RIVER
+        if river_around[4]:
+            middle[2] = WG_RIVER
+        bottom = [WG_LAND, WG_LAND, WG_LAND]
+        if river_around[6]:
+            bottom[1] = WG_RIVER
+        return [top, middle, bottom]
     else:
-        around = get_land_around(world,x,y)
-        if not around[1] and not around[3] and not around[4] and not around[6]:
-            # island
-            if dy == 0:
-                indexes = [TLAND_E_S_SE, TLAND_COAST_S, TLAND_W_SW_S]
-            elif dy == 1:
-                indexes = [TLAND_COAST_E, TLAND, TLAND_COAST_W]
-            else:
-                indexes = [TLAND_N_NE_E, TLAND_COAST_N, TLAND_NW_N_W]
-        elif not around[1] and not around[3] and around[4] and around[6] and around[7]:
-            # land at E and S (and in corner), water at N and W
-            if dy == 0:
-                indexes = [TOCEAN, TLAND_E_S_SE, TLAND_COAST_S]
-            elif dy == 1:
-                indexes = [TLAND_E_S_SE, TLAND_BUT_NW, TLAND]
-            else:
-                indexes = [TLAND_COAST_E, TLAND, TLAND]
-        elif not around[1] and around[3] and not around[4] and around[6] and around[5]:
-            # land at W and S (and in corner), water at N and E
-            if dy == 0:
-                indexes = [TLAND_COAST_S, TLAND_W_SW_S, TOCEAN]
-            elif dy == 1:
-                indexes = [TLAND, TLAND_BUT_NE, TLAND_W_SW_S]
-            else:
-                indexes = [TLAND, TLAND, TLAND_COAST_W]
-        elif not around[1] and around[3] and around[4] and around[6]:
-            # Coast south
-            if dy == 0:
-                indexes = [TLAND_COAST_S, TLAND_COAST_S, TLAND_COAST_S]
-            elif dy == 1:
-                indexes = [TLAND, TLAND, TLAND]
-            else:
-                indexes = [TLAND, TLAND, TLAND]
-                if not around[5]:
-                    indexes[0] = TLAND_BUT_SW
-                if not around[7]:
-                    indexes[2] = TLAND_BUT_SE
-        elif around[1] and around[3] and around[4] and not around[6]:
-            # Coast north
-            if dy == 0:
-                indexes = [TLAND, TLAND, TLAND]
-                if not around[0]:
-                    indexes[0] = TLAND_BUT_NW
-                if not around[2]:
-                    indexes[2] = TLAND_BUT_NE
-            elif dy == 1:
-                indexes = [TLAND, TLAND, TLAND]
-            else:
-                indexes = [TLAND_COAST_N, TLAND_COAST_N, TLAND_COAST_N]
-        elif around[1] and around[3] and not around[4] and around[6]:
-            # Coast west
-            if dy == 0:
-                indexes = [TLAND, TLAND, TLAND_COAST_W]
-                if not around[0]:
-                    indexes[0] = TLAND_BUT_NW
-            elif dy == 1:
-                indexes = [TLAND, TLAND, TLAND_COAST_W]
-            else:
-                indexes = [TLAND, TLAND, TLAND_COAST_W]
-                if not around[5]:
-                    indexes[0] = TLAND_BUT_SW
-        elif around[1] and around[4] and around[6] and not around[3]:
-            # Coast east
-            if dy == 0:
-                indexes = [TLAND_COAST_E, TLAND, TLAND]
-                if not around[2]:
-                    indexes[2] = TLAND_BUT_NE
-            elif dy == 1:
-                indexes = [TLAND_COAST_E, TLAND, TLAND]
-            else:
-                indexes = [TLAND_COAST_E, TLAND, TLAND]
-                if not around[7]:
-                    indexes[2] = TLAND_BUT_SE
-        elif around[1] and around[3] and not around[4] and not around[6]:
-            # Land is North and West
-            if dy == 0:
-                indexes = [TLAND, TLAND, TLAND_COAST_W]
-                if not around[0]:
-                    indexes[0] = TLAND_BUT_NW
-            elif dy == 1:
-                indexes = [TLAND, TLAND_BUT_SE, TLAND_NW_N_W]
-            else:
-                indexes = [TLAND_COAST_N, TLAND_NW_N_W, TOCEAN]
-        elif around[1] and not around[3] and around[4] and not around[6]:
-            # Land is North and East
-            if dy == 0:
-                indexes = [TLAND_COAST_E, TLAND, TLAND]
-            elif dy == 1:
-                indexes = [TLAND_N_NE_E, TLAND_BUT_SW, TLAND]
-            else:
-                indexes = [TOCEAN, TLAND_N_NE_E, TLAND_COAST_N]
-        elif not around[1] and around[3] and not around[4] and around[6]:
-            # Land is South and West
-            if dy == 0:
-                indexes = [TLAND_COAST_S, TLAND_W_SW_S, TOCEAN]
-            elif dy == 1:
-                indexes = [TLAND, TLAND_BUT_NE, TLAND_W_SW_S]
-            else:
-                indexes = [TLAND, TLAND, TLAND_COAST_W]
-                if not around[5]:
-                    indexes[0] = TLAND_BUT_SW
-        elif not around[1] and not around[3] and around[4] and around[6]:
-            # Land is South and East
-            if dy == 0:
-                indexes = [TOCEAN, TLAND_E_S_SE, TLAND_COAST_S]
-            elif dy == 1:
-                indexes = [TLAND_E_S_SE, TLAND_BUT_NW, TLAND]
-            else:
-                indexes = [TLAND_COAST_E, TLAND, TLAND]
-                if not around[7]:
-                    indexes[2] = TLAND_BUT_SE
-        elif not around[1] and around[3] and not around[4] and not around[6]:
-            # Peninsula going east
-            if dy == 0:
-                indexes = [TLAND_W_SW_S, TOCEAN, TOCEAN]
-            elif dy == 1:
-                indexes = [TLAND_COAST_W, TOCEAN, TOCEAN]
-            else:
-                indexes = [TLAND_NW_N_W, TOCEAN, TOCEAN]
-        elif not around[1] and not around[3] and around[4] and not around[6]:
-            # Peninsula going west
-            if dy == 0:
-                indexes = [TOCEAN, TOCEAN, TLAND_E_S_SE]
-            elif dy == 1:
-                indexes = [TOCEAN, TOCEAN, TLAND_COAST_E]
-            else:
-                indexes = [TOCEAN, TOCEAN, TLAND_N_NE_E]
-        elif around[1] and not around[3] and not around[4] and not around[6]:
-            # Peninsula going south
-            if dy == 0:
-                indexes = [TLAND_N_NE_E, TLAND_COAST_N, TLAND_NW_N_W]
-            elif dy == 1:
-                indexes = [TOCEAN, TOCEAN, TOCEAN]
-            else:
-                indexes = [TOCEAN, TOCEAN, TOCEAN]
-        elif not around[1] and not around[3] and not around[4] and around[6]:
-            # Peninsula going north
-            if dy == 0:
-                indexes = [TOCEAN, TOCEAN, TOCEAN]
-            elif dy == 1:
-                indexes = [TOCEAN, TOCEAN, TOCEAN]
-            else:
-                indexes = [TLAND_E_S_SE, TLAND_COAST_S, TLAND_W_SW_S]
-        elif not around[1] and around[3] and around[4] and not around[6]:
-            # Horizontal bridge
-            if dy == 0:
-                indexes = [TLAND_COAST_S, TLAND_COAST_S, TLAND_COAST_S]
-            elif dy == 1:
-                indexes = [TLAND, TLAND, TLAND]
-            else:
-                indexes = [TLAND_COAST_N, TLAND_COAST_N, TLAND_COAST_N]
-        elif around[1] and not around[3] and not around[4] and around[6]:
-            # Vertical bridge
-            if dy == 0:
-                indexes = [TLAND_COAST_E, TLAND, TLAND_COAST_W]
-            elif dy == 1:
-                indexes = [TLAND_COAST_E, TLAND, TLAND_COAST_W]
-            else:
-                indexes = [TLAND_COAST_E, TLAND, TLAND_COAST_W]
-        elif around==[True, True, True, True, True, True, True, True]:
-            indexes = [TLAND, TLAND, TLAND]
-        elif around[1] and around[3] and around[4] and around[6]:
-            # This could have just water in diagonal. In that case it needs to use a different
-            # tile in the corner
-            if dy == 0:
-                first_cell = TLAND
-                last_cell = TLAND
-                if not around[0]:
-                    first_cell = TLAND_BUT_NW
-                if not around[2]:
-                    last_cell = TLAND_BUT_NE
-                indexes = [first_cell, TLAND, last_cell]
-            elif dy == 1:
-                indexes = [TLAND, TLAND, TLAND]
-            elif dy == 2:
-                first_cell = TLAND
-                last_cell = TLAND
-                if not around[5]:
-                    first_cell = TLAND_BUT_SW
-                if not around[7]:
-                    last_cell = TLAND_BUT_SE
-                indexes = [first_cell, TLAND, last_cell]
+        return [[WG_LAND, WG_LAND, WG_LAND], [WG_LAND, WG_LAND, WG_LAND], [WG_LAND, WG_LAND, WG_LAND]]
+
+
+def grid_coords(world, pos, dy, dx, mov_x, mov_y):
+    x, y = pos
+    ndx = dx + mov_x
+    ndy = dy + mov_y
+    if ndx == 3:
+        ndx = 0
+        x = x + 1
+    if ndx == -1:
+        ndx = 2
+        x = x - 1
+    if ndy == 3:
+        ndy = 0
+        y = y + 1
+    if ndy == -1:
+        ndy = 2
+        y = y - 1
+    if x == -1:
+        x = world.width - 1
+    if x == world.width:
+        x = 0
+    if y == -1:
+        y = world.height - 1
+    if y == world.height:
+        y = 0
+    return (x, y), ndx, ndy
+
+
+def is_water_tile(water_grid, gx, gy):
+    return water_grid[gx, gy] != WG_LAND
+
+
+def tiles_around(water_grid, gx, gy):
+    gxw = gx - 1
+    if gxw == -1:
+        gxw = water_grid.shape[1] - 1
+    gxe = gx + 1
+    if gxe == water_grid.shape[1]:
+        gxe = 0
+    gyn = gy - 1
+    if gyn == -1:
+        gyn = water_grid.shape[0] - 1
+    gys = gy + 1
+    if gys == water_grid.shape[0] - 1:
+        gys = 0
+    return [(gxw, gyn),
+            (gx,  gyn),
+            (gxe, gyn),
+            (gxw, gy),
+            (gxe, gy),
+            (gxw, gys),
+            (gx,  gys),
+            (gxe, gys)]
+
+
+def water_tiles_around(water_grid, gx, gy):
+    gxw = gx - 1
+    if gxw == -1:
+        gxw = water_grid.shape[1] - 1
+    gxe = gx + 1
+    if gxe == water_grid.shape[1]:
+        gxe = 0
+    gyn = gy - 1
+    if gyn == -1:
+        gyn = water_grid.shape[0] - 1
+    gys = gy + 1
+    if gys == water_grid.shape[0] - 1:
+        gys = 0
+    return [is_water_tile(water_grid, gxw, gyn),
+            is_water_tile(water_grid, gx,  gyn),
+            is_water_tile(water_grid, gxe, gyn),
+            is_water_tile(water_grid, gxw, gy),
+            is_water_tile(water_grid, gxe, gy),
+            is_water_tile(water_grid, gxw, gys),
+            is_water_tile(water_grid, gx,  gys),
+            is_water_tile(water_grid, gxe, gys),]
+
+
+def terrain_grid_value(water_grid, gx, gy):
+    wg_tile = water_grid[gx, gy]
+    if wg_tile == WG_LAND:
+        water_around = water_tiles_around(water_grid, gx, gy)
+
+        #
+        # No water
+        #
+
+        if water_around == [False, False, False, False, False, False, False, False]:
+            return TLAND
+
+        #
+        # Water on one side
+        #
+
+        elif not water_around[1] and not water_around[3] and not water_around[4] and water_around[6]:
+            return TLAND_COAST_N
+        elif water_around[1] and not water_around[3] and not water_around[4] and not water_around[6]:
+            return TLAND_COAST_S
+        elif not water_around[1] and water_around[3] and not water_around[4] and not water_around[6]:
+            return TLAND_COAST_E
+        elif not water_around[1] and not water_around[3] and water_around[4] and not water_around[6]:
+            return TLAND_COAST_W
+
+        #
+        # Water in diagonal
+        #
+
+        elif water_around == [True, False, False, False, False, False, False, False]:
+            return TLAND_BUT_NW
+        elif water_around == [False, False, True, False, False, False, False, False]:
+            return TLAND_BUT_NE
+        elif water_around == [False, False, False, False, False, True, False, False]:
+            return TLAND_BUT_SW
+        elif water_around == [False, False, False, False, False, False, False, True]:
+            return TLAND_BUT_SE
+
+        #
+        # Water on two sides
+        #
+
+        elif water_around[1] and water_around[3] and not water_around[4] and not water_around[6]:
+            return TLAND_E_S_SE
+        elif water_around[1] and not water_around[3] and water_around[4] and not water_around[6]:
+            return TLAND_W_SW_S
+        elif not water_around[1] and water_around[3] and not water_around[4] and water_around[6]:
+            return TLAND_N_NE_E
+        elif not water_around[1] and not water_around[3] and water_around[4] and water_around[6]:
+            return TLAND_NW_N_W
+
+        elif water_around == [True, True, True, True, True, True, True, True]:
+            return T_ISLAND
+
         else:
-            print(around)
-            raise Exception(str(around))
-    return indexes
+            raise Exception(str(water_around))
+    elif wg_tile == WG_RIVER:
+        return TRIVER
+    elif wg_tile == WG_OCEAN:
+        return TOCEAN
+    else:
+        raise Exception("Unknown water grid cell")
+
+
+def clean_water_grid(water_grid):
+
+    def clean_single_cell(gx, gy):
+        wg_tile = water_grid[gx, gy]
+        if wg_tile == WG_LAND:
+            water_around = water_tiles_around(water_grid, gx, gy)
+
+            #
+            # No water
+            #
+
+            if water_around == [False, False, False, False, False, False, False, False]:
+                pass
+
+            #
+            # Water on one side
+            #
+
+            elif not water_around[1] and not water_around[3] and not water_around[4] and water_around[6]:
+                pass
+            elif water_around[1] and not water_around[3] and not water_around[4] and not water_around[6]:
+                pass
+            elif not water_around[1] and water_around[3] and not water_around[4] and not water_around[6]:
+                pass
+            elif not water_around[1] and not water_around[3] and water_around[4] and not water_around[6]:
+                pass
+
+            #
+            # Water in diagonal
+            #
+
+            elif water_around == [True, False, False, False, False, False, False, False]:
+                pass
+            elif water_around == [False, False, True, False, False, False, False, False]:
+                pass
+            elif water_around == [False, False, False, False, False, True, False, False]:
+                pass
+            elif water_around == [False, False, False, False, False, False, False, True]:
+                pass
+
+            #
+            # Water on two sides
+            #
+
+            elif water_around[1] and water_around[3] and not water_around[4] and not water_around[6]:
+                pass
+            elif water_around[1] and not water_around[3] and water_around[4] and not water_around[6]:
+                pass
+            elif not water_around[1] and water_around[3] and not water_around[4] and water_around[6]:
+                pass
+            elif not water_around[1] and not water_around[3] and water_around[4] and water_around[6]:
+                pass
+
+            elif water_around == [True, True, True, True, True, True, True, True]:
+                pass
+
+            else:
+                water_grid[gx, gy] = WG_RIVER
+                for around in tiles_around(water_grid, gx, gy):
+                    around_x, around_y = around
+                    clean_single_cell(around_x, around_y)
+
+    for gx in range(water_grid.shape[0]):
+        for gy in range(water_grid.shape[1]):
+            clean_single_cell(gx, gy)
+
+
+def generate_water_grid(world):
+    water_grid = numpy.zeros(shape=(world.width * 3, world.height * 3))
+    for y in range(world.height):
+        for x in range(world.width):
+            pos = (x, y)
+            cell = water_cell_grid(world, pos)
+            for dy in range(3):
+                for dx in range(3):
+                    water_grid[x * 3 + dx, y * 3 + dy] = cell[dy][dx]
+    return water_grid
 
 
 def export_to_tmx(world, tmx_filename):
     # We perform some preliminary transformation to make the world
     # nicer for a tiled map
-    _transform_for_tmx(world)
+    #_transform_for_tmx(world)
 
     tmx_file = open(tmx_filename, "w")
     tmx_file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
@@ -512,21 +375,16 @@ def export_to_tmx(world, tmx_filename):
     tmx_file.write('  <layer name="biome" width="%i" height="%i">\n' % (world.width*3, world.height*3))
     tmx_file.write('    <data encoding="csv">\n')
 
-    for y in range(world.height):
-        for dy in range(3):
-            for x in range(world.width):
-                pos = (x, y)
+    water_grid = generate_water_grid(world)
+    clean_water_grid(water_grid)
 
-                indexes = land_tile_for_row(world, pos, dy)
-
-                tmx_file.write(str(indexes[0]))
+    for gy in range(world.height * 3):
+        for gx in range(world.width * 3):
+            grid_value = terrain_grid_value(water_grid, gx, gy)
+            tmx_file.write(str(grid_value))
+            if gy != (world.height * 3 - 1) or (gx != world.width * 3 - 1):
                 tmx_file.write(',')
-                tmx_file.write(str(indexes[1]))
-                tmx_file.write(',')
-                tmx_file.write(str(indexes[2]))
-                if y != (world.height - 1) or (x != world.width - 1) or dy != 2:
-                    tmx_file.write(',')
-            tmx_file.write('\n')
+        tmx_file.write('\n')
     tmx_file.write('    </data>\n')
     tmx_file.write('  </layer>\n')
 
