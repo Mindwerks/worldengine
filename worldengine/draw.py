@@ -801,6 +801,6 @@ def draw_scatter_plot_on_file(world, filename):
 
 
 def draw_satellite_on_file(world, filename):
-    img = ImagePixelSetter(world.width, world.height, filename)
+    img = PNGWriter(world.width, world.height, filename)
     draw_satellite(world, img)
     img.complete()
