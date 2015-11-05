@@ -59,7 +59,14 @@ def get_river_around(world, x, y):
     w = x - 1
     if w == -1:
         w = world.width - 1
-    return [world.river_map[w,n]>0,world.river_map[x,n]>0,world.river_map[e,n]>0,world.river_map[w,y]>0,world.river_map[e,y]>0,world.river_map[w,s]>0,world.river_map[x,s]>0,world.river_map[e,s]>0]
+    return [world.river_map[w, n] > 0 or world.is_ocean((w, n)),
+            world.river_map[x, n] > 0 or world.is_ocean((x, n)),
+            world.river_map[e, n] > 0 or world.is_ocean((e, n)),
+            world.river_map[w, y] > 0 or world.is_ocean((w, y)),
+            world.river_map[e, y] > 0 or world.is_ocean((e, y)),
+            world.river_map[w, s] > 0 or world.is_ocean((w, s)),
+            world.river_map[x, s] > 0 or world.is_ocean((x, s)),
+            world.river_map[e, s] > 0 or world.is_ocean((e, s))]
 
 
 
@@ -128,7 +135,44 @@ def get_river_around(world, x, y):
                 #         unkwown.add(biome_name)
                 #         print(biome_name)
 
+
+def _transform_for_tmx(world):
+
+    # each river point with 2 or more tiles of ocean in N, S, E, W is transformed
+    # in an ocean tile
+    for y in range(world.height):
+        for x in range(world.width):
+            if world.river_map[x, y] > 0:
+                ocean_around = [(not v) for v in get_land_around(world,x,y)]
+                oceans = 0
+                if ocean_around[1]:
+                    oceans = oceans + 1
+                if ocean_around[3]:
+                    oceans = oceans + 1
+                if ocean_around[4]:
+                    oceans = oceans + 1
+                if ocean_around[6]:
+                    oceans = oceans + 1
+                if oceans >= 2:
+                    world.ocean[y, x] = True
+
+    # remove small pieces of land between rivers and ocean
+    for y in range(world.height):
+        for x in range(world.width):
+            if world.is_land((x, y)):
+                river_around = get_river_around(world,x,y)
+                ocean_around = [(not v) for v in get_land_around(world,x,y)]
+                if ocean_around[1] and ocean_around[6] and ocean_around[3] and river_around[4]:
+                    world.ocean[y, x] = True
+                elif river_around[1] and ocean_around[3] and ocean_around[6]:
+                    world.ocean[y, x] = True
+                elif river_around[6] and ocean_around[1] and ocean_around[2]:
+                    world.ocean[y, x] = True
+
+
 def export_to_tmx(world, tmx_filename):
+    _transform_for_tmx(world)
+
     tmx_file = open(tmx_filename, "w")
     tmx_file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
     tmx_file.write('<map version="1.0" orientation="orthogonal" renderorder="right-down" width="%i" height="%i" tilewidth="32" tileheight="32" nextobjectid="1">\n' % (world.width*3, world.height*3))
@@ -186,10 +230,18 @@ def export_to_tmx(world, tmx_filename):
                             indexes = [TLAND_COAST_W, TRIVER, TLAND_COAST_E]
                         else:
                             indexes = [TLAND_COAST_W, TRIVER, TLAND_COAST_E]
+                            if ocean_around[6]:
+                                indexes[0] = TLAND_NW_N_W
+                                indexes[2] = TLAND_N_NE_E
                     elif around[1] and not around[3] and not around[4] and not around[6]:
                         # south source
                         if dy == 0:
                             indexes = [TLAND_COAST_W, TRIVER, TLAND_COAST_E]
+                            if ocean_around[1]:
+                                indexes[0] = TLAND_W_SW_S
+                                indexes[2] = TLAND_E_S_SE
+                            if ocean_around[2]:
+                                indexes[2] = TLAND_E_S_SE
                         elif dy == 1:
                             indexes = [TLAND_COAST_W, TRIVER, TLAND_COAST_E]
                         else:
@@ -228,10 +280,18 @@ def export_to_tmx(world, tmx_filename):
                         # triangle to south
                         if dy == 0:
                             indexes = [TLAND_COAST_N, TLAND_COAST_N, TLAND_COAST_N]
+                            if ocean_around[4]:
+                                indexes[2] = TLAND_NW_N_W
                         elif dy == 1:
                             indexes = [TRIVER, TRIVER, TRIVER]
                         else:
                             indexes = [TLAND_W_SW_S, TRIVER, TLAND_E_S_SE]
+                            if around[5]:
+                                indexes[0] = TRIVER
+                            if around[7]:
+                                indexes[2] = TRIVER
+                            if ocean_around[4]:
+                                indexes[2] = TOCEAN
                     elif around[1] and around[3] and around[4] and not around[6]:
                         # triangle to north
                         if dy == 0:
@@ -246,10 +306,20 @@ def export_to_tmx(world, tmx_filename):
                         # triangle to west
                         if dy == 0:
                             indexes = [TLAND_NW_N_W, TRIVER, TLAND_COAST_E]
+                            if around[2]:
+                                indexes[2] = TLAND_E_S_SE
+                            if ocean_around[3]:
+                                indexes[0] = TOCEAN
                         elif dy == 1:
                             indexes = [TRIVER, TRIVER, TLAND_COAST_E]
                         else:
                             indexes = [TLAND_W_SW_S, TRIVER, TLAND_COAST_E]
+                            if around[7]:
+                                indexes[2] = TLAND_N_NE_E
+                            if ocean_around[6]:
+                                indexes[2] = TLAND_N_NE_E
+                            if ocean_around[3]:
+                                indexes[0] = TOCEAN
                     elif around[1] and not around[3] and around[4] and around[6]:
                         # triangle to east
                         if dy == 0:
@@ -259,7 +329,7 @@ def export_to_tmx(world, tmx_filename):
                         else:
                             indexes = [TLAND_COAST_W, TRIVER, TLAND_E_S_SE]
                     elif around[1] and not around[3] and not around[4] and around[6]:
-                        #vertical bridge
+                        #vertical pipe
                         if dy == 0:
                             indexes = [TLAND_COAST_W, TRIVER, TLAND_COAST_E]
                             if ocean_around[0]:
@@ -280,10 +350,12 @@ def export_to_tmx(world, tmx_filename):
                             if ocean_around[3]:
                                 indexes[0] = TOCEAN
                     elif not around[1] and around[3] and around[4] and not around[6]:
-                        #horizontal bridge
+                        #horizontal pipe
                         if dy == 0:
                             indexes = [TLAND_COAST_N, TLAND_COAST_N, TLAND_COAST_N]
                             if ocean_around[0]:
+                                indexes[0] = TLAND_N_NE_E
+                            if ocean_around[3]:
                                 indexes[0] = TLAND_N_NE_E
                             if ocean_around[1]:
                                 indexes[0] = TOCEAN
@@ -299,10 +371,14 @@ def export_to_tmx(world, tmx_filename):
                         #curve n -> e
                         if dy == 0:
                             indexes = [TLAND_COAST_W, TRIVER, TLAND_N_NE_E]
+                            if ocean_around[4]:
+                                indexes[2] = TOCEAN
                         elif dy == 1:
                             indexes = [TLAND_COAST_W, TRIVER, TRIVER]
                         else:
                             indexes = [TLAND_BUT_NE, TLAND_COAST_S, TLAND_COAST_S]
+                            if ocean_around[4]:
+                                indexes[2] = TLAND_W_SW_S
                     elif around[1] and around[3] and not around[4] and not around[6]:
                         #curve n -> w
                         if dy == 0:
@@ -319,6 +395,12 @@ def export_to_tmx(world, tmx_filename):
                             indexes = [TRIVER, TRIVER, TLAND_COAST_E]
                         else:
                             indexes = [TLAND_W_SW_S, TRIVER, TLAND_COAST_E]
+                            if ocean_around[5]:
+                                indexes[0] = TOCEAN
+                            if ocean_around[6]:
+                                indexes[2] = TLAND_N_NE_E
+                            if ocean_around[7]:
+                                indexes[2] = TLAND_N_NE_E
                     elif not around[1] and not around[3] and around[4] and around[6]:
                         #curve e -> s
                         if dy == 0:
@@ -327,6 +409,11 @@ def export_to_tmx(world, tmx_filename):
                             indexes = [TLAND_COAST_W, TRIVER, TRIVER]
                         else:
                             indexes = [TLAND_COAST_W, TRIVER, TLAND_E_S_SE]
+                            #if around[7]:
+                            #    indexes[2] = TRIVER
+                            if ocean_around[6]:
+                                indexes[0] = TLAND_NW_N_W
+                                indexes[2] = TOCEAN
                     else:
                         if dy == 0:
                             indexes = [TRIVER, TRIVER, TRIVER]
