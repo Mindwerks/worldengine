@@ -386,6 +386,8 @@ def draw_riversmap(world, target):
         for x in range(world.width):
             target.set_pixel(x, y, sea_color if world.is_ocean((x, y)) else land_color)    
 
+    draw_rivers_on_image(world, target, factor=1)
+
 
 def draw_grayscale_heightmap(world, target):
     c = get_normalized_elevation_array(world)
