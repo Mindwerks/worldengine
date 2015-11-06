@@ -1,0 +1,3 @@
+# For export support, you'll need HDF5
+-r requirements.txt
+h5py==2.5.0
