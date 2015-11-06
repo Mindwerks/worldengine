@@ -397,19 +397,36 @@ def draw_satellite(world, target):
     #  Water that is only diff_freeze_chance colder has a chance to freeze, depending on its exact temperature.
     #  rand_variation determines the variation in white for the frozen ocean. (very small = close-to-perfect white)
     polar_th = world.temperature['thresholds'][0][1]  # 'polar', i.e. the coldest biome
-    diff_freeze_limit = 0.40  # value is arbitrarily-chosen for now
-    diff_freeze_chance = 0.33  # value is arbitrarily-chosen for now
-    rand_variation = int(30)  # how far from perfect white can the snow stray
-    for y in range(world.height):
-        for x in range(world.width):
-            if world.is_ocean((x, y)):  # freeze ocean
-                ocean_temp = world.temperature_at((x, y))
-                if ocean_temp < polar_th and polar_th - ocean_temp > diff_freeze_chance:
-                    chance = numpy.interp(abs(ocean_temp - polar_th), [diff_freeze_chance, diff_freeze_limit], [0.0, 1.0])
-                    if rng.rand() <= chance:  # always freeze for chance = 1.0, never for 0.0
-                        smooth_mask[y, x] = True  # smooth the frozen areas, too
-                        variation = rng.randint(0, rand_variation)
-                        target.set_pixel(x, y, (255 - rand_variation + variation, 255 - rand_variation + variation, 255, 255))
+    coolest_spot = world.temperature['data'].min()
+    
+    if coolest_spot < polar_th: # TODO: reformat this trashy code; it's ugly and slow
+        diff_freeze_limit = (polar_th - coolest_spot) * 0.5 # only the coolest 50% of the oceanic polar-biome will freeze
+        diff_freeze_chance = diff_freeze_limit * 0.9  # 0.0 < diff_freeze_chance < diff_freeze_limit
+        rand_variation = int(30)  # how far from perfect white can the snow stray (only affects R and G)
+        surrounding_tile_influence = 0.5  # chance-modifier (added) to freeze a slightly warm tile when all neighbors are frozen
+        for y in range(world.height):
+            for x in range(world.width):
+                if world.is_ocean((x, y)):  # freeze ocean
+                    ocean_temp = world.temperature_at((x, y))
+                    if polar_th - ocean_temp > diff_freeze_chance:
+                        # map difference to [0.0, 1.0]
+                        chance = numpy.interp(polar_th - ocean_temp, [diff_freeze_chance, diff_freeze_limit], [0.0, 1.0])
+
+                        # count number of frozen/solid tiles around this one (there won't be more than four due to the way the iteration works)
+                        surr_view = smooth_mask[max(y-1, 0):min(y+2, world.height), max(x-1, 0):min(x+2, world.width)]
+                        chance_mod = numpy.count_nonzero(surr_view)
+                        
+                        # map amount of tiles to chance-modifier, [-1.0, 1.0]
+                        chance_mod = numpy.interp(chance_mod, [0, 4, 8], [-1.0, 1.0, 1.0])  # range above 4 is only mentioned for clarity/safety, it shouldn't occur
+
+                        # modify chance by up to surrounding_tile_influence%
+                        chance += chance_mod * surrounding_tile_influence
+
+                        # chance_mod can be in the range [-8 * 0.05, 8 * 0.05] = [-0.4, 0.4]
+                        if rng.rand() <= chance:  # always freeze for chance = 1.0, never for 0.0
+                            smooth_mask[y, x] = True  # smooth the frozen areas, too
+                            variation = rng.randint(0, rand_variation)
+                            target.set_pixel(x, y, (255 - rand_variation + variation, 255 - rand_variation + variation, 255, 255))
 
     # Loop through and average a pixel with its neighbors to smooth transitions between biomes
     for y in range(1, world.height-1):
