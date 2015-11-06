@@ -19,22 +19,22 @@ def save_world_to_hdf5(world, filename):
     elevation_ths_grp["sea"] = world.elevation['thresholds'][0][1]
     elevation_ths_grp["plain"] = world.elevation['thresholds'][1][1]
     elevation_ths_grp["hill"] = world.elevation['thresholds'][2][1]
-    elevation_data = elevation_grp.create_dataset("data", (world.height, world.width), dtype=float)
+    elevation_data = elevation_grp.create_dataset("data", (world.height, world.width), dtype=numpy.float)
     elevation_data.write_direct(world.elevation['data'])
 
-    plates_data = f.create_dataset("plates", (world.height, world.width), dtype=int)
+    plates_data = f.create_dataset("plates", (world.height, world.width), dtype=numpy.uint16)
     for y in range(world.height):
         for x in range(world.width):
             plates_data[y, x] = world.plates[y][x]
 
-    ocean_data = f.create_dataset("ocean", (world.height, world.width), dtype=bool)
+    ocean_data = f.create_dataset("ocean", (world.height, world.width), dtype=numpy.bool)
     ocean_data.write_direct(world.ocean)
 
-    sea_depth_data = f.create_dataset("sea_depth", (world.height, world.width), dtype=float)
+    sea_depth_data = f.create_dataset("sea_depth", (world.height, world.width), dtype=numpy.float)
     sea_depth_data.write_direct(world.sea_depth)
 
     if hasattr(world, 'biome'):
-        biome_data = f.create_dataset("biome", (world.height, world.width), dtype=int)
+        biome_data = f.create_dataset("biome", (world.height, world.width), dtype=numpy.uint16)
         for y in range(world.height):
             for x in range(world.width):
                 biome_data[y, x] = biome_name_to_index(world.biome[y][x])
@@ -44,11 +44,11 @@ def save_world_to_hdf5(world, filename):
         humidity_quantiles_grp = humidity_grp.create_group("quantiles")
         for k in world.humidity['quantiles'].keys():
             humidity_quantiles_grp[k] = world.humidity['quantiles'][k]
-        humidity_data = humidity_grp.create_dataset("data", (world.height, world.width), dtype=float)
+        humidity_data = humidity_grp.create_dataset("data", (world.height, world.width), dtype=numpy.float)
         humidity_data.write_direct(world.humidity['data'])
 
     if hasattr(world, 'irrigation'):
-        irrigation_data = f.create_dataset("irrigation", (world.height, world.width), dtype=float)
+        irrigation_data = f.create_dataset("irrigation", (world.height, world.width), dtype=numpy.float)
         irrigation_data.write_direct(world.irrigation)
 
     if hasattr(world, 'permeability'):
@@ -56,7 +56,7 @@ def save_world_to_hdf5(world, filename):
         permeability_ths_grp = permeability_grp.create_group("thresholds")
         permeability_ths_grp['low'] = world.permeability['thresholds'][0][1]
         permeability_ths_grp['med'] = world.permeability['thresholds'][1][1]
-        permeability_data = permeability_grp.create_dataset("data", (world.height, world.width), dtype=float)
+        permeability_data = permeability_grp.create_dataset("data", (world.height, world.width), dtype=numpy.float)
         permeability_data.write_direct(world.permeability['data'])
 
     if hasattr(world, 'watermap'):
@@ -65,7 +65,7 @@ def save_world_to_hdf5(world, filename):
         watermap_ths_grp['creek'] = world.watermap['thresholds']['creek']
         watermap_ths_grp['river'] = world.watermap['thresholds']['river']
         watermap_ths_grp['mainriver'] = world.watermap['thresholds']['main river']
-        watermap_data = watermap_grp.create_dataset("data", (world.height, world.width), dtype=float)
+        watermap_data = watermap_grp.create_dataset("data", (world.height, world.width), dtype=numpy.float)
         watermap_data.write_direct(world.watermap['data'])
 
     if hasattr(world, 'precipitation'):
@@ -73,7 +73,7 @@ def save_world_to_hdf5(world, filename):
         precipitation_ths_grp = precipitation_grp.create_group("thresholds")
         precipitation_ths_grp['low'] = world.precipitation['thresholds'][0][1]
         precipitation_ths_grp['med'] = world.precipitation['thresholds'][1][1]
-        precipitation_data = precipitation_grp.create_dataset("data", (world.height, world.width), dtype=float)
+        precipitation_data = precipitation_grp.create_dataset("data", (world.height, world.width), dtype=numpy.float)
         precipitation_data.write_direct(world.precipitation['data'])
 
     if hasattr(world, 'temperature'):
@@ -85,17 +85,17 @@ def save_world_to_hdf5(world, filename):
         temperature_ths_grp['cool'] = world.temperature['thresholds'][3][1]
         temperature_ths_grp['warm'] = world.temperature['thresholds'][4][1]
         temperature_ths_grp['subtropical'] = world.temperature['thresholds'][5][1]
-        temperature_data = temperature_grp.create_dataset("data", (world.height, world.width), dtype=float)
+        temperature_data = temperature_grp.create_dataset("data", (world.height, world.width), dtype=numpy.float)
         temperature_data.write_direct(world.temperature['data'])
 
     # lake_map and river_map have inverted coordinates
     if hasattr(world, 'lake_map'):
-        lake_map_data = f.create_dataset("lake_map", (world.width, world.height), dtype=float)
+        lake_map_data = f.create_dataset("lake_map", (world.width, world.height), dtype=numpy.float)
         lake_map_data.write_direct(world.lake_map)
 
     # lake_map and river_map have inverted coordinates
     if hasattr(world, 'river_map'):
-        river_map_data = f.create_dataset("river_map", (world.width, world.height), dtype=float)
+        river_map_data = f.create_dataset("river_map", (world.width, world.height), dtype=numpy.float)
         river_map_data.write_direct(world.river_map)
 
     generation_params_grp = f.create_group("generation_params")
