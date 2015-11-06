@@ -17,7 +17,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='World.proto',
   package='World',
   syntax='proto2',
-  serialized_pb=b'\n\x0bWorld.proto\x12\x05World\"\xf6\r\n\x05World\x12\x17\n\x0fworldengine_tag\x18\x01 \x02(\x05\x12\x1b\n\x13worldengine_version\x18\x02 \x02(\x05\x12\x0c\n\x04name\x18\x03 \x02(\t\x12\r\n\x05width\x18\x04 \x02(\x05\x12\x0e\n\x06height\x18\x05 \x02(\x05\x12\x30\n\rheightMapData\x18\x06 \x02(\x0b\x32\x19.World.World.DoubleMatrix\x12\x17\n\x0fheightMapTh_sea\x18\x07 \x02(\x01\x12\x19\n\x11heightMapTh_plain\x18\x08 \x02(\x01\x12\x18\n\x10heightMapTh_hill\x18\t \x02(\x01\x12*\n\x06plates\x18\n \x02(\x0b\x32\x1a.World.World.IntegerMatrix\x12)\n\x05ocean\x18\x0b \x02(\x0b\x32\x1a.World.World.BooleanMatrix\x12,\n\tsea_depth\x18\x0c \x02(\x0b\x32\x19.World.World.DoubleMatrix\x12)\n\x05\x62iome\x18\r \x01(\x0b\x32\x1a.World.World.IntegerMatrix\x12\x38\n\x08humidity\x18\x0e \x01(\x0b\x32&.World.World.DoubleMatrixWithQuantiles\x12-\n\nirrigation\x18\x0f \x01(\x0b\x32\x19.World.World.DoubleMatrix\x12\x33\n\x10permeabilityData\x18\x10 \x01(\x0b\x32\x19.World.World.DoubleMatrix\x12\x18\n\x10permeability_low\x18\x11 \x01(\x01\x12\x18\n\x10permeability_med\x18\x12 \x01(\x01\x12/\n\x0cwatermapData\x18\x13 \x01(\x0b\x32\x19.World.World.DoubleMatrix\x12\x16\n\x0ewatermap_creek\x18\x14 \x01(\x01\x12\x16\n\x0ewatermap_river\x18\x15 \x01(\x01\x12\x1a\n\x12watermap_mainriver\x18\x16 \x01(\x01\x12\x34\n\x11precipitationData\x18\x17 \x01(\x0b\x32\x19.World.World.DoubleMatrix\x12\x19\n\x11precipitation_low\x18\x18 \x01(\x01\x12\x19\n\x11precipitation_med\x18\x19 \x01(\x01\x12\x32\n\x0ftemperatureData\x18\x1a \x01(\x0b\x32\x19.World.World.DoubleMatrix\x12\x19\n\x11temperature_polar\x18\x1b \x01(\x01\x12\x1a\n\x12temperature_alpine\x18\x1c \x01(\x01\x12\x1a\n\x12temperature_boreal\x18\x1d \x01(\x01\x12\x18\n\x10temperature_cool\x18\x1e \x01(\x01\x12\x18\n\x10temperature_warm\x18\x1f \x01(\x01\x12\x1f\n\x17temperature_subtropical\x18  \x01(\x01\x12\x33\n\x0egenerationData\x18! \x01(\x0b\x32\x1b.World.World.GenerationData\x12*\n\x07lakemap\x18\" \x01(\x0b\x32\x19.World.World.DoubleMatrix\x12+\n\x08rivermap\x18# \x01(\x0b\x32\x19.World.World.DoubleMatrix\x12)\n\x06icecap\x18$ \x01(\x0b\x32\x19.World.World.DoubleMatrix\x1a\x1a\n\tDoubleRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x01\x1a\x1b\n\nBooleanRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x08\x1a\x1b\n\nIntegerRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x05\x1a\x18\n\x07\x42yteRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x05\x1a\x34\n\x0c\x44oubleMatrix\x12$\n\x04rows\x18\x01 \x03(\x0b\x32\x16.World.World.DoubleRow\x1a\x36\n\rBooleanMatrix\x12%\n\x04rows\x18\x01 \x03(\x0b\x32\x17.World.World.BooleanRow\x1a\x36\n\rIntegerMatrix\x12%\n\x04rows\x18\x01 \x03(\x0b\x32\x17.World.World.IntegerRow\x1a,\n\x0e\x44oubleQuantile\x12\x0b\n\x03key\x18\x01 \x02(\x05\x12\r\n\x05value\x18\x02 \x02(\x01\x1aq\n\x19\x44oubleMatrixWithQuantiles\x12.\n\tquantiles\x18\x01 \x03(\x0b\x32\x1b.World.World.DoubleQuantile\x12$\n\x04rows\x18\x02 \x03(\x0b\x32\x16.World.World.DoubleRow\x1aS\n\x0eGenerationData\x12\x0c\n\x04seed\x18\x01 \x01(\x05\x12\x10\n\x08n_plates\x18\x02 \x01(\x05\x12\x13\n\x0bocean_level\x18\x03 \x01(\x02\x12\x0c\n\x04step\x18\x04 \x01(\t'
+  serialized_pb=b'\n\x0bWorld.proto\x12\x05World\"\xdd\x0e\n\x05World\x12\x17\n\x0fworldengine_tag\x18\x01 \x02(\x05\x12\x1b\n\x13worldengine_version\x18\x02 \x02(\x05\x12\x0c\n\x04name\x18\x03 \x02(\t\x12\r\n\x05width\x18\x04 \x02(\x05\x12\x0e\n\x06height\x18\x05 \x02(\x05\x12\x30\n\rheightMapData\x18\x06 \x02(\x0b\x32\x19.World.World.DoubleMatrix\x12\x17\n\x0fheightMapTh_sea\x18\x07 \x02(\x01\x12\x19\n\x11heightMapTh_plain\x18\x08 \x02(\x01\x12\x18\n\x10heightMapTh_hill\x18\t \x02(\x01\x12 \n\x18heightMapTh_low_mountain\x18\n \x02(\x01\x12 \n\x18heightMapTh_med_mountain\x18\x0b \x02(\x01\x12!\n\x19heightMapTh_high_mountain\x18\x0c \x02(\x01\x12*\n\x06plates\x18\r \x02(\x0b\x32\x1a.World.World.IntegerMatrix\x12)\n\x05ocean\x18\x0e \x02(\x0b\x32\x1a.World.World.BooleanMatrix\x12,\n\tsea_depth\x18\x0f \x02(\x0b\x32\x19.World.World.DoubleMatrix\x12)\n\x05\x62iome\x18\x10 \x01(\x0b\x32\x1a.World.World.IntegerMatrix\x12\x38\n\x08humidity\x18\x11 \x01(\x0b\x32&.World.World.DoubleMatrixWithQuantiles\x12-\n\nirrigation\x18\x12 \x01(\x0b\x32\x19.World.World.DoubleMatrix\x12\x33\n\x10permeabilityData\x18\x13 \x01(\x0b\x32\x19.World.World.DoubleMatrix\x12\x18\n\x10permeability_low\x18\x14 \x01(\x01\x12\x18\n\x10permeability_med\x18\x15 \x01(\x01\x12/\n\x0cwatermapData\x18\x16 \x01(\x0b\x32\x19.World.World.DoubleMatrix\x12\x16\n\x0ewatermap_creek\x18\x17 \x01(\x01\x12\x16\n\x0ewatermap_river\x18\x18 \x01(\x01\x12\x1a\n\x12watermap_mainriver\x18\x19 \x01(\x01\x12\x34\n\x11precipitationData\x18\x1a \x01(\x0b\x32\x19.World.World.DoubleMatrix\x12\x19\n\x11precipitation_low\x18\x1b \x01(\x01\x12\x19\n\x11precipitation_med\x18\x1c \x01(\x01\x12\x32\n\x0ftemperatureData\x18\x1d \x01(\x0b\x32\x19.World.World.DoubleMatrix\x12\x19\n\x11temperature_polar\x18\x1e \x01(\x01\x12\x1a\n\x12temperature_alpine\x18\x1f \x01(\x01\x12\x1a\n\x12temperature_boreal\x18  \x01(\x01\x12\x18\n\x10temperature_cool\x18! \x01(\x01\x12\x18\n\x10temperature_warm\x18\" \x01(\x01\x12\x1f\n\x17temperature_subtropical\x18# \x01(\x01\x12\x33\n\x0egenerationData\x18$ \x01(\x0b\x32\x1b.World.World.GenerationData\x12*\n\x07lakemap\x18% \x01(\x0b\x32\x19.World.World.DoubleMatrix\x12+\n\x08rivermap\x18& \x01(\x0b\x32\x19.World.World.DoubleMatrix\x12)\n\x06icecap\x18\' \x01(\x0b\x32\x19.World.World.DoubleMatrix\x1a\x1a\n\tDoubleRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x01\x1a\x1b\n\nBooleanRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x08\x1a\x1b\n\nIntegerRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x05\x1a\x18\n\x07\x42yteRow\x12\r\n\x05\x63\x65lls\x18\x01 \x03(\x05\x1a\x34\n\x0c\x44oubleMatrix\x12$\n\x04rows\x18\x01 \x03(\x0b\x32\x16.World.World.DoubleRow\x1a\x36\n\rBooleanMatrix\x12%\n\x04rows\x18\x01 \x03(\x0b\x32\x17.World.World.BooleanRow\x1a\x36\n\rIntegerMatrix\x12%\n\x04rows\x18\x01 \x03(\x0b\x32\x17.World.World.IntegerRow\x1a,\n\x0e\x44oubleQuantile\x12\x0b\n\x03key\x18\x01 \x02(\x05\x12\r\n\x05value\x18\x02 \x02(\x01\x1aq\n\x19\x44oubleMatrixWithQuantiles\x12.\n\tquantiles\x18\x01 \x03(\x0b\x32\x1b.World.World.DoubleQuantile\x12$\n\x04rows\x18\x02 \x03(\x0b\x32\x16.World.World.DoubleRow\x1aS\n\x0eGenerationData\x12\x0c\n\x04seed\x18\x01 \x01(\x05\x12\x10\n\x08n_plates\x18\x02 \x01(\x05\x12\x13\n\x0bocean_level\x18\x03 \x01(\x02\x12\x0c\n\x04step\x18\x04 \x01(\t'
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -50,8 +50,8 @@ _WORLD_DOUBLEROW = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1283,
-  serialized_end=1309,
+  serialized_start=1386,
+  serialized_end=1412,
 )
 
 _WORLD_BOOLEANROW = _descriptor.Descriptor(
@@ -80,8 +80,8 @@ _WORLD_BOOLEANROW = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1311,
-  serialized_end=1338,
+  serialized_start=1414,
+  serialized_end=1441,
 )
 
 _WORLD_INTEGERROW = _descriptor.Descriptor(
@@ -110,8 +110,8 @@ _WORLD_INTEGERROW = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1340,
-  serialized_end=1367,
+  serialized_start=1443,
+  serialized_end=1470,
 )
 
 _WORLD_BYTEROW = _descriptor.Descriptor(
@@ -140,8 +140,8 @@ _WORLD_BYTEROW = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1369,
-  serialized_end=1393,
+  serialized_start=1472,
+  serialized_end=1496,
 )
 
 _WORLD_DOUBLEMATRIX = _descriptor.Descriptor(
@@ -170,8 +170,8 @@ _WORLD_DOUBLEMATRIX = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1395,
-  serialized_end=1447,
+  serialized_start=1498,
+  serialized_end=1550,
 )
 
 _WORLD_BOOLEANMATRIX = _descriptor.Descriptor(
@@ -200,8 +200,8 @@ _WORLD_BOOLEANMATRIX = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1449,
-  serialized_end=1503,
+  serialized_start=1552,
+  serialized_end=1606,
 )
 
 _WORLD_INTEGERMATRIX = _descriptor.Descriptor(
@@ -230,8 +230,8 @@ _WORLD_INTEGERMATRIX = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1505,
-  serialized_end=1559,
+  serialized_start=1608,
+  serialized_end=1662,
 )
 
 _WORLD_DOUBLEQUANTILE = _descriptor.Descriptor(
@@ -267,8 +267,8 @@ _WORLD_DOUBLEQUANTILE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1561,
-  serialized_end=1605,
+  serialized_start=1664,
+  serialized_end=1708,
 )
 
 _WORLD_DOUBLEMATRIXWITHQUANTILES = _descriptor.Descriptor(
@@ -304,8 +304,8 @@ _WORLD_DOUBLEMATRIXWITHQUANTILES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1607,
-  serialized_end=1720,
+  serialized_start=1710,
+  serialized_end=1823,
 )
 
 _WORLD_GENERATIONDATA = _descriptor.Descriptor(
@@ -355,8 +355,8 @@ _WORLD_GENERATIONDATA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1722,
-  serialized_end=1805,
+  serialized_start=1825,
+  serialized_end=1908,
 )
 
 _WORLD = _descriptor.Descriptor(
@@ -430,190 +430,211 @@ _WORLD = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='plates', full_name='World.World.plates', index=9,
-      number=10, type=11, cpp_type=10, label=2,
+      name='heightMapTh_low_mountain', full_name='World.World.heightMapTh_low_mountain', index=9,
+      number=10, type=1, cpp_type=5, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='heightMapTh_med_mountain', full_name='World.World.heightMapTh_med_mountain', index=10,
+      number=11, type=1, cpp_type=5, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='heightMapTh_high_mountain', full_name='World.World.heightMapTh_high_mountain', index=11,
+      number=12, type=1, cpp_type=5, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='plates', full_name='World.World.plates', index=12,
+      number=13, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='ocean', full_name='World.World.ocean', index=10,
-      number=11, type=11, cpp_type=10, label=2,
+      name='ocean', full_name='World.World.ocean', index=13,
+      number=14, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='sea_depth', full_name='World.World.sea_depth', index=11,
-      number=12, type=11, cpp_type=10, label=2,
+      name='sea_depth', full_name='World.World.sea_depth', index=14,
+      number=15, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='biome', full_name='World.World.biome', index=12,
-      number=13, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='humidity', full_name='World.World.humidity', index=13,
-      number=14, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='irrigation', full_name='World.World.irrigation', index=14,
-      number=15, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='permeabilityData', full_name='World.World.permeabilityData', index=15,
+      name='biome', full_name='World.World.biome', index=15,
       number=16, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='permeability_low', full_name='World.World.permeability_low', index=16,
-      number=17, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=0,
+      name='humidity', full_name='World.World.humidity', index=16,
+      number=17, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='permeability_med', full_name='World.World.permeability_med', index=17,
-      number=18, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=0,
+      name='irrigation', full_name='World.World.irrigation', index=17,
+      number=18, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='watermapData', full_name='World.World.watermapData', index=18,
+      name='permeabilityData', full_name='World.World.permeabilityData', index=18,
       number=19, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='watermap_creek', full_name='World.World.watermap_creek', index=19,
+      name='permeability_low', full_name='World.World.permeability_low', index=19,
       number=20, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='watermap_river', full_name='World.World.watermap_river', index=20,
+      name='permeability_med', full_name='World.World.permeability_med', index=20,
       number=21, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='watermap_mainriver', full_name='World.World.watermap_mainriver', index=21,
-      number=22, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='precipitationData', full_name='World.World.precipitationData', index=22,
-      number=23, type=11, cpp_type=10, label=1,
+      name='watermapData', full_name='World.World.watermapData', index=21,
+      number=22, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='precipitation_low', full_name='World.World.precipitation_low', index=23,
+      name='watermap_creek', full_name='World.World.watermap_creek', index=22,
+      number=23, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='watermap_river', full_name='World.World.watermap_river', index=23,
       number=24, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='precipitation_med', full_name='World.World.precipitation_med', index=24,
+      name='watermap_mainriver', full_name='World.World.watermap_mainriver', index=24,
       number=25, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='temperatureData', full_name='World.World.temperatureData', index=25,
+      name='precipitationData', full_name='World.World.precipitationData', index=25,
       number=26, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='temperature_polar', full_name='World.World.temperature_polar', index=26,
+      name='precipitation_low', full_name='World.World.precipitation_low', index=26,
       number=27, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='temperature_alpine', full_name='World.World.temperature_alpine', index=27,
+      name='precipitation_med', full_name='World.World.precipitation_med', index=27,
       number=28, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='temperature_boreal', full_name='World.World.temperature_boreal', index=28,
-      number=29, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=0,
+      name='temperatureData', full_name='World.World.temperatureData', index=28,
+      number=29, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='temperature_cool', full_name='World.World.temperature_cool', index=29,
+      name='temperature_polar', full_name='World.World.temperature_polar', index=29,
       number=30, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='temperature_warm', full_name='World.World.temperature_warm', index=30,
+      name='temperature_alpine', full_name='World.World.temperature_alpine', index=30,
       number=31, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='temperature_subtropical', full_name='World.World.temperature_subtropical', index=31,
+      name='temperature_boreal', full_name='World.World.temperature_boreal', index=31,
       number=32, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='generationData', full_name='World.World.generationData', index=32,
-      number=33, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      name='temperature_cool', full_name='World.World.temperature_cool', index=32,
+      number=33, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='lakemap', full_name='World.World.lakemap', index=33,
-      number=34, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      name='temperature_warm', full_name='World.World.temperature_warm', index=33,
+      number=34, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='rivermap', full_name='World.World.rivermap', index=34,
-      number=35, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      name='temperature_subtropical', full_name='World.World.temperature_subtropical', index=34,
+      number=35, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='icecap', full_name='World.World.icecap', index=35,
+      name='generationData', full_name='World.World.generationData', index=35,
       number=36, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='lakemap', full_name='World.World.lakemap', index=36,
+      number=37, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='rivermap', full_name='World.World.rivermap', index=37,
+      number=38, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='icecap', full_name='World.World.icecap', index=38,
+      number=39, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -631,7 +652,7 @@ _WORLD = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=23,
-  serialized_end=1805,
+  serialized_end=1908,
 )
 
 _WORLD_DOUBLEROW.containing_type = _WORLD

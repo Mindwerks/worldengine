@@ -11,7 +11,7 @@ class TemperatureSimulation(object):
 
     def execute(self, world, seed):
         e = world.elevation['data']
-        ml = world.start_mountain_th()  # returns how many percent of the world are mountains
+        ml = world.start_mountain_th()  # returns minimum elevation value for mountains (i.e. hills)
         ocean = world.ocean
 
         t = self._calculate(world, seed, e, ml)
