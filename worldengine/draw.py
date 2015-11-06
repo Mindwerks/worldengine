@@ -373,6 +373,7 @@ def draw_satellite(world, target):
 
     # Get an elevation mask where heights are normalized between 0 and 255
     elevation_mask = get_normalized_elevation_array(world)
+    smooth_mask = numpy.invert(world.ocean)  # all land shall be smoothed (other tiles can be included by setting them to True)
 
     rng = numpy.random.RandomState(world.seed)  # create our own random generator; necessary for now to make the tests reproducible, even though it is a bit ugly
 
@@ -390,11 +391,31 @@ def draw_satellite(world, target):
             # the map is smoothed and shaded.
             target.set_pixel(x, y, (r, g, b, 255))
 
+    ## When encountering ocean, check if it is cold enough to freeze
+    #  Check what the temperature threshold of the polar biome is,  # TODO: Find out if a desert planet would still freeze or if this value is dynamic
+    #  then freeze all water that is more than diff_freeze_limit colder than that.
+    #  Water that is only diff_freeze_chance colder has a chance to freeze, depending on its exact temperature.
+    #  rand_variation determines the variation in white for the frozen ocean. (very small = close-to-perfect white)
+    polar_th = world.temperature['thresholds'][0][1]  # 'polar', i.e. the coldest biome
+    diff_freeze_limit = 0.40  # value is arbitrarily-chosen for now
+    diff_freeze_chance = 0.33  # value is arbitrarily-chosen for now
+    rand_variation = int(30)  # how far from perfect white can the snow stray
+    for y in range(world.height):
+        for x in range(world.width):
+            if world.is_ocean((x, y)):  # freeze ocean
+                ocean_temp = world.temperature_at((x, y))
+                if ocean_temp < polar_th and polar_th - ocean_temp > diff_freeze_chance:
+                    chance = numpy.interp(abs(ocean_temp - polar_th), [diff_freeze_chance, diff_freeze_limit], [0.0, 1.0])
+                    if rng.rand() <= chance:  # always freeze for chance = 1.0, never for 0.0
+                        smooth_mask[y, x] = True  # smooth the frozen areas, too
+                        variation = rng.randint(0, rand_variation)
+                        target.set_pixel(x, y, (255 - rand_variation + variation, 255 - rand_variation + variation, 255, 255))
+
     # Loop through and average a pixel with its neighbors to smooth transitions between biomes
     for y in range(1, world.height-1):
         for x in range(1, world.width-1):
             ## Only smooth land tiles
-            if world.is_land((x, y)):
+            if smooth_mask[y, x]:
                 # Lists to hold the separated rgb values of the neighboring pixels
                 all_r = []
                 all_g = []
@@ -404,7 +425,7 @@ def draw_satellite(world, target):
                 for j in range(y-1, y+2):
                     for i in range(x-1, x+2):
                         # Don't include ocean in the smoothing, if this tile happens to border an ocean
-                        if world.is_land((i, j)):
+                        if smooth_mask[j, i]:
                             # Grab each rgb value and append to the list
                             r, g, b, a = target[j, i]
                             all_r.append(r)
