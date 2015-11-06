@@ -217,7 +217,11 @@ def elevation_color(elevation, sea_level=1.0):
 def add_colors(*args):
     ''' Do some *args magic to return a tuple, which has the sums of all tuples in *args '''
     # Adapted from an answer here: http://stackoverflow.com/questions/14180866/sum-each-value-in-a-list-of-tuples
-    return tuple([sum(x) for x in zip(*args)])
+    added = [sum(x) for x in zip(*args)]
+
+    for i in range(len(added)):  # prevent over- and underflows
+        added[i] = max(min(added[i], 255), 0)  # restrict to uint8
+    return added
 
 def average_colors(c1, c2):
     ''' Average the values of two colors together '''
@@ -307,9 +311,10 @@ def get_biome_color_based_on_elevation(world, elev, x, y, rng):
     modification_amount = int(elev / BASE_ELEVATION_INTENSITY_MODIFIER)
     base_elevation_modifier = (modification_amount, modification_amount, modification_amount)
 
-    this_tile_color = add_colors(biome_color, noise, base_elevation_modifier)  # this can lead to an overflow, i.e. a value above 255
-
+    this_tile_color = add_colors(biome_color, noise, base_elevation_modifier)
     return this_tile_color
+
+
 # ----------------------
 # Draw on generic target
 # ----------------------
@@ -367,7 +372,7 @@ def draw_grayscale_heightmap(world, target):
 
 
 def draw_satellite(world, target):
-    ''' This draws a "satellit map" - a view of the generated planet as it may look from space '''
+    ''' This draws a "satellite map" - a view of the generated planet as it may look from space '''
 
     # Get an elevation mask where heights are normalized between 0 and 255
     elevation_mask = get_normalized_elevation_array(world)
@@ -388,7 +393,6 @@ def draw_satellite(world, target):
             # the map is smoothed and shaded.
             target.set_pixel(x, y, (r, g, b, 255))
 
-
     # Loop through and average a pixel with its neighbors to smooth transitions between biomes
     for y in range(1, world.height-1):
         for x in range(1, world.width-1):
@@ -405,7 +409,7 @@ def draw_satellite(world, target):
                         # Don't include ocean in the smoothing, if this tile happens to border an ocean
                         if world.is_land((i, j)):
                             # Grab each rgb value and append to the list
-                            r, g, b, a = target.pixels[i, j]
+                            r, g, b, a = target[i, j]
                             all_r.append(r)
                             all_g.append(g)
                             all_b.append(b)
@@ -419,30 +423,28 @@ def draw_satellite(world, target):
                     ## Setting color of the pixel again - this will be once more modified by the shading algorithm
                     target.set_pixel(x, y, (avg_r, avg_g, avg_b, 255))
 
-
     ## After smoothing, draw rivers
     for y in range(world.height):
         for x in range(world.width):
             ## Color rivers
             if world.is_land((x, y)) and (world.river_map[x, y] > 0.0):
-                base_color = target.pixels[x, y]
+                base_color = target[x, y]
 
                 r, g, b = add_colors(base_color, RIVER_COLOR_CHANGE)
                 target.set_pixel(x, y, (r, g, b, 255))
 
             ## Color lakes
             if world.is_land((x, y)) and (world.lake_map[x, y] != 0):
-                base_color = target.pixels[x, y]
+                base_color = target[x, y]
 
                 r, g, b = add_colors(base_color, LAKE_COLOR_CHANGE)
                 target.set_pixel(x, y, (r, g, b, 255))
-
 
     # "Shade" the map by sending beams of light west to east, and increasing or decreasing value of pixel based on elevation difference
     for y in range(SAT_SHADOW_SIZE-1, world.height-SAT_SHADOW_SIZE-1):
         for x in range(SAT_SHADOW_SIZE-1, world.width-SAT_SHADOW_SIZE-1):
             if world.is_land((x, y)):
-                r, g, b, a = target.pixels[x, y]
+                r, g, b, a = target[x, y]
                 
                 # Build up list of elevations in the previous n tiles, where n is the shadow size.
                 # This goes northwest to southeast
@@ -460,9 +462,9 @@ def draw_satellite(world, target):
                 # The amplified difference is now translated into the rgb of the tile.
                 # This adds light to tiles higher that the previous average, and shadow
                 # to tiles lower than the previous average
-                r += adjusted_difference
-                g += adjusted_difference
-                b += adjusted_difference
+                r = max(min(adjusted_difference + r, 255), 0)  # NOTE: This could cause underflows and overflows
+                g = max(min(adjusted_difference + g, 255), 0)
+                b = max(min(adjusted_difference + b, 255), 0)
 
                 # Set the final color for this pixel
                 target.set_pixel(x, y, (r, g, b, 255))
