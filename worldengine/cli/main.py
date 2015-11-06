@@ -12,7 +12,11 @@ from worldengine.imex import export
 from worldengine.step import Step
 from worldengine.world import World
 from worldengine.version import __version__
-from worldengine.hdf5_serialization import save_world_to_hdf5
+try:
+    from worldengine.hdf5_serialization import save_world_to_hdf5
+    HDF5_AVAILABLE = True
+except:
+    HDF5_AVAILABLE = False
 
 VERSION = __version__
 
@@ -382,6 +386,9 @@ def main():
 
     if args.protobuf and args.hdf5:
         usage(error="Protobuf and hdf5 are exclusive choices")
+
+    if args.hdf5 and not HDF5_AVAILABLE:
+        usage(error="HDF5 requires the presence of native libraries")
 
     operation = "world"
     if args.OPERATOR is None:
