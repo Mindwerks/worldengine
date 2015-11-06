@@ -409,7 +409,7 @@ def draw_satellite(world, target):
                         # Don't include ocean in the smoothing, if this tile happens to border an ocean
                         if world.is_land((i, j)):
                             # Grab each rgb value and append to the list
-                            r, g, b, a = target[i, j]
+                            r, g, b, a = target[j, i]
                             all_r.append(r)
                             all_g.append(g)
                             all_b.append(b)
@@ -427,15 +427,15 @@ def draw_satellite(world, target):
     for y in range(world.height):
         for x in range(world.width):
             ## Color rivers
-            if world.is_land((x, y)) and (world.river_map[x, y] > 0.0):
-                base_color = target[x, y]
+            if world.is_land((x, y)) and (world.river_map[y, x] > 0.0):
+                base_color = target[y, x]
 
                 r, g, b = add_colors(base_color, RIVER_COLOR_CHANGE)
                 target.set_pixel(x, y, (r, g, b, 255))
 
             ## Color lakes
-            if world.is_land((x, y)) and (world.lake_map[x, y] != 0):
-                base_color = target[x, y]
+            if world.is_land((x, y)) and (world.lake_map[y, x] != 0):
+                base_color = target[y, x]
 
                 r, g, b = add_colors(base_color, LAKE_COLOR_CHANGE)
                 target.set_pixel(x, y, (r, g, b, 255))
@@ -444,7 +444,7 @@ def draw_satellite(world, target):
     for y in range(SAT_SHADOW_SIZE-1, world.height-SAT_SHADOW_SIZE-1):
         for x in range(SAT_SHADOW_SIZE-1, world.width-SAT_SHADOW_SIZE-1):
             if world.is_land((x, y)):
-                r, g, b, a = target[x, y]
+                r, g, b, a = target[y, x]
                 
                 # Build up list of elevations in the previous n tiles, where n is the shadow size.
                 # This goes northwest to southeast
