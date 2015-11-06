@@ -248,11 +248,11 @@ def main():
              "a name is not provided, then seed_N.world, " +
              "where N=SEED",
         metavar="STR")
-    # TODO: add description of protocol buffer
-    parser.add_argument('-b', '--protocol-buffer', dest='protobuf',
+    # TODO: add description of pickle and protobuf
+    parser.add_argument('--pickle', dest='pickle',
                         action="store_true",
-                        help="Save world file using protocol buffer format. " +
-                             "Default = store using pickle format",
+                        help="Save world file using the pickle format. " +
+                             "Default = store using protobuf format",
                         default=False)
     parser.add_argument('-s', '--seed', dest='seed', type=int,
                         help="Use seed=N to initialize the pseudo-random " +
@@ -429,9 +429,9 @@ def main():
 
     step = check_step(args.step)
 
-    world_format = 'pickle'
-    if args.protobuf:
-        world_format = 'protobuf'
+    world_format = 'protobuf'
+    if args.pickle:
+        world_format = 'pickle'
 
     generation_operation = (operation == 'world') or (operation == 'plates')
 
