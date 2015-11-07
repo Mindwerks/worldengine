@@ -163,6 +163,14 @@ def is_water_tile(water_grid, gx, gy):
     return water_grid[gx, gy] != WG_LAND
 
 
+def is_ocean_tile(water_grid, gx, gy):
+    return water_grid[gx, gy] == WG_OCEAN
+
+
+def is_river_tile(water_grid, gx, gy):
+    return water_grid[gx, gy] == WG_RIVER
+
+
 def tiles_around(water_grid, gx, gy):
     gxw = gx - 1
     if gxw == -1:
@@ -207,6 +215,52 @@ def water_tiles_around(water_grid, gx, gy):
             is_water_tile(water_grid, gxw, gys),
             is_water_tile(water_grid, gx,  gys),
             is_water_tile(water_grid, gxe, gys),]
+
+
+def river_tiles_around(water_grid, gx, gy):
+    gxw = gx - 1
+    if gxw == -1:
+        gxw = water_grid.shape[1] - 1
+    gxe = gx + 1
+    if gxe == water_grid.shape[1]:
+        gxe = 0
+    gyn = gy - 1
+    if gyn == -1:
+        gyn = water_grid.shape[0] - 1
+    gys = gy + 1
+    if gys == water_grid.shape[0] - 1:
+        gys = 0
+    return [is_river_tile(water_grid, gxw, gyn),
+            is_river_tile(water_grid, gx,  gyn),
+            is_river_tile(water_grid, gxe, gyn),
+            is_river_tile(water_grid, gxw, gy),
+            is_river_tile(water_grid, gxe, gy),
+            is_river_tile(water_grid, gxw, gys),
+            is_river_tile(water_grid, gx,  gys),
+            is_river_tile(water_grid, gxe, gys),]
+
+
+def ocean_tiles_around(water_grid, gx, gy):
+    gxw = gx - 1
+    if gxw == -1:
+        gxw = water_grid.shape[1] - 1
+    gxe = gx + 1
+    if gxe == water_grid.shape[1]:
+        gxe = 0
+    gyn = gy - 1
+    if gyn == -1:
+        gyn = water_grid.shape[0] - 1
+    gys = gy + 1
+    if gys == water_grid.shape[0] - 1:
+        gys = 0
+    return [is_ocean_tile(water_grid, gxw, gyn),
+            is_ocean_tile(water_grid, gx,  gyn),
+            is_ocean_tile(water_grid, gxe, gyn),
+            is_ocean_tile(water_grid, gxw, gy),
+            is_ocean_tile(water_grid, gxe, gy),
+            is_ocean_tile(water_grid, gxw, gys),
+            is_ocean_tile(water_grid, gx,  gys),
+            is_ocean_tile(water_grid, gxe, gys),]
 
 
 def terrain_grid_value(water_grid, gx, gy):
@@ -491,6 +545,13 @@ ISO_TLAND_COAST_E = 83
 ISO_TLAND_COAST_S = 82
 ISO_T_ISLAND = 103
 
+ISO_RIVER_VERT_PIPE = 93
+ISO_RIVER_HORI_PIPE = 92
+ISO_RIVER_TL = 91
+ISO_RIVER_TR = 94
+ISO_RIVER_BL = 95
+ISO_RIVER_BR = 96
+
 
 def draw_water(world, tmx_file, water_grid, this_lvl):
     def draw_cell(gx, gy):
@@ -519,7 +580,7 @@ def draw_water(world, tmx_file, water_grid, this_lvl):
                 return ISO_NONE
 
             else:
-                water_around = water_tiles_around(water_grid, gx, gy)
+                water_around = ocean_tiles_around(water_grid, gx, gy)
 
                 #
                 # No water
@@ -573,7 +634,21 @@ def draw_water(world, tmx_file, water_grid, this_lvl):
                 else:
                     raise Exception(str(water_around))
         elif wg_tile == WG_RIVER:
-            return ISO_RIVER
+            river_around = river_tiles_around(water_grid, gx, gy)
+            if river_around[1] == True and river_around[3] == False and river_around[4] == False and river_around[6] == True:
+                return ISO_RIVER_VERT_PIPE
+            elif river_around[1] == False and river_around[3] == True and river_around[4] == True and river_around[6] == False:
+                return ISO_RIVER_HORI_PIPE
+            elif river_around[1] == True and river_around[3] == True and river_around[4] == False and river_around[6] == False:
+                return ISO_RIVER_TL
+            elif river_around[1] == True and river_around[3] == False and river_around[4] == True and river_around[6] == False:
+                return ISO_RIVER_TR
+            elif river_around[1] == False and river_around[3] == True and river_around[4] == False and river_around[6] == True:
+                return ISO_RIVER_BL
+            elif river_around[1] == False and river_around[3] == False and river_around[4] == True and river_around[6] == True:
+                return ISO_RIVER_BR
+            else:
+                return ISO_RIVER
         elif wg_tile == WG_OCEAN:
             return ISO_NONE
         else:
@@ -607,10 +682,7 @@ def draw_level(world, tmx_file, water_grid, this_lvl):
             elif world.is_ocean((x, y)):
                 grid_value = ISO_OCEAN
             else:
-                if world.is_river((x, y)):
-                    grid_value = ISO_RIVER
-                else:
-                    grid_value = ISO_LAND
+                grid_value = ISO_LAND
                 slope_around = get_slope_around(world, x, y)
 
                 #
