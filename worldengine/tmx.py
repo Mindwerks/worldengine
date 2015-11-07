@@ -117,15 +117,15 @@ def water_cell_grid(world, pos):
         ocean_around = [(not v) for v in get_land_around(world, x, y)]
         river_around = get_river_around(world, x, y)
         top = [WG_LAND, WG_LAND, WG_LAND]
-        if river_around[1]:
+        if river_around[1] or ocean_around[1]:
             top[1] = WG_RIVER
         middle = [WG_LAND, WG_RIVER, WG_LAND]
-        if river_around[3]:
+        if river_around[3] or ocean_around[3]:
             middle[0] = WG_RIVER
-        if river_around[4]:
+        if river_around[4] or ocean_around[4]:
             middle[2] = WG_RIVER
         bottom = [WG_LAND, WG_LAND, WG_LAND]
-        if river_around[6]:
+        if river_around[6] or ocean_around[6]:
             bottom[1] = WG_RIVER
         return [top, middle, bottom]
     else:
@@ -270,7 +270,7 @@ def terrain_grid_value(water_grid, gx, gy):
     elif wg_tile == WG_OCEAN:
         return TOCEAN
     else:
-        raise Exception("Unknown water grid cell")
+        raise Exception("Unknown water grid cell. Found %i" % wg_tile)
 
 
 def clean_water_grid(water_grid):
@@ -388,7 +388,6 @@ def export_to_tmx_orthogonal(world, tmx_filename):
     tmx_file.write('    </data>\n')
     tmx_file.write('  </layer>\n')
 
-
     tmx_file.write('  <layer name="mountains" width="%i" height="%i">\n' % (world.width*3, world.height*3))
     tmx_file.write('    <data encoding="csv">\n')
 
@@ -458,6 +457,7 @@ def get_slope_around(world, x, y):
 
 
 ISO_OCEAN = 86
+ISO_RIVER = 85
 ISO_LAND = 3
 ISO_SLOPE_CORNER_BOTTOM_RIGHT = 31
 ISO_SLOPE_CORNER_BOTTOM_LEFT = 34
@@ -475,8 +475,121 @@ ISO_SLOPE_CORNER_BOTTOM_RIGHT_INTERNAL = 43
 ISO_SLOPE_CORNER_TOP_RIGHT_INTERNAL = 42
 ISO_SLOPE_CORNER_BOTTOM_LEFT_INTERNAL = 44
 
+# 81,82,83
 
-def draw_level(world, tmx_file, this_lvl):
+ISO_TLAND_E_S_SE = 100
+ISO_TLAND_W_SW_S = 99
+ISO_TLAND_N_NE_E = 98
+ISO_TLAND_NW_N_W = 97
+ISO_TLAND_BUT_SE = 90
+ISO_TLAND_BUT_SW = 87
+ISO_TLAND_BUT_NE = 84
+ISO_TLAND_BUT_NW = 91
+ISO_TLAND_COAST_N = 89
+ISO_TLAND_COAST_W = 88
+ISO_TLAND_COAST_E = 83
+ISO_TLAND_COAST_S = 82
+ISO_T_ISLAND = 103
+
+
+def draw_water(world, tmx_file, water_grid, this_lvl):
+    def draw_cell(gx, gy):
+        x = gx / 3
+        y = gy / 3
+        dx = gx - x * 3
+        dy = gy - y * 3
+        slope_around = get_slope_around(world, x, y)
+        wg_tile = water_grid[gx, gy]
+        if wg_tile == WG_LAND:
+            if dy == 0 and slope_around[1] != 0:
+                return ISO_NONE
+            if dy == 2 and slope_around[6] != 0:
+                return ISO_NONE
+            if dx == 0 and slope_around[3] != 0:
+                return ISO_NONE
+            if dx == 2 and slope_around[4] != 0:
+                return ISO_NONE
+            if dx == 0 and dy == 0 and slope_around[0] != 0:
+                return ISO_NONE
+            if dx == 2 and dy == 0 and slope_around[2] != 0:
+                return ISO_NONE
+            if dx == 0 and dy == 2 and slope_around[5] != 0:
+                return ISO_NONE
+            if dx == 2 and dy == 2 and slope_around[7] != 0:
+                return ISO_NONE
+
+            else:
+                water_around = water_tiles_around(water_grid, gx, gy)
+
+                #
+                # No water
+                #
+
+                if water_around == [False, False, False, False, False, False, False, False]:
+                    return ISO_NONE
+
+                #
+                # Water on one side
+                #
+
+                elif not water_around[1] and not water_around[3] and not water_around[4] and water_around[6]:
+                    return ISO_TLAND_COAST_N
+                elif water_around[1] and not water_around[3] and not water_around[4] and not water_around[6]:
+                    return ISO_TLAND_COAST_S
+                elif not water_around[1] and water_around[3] and not water_around[4] and not water_around[6]:
+                    return ISO_TLAND_COAST_E
+                elif not water_around[1] and not water_around[3] and water_around[4] and not water_around[6]:
+                    return ISO_TLAND_COAST_W
+
+                #
+                # Water in diagonal
+                #
+
+                elif water_around == [True, False, False, False, False, False, False, False]:
+                    return ISO_TLAND_BUT_NW
+                elif water_around == [False, False, True, False, False, False, False, False]:
+                    return ISO_TLAND_BUT_NE
+                elif water_around == [False, False, False, False, False, True, False, False]:
+                    return ISO_TLAND_BUT_SW
+                elif water_around == [False, False, False, False, False, False, False, True]:
+                    return ISO_TLAND_BUT_SE
+
+                #
+                # Water on two sides
+                #
+
+                elif water_around[1] and water_around[3] and not water_around[4] and not water_around[6]:
+                    return ISO_TLAND_E_S_SE
+                elif water_around[1] and not water_around[3] and water_around[4] and not water_around[6]:
+                    return ISO_TLAND_W_SW_S
+                elif not water_around[1] and water_around[3] and not water_around[4] and water_around[6]:
+                    return ISO_TLAND_N_NE_E
+                elif not water_around[1] and not water_around[3] and water_around[4] and water_around[6]:
+                    return ISO_TLAND_NW_N_W
+
+                elif water_around == [True, True, True, True, True, True, True, True]:
+                    return ISO_T_ISLAND
+
+                else:
+                    raise Exception(str(water_around))
+        elif wg_tile == WG_RIVER:
+            return ISO_RIVER
+        elif wg_tile == WG_OCEAN:
+            return ISO_NONE
+        else:
+            raise Exception("Unknown water grid cell")
+
+    tmx_file.write('    <data encoding="csv">\n')
+    for gy in range(world.height * 3):
+        for gx in range(world.width * 3):
+            tmx_file.write(str(draw_cell(gx, gy)))
+            if gy != (world.height * 3 - 1) or (gx != world.width * 3 - 1):
+                tmx_file.write(',')
+        tmx_file.write('\n')
+    tmx_file.write('    </data>\n')
+
+
+def draw_level(world, tmx_file, water_grid, this_lvl):
     tmx_file.write('    <data encoding="csv">\n')
 
     for gy in range(world.height * 3):
@@ -494,7 +607,10 @@ def draw_level(world, tmx_file, this_lvl):
             elif world.is_ocean((x, y)):
                 grid_value = ISO_OCEAN
             else:
-                grid_value = ISO_LAND
+                if world.is_river((x, y)):
+                    grid_value = ISO_RIVER
+                else:
+                    grid_value = ISO_LAND
                 slope_around = get_slope_around(world, x, y)
 
                 #
@@ -550,6 +666,9 @@ def export_to_tmx(world, tmx_filename):
     # nicer for a tiled map
     #_transform_for_tmx(world)
 
+    water_grid = generate_water_grid(world)
+    clean_water_grid(water_grid)
+
     tmx_file = open(tmx_filename, "w")
     tmx_file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
     tmx_file.write('<map version="1.0" orientation="isometric" renderorder="right-down" width="%i" height="%i" tilewidth="64" tileheight="32" nextobjectid="1">\n' % (world.width*3, world.height*3))
@@ -558,23 +677,27 @@ def export_to_tmx(world, tmx_filename):
     tmx_file.write('</tileset>\n')
 
     tmx_file.write('  <layer name="ground" width="%i" height="%i">\n' % (world.width*3, world.height*3))
-    draw_level(world, tmx_file, 0)
+    draw_level(world, tmx_file, water_grid, 0)
+    tmx_file.write('  </layer>\n')
+
+    tmx_file.write('  <layer name="water" width="%i" height="%i">\n' % (world.width*3, world.height*3))
+    draw_water(world, tmx_file, water_grid, 0)
     tmx_file.write('  </layer>\n')
 
     tmx_file.write('  <layer name="hill" width="%i" height="%i" offsetx="0" offsety="-32">\n' % (world.width*3, world.height*3))
-    draw_level(world, tmx_file, 1)
+    draw_level(world, tmx_file, water_grid, 1)
     tmx_file.write('  </layer>\n')
 
     tmx_file.write('  <layer name="low_mountain" width="%i" height="%i" offsetx="0" offsety="-64">\n' % (world.width*3, world.height*3))
-    draw_level(world, tmx_file, 2)
+    draw_level(world, tmx_file, water_grid, 2)
     tmx_file.write('  </layer>\n')
 
     tmx_file.write('  <layer name="med_mountain" width="%i" height="%i" offsetx="0" offsety="-96">\n' % (world.width*3, world.height*3))
-    draw_level(world, tmx_file, 3)
+    draw_level(world, tmx_file, water_grid, 3)
     tmx_file.write('  </layer>\n')
 
     tmx_file.write('  <layer name="high_mountain" width="%i" height="%i" offsetx="0" offsety="-128">\n' % (world.width*3, world.height*3))
-    draw_level(world, tmx_file, 4)
+    draw_level(world, tmx_file, water_grid, 4)
     tmx_file.write('  </layer>\n')
 
 
