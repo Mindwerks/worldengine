@@ -352,7 +352,7 @@ def generate_water_grid(world):
     return water_grid
 
 
-def export_to_tmx(world, tmx_filename):
+def export_to_tmx_orthogonal(world, tmx_filename):
     # We perform some preliminary transformation to make the world
     # nicer for a tiled map
     #_transform_for_tmx(world)
@@ -420,6 +420,164 @@ def export_to_tmx(world, tmx_filename):
 
     tmx_file.write('    </data>\n')
     tmx_file.write('  </layer>\n')
+
+    tmx_file.write('</map>\n')
+    tmx_file.close()
+
+
+def elev_level(world, pos):
+    if world.is_hill(pos):
+        return 1
+    elif world.is_low_mountain(pos):
+        return 2
+    elif world.is_high_mountain(pos):
+        return 4
+    elif world.is_mountain(pos):
+        return 3
+    else:
+        return 0
+
+
+def get_slope_around(world, x, y):
+    my_level = elev_level(world, (x,y))
+    s = y + 1
+    if s == world.height:
+        s = 0
+    n = y - 1
+    if n == -1:
+        n = world.height - 1
+    e = x + 1
+    if e == world.width:
+        e = 0
+    w = x - 1
+    if w == -1:
+        w = world.width - 1
+    return [elev_level(world,(w,n))-my_level,elev_level(world,(x,n))-my_level,elev_level(world,(e,n))-my_level,
+            elev_level(world,(w,y))-my_level,elev_level(world,(e,y))-my_level,
+            elev_level(world,(w,s))-my_level,elev_level(world,(x,s))-my_level,elev_level(world,(e,s))-my_level]
+
+
+ISO_OCEAN = 86
+ISO_LAND = 3
+ISO_SLOPE_CORNER_BOTTOM_RIGHT = 31
+ISO_SLOPE_CORNER_BOTTOM_LEFT = 34
+ISO_SLOPE_CORNER_TOP_LEFT = 39
+ISO_SLOPE_CORNER_TOP_RIGHT = 36
+ISO_SLOPE_LEFT = 33
+ISO_SLOPE_RIGHT = 37
+ISO_SLOPE_TOP = 32
+ISO_SLOPE_BOTTOM = 38
+ISO_TALL = 35
+ISO_NONE = 0
+ISO_GRASS = 115
+ISO_SLOPE_CORNER_TOP_LEFT_INTERNAL = 41
+ISO_SLOPE_CORNER_BOTTOM_RIGHT_INTERNAL = 43
+ISO_SLOPE_CORNER_TOP_RIGHT_INTERNAL = 42
+ISO_SLOPE_CORNER_BOTTOM_LEFT_INTERNAL = 44
+
+
+def draw_level(world, tmx_file, this_lvl):
+    tmx_file.write('    <data encoding="csv">\n')
+
+    for gy in range(world.height * 3):
+        for gx in range(world.width * 3):
+
+            x = int(gx / 3)
+            y = int(gy / 3)
+            dx = gx - (x*3)
+            dy = gy - (y*3)
+            lvl = elev_level(world, (x, y))
+            if lvl < this_lvl:
+                grid_value = ISO_NONE
+            elif lvl > this_lvl:
+                grid_value = ISO_TALL
+            elif world.is_ocean((x, y)):
+                grid_value = ISO_OCEAN
+            else:
+                grid_value = ISO_LAND
+                slope_around = get_slope_around(world, x, y)
+
+                #
+                # Sides
+                #
+
+                if dy==0 and slope_around[1]>=1:
+                    grid_value = ISO_SLOPE_TOP
+                if dy==2 and slope_around[6]>=1:
+                    grid_value = ISO_SLOPE_BOTTOM
+                if dx==0 and slope_around[3]>=1:
+                    grid_value = ISO_SLOPE_LEFT
+                if dx==2 and slope_around[4]>=1:
+                    grid_value = ISO_SLOPE_RIGHT
+
+                #
+                # Internal corners
+                #
+
+                if dx == 0 and dy == 0 and slope_around[1] >= 1 and slope_around[3] >= 1:
+                    grid_value = ISO_SLOPE_CORNER_BOTTOM_RIGHT_INTERNAL
+                elif dx == 2 and dy == 0 and slope_around[1] >= 1 and slope_around[4] >= 1:
+                    grid_value = ISO_SLOPE_CORNER_BOTTOM_LEFT_INTERNAL
+                elif dx == 0 and dy == 2 and slope_around[6] >= 1 and slope_around[3] >= 1:
+                    grid_value = ISO_SLOPE_CORNER_TOP_RIGHT_INTERNAL
+                elif dx == 2 and dy == 2 and slope_around[6] >= 1 and slope_around[4] >= 1:
+                    grid_value = ISO_SLOPE_CORNER_TOP_LEFT_INTERNAL
+
+                #
+                # Corners
+                #
+
+                if dx == 0 and dy == 0 and slope_around[0] >= 1 and slope_around[1] < 1 and slope_around[3] < 1:
+                    grid_value = ISO_SLOPE_CORNER_BOTTOM_RIGHT
+                elif dx == 2 and dy == 0 and slope_around[2] >= 1 and slope_around[1] < 1 and slope_around[4] < 1:
+                    grid_value = ISO_SLOPE_CORNER_BOTTOM_LEFT
+                elif dx == 0 and dy == 2 and slope_around[5] >= 1 and slope_around[6] < 1 and slope_around[3] < 1:
+                    grid_value = ISO_SLOPE_CORNER_TOP_RIGHT
+                elif dx == 2 and dy == 2 and slope_around[7] >= 1 and slope_around[6] < 1 and slope_around[4] < 1:
+                    grid_value = ISO_SLOPE_CORNER_TOP_LEFT
+
+
+            tmx_file.write(str(grid_value))
+            if gy != (world.height * 3 - 1) or (gx != world.width * 3 - 1):
+                tmx_file.write(',')
+        tmx_file.write('\n')
+    tmx_file.write('    </data>\n')
+
+
+# isometric
+def export_to_tmx(world, tmx_filename):
+    # We perform some preliminary transformation to make the world
+    # nicer for a tiled map
+    #_transform_for_tmx(world)
+
+    tmx_file = open(tmx_filename, "w")
+    tmx_file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+    tmx_file.write('<map version="1.0" orientation="isometric" renderorder="right-down" width="%i" height="%i" tilewidth="64" tileheight="32" nextobjectid="1">\n' % (world.width*3, world.height*3))
+    tmx_file.write('<tileset firstgid="1" name="iso-64x64-outside" tilewidth="64" tileheight="64" tilecount="160">\n')
+    tmx_file.write('<image source="../Downloads/iso-64x64-outside.png" width="640" height="1024"/>\n')
+    tmx_file.write('</tileset>\n')
+
+    tmx_file.write('  <layer name="ground" width="%i" height="%i">\n' % (world.width*3, world.height*3))
+    draw_level(world, tmx_file, 0)
+    tmx_file.write('  </layer>\n')
+
+    tmx_file.write('  <layer name="hill" width="%i" height="%i" offsetx="0" offsety="-32">\n' % (world.width*3, world.height*3))
+    draw_level(world, tmx_file, 1)
+    tmx_file.write('  </layer>\n')
+
+    tmx_file.write('  <layer name="low_mountain" width="%i" height="%i" offsetx="0" offsety="-64">\n' % (world.width*3, world.height*3))
+    draw_level(world, tmx_file, 2)
+    tmx_file.write('  </layer>\n')
+
+    tmx_file.write('  <layer name="med_mountain" width="%i" height="%i" offsetx="0" offsety="-96">\n' % (world.width*3, world.height*3))
+    draw_level(world, tmx_file, 3)
+    tmx_file.write('  </layer>\n')
+
+    tmx_file.write('  <layer name="high_mountain" width="%i" height="%i" offsetx="0" offsety="-128">\n' % (world.width*3, world.height*3))
+    draw_level(world, tmx_file, 4)
+    tmx_file.write('  </layer>\n')
+
+
 
     tmx_file.write('</map>\n')
     tmx_file.close()
