@@ -786,7 +786,7 @@ def export_to_tmx(world, tmx_filename):
     tmx_file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
     tmx_file.write('<map version="1.0" orientation="isometric" renderorder="right-down" width="%i" height="%i" tilewidth="64" tileheight="32" nextobjectid="1">\n' % (world.width*3, world.height*3))
     tmx_file.write('<tileset firstgid="1" name="iso-64x64-outside" tilewidth="64" tileheight="64" tilecount="160">\n')
-    tmx_file.write('<image source="../Downloads/iso-64x64-outside.png" width="640" height="1024"/>\n')
+    tmx_file.write('<image source="iso-64x64-outside.png" width="640" height="1024"/>\n')
     tmx_file.write('</tileset>\n')
     tmx_file.write('<tileset firstgid="161" name="Decorations" tilewidth="64" tileheight="32" tilecount="2">\n')
     tmx_file.write('<tile id="0">\n')
@@ -839,6 +839,22 @@ def export_to_tmx(world, tmx_filename):
 
     tmx_file.write('  <layer name="forest_ground" width="%i" height="%i" offsetx="0" offsety="0">\n' % (world.width*3, world.height*3))
     draw_forest_level(world, tmx_file, 0)
+    tmx_file.write('  </layer>\n')
+
+    tmx_file.write('  <layer name="forest_hill" width="%i" height="%i" offsetx="0" offsety="-32">\n' % (world.width*3, world.height*3))
+    draw_forest_level(world, tmx_file, 1)
+    tmx_file.write('  </layer>\n')
+
+    tmx_file.write('  <layer name="forest_low_mountain" width="%i" height="%i" offsetx="0" offsety="-64">\n' % (world.width*3, world.height*3))
+    draw_forest_level(world, tmx_file, 2)
+    tmx_file.write('  </layer>\n')
+
+    tmx_file.write('  <layer name="forest_med_mountain" width="%i" height="%i" offsetx="0" offsety="-96">\n' % (world.width*3, world.height*3))
+    draw_forest_level(world, tmx_file, 3)
+    tmx_file.write('  </layer>\n')
+
+    tmx_file.write('  <layer name="forest_high_mountain" width="%i" height="%i" offsetx="0" offsety="-128">\n' % (world.width*3, world.height*3))
+    draw_forest_level(world, tmx_file, 4)
     tmx_file.write('  </layer>\n')
 
     tmx_file.write('</map>\n')
