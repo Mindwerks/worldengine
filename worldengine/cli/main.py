@@ -22,7 +22,7 @@ STEPS = 'plates|precipitations|full'
 
 
 def generate_world(world_name, width, height, seed, num_plates, output_dir,
-                   step, ocean_level, temps, humids, world_format='pickle',
+                   step, ocean_level, temps, humids, world_format='protobuf',
                    gamma_curve=1.25, curve_offset=.2, fade_borders=True,
                    verbose=True, black_and_white=False):
     w = world_gen(world_name, width, height, seed, temps, humids, num_plates, ocean_level,
@@ -248,12 +248,6 @@ def main():
              "a name is not provided, then seed_N.world, " +
              "where N=SEED",
         metavar="STR")
-    # TODO: add description of protocol buffer
-    parser.add_argument('-b', '--protocol-buffer', dest='protobuf',
-                        action="store_true",
-                        help="Save world file using protocol buffer format. " +
-                             "Default = store using pickle format",
-                        default=False)
     parser.add_argument('-s', '--seed', dest='seed', type=int,
                         help="Use seed=N to initialize the pseudo-random " +
                              "generation. If not provided, one will be " +
@@ -429,9 +423,7 @@ def main():
 
     step = check_step(args.step)
 
-    world_format = 'pickle'
-    if args.protobuf:
-        world_format = 'protobuf'
+    world_format = 'protobuf'
 
     generation_operation = (operation == 'world') or (operation == 'plates')
 
