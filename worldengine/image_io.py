@@ -3,10 +3,18 @@ This file is supposed to be the wrapper around image-processing modules like
 PyPNG or Pillow. These modules should not be included anywhere but here. Should
 a later replacement be necessary, it should be easy to do.
 This module provides elaborate means to write images and simple means to read
-them, too - the latter is only needed for the tests to be able to run, hence a
-rudimentary implementation should suffice.
+them, too - the latter is (currently) only needed for the tests to be able to
+run, hence a rudimentary implementation should suffice.
 
-In case the used library was replaced, the following functions would have to be
+The arrays in WorldEngine are numpy-arrays and thus use matrix-notation for
+access, see: https://en.wikipedia.org/wiki/Matrix_%28mathematics%29
+This means that a matrix-element will be accessed via [y, x] throughout the
+code.
+Only right before writing (PNGWriter.complete()) and right after reading
+(PNGReader.__init__()) may there be a need to switch to [x, y]-notation, but it
+can probably be avoided even then.
+
+In case the used library was replaced, the following functions have to be
 rewritten:
   PNGWriter.complete()
   PNGWriter.prepare_array()
@@ -32,37 +40,37 @@ class PNGWriter(object):
     """
     # convenience constructors
     @staticmethod
-    def grayscale_from_dimensions(width, height, filename, channel_bitdepth=16):
-        return PNGWriter.from_dimensions(width, height, filename, channels=1,
+    def grayscale_from_dimensions(width, height, filename=None, channel_bitdepth=16):
+        return PNGWriter.from_dimensions(width, height, channels=1, filename=filename,
                                          channel_bitdepth=channel_bitdepth, grayscale=True)
 
     @staticmethod
-    def rgb_from_dimensions(width, height, filename, channel_bitdepth=8):
-        return PNGWriter.from_dimensions(width, height, filename, channels=3,
+    def rgb_from_dimensions(width, height, filename=None, channel_bitdepth=8):
+        return PNGWriter.from_dimensions(width, height, channels=3, filename=filename,
                                          channel_bitdepth=channel_bitdepth)
 
     @staticmethod
-    def rgba_from_dimensions(width, height, filename, channel_bitdepth=8):
-        return PNGWriter.from_dimensions(width, height, filename, channels=4,
+    def rgba_from_dimensions(width, height, filename=None, channel_bitdepth=8):
+        return PNGWriter.from_dimensions(width, height, channels=4, filename=filename,
                                          channel_bitdepth=channel_bitdepth, has_alpha=True)
 
     @staticmethod
-    def grayscale_from_array(array, filename, channel_bitdepth=16, scale_to_range=False):
-        return PNGWriter.from_array(array, filename, channels=1, scale_to_range=scale_to_range,
+    def grayscale_from_array(array, filename=None, channel_bitdepth=16, scale_to_range=False):
+        return PNGWriter.from_array(array, filename=filename, channels=1, scale_to_range=scale_to_range,
                                     grayscale=True, channel_bitdepth=channel_bitdepth)
 
     @staticmethod
-    def rgb_from_array(array, filename, channel_bitdepth=8, scale_to_range=False):
-        return PNGWriter.from_array(array, filename, channels=3, scale_to_range=scale_to_range,
+    def rgb_from_array(array, filename=None, channel_bitdepth=8, scale_to_range=False):
+        return PNGWriter.from_array(array, filename=filename, channels=3, scale_to_range=scale_to_range,
                                     channel_bitdepth=channel_bitdepth)
 
     @staticmethod
-    def rgba_from_array(array, filename, channel_bitdepth=8, scale_to_range=False):
-        return PNGWriter.from_array(array, filename, channels=4, scale_to_range=scale_to_range,
+    def rgba_from_array(array, filename=None, channel_bitdepth=8, scale_to_range=False):
+        return PNGWriter.from_array(array, filename=filename, channels=4, scale_to_range=scale_to_range,
                                     channel_bitdepth=channel_bitdepth, has_alpha=True)
 
     # general constructors
-    def __init__(self, array, filename, channels=3, channel_bitdepth=8, has_alpha=False, palette=None, grayscale=False):
+    def __init__(self, array, filename=None, channels=3, channel_bitdepth=8, has_alpha=False, palette=None, grayscale=False):
         """
         Calling the generic constructor gives full control over the created PNG
         file but it is very much recommended to use the appropriate static
@@ -70,18 +78,21 @@ class PNGWriter(object):
         
         The default settings are chosen to represent a standard RGB image.
         """
-        self.img = png.Writer(width=array.shape[1], height=array.shape[0],
-                              greyscale=grayscale, bitdepth=channel_bitdepth,  # British spelling
-                              alpha=has_alpha, palette=palette)
+        self.img = None
         self.array = array
         self.filename = filename
-        self.channel_bitdepth = channel_bitdepth
         self.channels = channels
+
+        # PNG parameters
         self.height = array.shape[0]
         self.width = array.shape[1]
+        self.grayscale = grayscale
+        self.channel_bitdepth = channel_bitdepth
+        self.has_alpha = has_alpha
+        self.palette = palette
 
     @classmethod
-    def from_dimensions(cls, width, height, filename, channels,
+    def from_dimensions(cls, width, height, channels, filename=None,
                         grayscale=False, channel_bitdepth=8,
                         has_alpha=False, palette=None):
         """
@@ -101,7 +112,7 @@ class PNGWriter(object):
                    has_alpha=has_alpha, palette=palette, channels=channels)
 
     @classmethod
-    def from_array(cls, array, filename, channels=3, scale_to_range=False,
+    def from_array(cls, array, filename=None, channels=3, scale_to_range=False,
                    grayscale=False, channel_bitdepth=8,
                    has_alpha=False, palette=None):
         """
@@ -124,7 +135,7 @@ class PNGWriter(object):
     #the following methods should not need to be overriden
     def set_pixel(self, x, y, color):
         """
-        Color may be: value, tuple, list (and more)
+        Color may be: value, tuple, list etc.
 
         If the image is set to contain more color-channels than len(color), the
         remaining channels will be filled automatically.
@@ -162,9 +173,17 @@ class PNGWriter(object):
                     color = [color, color, color, 255]
         self.array[y, x] = color
 
-    def complete(self):
+    def complete(self, filename=None):
+        if filename is None:
+            filename = self.filename
+        if filename is None:
+            return
+        if self.img is None:
+            self.img = png.Writer(width=self.width, height=self.height,
+                                  greyscale=self.grayscale, bitdepth=self.channel_bitdepth,  # British spelling
+                                  alpha=self.has_alpha, palette=self.palette)
         #write the image
-        with open(self.filename, 'wb') as f:
+        with open(filename, 'wb') as f:
             self.img.write_array(f, self.prepare_array(self.array))
 
     @staticmethod
