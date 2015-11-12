@@ -1,7 +1,7 @@
 argparse==1.2.1
 noise==1.2.2
 numpy==1.9.2
-Pillow==2.8.2
+pypng==0.0.18
 PyPlatec==1.4.0
 protobuf==3.0.0a3
 six==1.10.0

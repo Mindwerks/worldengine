@@ -1,32 +1,12 @@
 import unittest
 import os
-from worldengine.draw import _biome_colors, Image, draw_simple_elevation, elevation_color, \
+import numpy
+from worldengine.draw import _biome_colors, draw_simple_elevation, elevation_color, \
     draw_elevation, draw_riversmap, draw_grayscale_heightmap, draw_ocean, draw_precipitation, \
     draw_world, draw_temperature_levels, draw_biome, draw_scatter_plot
 from worldengine.biome import Biome
 from worldengine.world import World
-
-
-class PixelCollector:
-
-    def __init__(self, width, height):
-        self.pixels = {}
-        self.width = width
-        self.height = height
-        for y in range(height):
-            for x in range(width):
-                self.pixels[x, y] = (0, 0, 0, 0)
-
-    def set_pixel(self, x, y, color):
-        if len(color) == 3:
-            color = color + (255,)
-        self.pixels[(x, y)] = color
-
-    def __getitem__(self, item):
-        return self.pixels[item]
-
-    def __setitem__(self, key, value):
-        self.pixels[key] = value
+from worldengine.image_io import PNGWriter, PNGReader
 
 
 class TestBase(unittest.TestCase):
@@ -55,19 +35,25 @@ class TestBase(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def _assert_img_equal(self, blessed_image_name, drawn_image):
-        blessed_img = Image.open("%s/%s.png" % (self.tests_blessed_images_dir, blessed_image_name))
-        blessed_img_pixels = blessed_img.load()
+        blessed_img = PNGReader("%s/%s.png" % (self.tests_blessed_images_dir, blessed_image_name))
 
-        blessed_img_width, blessed_img_height = blessed_img.size
-        self.assertEqual(blessed_img_width, drawn_image.width)
-        self.assertEqual(blessed_img_height, drawn_image.height)
-        for y in range(blessed_img_height):
-            for x in range(blessed_img_width):
-                blessed_pixel = blessed_img_pixels[x, y]
-                drawn_pixel = drawn_image[x, y]
-                self.assertEqual(blessed_pixel, drawn_pixel,
-                                 "Pixels at %i, %i are different. Blessed %s, drawn %s"
-                                 % (x, y, blessed_pixel, drawn_pixel))
+        # check shapes (i.e. (height, width, channels)-tuple)
+        self.assertTrue(blessed_img.array.shape == drawn_image.array.shape,
+                        "Blessed and drawn images differ in height, width " +
+                        "and/or amount of channels. Blessed %s, drawn %s"
+                        % (str(blessed_img.array.shape), str(drawn_image.array.shape)))
+
+        # compare images; cmp_array will be an array of booleans in case of equal shapes (and a pure boolean otherwise)
+        cmp_array = blessed_img.array != drawn_image.array
+
+        # avoid calling assertTrue if shapes differed; results would be weird (and meaningless)
+        if numpy.any(cmp_array):
+            diff = numpy.transpose(numpy.nonzero(cmp_array))  # list of tuples of differing indices
+            self.assertTrue(False,
+                            "Pixels at %i, %i are different. Blessed %s, drawn %s"
+                            % (diff[0][0], diff[0][1],
+                            blessed_img.array[diff[0][0], diff[0][1]],
+                            drawn_image.array[diff[0][0], diff[0][1]]))
 
 
 class TestDraw(TestBase):
@@ -102,69 +88,69 @@ class TestDraw(TestBase):
 
     def test_draw_simple_elevation(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        target = PixelCollector(w.width, w.height)
+        target = PNGWriter.rgba_from_dimensions(w.width, w.height)
         draw_simple_elevation(w, w.sea_level(), target)
         self._assert_img_equal("simple_elevation_28070", target)
 
     def test_draw_elevation_shadow(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
         data = w.elevation['data']
-        target = PixelCollector(w.width, w.height)
+        target = PNGWriter.rgba_from_dimensions(w.width, w.height)
         draw_elevation(w, True, target)
         self._assert_img_equal("elevation_28070_shadow", target)
 
     def test_draw_elevation_no_shadow(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
         data = w.elevation['data']
-        target = PixelCollector(w.width, w.height)
+        target = PNGWriter.rgba_from_dimensions(w.width, w.height)
         draw_elevation(w, False, target)
         self._assert_img_equal("elevation_28070_no_shadow", target)
 
     def test_draw_river_map(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        target = PixelCollector(w.width, w.height)
+        target = PNGWriter.rgba_from_dimensions(w.width, w.height)
         draw_riversmap(w, target)
         self._assert_img_equal("riversmap_28070", target)
 
     def test_draw_grayscale_heightmap(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        target = PixelCollector(w.width, w.height)
-        draw_grayscale_heightmap(w, target)
+        target = PNGWriter.grayscale_from_array(w.elevation['data'], scale_to_range=True)
+        #draw_grayscale_heightmap(w, target)
         self._assert_img_equal("grayscale_heightmap_28070", target)
 
     def test_draw_ocean(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        target = PixelCollector(w.width, w.height)
+        target = PNGWriter.rgba_from_dimensions(w.width, w.height)
         draw_ocean(w.ocean, target)
         self._assert_img_equal("ocean_28070", target)
 
     def test_draw_precipitation(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        target = PixelCollector(w.width, w.height)
+        target = PNGWriter.rgba_from_dimensions(w.width, w.height)
         draw_precipitation(w, target)
         self._assert_img_equal("precipitation_28070", target)
 
     def test_draw_world(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        target = PixelCollector(w.width, w.height)
+        target = PNGWriter.rgba_from_dimensions(w.width, w.height)
         draw_world(w, target)
         self._assert_img_equal("world_28070", target)
 
     def test_draw_temperature_levels(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        target = PixelCollector(w.width, w.height)
+        target = PNGWriter.rgba_from_dimensions(w.width, w.height)
         draw_temperature_levels(w, target)
         self._assert_img_equal("temperature_28070", target)
 
     def test_draw_biome(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        target = PixelCollector(w.width, w.height)
+        target = PNGWriter.rgba_from_dimensions(w.width, w.height)
         draw_biome(w, target)
         self._assert_img_equal("biome_28070", target)
 
     def test_draw_scatter_plot(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        target = PixelCollector(16, 16)
+        target = PNGWriter.rgba_from_dimensions(16, 16)
         draw_scatter_plot(w, 16, target)
 
 if __name__ == '__main__':

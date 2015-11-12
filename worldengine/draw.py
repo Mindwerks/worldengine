@@ -1,9 +1,9 @@
-from PIL import Image
 import numpy
 import numpy.ma as ma
 
 from worldengine.drawing_functions import draw_ancientmap, \
     draw_rivers_on_image
+from worldengine.image_io import PNGWriter
 
 # -------------
 # Helper values
@@ -314,37 +314,6 @@ def get_biome_color_based_on_elevation(world, elev, x, y):
 # Draw on generic target
 # ----------------------
 
-
-class ImagePixelSetter(object):
-
-    def __init__(self, width, height, filename):
-        self.img = Image.new('RGBA', (width, height))
-        self.pixels = self.img.load()
-        self.filename = filename
-
-    def set_pixel(self, x, y, color):
-        if len(color) == 3:  # Convert RGB to RGBA - TODO: go through code to fix this
-            color = (color[0], color[1], color[2], 255)
-        self.pixels[x, y] = color
-
-    def complete(self):
-        try:
-            self.img.save(self.filename)
-        except KeyError:
-            print("Cannot save to file `{}`, unsupported file format.".format(self.filename))
-            filename = self.filename+".png"
-            print("Defaulting to PNG: `{}`".format(filename))
-            self.img.save(filename)
-
-    def __getitem__(self, item):
-        return self.pixels[item]
-
-    def __setitem__(self, item, value):
-        if len(value) == 3:  # Convert RGB to RGBA - TODO: go through code to fix this
-            value = (value[0], value[1], value[2], 255)
-        self.pixels[item] = value
-
-
 def draw_simple_elevation(world, sea_level, target):
     """ This function can be used on a generic canvas (either an image to save
         on disk or a canvas part of a GUI)
@@ -552,7 +521,7 @@ def draw_precipitation(world, target, black_and_white=False):
         low = world.precipitation['data'].min()
         high = world.precipitation['data'].max()
         floor = 0
-        ceiling = 255
+        ceiling = 255  # could be changed into 16 Bit grayscale easily
 
         colors = numpy.interp(world.precipitation['data'], [low, high], [floor, ceiling])
         colors = numpy.rint(colors).astype(dtype=numpy.int32)  # proper rounding
@@ -602,7 +571,7 @@ def draw_temperature_levels(world, target, black_and_white=False):
         low = world.temperature_thresholds()[0][1]
         high = world.temperature_thresholds()[5][1]
         floor = 0
-        ceiling = 255
+        ceiling = 255  # could be changed into 16 Bit grayscale easily
 
         colors = numpy.interp(world.temperature['data'], [low, high], [floor, ceiling])
         colors = numpy.rint(colors).astype(dtype=numpy.int32)  # proper rounding
@@ -760,56 +729,56 @@ def draw_scatter_plot(world, size, target):
 
 
 def draw_simple_elevation_on_file(world, filename, sea_level):
-    img = ImagePixelSetter(world.width, world.height, filename)
+    img = PNGWriter.rgba_from_dimensions(world.width, world.height, filename)
     draw_simple_elevation(world, sea_level, img)
     img.complete()
 
 
 def draw_riversmap_on_file(world, filename):
-    img = ImagePixelSetter(world.width, world.height, filename)
+    img = PNGWriter.rgba_from_dimensions(world.width, world.height, filename)
     draw_riversmap(world, img)
     img.complete()
 
 
 def draw_grayscale_heightmap_on_file(world, filename):
-    img = ImagePixelSetter(world.width, world.height, filename)
-    draw_grayscale_heightmap(world, img)
+    img = PNGWriter.grayscale_from_array(world.elevation['data'], filename, scale_to_range=True)
+    #draw_grayscale_heightmap(world, img)
     img.complete()
 
 
 def draw_elevation_on_file(world, filename, shadow=True):
-    img = ImagePixelSetter(world.width, world.height, filename)
+    img = PNGWriter.rgba_from_dimensions(world.width, world.height, filename)
     draw_elevation(world, shadow, img)
     img.complete()
 
 
 def draw_ocean_on_file(ocean, filename):
     height, width = ocean.shape
-    img = ImagePixelSetter(width, height, filename)
+    img = PNGWriter.rgba_from_dimensions(width, height, filename)
     draw_ocean(ocean, img)
     img.complete()
 
 
 def draw_precipitation_on_file(world, filename, black_and_white=False):
-    img = ImagePixelSetter(world.width, world.height, filename)
+    img = PNGWriter.rgba_from_dimensions(world.width, world.height, filename)
     draw_precipitation(world, img, black_and_white)
     img.complete()
 
 
 def draw_world_on_file(world, filename):
-    img = ImagePixelSetter(world.width, world.height, filename)
+    img = PNGWriter.rgba_from_dimensions(world.width, world.height, filename)
     draw_world(world, img)
     img.complete()
 
 
 def draw_temperature_levels_on_file(world, filename, black_and_white=False):
-    img = ImagePixelSetter(world.width, world.height, filename)
+    img = PNGWriter.rgba_from_dimensions(world.width, world.height, filename)
     draw_temperature_levels(world, img, black_and_white)
     img.complete()
 
 
 def draw_biome_on_file(world, filename):
-    img = ImagePixelSetter(world.width, world.height, filename)
+    img = PNGWriter.rgba_from_dimensions(world.width, world.height, filename)
     draw_biome(world, img)
     img.complete()
 
@@ -818,8 +787,7 @@ def draw_ancientmap_on_file(world, filename, resize_factor=1,
                             sea_color=(212, 198, 169, 255),
                             draw_biome=True, draw_rivers=True, draw_mountains=True, 
                             draw_outer_land_border=False, verbose=False):
-    img = ImagePixelSetter(world.width * resize_factor,
-                           world.height * resize_factor, filename)
+    img = PNGWriter.rgba_from_dimensions(world.width * resize_factor, world.height * resize_factor, filename)
     draw_ancientmap(world, img, resize_factor, sea_color,
                     draw_biome, draw_rivers, draw_mountains, draw_outer_land_border, 
                     verbose)
@@ -827,12 +795,12 @@ def draw_ancientmap_on_file(world, filename, resize_factor=1,
 
 
 def draw_scatter_plot_on_file(world, filename):
-    img = ImagePixelSetter(512, 512, filename)
+    img = PNGWriter.rgba_from_dimensions(512, 512, filename)
     draw_scatter_plot(world, 512, img)
     img.complete()
 
 
 def draw_satellite_on_file(world, filename):
-    img = ImagePixelSetter(world.width, world.height, filename)
+    img = PNGWriter.rgba_from_dimensions(world.width, world.height, filename)
     draw_satellite(world, img)
     img.complete()

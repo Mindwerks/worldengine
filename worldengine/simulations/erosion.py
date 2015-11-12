@@ -48,12 +48,12 @@ class ErosionSimulation(object):
         return world.has_precipitations()
 
     def execute(self, world, seed):
-        water_flow = numpy.zeros((world.width, world.height))
-        water_path = numpy.zeros((world.width, world.height), dtype=int)
+        water_flow = numpy.zeros((world.height, world.width))
+        water_path = numpy.zeros((world.height, world.width), dtype=int)
         river_list = []
         lake_list = []
-        river_map = numpy.zeros((world.width, world.height))
-        lake_map = numpy.zeros((world.width, world.height))
+        river_map = numpy.zeros((world.height, world.width))
+        lake_map = numpy.zeros((world.height, world.width))
 
         # step one: water flow per cell based on rainfall
         self.find_water_flow(world, water_path)
@@ -81,7 +81,7 @@ class ErosionSimulation(object):
         for lake in lake_list:
             # print "Found lake at:",lake
             lx, ly = lake
-            lake_map[lx, ly] = 0.1  # TODO: make this based on rainfall/flow
+            lake_map[ly, lx] = 0.1  # TODO: make this based on rainfall/flow
 
         world.set_rivermap(river_map)
         world.set_lakemap(lake_map)
@@ -100,7 +100,7 @@ class ErosionSimulation(object):
                     key = 0
                     for direction in DIR_NEIGHBORS_CENTER:
                         if direction == flow_dir:
-                            water_path[x, y] = key
+                            water_path[y, x] = key
                         key += 1
 
     def find_quick_path(self, river, world):
@@ -154,9 +154,9 @@ class ErosionSimulation(object):
         for x in range(0, world.width - 1):
             for y in range(0, world.height - 1):
                 rain_fall = world.precipitation['data'][y, x]
-                water_flow[x, y] = rain_fall
+                water_flow[y, x] = rain_fall
 
-                if water_path[x, y] == 0:
+                if water_path[y, x] == 0:
                     continue  # ignore cells without flow direction
                 cx, cy = x, y  # begin with starting location
                 neighbour_seed_found = False
@@ -165,7 +165,7 @@ class ErosionSimulation(object):
 
                     # have we found a seed?
                     if world.is_mountain((cx, cy)) and \
-                            water_flow[cx, cy] >= RIVER_TH:
+                            water_flow[cy, cx] >= RIVER_TH:
 
                         # try not to create seeds around other seeds
                         for seed in river_source_list:
@@ -179,13 +179,13 @@ class ErosionSimulation(object):
                         break
 
                     # no path means dead end...
-                    if water_path[cx, cy] == 0:
+                    if water_path[cy, cx] == 0:
                         break  # break out of loop
 
                     # follow path, add water flow from previous cell
-                    dx, dy = DIR_NEIGHBORS_CENTER[water_path[cx, cy]]
+                    dx, dy = DIR_NEIGHBORS_CENTER[water_path[cy, cx]]
                     nx, ny = cx + dx, cy + dy  # calculate next cell
-                    water_flow[nx, ny] += rain_fall
+                    water_flow[ny, nx] += rain_fall
                     cx, cy = nx, ny  # set current cell to next cell
         return river_source_list
 
@@ -414,8 +414,8 @@ class ErosionSimulation(object):
         px, py = (0, 0)
         for x, y in river:
             if isSeed:
-                rivermap[x, y] = water_flow[x, y]
+                rivermap[y, x] = water_flow[y, x]
                 isSeed = False
             else:
-                rivermap[x, y] = precipitations[y, x] + rivermap[px, py]
+                rivermap[y, x] = precipitations[y, x] + rivermap[py, px]
             px, py = x, y

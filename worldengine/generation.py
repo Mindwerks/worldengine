@@ -124,8 +124,8 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
     """
     e = world.elevation['data']
     ocean = fill_ocean(e, ocean_level)
-    hl = find_threshold_f(e, 0.10)
-    ml = find_threshold_f(e, 0.03)
+    hl = find_threshold_f(e, 0.10)  # the highest 10% of all (!) land are declared hills
+    ml = find_threshold_f(e, 0.03)  # the highest 3% are declared mountains
     e_th = [('sea', ocean_level),
             ('plain', hl),
             ('hill', ml),
