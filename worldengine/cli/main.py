@@ -2,7 +2,6 @@ import sys
 from argparse import ArgumentParser
 import os
 import numpy
-import pickle
 import worldengine.generation as geo
 from worldengine.common import array_to_matrix, set_verbose, print_verbose
 from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
@@ -36,9 +35,7 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
     # Save data
     filename = "%s/%s.world" % (output_dir, world_name)
     with open(filename, "wb") as f:
-        if world_format == 'pickle':
-            pickle.dump(w, f, pickle.HIGHEST_PROTOCOL)
-        elif world_format == 'protobuf':
+        if world_format == 'protobuf':
             f.write(w.protobuf_serialize())
         else:
             print("Unknown format '%s', not saving " % world_format)
@@ -186,32 +183,18 @@ def __seems_protobuf_worldfile__(world_filename):
     return worldengine_tag == World.worldengine_tag()
 
 
-def __seems_pickle_file__(world_filename):
-    last_byte = __get_last_byte__(world_filename)
-    return str(last_byte) == '.'
-
-
 def load_world(world_filename):
     pb = __seems_protobuf_worldfile__(world_filename)
-    pi = __seems_pickle_file__(world_filename)
-    if pb and pi:
-        print("we cannot distinguish if the file is a pickle or a protobuf "
-              "world file. Trying to load first as protobuf then as pickle "
-              "file")
+    if pb:
+        # print("we cannot distinguish if the file is a pickle or a protobuf "
+        #       "world file. Trying to load first as protobuf then as pickle "
+        #       "file")
         try:
             return World.open_protobuf(world_filename)
         except Exception:
-            try:
-                return World.from_pickle_file(world_filename)
-            except Exception:
-                raise Exception("Unable to load the worldfile neither as protobuf or pickle file")
-
-    elif pb:
-        return World.open_protobuf(world_filename)
-    elif pi:
-        return World.from_pickle_file(world_filename)
+            raise Exception("Unable to load the worldfile as protobuf file")
     else:
-        raise Exception("The given worldfile does not seem a pickle or a protobuf file")
+        raise Exception("The given worldfile does not seem to be a protobuf file")
 
 
 def print_world_info(world):

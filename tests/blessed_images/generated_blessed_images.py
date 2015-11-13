@@ -8,7 +8,6 @@ A script, generate_blessed_images, can be used to regenerate blessed images
 """
 
 import os
-import platform
 from worldengine.world import *
 from worldengine.draw import *
 from worldengine.image_io import PNGWriter
@@ -27,10 +26,7 @@ def main(blessed_images_dir, tests_data_dir):
     draw_world_on_file(w, "%s/world_28070.png" % blessed_images_dir)
     draw_temperature_levels_on_file(w, "%s/temperature_28070.png" % blessed_images_dir)
     draw_biome_on_file(w, "%s/biome_28070.png" % blessed_images_dir)
-
-    w_large = World.from_pickle_file("%s/py%s_seed_48956.world" % (tests_data_dir, platform.python_version_tuple()[0]))
     draw_ancientmap_on_file(w, "%s/ancientmap_28070_factor3.png" % blessed_images_dir, resize_factor=3)
-    draw_ancientmap_on_file(w_large, "%s/ancientmap_48956.png" % blessed_images_dir, resize_factor=1)
 
     img = PNGWriter.rgba_from_dimensions(w.width * 2, w.height * 2, "%s/rivers_28070_factor2.png" % blessed_images_dir)
     draw_rivers_on_image(w, img, factor=2)
