@@ -1,3 +1,4 @@
+syntax = "proto2";
 package World;
 
 message World {
@@ -103,13 +104,16 @@ message World {
     optional double temperature_warm         = 31;
     optional double temperature_subtropical  = 32;
 
+    // Ice-caps
+    optional DoubleMatrix icecap  = 33;
+
     // Data about generation:
     // introduced in v0.5.3
     // this is optional for backward compatibility reasons
-    optional GenerationData generationData = 33;
+    optional GenerationData generationData = 34;
 
-    optional DoubleMatrix lakemap = 34;
-    optional DoubleMatrix rivermap = 35;
+    optional DoubleMatrix lakemap = 35;
+    optional DoubleMatrix rivermap = 36;
 
 }
 
