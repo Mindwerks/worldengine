@@ -392,6 +392,7 @@ def draw_satellite(world, target):
             target.set_pixel(x, y, (r, g, b, 255))
 
     # Paint frozen areas.
+    ice_color_variation = int(30)  # 0 means perfectly white ice; must be in [0, 255]; only affects R- and G-channel
     for y in range(world.height):
         for x in range(world.width):
             if world.icecap[y, x] > 0.0:
@@ -813,4 +814,9 @@ def draw_scatter_plot_on_file(world, filename):
 def draw_satellite_on_file(world, filename):
     img = PNGWriter.rgba_from_dimensions(world.width, world.height, filename)
     draw_satellite(world, img)
+    img.complete()
+
+
+def draw_icecaps_on_file(world, filename):
+    img = PNGWriter.grayscale_from_array(world.icecap, filename, scale_to_range=True)
     img.complete()
