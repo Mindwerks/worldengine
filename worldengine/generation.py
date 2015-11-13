@@ -9,6 +9,7 @@ from worldengine.simulations.permeability import PermeabilitySimulation
 from worldengine.simulations.erosion import ErosionSimulation
 from worldengine.simulations.precipitation import PrecipitationSimulation
 from worldengine.simulations.biome import BiomeSimulation
+from worldengine.simulations.icecap import IcecapSimulation
 from worldengine.common import anti_alias, get_verbose
 import numpy
 
@@ -210,6 +211,7 @@ def generate_world(w, step):
                  'HumiditySimulation':      sub_seeds[ 5],
                  'PermeabilitySimulation':  sub_seeds[ 6],
                  'BiomeSimulation':         sub_seeds[ 7],
+                 'IcecapSimulation':        sub_seeds[ 8],
                  '':                        sub_seeds[99]
     }
 
@@ -229,7 +231,6 @@ def generate_world(w, step):
     IrrigationSimulation().execute(w, seed_dict['IrrigationSimulation'])  # seed not currently used
     HumiditySimulation().execute(w, seed_dict['HumiditySimulation'])  # seed not currently used
 
-    
     PermeabilitySimulation().execute(w, seed_dict['PermeabilitySimulation'])
 
     cm, biome_cm = BiomeSimulation().execute(w, seed_dict['BiomeSimulation'])  # seed not currently used
@@ -246,5 +247,7 @@ def generate_world(w, step):
         count = biome_cm[cl]
         if get_verbose():
             print(" %30s = %7i" % (str(cl), count))
+
+    IcecapSimulation().execute(w, seed_dict['IcecapSimulation'])  # makes use of temperature-map
 
     return w
