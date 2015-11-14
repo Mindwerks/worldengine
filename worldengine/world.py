@@ -477,6 +477,35 @@ class World(object):
         x, y = pos
         return hill_level < self.elevation['data'][y, x] < mountain_level
 
+    def hill_level(self):
+        if len(self.elevation['thresholds']) == 4:
+            hi = 1
+        else:
+            hi = 0
+        return self.elevation['thresholds'][hi][1]
+
+    def low_mountain_level(self):
+        if len(self.elevation['thresholds']) == 4:
+            hi = 1
+        else:
+            hi = 0
+        return self.elevation['thresholds'][hi + 1][1]
+
+    def med_mountain_level(self):
+        if len(self.elevation['thresholds']) == 4:
+            hi = 1
+        else:
+            hi = 0
+        return self.elevation['thresholds'][hi + 1][1] + 2.0
+
+    def high_mountain_level(self):
+        if len(self.elevation['thresholds']) == 4:
+            hi = 1
+        else:
+            hi = 0
+        return self.elevation['thresholds'][hi + 1][1] + 4.0
+
+
     def elevation_at(self, pos):
         return self.elevation['data'][pos[1], pos[0]]
 
