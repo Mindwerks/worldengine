@@ -568,6 +568,10 @@ ISO_LAND = 1
 ISO_SNOW = 4
 ISO_DIRT = 2
 ISO_SCRUB = 3
+ISO_GRASS = 1
+
+ISO_NONE = 0
+
 ISO_SLOPE_CORNER_BOTTOM_RIGHT = 16
 ISO_SLOPE_CORNER_BOTTOM_LEFT = 14
 ISO_SLOPE_CORNER_TOP_LEFT = 13
@@ -577,12 +581,12 @@ ISO_SLOPE_RIGHT = 9
 ISO_SLOPE_TOP = 10
 ISO_SLOPE_BOTTOM = 12
 ISO_TALL = 21
-ISO_NONE = 0
-ISO_GRASS = 1
 ISO_SLOPE_CORNER_TOP_LEFT_INTERNAL = 20
 ISO_SLOPE_CORNER_BOTTOM_RIGHT_INTERNAL = 17
 ISO_SLOPE_CORNER_TOP_RIGHT_INTERNAL = 18
 ISO_SLOPE_CORNER_BOTTOM_LEFT_INTERNAL = 19
+
+ISO_MULTIPLIER_SLOPES_BLOCK = 16
 
 # 81,82,83
 
@@ -607,12 +611,12 @@ ISO_T_ISLAND = 103
 # ISO_RIVER_BL = 95
 # ISO_RIVER_BR = 96
 
-ISO_RIVER_VERT_PIPE = 37
-ISO_RIVER_HORI_PIPE = 38
-ISO_RIVER_TL = 43
-ISO_RIVER_TR = 41
-ISO_RIVER_BL = 42
-ISO_RIVER_BR = 44
+ISO_RIVER_VERT_PIPE = 97
+ISO_RIVER_HORI_PIPE = 98
+ISO_RIVER_TL = 103
+ISO_RIVER_TR = 101
+ISO_RIVER_BL = 102
+ISO_RIVER_BR = 104
 
 
 def draw_water(world, tmx_file, water_grid, this_lvl):
@@ -745,6 +749,12 @@ def draw_level(world, tmx_file, water_grid, this_lvl):
                 grid_value = ISO_NONE
             elif lvl > this_lvl:
                 grid_value = ISO_TALL
+                if world.is_cool_desert((x, y)) or world.is_iceland((x, y)) or world.is_cold_parklands((x,y)) or world.is_tundra((x,y)):
+                    grid_value += 3 * ISO_MULTIPLIER_SLOPES_BLOCK
+                elif world.is_hot_desert((x, y)):
+                    grid_value += 2 * ISO_MULTIPLIER_SLOPES_BLOCK
+                elif world.is_chaparral((x, y)) or world.is_steppe((x, y)) or world.is_savanna((x, y)):
+                    grid_value += 1 * ISO_MULTIPLIER_SLOPES_BLOCK
             elif world.is_ocean((x, y)):
                 if world.sea_depth[y, x] > 0.5:
                     grid_value = ISO_OCEAN_DEEP
@@ -752,11 +762,15 @@ def draw_level(world, tmx_file, water_grid, this_lvl):
                     grid_value = ISO_OCEAN_SHALLOW
             else:
                 grid_value = ISO_LAND
+                mult = 0
                 if world.is_cool_desert((x, y)) or world.is_iceland((x, y)) or world.is_cold_parklands((x,y)) or world.is_tundra((x,y)):
+                    mult = 3
                     grid_value = ISO_SNOW
                 elif world.is_hot_desert((x, y)):
+                    mult = 2
                     grid_value = ISO_DIRT
                 elif world.is_chaparral((x, y)) or world.is_steppe((x, y)) or world.is_savanna((x, y)):
+                    mult = 1
                     grid_value = ISO_SCRUB
                 slope_around = get_slope_around(world, x, y)
 
@@ -765,39 +779,39 @@ def draw_level(world, tmx_file, water_grid, this_lvl):
                 #
 
                 if dy==0 and slope_around[1]>=1:
-                    grid_value = ISO_SLOPE_TOP
+                    grid_value = ISO_SLOPE_TOP + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 if dy==2 and slope_around[6]>=1:
-                    grid_value = ISO_SLOPE_BOTTOM
+                    grid_value = ISO_SLOPE_BOTTOM + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 if dx==0 and slope_around[3]>=1:
-                    grid_value = ISO_SLOPE_LEFT
+                    grid_value = ISO_SLOPE_LEFT + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 if dx==2 and slope_around[4]>=1:
-                    grid_value = ISO_SLOPE_RIGHT
+                    grid_value = ISO_SLOPE_RIGHT + ISO_MULTIPLIER_SLOPES_BLOCK * mult
 
                 #
                 # Internal corners
                 #
 
                 if dx == 0 and dy == 0 and slope_around[1] >= 1 and slope_around[3] >= 1:
-                    grid_value = ISO_SLOPE_CORNER_BOTTOM_RIGHT_INTERNAL
+                    grid_value = ISO_SLOPE_CORNER_BOTTOM_RIGHT_INTERNAL + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 elif dx == 2 and dy == 0 and slope_around[1] >= 1 and slope_around[4] >= 1:
-                    grid_value = ISO_SLOPE_CORNER_BOTTOM_LEFT_INTERNAL
+                    grid_value = ISO_SLOPE_CORNER_BOTTOM_LEFT_INTERNAL + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 elif dx == 0 and dy == 2 and slope_around[6] >= 1 and slope_around[3] >= 1:
-                    grid_value = ISO_SLOPE_CORNER_TOP_RIGHT_INTERNAL
+                    grid_value = ISO_SLOPE_CORNER_TOP_RIGHT_INTERNAL + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 elif dx == 2 and dy == 2 and slope_around[6] >= 1 and slope_around[4] >= 1:
-                    grid_value = ISO_SLOPE_CORNER_TOP_LEFT_INTERNAL
+                    grid_value = ISO_SLOPE_CORNER_TOP_LEFT_INTERNAL + ISO_MULTIPLIER_SLOPES_BLOCK * mult
 
                 #
                 # Corners
                 #
 
                 if dx == 0 and dy == 0 and slope_around[0] >= 1 and slope_around[1] < 1 and slope_around[3] < 1:
-                    grid_value = ISO_SLOPE_CORNER_BOTTOM_RIGHT
+                    grid_value = ISO_SLOPE_CORNER_BOTTOM_RIGHT + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 elif dx == 2 and dy == 0 and slope_around[2] >= 1 and slope_around[1] < 1 and slope_around[4] < 1:
-                    grid_value = ISO_SLOPE_CORNER_BOTTOM_LEFT
+                    grid_value = ISO_SLOPE_CORNER_BOTTOM_LEFT + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 elif dx == 0 and dy == 2 and slope_around[5] >= 1 and slope_around[6] < 1 and slope_around[3] < 1:
-                    grid_value = ISO_SLOPE_CORNER_TOP_RIGHT
+                    grid_value = ISO_SLOPE_CORNER_TOP_RIGHT + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 elif dx == 2 and dy == 2 and slope_around[7] >= 1 and slope_around[6] < 1 and slope_around[4] < 1:
-                    grid_value = ISO_SLOPE_CORNER_TOP_LEFT
+                    grid_value = ISO_SLOPE_CORNER_TOP_LEFT + ISO_MULTIPLIER_SLOPES_BLOCK * mult
 
 
             tmx_file.write(str(grid_value))
@@ -806,8 +820,10 @@ def draw_level(world, tmx_file, water_grid, this_lvl):
         tmx_file.write('\n')
     tmx_file.write('    </data>\n')
 
-ISO_FOREST = 53
-ISO_BOREAL_FOREST = 54
+ISO_FOREST = 113
+ISO_BOREAL_FOREST = 111
+ISO_WARM_FOREST = 109
+ISO_CACTUS = 115
 
 # 134, 124
 # 153,143
@@ -828,6 +844,17 @@ def draw_forest_level(world, tmx_file, this_lvl):
                     for ta in  tiles_around(forest_grid, x * 3 + 1, y * 3 + 1):
                         ta_x, ta_y = ta
                         forest_grid[ta_x, ta_y] = ISO_BOREAL_FOREST
+                elif world.is_warm_temperate_forest((x, y)):
+                    forest_grid[x * 3 + 1, y * 3 + 1] = ISO_WARM_FOREST
+                    for ta in  tiles_around(forest_grid, x * 3 + 1, y * 3 + 1):
+                        ta_x, ta_y = ta
+                        forest_grid[ta_x, ta_y] = ISO_WARM_FOREST
+                elif world.is_hot_desert((x, y)):
+                    forest_grid[x * 3 + 1, y * 3 + 1] = ISO_CACTUS
+                    for ta in tiles_around(forest_grid, x * 3 + 1, y * 3 + 1):
+                        ta_x, ta_y = ta
+                        forest_grid[ta_x, ta_y] = ISO_CACTUS
+
 
     tmx_file.write('    <data encoding="csv">\n')
 
@@ -853,8 +880,11 @@ def export_to_tmx(world, tmx_filename):
     tmx_file = open(tmx_filename, "w")
     tmx_file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
     tmx_file.write('<map version="1.0" orientation="isometric" renderorder="right-down" width="%i" height="%i" tilewidth="256" tileheight="128" nextobjectid="1">\n' % (world.width*3, world.height*3))
-    tmx_file.write('<tileset firstgid="1" name="256 pro" tilewidth="256" tileheight="256" tilecount="64">')
-    tmx_file.write('<image source="gogoFireworks_8.fw" width="1024" height="4096"/>')
+    tmx_file.write('<tileset firstgid="1" name="256_base" tilewidth="256" tileheight="256" tilecount="92">')
+    tmx_file.write('<image source="256_base.png" width="1024" height="6000"/>')
+    tmx_file.write('</tileset>')
+    tmx_file.write('<tileset firstgid="93" name="256_decor" tilewidth="256" tileheight="256" tilecount="92">')
+    tmx_file.write('<image source="256_decor.png" width="1024" height="6000"/>')
     tmx_file.write('</tileset>')
     # tmx_file.write('<tileset firstgid="1" name="iso-64x64-outside" tilewidth="64" tileheight="64" tilecount="160">\n')
     # tmx_file.write('<image source="iso-64x64-outside.png" width="640" height="1024"/>\n')
