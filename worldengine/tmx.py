@@ -510,26 +510,48 @@ def get_slope_around(world, x, y):
             elev_level(world,(w,s))-my_level,elev_level(world,(x,s))-my_level,elev_level(world,(e,s))-my_level]
 
 
-ISO_OCEAN = 86
-ISO_RIVER = 85
-ISO_LAND = 3
-ISO_SNOW = 161
-ISO_DIRT = 162
-ISO_SLOPE_CORNER_BOTTOM_RIGHT = 31
-ISO_SLOPE_CORNER_BOTTOM_LEFT = 34
-ISO_SLOPE_CORNER_TOP_LEFT = 39
-ISO_SLOPE_CORNER_TOP_RIGHT = 36
-ISO_SLOPE_LEFT = 33
-ISO_SLOPE_RIGHT = 37
-ISO_SLOPE_TOP = 32
-ISO_SLOPE_BOTTOM = 38
-ISO_TALL = 35
+# ISO_OCEAN = 86
+# ISO_RIVER = 85
+# ISO_LAND = 3
+# ISO_SNOW = 161
+# ISO_DIRT = 162
+# ISO_SLOPE_CORNER_BOTTOM_RIGHT = 31
+# ISO_SLOPE_CORNER_BOTTOM_LEFT = 34
+# ISO_SLOPE_CORNER_TOP_LEFT = 39
+# ISO_SLOPE_CORNER_TOP_RIGHT = 36
+# ISO_SLOPE_LEFT = 33
+# ISO_SLOPE_RIGHT = 37
+# ISO_SLOPE_TOP = 32
+# ISO_SLOPE_BOTTOM = 38
+# ISO_TALL = 35
+# ISO_NONE = 0
+# ISO_GRASS = 115
+# ISO_SLOPE_CORNER_TOP_LEFT_INTERNAL = 41
+# ISO_SLOPE_CORNER_BOTTOM_RIGHT_INTERNAL = 43
+# ISO_SLOPE_CORNER_TOP_RIGHT_INTERNAL = 42
+# ISO_SLOPE_CORNER_BOTTOM_LEFT_INTERNAL = 44
+
+
+ISO_OCEAN = 6
+ISO_RIVER = 6
+ISO_LAND = 1
+ISO_SNOW = 4
+ISO_DIRT = 2
+ISO_SLOPE_CORNER_BOTTOM_RIGHT = 16
+ISO_SLOPE_CORNER_BOTTOM_LEFT = 14
+ISO_SLOPE_CORNER_TOP_LEFT = 13
+ISO_SLOPE_CORNER_TOP_RIGHT = 15
+ISO_SLOPE_LEFT = 11
+ISO_SLOPE_RIGHT = 9
+ISO_SLOPE_TOP = 10
+ISO_SLOPE_BOTTOM = 12
+ISO_TALL = 21
 ISO_NONE = 0
-ISO_GRASS = 115
-ISO_SLOPE_CORNER_TOP_LEFT_INTERNAL = 41
-ISO_SLOPE_CORNER_BOTTOM_RIGHT_INTERNAL = 43
-ISO_SLOPE_CORNER_TOP_RIGHT_INTERNAL = 42
-ISO_SLOPE_CORNER_BOTTOM_LEFT_INTERNAL = 44
+ISO_GRASS = 1
+ISO_SLOPE_CORNER_TOP_LEFT_INTERNAL = 20
+ISO_SLOPE_CORNER_BOTTOM_RIGHT_INTERNAL = 17
+ISO_SLOPE_CORNER_TOP_RIGHT_INTERNAL = 18
+ISO_SLOPE_CORNER_BOTTOM_LEFT_INTERNAL = 19
 
 # 81,82,83
 
@@ -784,78 +806,81 @@ def export_to_tmx(world, tmx_filename):
 
     tmx_file = open(tmx_filename, "w")
     tmx_file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-    tmx_file.write('<map version="1.0" orientation="isometric" renderorder="right-down" width="%i" height="%i" tilewidth="64" tileheight="32" nextobjectid="1">\n' % (world.width*3, world.height*3))
-    tmx_file.write('<tileset firstgid="1" name="iso-64x64-outside" tilewidth="64" tileheight="64" tilecount="160">\n')
-    tmx_file.write('<image source="iso-64x64-outside.png" width="640" height="1024"/>\n')
-    tmx_file.write('</tileset>\n')
-    tmx_file.write('<tileset firstgid="161" name="Decorations" tilewidth="64" tileheight="32" tilecount="2">\n')
-    tmx_file.write('<tile id="0">\n')
-    tmx_file.write('<image width="64" height="32" source="snow.png"/>\n')
-    tmx_file.write('</tile>\n')
-    tmx_file.write('<tile id="1">\n')
-    tmx_file.write('<image width="64" height="32" source="dirt.png"/>\n')
-    tmx_file.write('</tile>\n')
-    tmx_file.write('</tileset>\n')
+    tmx_file.write('<map version="1.0" orientation="isometric" renderorder="right-down" width="%i" height="%i" tilewidth="256" tileheight="128" nextobjectid="1">\n' % (world.width*3, world.height*3))
+    tmx_file.write('<tileset firstgid="1" name="256 pro" tilewidth="256" tileheight="256" tilecount="64">')
+    tmx_file.write('<image source="gogoFireworks_8.fw" width="1024" height="4096"/>')
+    tmx_file.write('</tileset>')
+    # tmx_file.write('<tileset firstgid="1" name="iso-64x64-outside" tilewidth="64" tileheight="64" tilecount="160">\n')
+    # tmx_file.write('<image source="iso-64x64-outside.png" width="640" height="1024"/>\n')
+    # tmx_file.write('</tileset>\n')
+    # tmx_file.write('<tileset firstgid="161" name="Decorations" tilewidth="64" tileheight="32" tilecount="2">\n')
+    # tmx_file.write('<tile id="0">\n')
+    # tmx_file.write('<image width="64" height="32" source="snow.png"/>\n')
+    # tmx_file.write('</tile>\n')
+    # tmx_file.write('<tile id="1">\n')
+    # tmx_file.write('<image width="64" height="32" source="dirt.png"/>\n')
+    # tmx_file.write('</tile>\n')
+    # tmx_file.write('</tileset>\n')
 
     tmx_file.write('  <layer name="ground" width="%i" height="%i">\n' % (world.width*3, world.height*3))
     draw_level(world, tmx_file, water_grid, 0)
     tmx_file.write('  </layer>\n')
 
-    tmx_file.write('  <layer name="ground_water" width="%i" height="%i">\n' % (world.width*3, world.height*3))
-    draw_water(world, tmx_file, water_grid, 0)
-    tmx_file.write('  </layer>\n')
-
-    tmx_file.write('  <layer name="hill" width="%i" height="%i" offsetx="0" offsety="-32">\n' % (world.width*3, world.height*3))
-    draw_level(world, tmx_file, water_grid, 1)
-    tmx_file.write('  </layer>\n')
-
-    # tmx_file.write('  <layer name="hill_water" width="%i" height="%i" offsetx="0" offsety="-32">\n' % (world.width*3, world.height*3))
-    # draw_water(world, tmx_file, water_grid, 1)
+    # tmx_file.write('  <layer name="ground_water" width="%i" height="%i">\n' % (world.width*3, world.height*3))
+    # draw_water(world, tmx_file, water_grid, 0)
     # tmx_file.write('  </layer>\n')
-
-    tmx_file.write('  <layer name="low_mountain" width="%i" height="%i" offsetx="0" offsety="-64">\n' % (world.width*3, world.height*3))
-    draw_level(world, tmx_file, water_grid, 2)
-    tmx_file.write('  </layer>\n')
-
-    # tmx_file.write('  <layer name="low_mountain_water" width="%i" height="%i" offsetx="0" offsety="-64">\n' % (world.width*3, world.height*3))
-    # draw_water(world, tmx_file, water_grid, 2)
+    #
+    # tmx_file.write('  <layer name="hill" width="%i" height="%i" offsetx="0" offsety="-32">\n' % (world.width*3, world.height*3))
+    # draw_level(world, tmx_file, water_grid, 1)
     # tmx_file.write('  </layer>\n')
-
-    tmx_file.write('  <layer name="med_mountain" width="%i" height="%i" offsetx="0" offsety="-96">\n' % (world.width*3, world.height*3))
-    draw_level(world, tmx_file, water_grid, 3)
-    tmx_file.write('  </layer>\n')
-
-    # tmx_file.write('  <layer name="med_mountain_water" width="%i" height="%i" offsetx="0" offsety="-96">\n' % (world.width*3, world.height*3))
-    # draw_water(world, tmx_file, water_grid, 3)
+    #
+    # # tmx_file.write('  <layer name="hill_water" width="%i" height="%i" offsetx="0" offsety="-32">\n' % (world.width*3, world.height*3))
+    # # draw_water(world, tmx_file, water_grid, 1)
+    # # tmx_file.write('  </layer>\n')
+    #
+    # tmx_file.write('  <layer name="low_mountain" width="%i" height="%i" offsetx="0" offsety="-64">\n' % (world.width*3, world.height*3))
+    # draw_level(world, tmx_file, water_grid, 2)
     # tmx_file.write('  </layer>\n')
-
-    tmx_file.write('  <layer name="high_mountain" width="%i" height="%i" offsetx="0" offsety="-128">\n' % (world.width*3, world.height*3))
-    draw_level(world, tmx_file, water_grid, 4)
-    tmx_file.write('  </layer>\n')
-
-    # tmx_file.write('  <layer name="high_mountain_water" width="%i" height="%i" offsetx="0" offsety="-128">\n' % (world.width*3, world.height*3))
-    # draw_water(world, tmx_file, water_grid, 4)
+    #
+    # # tmx_file.write('  <layer name="low_mountain_water" width="%i" height="%i" offsetx="0" offsety="-64">\n' % (world.width*3, world.height*3))
+    # # draw_water(world, tmx_file, water_grid, 2)
+    # # tmx_file.write('  </layer>\n')
+    #
+    # tmx_file.write('  <layer name="med_mountain" width="%i" height="%i" offsetx="0" offsety="-96">\n' % (world.width*3, world.height*3))
+    # draw_level(world, tmx_file, water_grid, 3)
     # tmx_file.write('  </layer>\n')
-
-    tmx_file.write('  <layer name="forest_ground" width="%i" height="%i" offsetx="0" offsety="0">\n' % (world.width*3, world.height*3))
-    draw_forest_level(world, tmx_file, 0)
-    tmx_file.write('  </layer>\n')
-
-    tmx_file.write('  <layer name="forest_hill" width="%i" height="%i" offsetx="0" offsety="-32">\n' % (world.width*3, world.height*3))
-    draw_forest_level(world, tmx_file, 1)
-    tmx_file.write('  </layer>\n')
-
-    tmx_file.write('  <layer name="forest_low_mountain" width="%i" height="%i" offsetx="0" offsety="-64">\n' % (world.width*3, world.height*3))
-    draw_forest_level(world, tmx_file, 2)
-    tmx_file.write('  </layer>\n')
-
-    tmx_file.write('  <layer name="forest_med_mountain" width="%i" height="%i" offsetx="0" offsety="-96">\n' % (world.width*3, world.height*3))
-    draw_forest_level(world, tmx_file, 3)
-    tmx_file.write('  </layer>\n')
-
-    tmx_file.write('  <layer name="forest_high_mountain" width="%i" height="%i" offsetx="0" offsety="-128">\n' % (world.width*3, world.height*3))
-    draw_forest_level(world, tmx_file, 4)
-    tmx_file.write('  </layer>\n')
+    #
+    # # tmx_file.write('  <layer name="med_mountain_water" width="%i" height="%i" offsetx="0" offsety="-96">\n' % (world.width*3, world.height*3))
+    # # draw_water(world, tmx_file, water_grid, 3)
+    # # tmx_file.write('  </layer>\n')
+    #
+    # tmx_file.write('  <layer name="high_mountain" width="%i" height="%i" offsetx="0" offsety="-128">\n' % (world.width*3, world.height*3))
+    # draw_level(world, tmx_file, water_grid, 4)
+    # tmx_file.write('  </layer>\n')
+    #
+    # # tmx_file.write('  <layer name="high_mountain_water" width="%i" height="%i" offsetx="0" offsety="-128">\n' % (world.width*3, world.height*3))
+    # # draw_water(world, tmx_file, water_grid, 4)
+    # # tmx_file.write('  </layer>\n')
+    #
+    # tmx_file.write('  <layer name="forest_ground" width="%i" height="%i" offsetx="0" offsety="0">\n' % (world.width*3, world.height*3))
+    # draw_forest_level(world, tmx_file, 0)
+    # tmx_file.write('  </layer>\n')
+    #
+    # tmx_file.write('  <layer name="forest_hill" width="%i" height="%i" offsetx="0" offsety="-32">\n' % (world.width*3, world.height*3))
+    # draw_forest_level(world, tmx_file, 1)
+    # tmx_file.write('  </layer>\n')
+    #
+    # tmx_file.write('  <layer name="forest_low_mountain" width="%i" height="%i" offsetx="0" offsety="-64">\n' % (world.width*3, world.height*3))
+    # draw_forest_level(world, tmx_file, 2)
+    # tmx_file.write('  </layer>\n')
+    #
+    # tmx_file.write('  <layer name="forest_med_mountain" width="%i" height="%i" offsetx="0" offsety="-96">\n' % (world.width*3, world.height*3))
+    # draw_forest_level(world, tmx_file, 3)
+    # tmx_file.write('  </layer>\n')
+    #
+    # tmx_file.write('  <layer name="forest_high_mountain" width="%i" height="%i" offsetx="0" offsety="-128">\n' % (world.width*3, world.height*3))
+    # draw_forest_level(world, tmx_file, 4)
+    # tmx_file.write('  </layer>\n')
 
     tmx_file.write('</map>\n')
     tmx_file.close()
