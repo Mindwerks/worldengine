@@ -957,13 +957,14 @@ def export_to_tmx(world, tmx_filename):
     draw_forest_level(world, tmx_file, 6)
     tmx_file.write('  </layer>\n')
 
-    # tmx_file.write('  <layer name="decoration half high mountain" width="%i" height="%i" offsetx="0" offsety="-336">\n' % (world.width*3, world.height*3))
-    # draw_forest_level(world, tmx_file, 7)
-    # tmx_file.write('  </layer>\n')
-    #
-    # tmx_file.write('  <layer name="decoration high mountain" width="%i" height="%i" offsetx="0" offsety="-384">\n' % (world.width*3, world.height*3))
-    # draw_forest_level(world, tmx_file, 8)
-    # tmx_file.write('  </layer>\n')
+    tmx_file.write('  <layer name="decoration half high mountain" width="%i" height="%i" offsetx="0" offsety="-336">\n' % (world.width*3, world.height*3))
+    draw_forest_level(world, tmx_file, 7)
+    tmx_file.write('  </layer>\n')
+
+    tmx_file.write('  <layer name="decoration high mountain" width="%i" height="%i" offsetx="0" offsety="-384">\n' % (world.width*3, world.height*3))
+    draw_forest_level(world, tmx_file, 8)
+    tmx_file.write('  </layer>\n')
+
     #
     # tmx_file.write('  <layer name="forest_hill" width="%i" height="%i" offsetx="0" offsety="-32">\n' % (world.width*3, world.height*3))
     # draw_forest_level(world, tmx_file, 1)
