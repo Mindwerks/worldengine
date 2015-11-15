@@ -26,6 +26,8 @@ def main(blessed_images_dir, tests_data_dir):
     draw_world_on_file(w, "%s/world_28070.png" % blessed_images_dir)
     draw_temperature_levels_on_file(w, "%s/temperature_28070.png" % blessed_images_dir)
     draw_biome_on_file(w, "%s/biome_28070.png" % blessed_images_dir)
+    draw_scatter_plot_on_file(w, "%s/scatter_28070.png" % blessed_images_dir)
+    draw_satellite_on_file(w, "%s/satellite_28070.png" % blessed_images_dir)
     draw_ancientmap_on_file(w, "%s/ancientmap_28070_factor3.png" % blessed_images_dir, resize_factor=3)
 
     img = PNGWriter.rgba_from_dimensions(w.width * 2, w.height * 2, "%s/rivers_28070_factor2.png" % blessed_images_dir)

@@ -3,7 +3,7 @@ import os
 import numpy
 from worldengine.draw import _biome_colors, draw_simple_elevation, elevation_color, \
     draw_elevation, draw_riversmap, draw_grayscale_heightmap, draw_ocean, draw_precipitation, \
-    draw_world, draw_temperature_levels, draw_biome, draw_scatter_plot
+    draw_world, draw_temperature_levels, draw_biome, draw_scatter_plot, draw_satellite
 from worldengine.biome import Biome
 from worldengine.world import World
 from worldengine.image_io import PNGWriter, PNGReader
@@ -150,8 +150,15 @@ class TestDraw(TestBase):
 
     def test_draw_scatter_plot(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        target = PNGWriter.rgba_from_dimensions(16, 16)
-        draw_scatter_plot(w, 16, target)
+        target = PNGWriter.rgba_from_dimensions(512, 512)
+        draw_scatter_plot(w, 512, target)
+        self._assert_img_equal("scatter_28070", target)
+
+    def test_draw_satellite(self):
+        w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        target = PNGWriter.rgba_from_dimensions(w.width, w.height)
+        draw_satellite(w, target)
+        self._assert_img_equal("satellite_28070", target)
 
 if __name__ == '__main__':
     unittest.main()
