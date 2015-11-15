@@ -36,6 +36,7 @@ addons:
     - cmake
     - build-essential
     - libgdal-dev
+    - libhdf5-serial-dev
 
 install:
   - echo "libgdal version `gdal-config --version`"

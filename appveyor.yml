@@ -43,6 +43,7 @@ init:
   - echo %path%
 
 install:
+  - "powershell appveyor\\install_hdf5.ps1"
   - "powershell appveyor\\install.ps1"
   - "%PYTHON%\\Scripts\\pip.exe install -r requirements-dev.txt"
   - mkdir %systemdrive%\temp

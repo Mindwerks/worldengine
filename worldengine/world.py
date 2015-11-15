@@ -16,6 +16,7 @@ from worldengine.step import Step
 from worldengine.common import _equal
 from worldengine.version import __version__
 
+
 class World(object):
     """A world composed by name, dimensions and all the characteristics of
     each cell.

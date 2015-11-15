@@ -12,6 +12,11 @@ from worldengine.imex import export
 from worldengine.step import Step
 from worldengine.world import World
 from worldengine.version import __version__
+try:
+    from worldengine.hdf5_serialization import save_world_to_hdf5
+    HDF5_AVAILABLE = True
+except:
+    HDF5_AVAILABLE = False
 
 VERSION = __version__
 
@@ -34,11 +39,13 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
 
     # Save data
     filename = "%s/%s.world" % (output_dir, world_name)
-    with open(filename, "wb") as f:
-        if world_format == 'protobuf':
+    if world_format == 'protobuf':
+        with open(filename, "wb") as f:
             f.write(w.protobuf_serialize())
-        else:
-            print("Unknown format '%s', not saving " % world_format)
+    elif world_format == 'hdf5':
+        save_world_to_hdf5(w, filename)
+    else:
+        print("Unknown format '%s', not saving " % world_format)
     print("* world data saved in '%s'" % filename)
     sys.stdout.flush()
 
@@ -228,6 +235,11 @@ def main():
              "a name is not provided, then seed_N.world, " +
              "where N=SEED",
         metavar="STR")
+    parser.add_argument('--hdf5', dest='hdf5',
+                        action="store_true",
+                        help="Save world file using HDF5 format. " +
+                             "Default = store using protobuf format",
+                        default=False)
     parser.add_argument('-s', '--seed', dest='seed', type=int,
                         help="Use seed=N to initialize the pseudo-random " +
                              "generation. If not provided, one will be " +
@@ -372,6 +384,9 @@ def main():
     if args.number_of_plates < 1 or args.number_of_plates > 100:
         usage(error="Number of plates should be in [1, 100]")
 
+    if args.hdf5 and not HDF5_AVAILABLE:
+        usage(error="HDF5 requires the presence of native libraries")
+
     operation = "world"
     if args.OPERATOR is None:
         pass
@@ -404,6 +419,8 @@ def main():
     step = check_step(args.step)
 
     world_format = 'protobuf'
+    if args.hdf5:
+        world_format = 'hdf5'
 
     generation_operation = (operation == 'world') or (operation == 'plates')
 
