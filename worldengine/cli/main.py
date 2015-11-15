@@ -384,9 +384,6 @@ def main():
     if args.number_of_plates < 1 or args.number_of_plates > 100:
         usage(error="Number of plates should be in [1, 100]")
 
-    if args.protobuf and args.hdf5:
-        usage(error="Protobuf and hdf5 are exclusive choices")
-
     if args.hdf5 and not HDF5_AVAILABLE:
         usage(error="HDF5 requires the presence of native libraries")
 
