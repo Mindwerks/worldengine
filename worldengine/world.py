@@ -673,7 +673,7 @@ class World(object):
 
     def is_river(self, pos):
         x, y = pos
-        return self.river_map[x, y] > 0
+        return self.river_map[y, x] > 0
 
     #
     # Biome
