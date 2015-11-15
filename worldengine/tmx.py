@@ -1,4 +1,4 @@
-from biome import Biome, biome_name_to_index
+from biome import *
 
 import numpy
 
@@ -52,14 +52,14 @@ def get_river_around(world, x, y):
     w = x - 1
     if w == -1:
         w = world.width - 1
-    return [world.river_map[w, n] > 0 or world.is_ocean((w, n)),
-            world.river_map[x, n] > 0 or world.is_ocean((x, n)),
-            world.river_map[e, n] > 0 or world.is_ocean((e, n)),
-            world.river_map[w, y] > 0 or world.is_ocean((w, y)),
-            world.river_map[e, y] > 0 or world.is_ocean((e, y)),
-            world.river_map[w, s] > 0 or world.is_ocean((w, s)),
-            world.river_map[x, s] > 0 or world.is_ocean((x, s)),
-            world.river_map[e, s] > 0 or world.is_ocean((e, s))]
+    return [world.river_map[n, w] > 0 or world.is_ocean((w, n)),
+            world.river_map[n, x] > 0 or world.is_ocean((x, n)),
+            world.river_map[n, e] > 0 or world.is_ocean((e, n)),
+            world.river_map[y, w] > 0 or world.is_ocean((w, y)),
+            world.river_map[y, e] > 0 or world.is_ocean((e, y)),
+            world.river_map[s, w] > 0 or world.is_ocean((w, s)),
+            world.river_map[s, x] > 0 or world.is_ocean((x, s)),
+            world.river_map[s, e] > 0 or world.is_ocean((e, s))]
 
 
 def _transform_for_tmx(world):
@@ -116,6 +116,8 @@ def water_cell_grid(world, pos):
     elif world.is_river(pos):
         ocean_around = [(not v) for v in get_land_around(world, x, y)]
         river_around = get_river_around(world, x, y)
+        #print("OCEAN AROUND %s" % ocean_around)
+        #print("RIVER AROUND %s" % river_around)
         top = [WG_LAND, WG_LAND, WG_LAND]
         if river_around[1] or ocean_around[1]:
             top[1] = WG_RIVER
@@ -400,6 +402,8 @@ def generate_water_grid(world):
         for x in range(world.width):
             pos = (x, y)
             cell = water_cell_grid(world, pos)
+            #if cell != [[1, 1, 1], [1, 1, 1], [1, 1, 1]] and cell != [[0, 0, 0], [0, 0, 0], [0, 0, 0]]:
+            #    print("%i %i = %s" % (x, y, cell))
             for dy in range(3):
                 for dx in range(3):
                     water_grid[x * 3 + dx, y * 3 + dy] = cell[dy][dx]
@@ -451,7 +455,7 @@ def export_to_tmx_orthogonal(world, tmx_filename):
                 pos = (x, y)
                 indexes = [0, 0, 0]
                 land_around = get_land_around(world,x,y)
-                if land_around==[True,True,True,True,True,True,True,True] and world.river_map[x, y] == 0.0:
+                if land_around==[True,True,True,True,True,True,True,True] and world.river_map[y, x] == 0.0:
                     if world.is_mountain(pos):
                         if dy == 1:
                             indexes = [TMOUNTAIN, 0, 0]
@@ -618,6 +622,11 @@ ISO_RIVER_TR = 101
 ISO_RIVER_BL = 102
 ISO_RIVER_BR = 104
 
+ISO_RIVER_NO_N = 105
+ISO_RIVER_NO_W = 106
+ISO_RIVER_NO_E = 108
+ISO_RIVER_NO_S = 107
+
 
 def draw_water(world, tmx_file, water_grid, this_lvl, slopes_map):
     def draw_cell(gx, gy):
@@ -718,6 +727,14 @@ def draw_water(world, tmx_file, water_grid, this_lvl, slopes_map):
                     return ISO_RIVER_BL
                 elif river_around[1] == False and river_around[3] == False and river_around[4] == True and river_around[6] == True:
                     return ISO_RIVER_BR
+                elif river_around[1] == False and river_around[3] == True and river_around[4] == True and river_around[6] == True:
+                    return ISO_RIVER_NO_N
+                elif river_around[1] == True and river_around[3] == False and river_around[4] == True and river_around[6] == True:
+                    return ISO_RIVER_NO_W
+                elif river_around[1] == True and river_around[3] == True and river_around[4] == False and river_around[6] == True:
+                    return ISO_RIVER_NO_E
+                elif river_around[1] == True and river_around[3] == True and river_around[4] == True and river_around[6] == False:
+                    return ISO_RIVER_NO_S
                 else:
                     return ISO_RIVER
             else:
@@ -737,6 +754,89 @@ def draw_water(world, tmx_file, water_grid, this_lvl, slopes_map):
     tmx_file.write('    </data>\n')
 
 
+def base_terrain_mult(world, pos):
+    biome = world.biome_at(pos)
+    if isinstance(biome, CoolTemperateMoistForest):
+        return 0
+    if isinstance(biome, CoolTemperateRainForest):
+        return 0
+    if isinstance(biome, CoolTemperateWetForest):
+        return 0
+    if isinstance(biome, SubtropicalMoistForest):
+        return 0
+    if isinstance(biome, SubtropicalRainForest):
+        return 0
+    if isinstance(biome, SubtropicalWetForest):
+        return 0
+    if isinstance(biome, TropicalMoistForest):
+        return 0
+    if isinstance(biome, TropicalRainForest):
+        return 0
+    if isinstance(biome, TropicalWetForest):
+        return 0
+    if isinstance(biome, WarmTemperateMoistForest):
+        return 0
+    if isinstance(biome, WarmTemperateRainForest):
+        return 0
+    if isinstance(biome, WarmTemperateWetForest):
+        return 0
+    if isinstance(biome, BorealMoistForest):
+        return 0
+    if isinstance(biome, BorealWetForest):
+        return 0
+    if isinstance(biome, BorealRainForest):
+        return 0
+    if isinstance(biome, CoolTemperateDesertScrub):
+        return 2
+    if isinstance(biome, CoolTemperateSteppe):
+        return 2
+    if isinstance(biome, SubpolarDryTundra):
+        return 2
+    if isinstance(biome, SubpolarMoistTundra):
+        return 2
+    if isinstance(biome, SubpolarRainTundra):
+        return 2
+    if isinstance(biome, SubpolarWetTundra):
+        return 2
+    if isinstance(biome, TropicalThornWoodland):
+        return 2
+    if isinstance(biome, SubtropicalThornWoodland):
+        return 2
+    if isinstance(biome, WarmTemperateThornScrub):
+        return 2
+    if isinstance(biome, SubtropicalDryForest):
+        return 2
+    if isinstance(biome, TropicalDryForest):
+        return 2
+    if isinstance(biome, TropicalVeryDryForest):
+        return 2
+    if isinstance(biome, WarmTemperateDryForest):
+        return 2
+    if isinstance(biome, BorealDesert):
+        return 3
+    if isinstance(biome, Ice):
+        return 3
+    if isinstance(biome, PolarDesert):
+        return 3
+    if isinstance(biome, BorealDryScrub):
+        return 3
+    if isinstance(biome, CoolTemperateDesert):
+        return 1
+    if isinstance(biome, SubtropicalDesert):
+        return 1
+    if isinstance(biome, TropicalDesert):
+        return 1
+    if isinstance(biome, WarmTemperateDesert):
+        return 1
+    if isinstance(biome, SubtropicalDesertScrub):
+        return 1
+    if isinstance(biome, WarmTemperateDesertScrub):
+        return 1
+    if isinstance(biome, TropicalDesertScrub):
+        return 1
+    raise Exception(biome)
+
+
 def draw_level(world, tmx_file, water_grid, this_lvl):
     tmx_file.write('    <data encoding="csv">\n')
 
@@ -753,30 +853,15 @@ def draw_level(world, tmx_file, water_grid, this_lvl):
             if lvl < this_lvl:
                 grid_value = ISO_NONE
             elif lvl > this_lvl:
-                grid_value = ISO_TALL
-                if world.is_cool_desert((x, y)) or world.is_iceland((x, y)) or world.is_cold_parklands((x,y)) or world.is_tundra((x,y)):
-                    grid_value += 3 * ISO_MULTIPLIER_SLOPES_BLOCK
-                elif world.is_hot_desert((x, y)):
-                    grid_value += 2 * ISO_MULTIPLIER_SLOPES_BLOCK
-                elif world.is_chaparral((x, y)) or world.is_steppe((x, y)) or world.is_savanna((x, y)):
-                    grid_value += 1 * ISO_MULTIPLIER_SLOPES_BLOCK
+                grid_value = ISO_TALL + base_terrain_mult(world, (x, y)) * ISO_MULTIPLIER_SLOPES_BLOCK
             elif world.is_ocean((x, y)):
                 if world.sea_depth[y, x] > 0.5:
                     grid_value = ISO_OCEAN_DEEP
                 else:
                     grid_value = ISO_OCEAN_SHALLOW
             else:
-                grid_value = ISO_LAND
-                mult = 0
-                if world.is_cool_desert((x, y)) or world.is_iceland((x, y)) or world.is_cold_parklands((x,y)) or world.is_tundra((x,y)):
-                    mult = 3
-                    grid_value = ISO_SNOW
-                elif world.is_hot_desert((x, y)):
-                    mult = 2
-                    grid_value = ISO_DIRT
-                elif world.is_chaparral((x, y)) or world.is_steppe((x, y)) or world.is_savanna((x, y)):
-                    mult = 1
-                    grid_value = ISO_SCRUB
+                mult = base_terrain_mult(world, (x, y))
+                grid_value = 1 + mult
                 slope_around = get_slope_around(world, x, y)
 
                 #
@@ -838,10 +923,106 @@ def draw_level(world, tmx_file, water_grid, this_lvl):
     tmx_file.write('    </data>\n')
     return slopes_map
 
-ISO_FOREST = 114
-ISO_BOREAL_FOREST = 112
-ISO_WARM_FOREST = 110
-ISO_CACTUS = 115
+ISO_FOREST_RARE = 109
+ISO_FOREST_NORMAL = 110
+ISO_FOREST_DENSE = 111
+ISO_BOREAL_FOREST = 119
+ISO_CACTUS = 121
+ISO_SNOW_BUSH = 118
+ISO_SNOW_BUSH_ROCK = 120
+ISO_BUSH_ROCK = 113
+ISO_BUSHES = 114
+ISO_BUSHES_SMALL_TREE = 115
+ISO_BUSHES_SMALL_TREES = 116
+ISO_BUSH = 117
+
+
+def decoration_tile(world, pos):
+    biome = world.biome_at(pos)
+
+    if isinstance(biome, SubtropicalDesertScrub):
+        return ISO_CACTUS
+    if isinstance(biome, WarmTemperateDesertScrub):
+        return ISO_CACTUS
+    if isinstance(biome, TropicalDesertScrub):
+        return ISO_CACTUS
+    if isinstance(biome, BorealDryScrub):
+        return ISO_SNOW_BUSH
+    if isinstance(biome, BorealMoistForest):
+        return ISO_BOREAL_FOREST
+    if isinstance(biome, BorealWetForest):
+        return ISO_BOREAL_FOREST
+    if isinstance(biome, BorealRainForest):
+        return ISO_BOREAL_FOREST
+    if isinstance(biome, CoolTemperateMoistForest):
+        return ISO_FOREST_NORMAL
+    if isinstance(biome, CoolTemperateRainForest):
+        return ISO_FOREST_DENSE
+    if isinstance(biome, CoolTemperateWetForest):
+        return ISO_FOREST_DENSE
+    if isinstance(biome, WarmTemperateMoistForest):
+        return ISO_BUSHES
+    if isinstance(biome, WarmTemperateRainForest):
+        return ISO_BUSHES_SMALL_TREES
+    if isinstance(biome, WarmTemperateWetForest):
+        return ISO_BUSHES_SMALL_TREE
+    if isinstance(biome, SubtropicalMoistForest):
+        return ISO_FOREST_NORMAL
+    if isinstance(biome, SubtropicalRainForest):
+        return ISO_FOREST_DENSE
+    if isinstance(biome, SubtropicalWetForest):
+        return ISO_FOREST_DENSE
+    if isinstance(biome, CoolTemperateDesertScrub):
+        return ISO_SNOW_BUSH_ROCK
+    if isinstance(biome, SubpolarDryTundra):
+        return ISO_SNOW_BUSH_ROCK
+    if isinstance(biome, SubpolarMoistTundra):
+        return ISO_SNOW_BUSH
+    if isinstance(biome, SubpolarRainTundra):
+        return ISO_SNOW_BUSH
+    if isinstance(biome, SubpolarWetTundra):
+        return ISO_SNOW_BUSH
+
+    if isinstance(biome, TropicalMoistForest):
+        return ISO_NONE
+    if isinstance(biome, TropicalRainForest):
+        return ISO_NONE
+    if isinstance(biome, TropicalWetForest):
+        return ISO_NONE
+
+    if isinstance(biome, TropicalThornWoodland):
+        return ISO_NONE
+    if isinstance(biome, SubtropicalThornWoodland):
+        return ISO_NONE
+    if isinstance(biome, WarmTemperateThornScrub):
+        return ISO_NONE
+    if isinstance(biome, SubtropicalDryForest):
+        return ISO_NONE
+    if isinstance(biome, TropicalDryForest):
+        return ISO_NONE
+    if isinstance(biome, TropicalVeryDryForest):
+        return ISO_NONE
+    if isinstance(biome, WarmTemperateDryForest):
+        return ISO_NONE
+
+    # For these one we want no decorations
+    if isinstance(biome, CoolTemperateSteppe):
+        return ISO_NONE
+    if isinstance(biome, BorealDesert):
+        return ISO_NONE
+    if isinstance(biome, Ice):
+        return ISO_NONE
+    if isinstance(biome, PolarDesert):
+        return ISO_NONE
+    if isinstance(biome, CoolTemperateDesert):
+        return ISO_NONE
+    if isinstance(biome, SubtropicalDesert):
+        return ISO_NONE
+    if isinstance(biome, TropicalDesert):
+        return ISO_NONE
+    if isinstance(biome, WarmTemperateDesert):
+        return ISO_NONE
+    return ISO_NONE
 
 
 # 134, 124
@@ -853,15 +1034,7 @@ def draw_forest_level(world, tmx_file, this_lvl, water_grid):
         for x in range(world.width):
             lvl = elev_level(world, (x, y))
             if lvl == this_lvl:
-                tile = ISO_NONE
-                if world.is_temperate_forest((x, y)):
-                    tile = ISO_FOREST
-                elif world.is_boreal_forest((x, y)):
-                    tile = ISO_BOREAL_FOREST
-                elif world.is_warm_temperate_forest((x, y)):
-                    tile = ISO_WARM_FOREST
-                elif world.is_hot_desert((x, y)):
-                    tile = ISO_CACTUS
+                tile = decoration_tile(world, (x, y))
 
                 if tile != ISO_NONE:
                     if water_grid[x * 3 + 1, y * 3 + 1] == WG_LAND:
