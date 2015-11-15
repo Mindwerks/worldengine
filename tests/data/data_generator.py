@@ -15,12 +15,6 @@ def main(tests_data_dir):
     w = world_gen("seed_28070", 300, 200, 28070)
     w.protobuf_to_file("%s/seed_28070.world" % tests_data_dir)
 
-    # w = world_gen("seed_48956", 450, 300, 48956)
-    # w.protobuf_to_file("%s/seed_48956.world" % tests_data_dir)
-
-    # w = world_gen("biome_test", 128, 128, 6908)
-    # w.protobuf_to_file("%s/biome_test.world" % tests_data_dir)
-
 
 if __name__ == '__main__':
     blessed_images_dir = os.path.dirname(os.path.realpath(__file__))

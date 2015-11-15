@@ -186,9 +186,6 @@ def __seems_protobuf_worldfile__(world_filename):
 def load_world(world_filename):
     pb = __seems_protobuf_worldfile__(world_filename)
     if pb:
-        # print("we cannot distinguish if the file is a pickle or a protobuf "
-        #       "world file. Trying to load first as protobuf then as pickle "
-        #       "file")
         try:
             return World.open_protobuf(world_filename)
         except Exception:
