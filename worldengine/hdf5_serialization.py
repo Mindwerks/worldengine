@@ -90,12 +90,12 @@ def save_world_to_hdf5(world, filename):
 
     # lake_map and river_map have inverted coordinates
     if hasattr(world, 'lake_map'):
-        lake_map_data = f.create_dataset("lake_map", (world.width, world.height), dtype=numpy.float)
+        lake_map_data = f.create_dataset("lake_map", (world.height, world.width), dtype=numpy.float)
         lake_map_data.write_direct(world.lake_map)
 
     # lake_map and river_map have inverted coordinates
     if hasattr(world, 'river_map'):
-        river_map_data = f.create_dataset("river_map", (world.width, world.height), dtype=numpy.float)
+        river_map_data = f.create_dataset("river_map", (world.height, world.width), dtype=numpy.float)
         river_map_data.write_direct(world.river_map)
 
     generation_params_grp = f.create_group("generation_params")
