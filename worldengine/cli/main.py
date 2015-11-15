@@ -238,7 +238,7 @@ def main():
     parser.add_argument('--hdf5', dest='hdf5',
                         action="store_true",
                         help="Save world file using HDF5 format. " +
-                             "Default = store using pickle format",
+                             "Default = store using protobuf format",
                         default=False)
     parser.add_argument('-s', '--seed', dest='seed', type=int,
                         help="Use seed=N to initialize the pseudo-random " +
