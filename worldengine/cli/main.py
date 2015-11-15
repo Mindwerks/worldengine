@@ -39,13 +39,13 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
 
     # Save data
     filename = "%s/%s.world" % (output_dir, world_name)
-    with open(filename, "wb") as f:
-        if world_format == 'protobuf':
+    if world_format == 'protobuf':
+        with open(filename, "wb") as f:
             f.write(w.protobuf_serialize())
-        elif world_format == 'hdf5':
-            save_world_to_hdf5(w, filename)
-        else:
-            print("Unknown format '%s', not saving " % world_format)
+    elif world_format == 'hdf5':
+        save_world_to_hdf5(w, filename)
+    else:
+        print("Unknown format '%s', not saving " % world_format)
     print("* world data saved in '%s'" % filename)
     sys.stdout.flush()
 
