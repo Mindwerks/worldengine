@@ -619,7 +619,7 @@ ISO_RIVER_BL = 102
 ISO_RIVER_BR = 104
 
 
-def draw_water(world, tmx_file, water_grid, this_lvl):
+def draw_water(world, tmx_file, water_grid, this_lvl, slopes_map):
     def draw_cell(gx, gy):
         x = gx / 3
         y = gy / 3
@@ -704,21 +704,24 @@ def draw_water(world, tmx_file, water_grid, this_lvl):
             #     else:
             #         raise Exception(str(water_around))
         elif wg_tile == WG_RIVER:
-            river_around = river_tiles_around(water_grid, gx, gy)
-            if river_around[1] == True and river_around[3] == False and river_around[4] == False and river_around[6] == True:
-                return ISO_RIVER_VERT_PIPE
-            elif river_around[1] == False and river_around[3] == True and river_around[4] == True and river_around[6] == False:
-                return ISO_RIVER_HORI_PIPE
-            elif river_around[1] == True and river_around[3] == True and river_around[4] == False and river_around[6] == False:
-                return ISO_RIVER_TL
-            elif river_around[1] == True and river_around[3] == False and river_around[4] == True and river_around[6] == False:
-                return ISO_RIVER_TR
-            elif river_around[1] == False and river_around[3] == True and river_around[4] == False and river_around[6] == True:
-                return ISO_RIVER_BL
-            elif river_around[1] == False and river_around[3] == False and river_around[4] == True and river_around[6] == True:
-                return ISO_RIVER_BR
+            if slopes_map[gx, gy] == False:
+                river_around = river_tiles_around(water_grid, gx, gy)
+                if river_around[1] == True and river_around[3] == False and river_around[4] == False and river_around[6] == True:
+                    return ISO_RIVER_VERT_PIPE
+                elif river_around[1] == False and river_around[3] == True and river_around[4] == True and river_around[6] == False:
+                    return ISO_RIVER_HORI_PIPE
+                elif river_around[1] == True and river_around[3] == True and river_around[4] == False and river_around[6] == False:
+                    return ISO_RIVER_TL
+                elif river_around[1] == True and river_around[3] == False and river_around[4] == True and river_around[6] == False:
+                    return ISO_RIVER_TR
+                elif river_around[1] == False and river_around[3] == True and river_around[4] == False and river_around[6] == True:
+                    return ISO_RIVER_BL
+                elif river_around[1] == False and river_around[3] == False and river_around[4] == True and river_around[6] == True:
+                    return ISO_RIVER_BR
+                else:
+                    return ISO_RIVER
             else:
-                return ISO_RIVER
+                return ISO_NONE
         elif wg_tile == WG_OCEAN:
             return ISO_NONE
         else:
@@ -736,6 +739,8 @@ def draw_water(world, tmx_file, water_grid, this_lvl):
 
 def draw_level(world, tmx_file, water_grid, this_lvl):
     tmx_file.write('    <data encoding="csv">\n')
+
+    slopes_map = numpy.zeros(shape=(world.width * 3, world.height * 3), dtype=numpy.bool)
 
     for gy in range(world.height * 3):
         for gx in range(world.width * 3):
@@ -779,12 +784,16 @@ def draw_level(world, tmx_file, water_grid, this_lvl):
                 #
 
                 if dy==0 and slope_around[1]>=1:
+                    slopes_map[gx, gy] = True
                     grid_value = ISO_SLOPE_TOP + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 if dy==2 and slope_around[6]>=1:
+                    slopes_map[gx, gy] = True
                     grid_value = ISO_SLOPE_BOTTOM + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 if dx==0 and slope_around[3]>=1:
+                    slopes_map[gx, gy] = True
                     grid_value = ISO_SLOPE_LEFT + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 if dx==2 and slope_around[4]>=1:
+                    slopes_map[gx, gy] = True
                     grid_value = ISO_SLOPE_RIGHT + ISO_MULTIPLIER_SLOPES_BLOCK * mult
 
                 #
@@ -792,12 +801,16 @@ def draw_level(world, tmx_file, water_grid, this_lvl):
                 #
 
                 if dx == 0 and dy == 0 and slope_around[1] >= 1 and slope_around[3] >= 1:
+                    slopes_map[gx, gy] = True
                     grid_value = ISO_SLOPE_CORNER_BOTTOM_RIGHT_INTERNAL + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 elif dx == 2 and dy == 0 and slope_around[1] >= 1 and slope_around[4] >= 1:
+                    slopes_map[gx, gy] = True
                     grid_value = ISO_SLOPE_CORNER_BOTTOM_LEFT_INTERNAL + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 elif dx == 0 and dy == 2 and slope_around[6] >= 1 and slope_around[3] >= 1:
+                    slopes_map[gx, gy] = True
                     grid_value = ISO_SLOPE_CORNER_TOP_RIGHT_INTERNAL + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 elif dx == 2 and dy == 2 and slope_around[6] >= 1 and slope_around[4] >= 1:
+                    slopes_map[gx, gy] = True
                     grid_value = ISO_SLOPE_CORNER_TOP_LEFT_INTERNAL + ISO_MULTIPLIER_SLOPES_BLOCK * mult
 
                 #
@@ -805,12 +818,16 @@ def draw_level(world, tmx_file, water_grid, this_lvl):
                 #
 
                 if dx == 0 and dy == 0 and slope_around[0] >= 1 and slope_around[1] < 1 and slope_around[3] < 1:
+                    slopes_map[gx, gy] = True
                     grid_value = ISO_SLOPE_CORNER_BOTTOM_RIGHT + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 elif dx == 2 and dy == 0 and slope_around[2] >= 1 and slope_around[1] < 1 and slope_around[4] < 1:
+                    slopes_map[gx, gy] = True
                     grid_value = ISO_SLOPE_CORNER_BOTTOM_LEFT + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 elif dx == 0 and dy == 2 and slope_around[5] >= 1 and slope_around[6] < 1 and slope_around[3] < 1:
+                    slopes_map[gx, gy] = True
                     grid_value = ISO_SLOPE_CORNER_TOP_RIGHT + ISO_MULTIPLIER_SLOPES_BLOCK * mult
                 elif dx == 2 and dy == 2 and slope_around[7] >= 1 and slope_around[6] < 1 and slope_around[4] < 1:
+                    slopes_map[gx, gy] = True
                     grid_value = ISO_SLOPE_CORNER_TOP_LEFT + ISO_MULTIPLIER_SLOPES_BLOCK * mult
 
 
@@ -819,41 +836,40 @@ def draw_level(world, tmx_file, water_grid, this_lvl):
                 tmx_file.write(',')
         tmx_file.write('\n')
     tmx_file.write('    </data>\n')
+    return slopes_map
 
 ISO_FOREST = 114
 ISO_BOREAL_FOREST = 112
 ISO_WARM_FOREST = 110
 ISO_CACTUS = 115
 
+
 # 134, 124
 # 153,143
-def draw_forest_level(world, tmx_file, this_lvl):
+def draw_forest_level(world, tmx_file, this_lvl, water_grid):
 
     forest_grid = numpy.zeros(shape=(world.width * 3, world.height * 3), dtype=numpy.uint16)
     for y in range(world.height):
         for x in range(world.width):
             lvl = elev_level(world, (x, y))
             if lvl == this_lvl:
+                tile = ISO_NONE
                 if world.is_temperate_forest((x, y)):
-                    forest_grid[x * 3 + 1, y * 3 + 1] = ISO_FOREST
-                    for ta in  tiles_around(forest_grid, x * 3 + 1, y * 3 + 1):
-                        ta_x, ta_y = ta
-                        forest_grid[ta_x, ta_y] = ISO_FOREST
+                    tile = ISO_FOREST
                 elif world.is_boreal_forest((x, y)):
-                    forest_grid[x * 3 + 1, y * 3 + 1] = ISO_BOREAL_FOREST
-                    for ta in  tiles_around(forest_grid, x * 3 + 1, y * 3 + 1):
-                        ta_x, ta_y = ta
-                        forest_grid[ta_x, ta_y] = ISO_BOREAL_FOREST
+                    tile = ISO_BOREAL_FOREST
                 elif world.is_warm_temperate_forest((x, y)):
-                    forest_grid[x * 3 + 1, y * 3 + 1] = ISO_WARM_FOREST
-                    for ta in  tiles_around(forest_grid, x * 3 + 1, y * 3 + 1):
-                        ta_x, ta_y = ta
-                        forest_grid[ta_x, ta_y] = ISO_WARM_FOREST
+                    tile = ISO_WARM_FOREST
                 elif world.is_hot_desert((x, y)):
-                    forest_grid[x * 3 + 1, y * 3 + 1] = ISO_CACTUS
+                    tile = ISO_CACTUS
+
+                if tile != ISO_NONE:
+                    if water_grid[x * 3 + 1, y * 3 + 1] == WG_LAND:
+                        forest_grid[x * 3 + 1, y * 3 + 1] = tile
                     for ta in tiles_around(forest_grid, x * 3 + 1, y * 3 + 1):
                         ta_x, ta_y = ta
-                        forest_grid[ta_x, ta_y] = ISO_CACTUS
+                        if water_grid[ta_x, ta_y] == WG_LAND:
+                            forest_grid[ta_x, ta_y] = tile
 
 
     tmx_file.write('    <data encoding="csv">\n')
@@ -899,22 +915,22 @@ def export_to_tmx(world, tmx_filename):
     # tmx_file.write('</tileset>\n')
 
     tmx_file.write('  <layer name="ground" width="%i" height="%i">\n' % (world.width*3, world.height*3))
-    draw_level(world, tmx_file, water_grid, 0)
+    slopes_map = draw_level(world, tmx_file, water_grid, 0)
     tmx_file.write('  </layer>\n')
 
     tmx_file.write('  <layer name="ground_water" width="%i" height="%i">\n' % (world.width*3, world.height*3))
-    draw_water(world, tmx_file, water_grid, 0)
+    draw_water(world, tmx_file, water_grid, 0, slopes_map)
     tmx_file.write('  </layer>\n')
 
     tmx_file.write('  <layer name="decoration ground" width="%i" height="%i" offsetx="0" offsety="0">\n' % (world.width*3, world.height*3))
-    draw_forest_level(world, tmx_file, 0)
+    draw_forest_level(world, tmx_file, 0, water_grid)
     tmx_file.write('  </layer>\n')
     #
     tmx_file.write('  <layer name="hill half" width="%i" height="%i" offsetx="0" offsety="-48">\n' % (world.width*3, world.height*3))
     draw_level(world, tmx_file, water_grid, 1)
     tmx_file.write('  </layer>\n')
     tmx_file.write('  <layer name="decoration half hill" width="%i" height="%i" offsetx="0" offsety="-48">\n' % (world.width*3, world.height*3))
-    draw_forest_level(world, tmx_file, 1)
+    draw_forest_level(world, tmx_file, 1, water_grid)
     tmx_file.write('  </layer>\n')
 
 
@@ -926,7 +942,7 @@ def export_to_tmx(world, tmx_filename):
     draw_level(world, tmx_file, water_grid, 2)
     tmx_file.write('  </layer>\n')
     tmx_file.write('  <layer name="decoration hill" width="%i" height="%i" offsetx="0" offsety="-96">\n' % (world.width*3, world.height*3))
-    draw_forest_level(world, tmx_file, 2)
+    draw_forest_level(world, tmx_file, 2, water_grid)
     tmx_file.write('  </layer>\n')
 
 
@@ -942,13 +958,13 @@ def export_to_tmx(world, tmx_filename):
     draw_level(world, tmx_file, water_grid, 3)
     tmx_file.write('  </layer>\n')
     tmx_file.write('  <layer name="decoration half low mountain" width="%i" height="%i" offsetx="0" offsety="-144">\n' % (world.width*3, world.height*3))
-    draw_forest_level(world, tmx_file, 3)
+    draw_forest_level(world, tmx_file, 3, water_grid)
     tmx_file.write('  </layer>\n')
     tmx_file.write('  <layer name="low_mountain" width="%i" height="%i" offsetx="0" offsety="-192">\n' % (world.width*3, world.height*3))
     draw_level(world, tmx_file, water_grid, 4)
     tmx_file.write('  </layer>\n')
     tmx_file.write('  <layer name="decoration low mountain" width="%i" height="%i" offsetx="0" offsety="-192">\n' % (world.width*3, world.height*3))
-    draw_forest_level(world, tmx_file, 4)
+    draw_forest_level(world, tmx_file, 4, water_grid)
     tmx_file.write('  </layer>\n')
 
     #
@@ -960,13 +976,13 @@ def export_to_tmx(world, tmx_filename):
     draw_level(world, tmx_file, water_grid, 5)
     tmx_file.write('  </layer>\n')
     tmx_file.write('  <layer name="decoration half med mountain" width="%i" height="%i" offsetx="0"  offsety="-240">\n' % (world.width*3, world.height*3))
-    draw_forest_level(world, tmx_file, 5)
+    draw_forest_level(world, tmx_file, 5, water_grid)
     tmx_file.write('  </layer>\n')
     tmx_file.write('  <layer name="med_mountain" width="%i" height="%i" offsetx="0" offsety="-288">\n' % (world.width*3, world.height*3))
     draw_level(world, tmx_file, water_grid, 6)
     tmx_file.write('  </layer>\n')
     tmx_file.write('  <layer name="decoration med mountain" width="%i" height="%i" offsetx="0" offsety="-288">\n' % (world.width*3, world.height*3))
-    draw_forest_level(world, tmx_file, 6)
+    draw_forest_level(world, tmx_file, 6, water_grid)
     tmx_file.write('  </layer>\n')
     #
     # # tmx_file.write('  <layer name="med_mountain_water" width="%i" height="%i" offsetx="0" offsety="-96">\n' % (world.width*3, world.height*3))
@@ -977,13 +993,13 @@ def export_to_tmx(world, tmx_filename):
     draw_level(world, tmx_file, water_grid, 7)
     tmx_file.write('  </layer>\n')
     tmx_file.write('  <layer name="decoration half high mountain" width="%i" height="%i" offsetx="0" offsety="-336">\n' % (world.width*3, world.height*3))
-    draw_forest_level(world, tmx_file, 7)
+    draw_forest_level(world, tmx_file, 7, water_grid)
     tmx_file.write('  </layer>\n')
     tmx_file.write('  <layer name="high_mountain" width="%i" height="%i" offsetx="0" offsety="-384">\n' % (world.width*3, world.height*3))
     draw_level(world, tmx_file, water_grid, 8)
     tmx_file.write('  </layer>\n')
     tmx_file.write('  <layer name="decoration high mountain" width="%i" height="%i" offsetx="0" offsety="-384">\n' % (world.width*3, world.height*3))
-    draw_forest_level(world, tmx_file, 8)
+    draw_forest_level(world, tmx_file, 8, water_grid)
     tmx_file.write('  </layer>\n')
     #
     # # tmx_file.write('  <layer name="high_mountain_water" width="%i" height="%i" offsetx="0" offsety="-128">\n' % (world.width*3, world.height*3))
