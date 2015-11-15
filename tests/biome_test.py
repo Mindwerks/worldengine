@@ -121,8 +121,8 @@ class TestBiome(unittest.TestCase):
         self.assertEqual('warm temperate wet forest', biome_index_to_name(40))
 
     def test_locate_biomes(self):
-        w = World.open_protobuf("%s/biome_test.world" % self.tests_data_dir)
-        cm, biome_cm = BiomeSimulation().execute(w, 6908)
+        w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        cm, biome_cm = BiomeSimulation().execute(w, 28070)
 
     @staticmethod
     def name():

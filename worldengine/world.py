@@ -1,4 +1,3 @@
-import pickle
 import numpy
 
 from worldengine.biome import Biome, BorealDesert, BorealDryScrub, BorealMoistForest, \
@@ -48,15 +47,6 @@ class World(object):
     #
     # Serialization/Unserialization
     #
-
-    @classmethod
-    def from_pickle_file(cls, filename):
-        with open(filename, "rb") as f:
-            return pickle.load(f)
-
-    def to_pickle_file(self, filename):
-        with open(filename, "wb") as f:
-            pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
     @classmethod
     def from_dict(cls, dict):

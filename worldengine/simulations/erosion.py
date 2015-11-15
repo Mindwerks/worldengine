@@ -28,18 +28,6 @@ def in_circle(radius, center_x, center_y, x, y):
     return square_dist <= radius ** 2
 
 
-def _numpy_to_matrix(numpy_array):
-    """Convert a bi-dimensional numpy array to a plain Python matrix.
-
-    This is used because currently we do not know how to serialize numpy
-    arrays :( with pickle. In the future we will use pytables/hdf5"""
-    # TODO: Is this still true? Pickle didn't seem to cause problems for me. /tcld
-
-    width = numpy_array.shape[0]
-    height = numpy_array.shape[1]
-    return [[numpy_array[x, y] for x in range(width)] for y in range(height)]
-
-
 class ErosionSimulation(object):
     def __init__(self):
         self.wrap = True

@@ -1,5 +1,4 @@
 import unittest
-import platform
 from worldengine.plates import Step, center_land, world_gen
 from worldengine.world import World
 
@@ -30,7 +29,7 @@ class TestGeneration(TestBase):
         return borders_total_elevation / n_cells_on_border
 
     def test_center_land(self):
-        w = World.from_pickle_file("%s/py%s_plates_279.world" % (self.tests_data_dir, platform.python_version_tuple()[0]))
+        w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
 
         # We want to have less land than before at the borders
         el_before = TestGeneration._mean_elevation_at_borders(w)
