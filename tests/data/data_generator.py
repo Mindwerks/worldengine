@@ -8,10 +8,12 @@ because the plate simulation steps do not provide the same results on all the pl
 """
 
 import os
+import numpy
 from worldengine.plates import world_gen, _plates_simulation
 
 
 def main(tests_data_dir):
+    numpy.random.seed(28070)
     w = world_gen("seed_28070", 300, 200, 28070)
     w.protobuf_to_file("%s/seed_28070.world" % tests_data_dir)
 
