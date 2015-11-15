@@ -218,10 +218,7 @@ def add_colors(*args):
     ''' Do some *args magic to return a tuple, which has the sums of all tuples in *args '''
     # Adapted from an answer here: http://stackoverflow.com/questions/14180866/sum-each-value-in-a-list-of-tuples
     added = [sum(x) for x in zip(*args)]
-
-    for i in range(len(added)):  # prevent over- and underflows
-        added[i] = max(min(added[i], 255), 0)  # restrict to uint8
-    return added
+    return numpy.clip(added, 0, 255)  # restrict to uint8
 
 def average_colors(c1, c2):
     ''' Average the values of two colors together '''
@@ -462,9 +459,9 @@ def draw_satellite(world, target):
                 # The amplified difference is now translated into the rgb of the tile.
                 # This adds light to tiles higher that the previous average, and shadow
                 # to tiles lower than the previous average
-                r = max(min(adjusted_difference + r, 255), 0)  # NOTE: This could cause underflows and overflows
-                g = max(min(adjusted_difference + g, 255), 0)
-                b = max(min(adjusted_difference + b, 255), 0)
+                r = numpy.clip(adjusted_difference + r, 0, 255)  # prevent under-/overflows
+                g = numpy.clip(adjusted_difference + g, 0, 255)
+                b = numpy.clip(adjusted_difference + b, 0, 255)
 
                 # Set the final color for this pixel
                 target.set_pixel(x, y, (r, g, b, 255))
