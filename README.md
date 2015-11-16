@@ -273,11 +273,6 @@ You can write us at:
  * psi29a _at_ gmail _dot_ com
 Thank you, all the feedback is precious for us!
 
-Requirements
-============
-
-Libjpeg, libtiff and zlib are required by Pillow
-
 Projects using WorldEngine
 ==========================
 
