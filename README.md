@@ -110,44 +110,8 @@ Usage
 ```
 worldengine [options] [world|plates|ancient_map|info]
 ```
-_Note that options were changed in version 0.5.3_
 
-### General options
-
-| Short     | Long | Description |
-|-----------|------|-------------|
-| -o DIR    | --output-dir=DIR | generate files in DIR default = '.' |
-| -n STR    | --worldname=STR | set world name to STR |
-| -b        | --protocol-buffer | save world using protocol buffer format (smaller file) |
-| -s N      | --seed=N | use SEED to initialize the pseudo-random generation |
-| -t STR    | --step=STR | use STEP to specify how far to proceed in the world generation process. Valid values are: plates precipitations full |
-| -x N      | --width=N | WIDTH of the world to be generated |
-| -y N      | --height=N | HEIGHT of the world to be generated |
-| -q N   | --number-of-plates=N | number of plates |
-|       | --recursion-limit=N | you need that just if you encounter an error while generating very large maps |
-| -v    | --verbose | Enable verbose messages |
-| --bw  | --black-and-white | Draw maps in black and white |
-
-### Options valid only for generate
-
-| Short     | Long | Description |
-|-----------|------|-------------|
-| -r FILE   | --rivers=FILE | produce a map of rivers, after the option it expects the name of the file where to generate the map  |
-| --gs  | --grayscale-heightmap | produce a grayscale heightmap |
-|   | --ocean_level=N   |  elevation cut off for sea level (default = 1.0) |
-|   | --temps #/#/#/#/#/#|  Provide alternate ranges for temperatures. [default =                 .126/.235/.406/.561/.634/.876] |
-|   | --humidity #/#/#/#/#/#/# | Provide alternate ranges for humidities. [default =                        .059/.222/.493/.764/.927/.986/.998] |
-| -gv N | --gamma-value N | N = Gamma value for temperature/precipitation gamma correction curve. [default = 1.25] |
-| -go N | --gamma-offset N | N = Adjustment value for temperature/precipitation gamma correction curve. [default = .2] |
-|   | ---not-fade-borders   |  avoid fading borders |
-
-### Options valid only for ancient map operations
-
-| Short     | Long | Description |
-|-----------|------|-------------|
-| -w FILE   | --worldfile=FILE | WORLD_FILE to be loaded |
-| -g FILE   | --generatedfile=FILE | name of the GENERATED_FILE |
-| -f N   | --resize-factor=N | resize factor |
+For details about all the possible options please refer to the [manual](http://worldengine.readthedocs.org/en/latest/).
 
 For example these commands:
 
