@@ -104,6 +104,8 @@ The program produces a binary format with all the data of the generated world an
 
 ![](https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/examples/world_seed_1_ocean.png)
 
+There are several optional outputs and many options to control the result. The [manual](http://worldengine.readthedocs.org/en/latest/) is your friend!
+
 Usage
 =====
 
@@ -288,10 +290,10 @@ If you are using WorldEngine please let us know!
 Contributors
 ============
 
-The merged project is maintained by [Bret Curtis](https://github.com/psi29a) and [Federico Tomassetti](https://github.com/ftomassetti).
+The this project is maintained by [Bret Curtis](https://github.com/psi29a) and [Federico Tomassetti](https://github.com/ftomassetti).
 
 All contributions, questions, ideas are more than welcome!
-Feel free to open an issue or write in our [google group](https://groups.google.com/forum/?hl=en#!forum/lands_worldsynth).
+Feel free to open an issue or write in our [google group](https://groups.google.com/forum/?hl=en#!forum/worldengine).
 
 We would like to thank you great people who helped us while working on WorldEngine and the projects from which it was derived:
 
