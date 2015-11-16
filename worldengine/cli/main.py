@@ -59,6 +59,7 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
         filename = '%s/%s_precipitation.png' % (output_dir, world_name)
         draw_precipitation_on_file(w, filename, black_and_white)
         print("* precipitation image generated in '%s'" % filename)
+
         filename = '%s/%s_temperature.png' % (output_dir, world_name)
         draw_temperature_levels_on_file(w, filename, black_and_white)
         print("* temperature image generated in '%s'" % filename)
@@ -69,9 +70,13 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
         print("* biome image generated in '%s'" % filename)
 
     filename = '%s/%s_elevation.png' % (output_dir, world_name)
-    sea_level = w.sea_level()
-    draw_simple_elevation_on_file(w, filename, sea_level=sea_level)
+    draw_simple_elevation_on_file(w, filename, sea_level=w.sea_level())
     print("* elevation image generated in '%s'" % filename)
+
+    filename = '%s/%s_satellite.png' % (output_dir, world_name)
+    draw_satellite_on_file(w, filename)
+    print("* satellite image generated in '%s'" % filename)
+
     return w
 
 
@@ -84,15 +89,11 @@ def generate_rivers_map(world, filename):
     draw_riversmap_on_file(world, filename)
     print("+ rivers map generated in '%s'" % filename)
 
-def draw_scatter_plot(world, filename):
+def generate_scatter_plot(world, filename):
     draw_scatter_plot_on_file(world, filename)
     print("+ scatter plot generated in '%s'" % filename)
 
-def draw_satellite_map(world, filename):
-    draw_satellite_on_file(world, filename)
-    print("+ satellite map generated in '%s'" % filename)
-
-def draw_icecaps_map(world, filename):
+def generate_icecaps_map(world, filename):
     draw_icecaps_on_file(world, filename)
     print("+ icecap map generated in '%s'" % filename)
 
@@ -214,7 +215,6 @@ def print_world_info(world):
     print(" no plates          : %i" % world.n_plates)
     print(" ocean level        : %f" % world.ocean_level)
     print(" step               : %s" % world.step.name)
-
     print(" has biome          : %s" % world.has_biome())
     print(" has humidity       : %s" % world.has_humidity())
     print(" has irrigation     : %s" % world.has_irrigation())
@@ -319,8 +319,6 @@ def main():
                                default=True)
     g_generate.add_argument('--scatter', dest='scatter_plot',
                             action="store_true", help="generate scatter plot")
-    g_generate.add_argument('--sat', dest='satelite_map',
-                            action="store_true", help="generate satellite map")
     g_generate.add_argument('--ice', dest='icecaps_map',
                             action="store_true", help="generate ice caps map")
 
@@ -486,7 +484,6 @@ def main():
         print(' icecaps heightmap    : %s' % args.icecaps_map)
         print(' rivers map           : %s' % args.rivers_map)
         print(' scatter plot         : %s' % args.scatter_plot)
-        print(' satellite map        : %s' % args.satelite_map)
         print(' fade borders         : %s' % args.fade_borders)
         if args.temps:
             print(' temperature ranges   : %s' % args.temps)
@@ -543,13 +540,10 @@ def main():
             generate_rivers_map(world,
             '%s/%s_rivers.png' % (args.output_dir, world_name))
         if args.scatter_plot:
-            draw_scatter_plot(world,
-            '%s/%s_scatter.png' % (args.output_dir, world_name))    
-        if args.satelite_map:
-            draw_satellite_map(world,
-            '%s/%s_satellite.png' % (args.output_dir, world_name))
+            generate_scatter_plot(world,
+            '%s/%s_scatter.png' % (args.output_dir, world_name))
         if args.icecaps_map:
-            draw_icecaps_map(world,
+            generate_icecaps_map(world,
             '%s/%s_icecaps.png' % (args.output_dir, world_name))
 
     elif operation == 'plates':
