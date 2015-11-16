@@ -923,18 +923,33 @@ def draw_level(world, tmx_file, water_grid, this_lvl):
     tmx_file.write('    </data>\n')
     return slopes_map
 
-ISO_FOREST_RARE = 109
-ISO_FOREST_NORMAL = 110
-ISO_FOREST_DENSE = 111
-ISO_BOREAL_FOREST = 119
-ISO_CACTUS = 121
-ISO_SNOW_BUSH = 118
-ISO_SNOW_BUSH_ROCK = 120
-ISO_BUSH_ROCK = 113
-ISO_BUSHES = 114
-ISO_BUSHES_SMALL_TREE = 115
-ISO_BUSHES_SMALL_TREES = 116
-ISO_BUSH = 117
+ISO_CACTUS = 129
+ISO_CACTUS_AND_ROCKS = 130
+ISO_STEPPE_DARK = 109
+ISO_STEPPE_LIGHT = 117
+
+ISO_SNOW_BUSH = 126
+ISO_SNOW_BUSH_ROCK = 127
+
+ISO_BOREAL_FOREST = 128
+
+ISO_JUNGLE_LIGHT = 114
+ISO_JUNGLE_MED = 115
+ISO_JUNGLE_DEEP = 116
+
+ISO_SAVANNA_THORN = 118
+ISO_SAVANNA = 119
+ISO_SAVANNA_WET = 120
+
+ISO_FOREST_RARE = 110
+ISO_FOREST_NORMAL = 112
+ISO_FOREST_DENSE = 112
+
+ISO_BUSH_ROCK = 121
+ISO_BUSHES = 122
+ISO_BUSHES_SMALL_TREE = 123
+ISO_BUSHES_SMALL_TREES = 124
+ISO_BUSH = 125
 
 
 def decoration_tile(world, pos):
@@ -943,9 +958,10 @@ def decoration_tile(world, pos):
     if isinstance(biome, SubtropicalDesertScrub):
         return ISO_CACTUS
     if isinstance(biome, WarmTemperateDesertScrub):
-        return ISO_CACTUS
+        return ISO_CACTUS_AND_ROCKS
     if isinstance(biome, TropicalDesertScrub):
         return ISO_CACTUS
+
     if isinstance(biome, BorealDryScrub):
         return ISO_SNOW_BUSH
     if isinstance(biome, BorealMoistForest):
@@ -954,18 +970,21 @@ def decoration_tile(world, pos):
         return ISO_BOREAL_FOREST
     if isinstance(biome, BorealRainForest):
         return ISO_BOREAL_FOREST
+
     if isinstance(biome, CoolTemperateMoistForest):
         return ISO_FOREST_NORMAL
     if isinstance(biome, CoolTemperateRainForest):
         return ISO_FOREST_DENSE
     if isinstance(biome, CoolTemperateWetForest):
         return ISO_FOREST_DENSE
+
     if isinstance(biome, WarmTemperateMoistForest):
         return ISO_BUSHES
     if isinstance(biome, WarmTemperateRainForest):
         return ISO_BUSHES_SMALL_TREES
     if isinstance(biome, WarmTemperateWetForest):
         return ISO_BUSHES_SMALL_TREE
+
     if isinstance(biome, SubtropicalMoistForest):
         return ISO_FOREST_NORMAL
     if isinstance(biome, SubtropicalRainForest):
@@ -984,26 +1003,26 @@ def decoration_tile(world, pos):
         return ISO_SNOW_BUSH
 
     if isinstance(biome, TropicalMoistForest):
-        return ISO_NONE
+        return ISO_JUNGLE_LIGHT
     if isinstance(biome, TropicalRainForest):
-        return ISO_NONE
+        return ISO_JUNGLE_MED
     if isinstance(biome, TropicalWetForest):
-        return ISO_NONE
+        return ISO_JUNGLE_DEEP
 
     if isinstance(biome, TropicalThornWoodland):
-        return ISO_NONE
+        return ISO_SAVANNA_THORN
     if isinstance(biome, SubtropicalThornWoodland):
-        return ISO_NONE
+        return ISO_SAVANNA_THORN
     if isinstance(biome, WarmTemperateThornScrub):
-        return ISO_NONE
+        return ISO_SAVANNA_THORN
     if isinstance(biome, SubtropicalDryForest):
-        return ISO_NONE
+        return ISO_SAVANNA
     if isinstance(biome, TropicalDryForest):
-        return ISO_NONE
+        return ISO_SAVANNA
     if isinstance(biome, TropicalVeryDryForest):
-        return ISO_NONE
+        return ISO_SAVANNA
     if isinstance(biome, WarmTemperateDryForest):
-        return ISO_NONE
+        return ISO_SAVANNA_WET
 
     # For these one we want no decorations
     if isinstance(biome, CoolTemperateSteppe):
