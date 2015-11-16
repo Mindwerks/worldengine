@@ -88,12 +88,14 @@ def save_world_to_hdf5(world, filename):
         temperature_data = temperature_grp.create_dataset("data", (world.height, world.width), dtype=numpy.float)
         temperature_data.write_direct(world.temperature['data'])
 
-    # lake_map and river_map have inverted coordinates
+    if hasattr(world, 'icecap'):
+        icecap_data = f.create_dataset("icecap", (world.height, world.width), dtype=numpy.float)
+        icecap_data.write_direct(world.icecap)
+
     if hasattr(world, 'lake_map'):
         lake_map_data = f.create_dataset("lake_map", (world.height, world.width), dtype=numpy.float)
         lake_map_data.write_direct(world.lake_map)
 
-    # lake_map and river_map have inverted coordinates
     if hasattr(world, 'river_map'):
         river_map_data = f.create_dataset("river_map", (world.height, world.width), dtype=numpy.float)
         river_map_data.write_direct(world.river_map)
@@ -206,6 +208,9 @@ def load_world_to_hdf5(filename):
             ('tropical', None)
         ]
         w.set_temperature(t, t_th)
+
+    if 'icecap' in f.keys():
+        w.icecap = numpy.array(f['icecap'])
 
     if 'lake_map' in f.keys():
         m = numpy.array(f['lake_map'])

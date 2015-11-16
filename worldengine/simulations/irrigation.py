@@ -10,10 +10,10 @@ class IrrigationSimulation(object):
 
     @staticmethod
     def _calculate(world):
-        #Notes on performance:
+        # Notes on performance:
         #  -method is run once per generation
         #  -iterations        : width * height
-        #  -memory consumption: width * height * 8 Byte (numpy 1.9.2)
+        #  -memory consumption: width * height * sizeof(numpy.float) (permanent)
 
         width = world.width
         height = world.height

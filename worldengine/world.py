@@ -224,6 +224,9 @@ class World(object):
             p_world.temperature_subtropical = \
                 self.temperature['thresholds'][5][1]
 
+        if hasattr(self, 'icecap'):
+            self._to_protobuf_matrix(self.icecap, p_world.icecap)
+
         return p_world
 
     @classmethod
@@ -312,6 +315,9 @@ class World(object):
         if len(p_world.rivermap.rows) > 0:
             m = numpy.array(World._from_protobuf_matrix(p_world.rivermap))
             w.set_rivermap(m)
+
+        if len(p_world.icecap.rows) > 0:
+            w.icecap = numpy.array(World._from_protobuf_matrix(p_world.icecap))
 
         return w
 
@@ -855,6 +861,9 @@ class World(object):
             raise Exception("Setting data with wrong width")
 
         self.permeability = {'data': data, 'thresholds': thresholds}
+
+    def has_ocean(self):
+        return hasattr(self, 'ocean')
 
     def has_precipitations(self):
         return hasattr(self, 'precipitation')

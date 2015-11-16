@@ -373,6 +373,7 @@ def draw_satellite(world, target):
 
     # Get an elevation mask where heights are normalized between 0 and 255
     elevation_mask = get_normalized_elevation_array(world)
+    smooth_mask = numpy.invert(world.ocean)  # all land shall be smoothed (other tiles can be included by setting them to True)
 
     rng = numpy.random.RandomState(world.seed)  # create our own random generator; necessary for now to make the tests reproducible, even though it is a bit ugly
 
@@ -390,11 +391,20 @@ def draw_satellite(world, target):
             # the map is smoothed and shaded.
             target.set_pixel(x, y, (r, g, b, 255))
 
+    # Paint frozen areas.
+    ice_color_variation = int(30)  # 0 means perfectly white ice; must be in [0, 255]; only affects R- and G-channel
+    for y in range(world.height):
+        for x in range(world.width):
+            if world.icecap[y, x] > 0.0:
+                smooth_mask[y, x] = True  # smooth the frozen areas, too
+                variation = rng.randint(0, ice_color_variation)
+                target.set_pixel(x, y, (255 - ice_color_variation + variation, 255 - ice_color_variation + variation, 255, 255))
+
     # Loop through and average a pixel with its neighbors to smooth transitions between biomes
     for y in range(1, world.height-1):
         for x in range(1, world.width-1):
             ## Only smooth land tiles
-            if world.is_land((x, y)):
+            if smooth_mask[y, x]:
                 # Lists to hold the separated rgb values of the neighboring pixels
                 all_r = []
                 all_g = []
@@ -404,7 +414,7 @@ def draw_satellite(world, target):
                 for j in range(y-1, y+2):
                     for i in range(x-1, x+2):
                         # Don't include ocean in the smoothing, if this tile happens to border an ocean
-                        if world.is_land((i, j)):
+                        if smooth_mask[j, i]:
                             # Grab each rgb value and append to the list
                             r, g, b, a = target[j, i]
                             all_r.append(r)
@@ -804,4 +814,9 @@ def draw_scatter_plot_on_file(world, filename):
 def draw_satellite_on_file(world, filename):
     img = PNGWriter.rgba_from_dimensions(world.width, world.height, filename)
     draw_satellite(world, img)
+    img.complete()
+
+
+def draw_icecaps_on_file(world, filename):
+    img = PNGWriter.grayscale_from_array(world.icecap, filename, scale_to_range=True)
     img.complete()

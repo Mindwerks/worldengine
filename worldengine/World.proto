@@ -1,3 +1,4 @@
+syntax = "proto2";
 package World;
 
 message World {
@@ -56,7 +57,6 @@ message World {
     required int32  height = 5;
 
     // Elevation
-
     required DoubleMatrix heightMapData  = 6;
     required double heightMapTh_sea      = 7;
     required double heightMapTh_plain    = 8;
@@ -111,6 +111,8 @@ message World {
     optional DoubleMatrix lakemap = 34;
     optional DoubleMatrix rivermap = 35;
 
+    // Ice-caps
+    optional DoubleMatrix icecap  = 36;
 }
 
 
