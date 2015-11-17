@@ -111,16 +111,6 @@ def anti_alias(map, steps):#TODO: There is probably a bit of numpy-optimization 
     return current
 
 
-def array_to_matrix(array, width, height):
-    if len(array) != (width * height):
-        raise Exception("Array as not expected length")
-    matrix = []
-    for y in range(height):
-        matrix.append([])
-        for x in range(width):
-            matrix[y].append(array[y * width + x])
-    return matrix
-
 def _equal(a, b):
     #recursion on subclasses of types: tuple, list, dict
     #specifically checks             : float, ndarray

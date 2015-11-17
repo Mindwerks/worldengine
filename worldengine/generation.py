@@ -22,39 +22,19 @@ def center_land(world):
     """Translate the map horizontally and vertically to put as much ocean as
        possible at the borders. It operates on elevation and plates map"""
 
-    min_sum_on_y = None
-    y_with_min_sum = None
-    latshift = 0
-    for y in range(world.height):
-        sum_on_y = world.elevation['data'][y].sum()
-        if min_sum_on_y is None or sum_on_y < min_sum_on_y:
-            min_sum_on_y = sum_on_y
-            y_with_min_sum = y
+    y_sums = world.elevation['data'].sum(1)  # 1 == sum along x-axis
+    y_with_min_sum = y_sums.argmin()
     if get_verbose():
         print("geo.center_land: height complete")
 
-    min_sum_on_x = None
-    x_with_min_sum = None
-    for x in range(world.width):
-        sum_on_x = world.elevation['data'].T[x].sum()
-        if min_sum_on_x is None or sum_on_x < min_sum_on_x:
-            min_sum_on_x = sum_on_x
-            x_with_min_sum = x
+    x_sums = world.elevation['data'].sum(0)  # 0 == sum along y-axis
+    x_with_min_sum = x_sums.argmin()
     if get_verbose():
         print("geo.center_land: width complete")
 
-    new_elevation_data = [] #TODO: this should fully use numpy
-    new_plates = []
-    for y in range(world.height):
-        new_elevation_data.append([])
-        new_plates.append([])
-        src_y = (y_with_min_sum + y - latshift) % world.height
-        for x in range(world.width):
-            src_x = (x_with_min_sum + x) % world.width
-            new_elevation_data[y].append(world.elevation['data'][src_y, src_x])
-            new_plates[y].append(world.plates[src_y][src_x])
-    world.elevation['data'] = numpy.array(new_elevation_data)
-    world.plates = new_plates
+    latshift = 0
+    world.elevation['data'] = numpy.roll(numpy.roll(world.elevation['data'], -y_with_min_sum + latshift, axis=0), -x_with_min_sum, axis=1)
+    world.plates = numpy.roll(numpy.roll(world.plates, -y_with_min_sum + latshift, axis=0), -x_with_min_sum, axis=1)
     if get_verbose():
         print("geo.center_land: width complete")
 
