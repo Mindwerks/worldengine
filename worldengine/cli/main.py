@@ -366,10 +366,10 @@ def main():
     export_options.add_argument("--export-format", dest="export_format", type=str,
                                 help="Export to a specific format such as BMP or PNG. " +
                                 "See http://www.gdal.org/formats_list.html for possible formats.",
-                                default="PNG")
+                                default="PNG", metavar="STR")
     export_options.add_argument("--export-datatype", dest="export_datatype", type=str,
                                 help="Type of stored data, e.g. uint16, int32, float32 etc.",
-                                default="uint16")
+                                default="uint16", metavar="STR")
 
     args = parser.parse_args()
 
