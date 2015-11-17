@@ -341,6 +341,8 @@ We would like to thank you great people who helped us while working on WorldEngi
 
 * [Joshua Coppola](https://github.com/pangal) implemented the satellite view. Thanks a lot, it looks gorgeous!
 
+* [Stephan](https://github.com/tcld) made WorldEngine make heavy use of numpy, helping to speed up the generation. He also made world-generation much more reproducible and helped improve compatibility with Python 3.
+
 History
 =======
 

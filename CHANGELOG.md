@@ -1,11 +1,17 @@
 Version 0.19-UNRELEASED
 
-* Added export support using libgdal
-* Force rivers and grayscale_heightmap to PNG to avoid ambiguity of providing a 
-filename which can introduce input error.
+* Rivers and grayscale_heightmaps are generated as PNG images, filenames no longer have to be provided.
+* The grayscale_heightmap is now stored as a proper 16 bit grayscale PNG.
 * Modified color elevation routines so that depressions are still represented as land instead of ocean and heights are normalied.
+* Speed of generation increased by almost a factor of 3 (due to update to Platec and making heavy use of numpy).
+* World-generation is now deterministic, i.e. generation is 100% reproducible.
+* Added support for exporting heightmaps using libgdal (see http://www.gdal.org/formats_list.html for possible formats).
 * Added the ability to modify temperature and humidity ranges as well as the temperature/precipitation curve.
-* Added the ability to generate scatter plots showing temperature and humidity of all terrestrial cells. 
+* Added the ability to generate scatter plots showing temperature and humidity of all terrestrial cells.
+* Added small variations to the temperature-map based on basic orbital parameters.
+* Added a satellite-like view of the world.
+* Added support to save/load worlds in/from HDF5-format.
+* Removed support for saving/loading worlds in/from pickle-format.
 
 Version 0.18
 
@@ -65,13 +71,3 @@ Version 0.4.1
 Version 0.4.0
 
 * Evan Sampson added Holdridge life zones model
-
-
-
-
-
-
-
-
-
-
