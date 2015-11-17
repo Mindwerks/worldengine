@@ -285,7 +285,7 @@ If you are using WorldEngine please let us know!
 Contributors
 ============
 
-The this project is maintained by [Bret Curtis](https://github.com/psi29a) and [Federico Tomassetti](https://github.com/ftomassetti).
+This project is maintained by [Bret Curtis](https://github.com/psi29a) and [Federico Tomassetti](https://github.com/ftomassetti).
 
 All contributions, questions, ideas are more than welcome!
 Feel free to open an issue or write in our [google group](https://groups.google.com/forum/?hl=en#!forum/worldengine).
