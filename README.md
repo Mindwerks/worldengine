@@ -3,7 +3,7 @@ WorldEngine - a world generator
 
 [![Coverage Status](https://coveralls.io/repos/Mindwerks/worldengine/badge.svg?branch=master&service=github)](https://coveralls.io/github/Mindwerks/worldengine?branch=master) [![Build Status](https://travis-ci.org/Mindwerks/worldengine.svg?branch=master)](https://travis-ci.org/Mindwerks/worldengine) [![Build status](https://ci.appveyor.com/api/projects/status/io4ljim2ra83df23?svg=true)](https://ci.appveyor.com/project/ftomassetti/worldengine)
 
-_The current stable version is 0.18.0_
+_The current stable version is 0.19.0_
 
 You can generate the data for your own world, including a number of images (heigthmap, biomes, etc.).
 
@@ -124,7 +124,7 @@ worldengine -s 4 -n an_example -q 25 -x 2048 -y 2048
 Produce this output
 
 ```
-Worldengine - a world generator (v. 0.18.0)
+Worldengine - a world generator (v. 0.19.0)
 -----------------------
  operation            : world generation
  seed                 : 4
