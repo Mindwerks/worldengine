@@ -5,7 +5,7 @@ WorldEngine - a world generator
 
 _The current stable version is 0.18.0_
 
-You can generate worlds data (heighmap, biome, etc.) and images for your own worlds.
+You can generate the data for your own world, including a number of images (heigthmap, biomes, etc.).
 
 For example:
 
@@ -15,9 +15,9 @@ worldengine world -s 1 -n seed1
 
 Worlds are generated using plate simulations, erosion, rain shadows, Holdridge life zones model and plenty of other phenomenons.
 
-Once a world it can be used for simulation civs evolution (see project [civs](https://github.com/ftomassetti/civs)).
+The created world can be used for simulating the evolution of a civilization (see project [civs](https://github.com/ftomassetti/civs)).
 
-For a generated world is also possible to generate additional maps, for example ancient looking map:
+It is also possible to generate additional maps, for example an ancient looking map:
 
 ```bash
 worldengine ancient_map -w seed1.world
@@ -26,7 +26,7 @@ worldengine ancient_map -w seed1.world
 ![](https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/examples/ancient_map_seed1.png)
 
 
-We started a [google group](https://groups.google.com/forum/?hl=en#!forum/worldengine): if you have ideas, problems, suggestions or want to contribute please [join us](https://groups.google.com/forum/?hl=en#!forum/worldengine)!
+We started a [Google group](https://groups.google.com/forum/?hl=en#!forum/worldengine): Should you have ideas, problems, suggestions or want to contribute, please [join us](https://groups.google.com/forum/?hl=en#!forum/worldengine)!
 
 Interoperability (Python, Java)
 ===============================
