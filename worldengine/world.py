@@ -423,42 +423,47 @@ class World(object):
     def start_mountain_th(self):
         return self.elevation['thresholds'][3][1]
 
-    def is_mountain(self, pos):  # general test
-        if self.ocean[pos[1], pos[0]]:
-            return False
-        mountain_level = self.elevation['thresholds'][2][1]  # hills are mountains, too
-        x, y = pos
-        return mountain_level <= self.elevation['data'][y, x]
-
-    def is_hill(self, pos):
+    def is_hill(self, pos, include_higher=False):
         if self.ocean[pos[1], pos[0]]:
             return False
         hill_level = self.elevation['thresholds'][2][1]
         low_mountain_level = self.elevation['thresholds'][3][1]
         x, y = pos
-        return hill_level <= self.elevation['data'][y, x] < low_mountain_level
+        if include_higher:
+            return hill_level <= self.elevation['data'][y, x]
+        else:
+            return hill_level <= self.elevation['data'][y, x] < low_mountain_level
 
-    def is_low_mountain(self, pos):
+    def is_low_mountain(self, pos, include_higher=False):
         if self.ocean[pos[1], pos[0]]:
             return False
         low_mountain_level = self.elevation['thresholds'][3][1]
         mountain_level = self.elevation['thresholds'][4][1]
         x, y = pos
-        return low_mountain_level <= self.elevation['data'][y, x] < mountain_level
+        if include_higher:
+            return low_mountain_level <= self.elevation['data'][y, x]
+        else:
+            return low_mountain_level <= self.elevation['data'][y, x] < mountain_level
 
-    def is_medium_mountain(self, pos):
+    def is_medium_mountain(self, pos, include_higher=False):
         if self.ocean[pos[1], pos[0]]:
             return False
         mountain_level = self.elevation['thresholds'][4][1]
         high_mountain_level = self.elevation['thresholds'][5][1]
         x, y = pos
-        return mountain_level <= self.elevation['data'][y, x] < high_mountain_level
+        if include_higher:
+            return mountain_level <= self.elevation['data'][y, x]
+        else:
+            return mountain_level <= self.elevation['data'][y, x] < high_mountain_level
 
-    def is_high_mountain(self, pos):
+    def is_high_mountain(self, pos, include_higher=False):
+        # include_higher is not used here (there is no higher threshold anyway); it is there to give all functions of this type the same signature
         if self.ocean[pos[1], pos[0]]:
             return False
         high_mountain_level = self.elevation['thresholds'][5][1]
         x, y = pos
+        if include_higher:
+            pass
         return high_mountain_level <= self.elevation['data'][y, x]
 
     def level_of_mountain(self, pos):

@@ -152,9 +152,7 @@ class ErosionSimulation(object):
                 while not neighbour_seed_found:
 
                     # have we found a seed?
-                    if world.is_mountain((cx, cy)) and \
-                            water_flow[cy, cx] >= RIVER_TH:
-
+                    if world.is_low_mountain((cx, cy), include_higher=True) and water_flow[cy, cx] >= RIVER_TH:
                         # try not to create seeds around other seeds
                         for seed in river_source_list:
                             sx, sy = seed
