@@ -62,3 +62,5 @@ Each point on this plot is a single point on the landmass of the planet. The Tem
 
 .. image:: https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/examples/scatter_plot-labelled.png
    :align: center
+
+Cells in grey are ones which do not technically occur in the standard Holdridge life zone model and as the example above shows there are certain areas of terrain in the example that are both **Polar** and **Semiarid**. Since there are not too many of them we will not concern ourselves as Worldengine will simply treat them as **Polar** and **Arid** (i.e. classify them as **Polar Ice**).
