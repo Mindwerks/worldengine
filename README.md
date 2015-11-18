@@ -5,7 +5,7 @@ WorldEngine - a world generator
 
 _The current stable version is 0.18.0_
 
-You can generate your own world, including images (heigthmap, biomes, etc.).
+You can generate the data for your own world, including a number of images (heigthmap, biomes, etc.).
 
 For example:
 
@@ -15,7 +15,7 @@ worldengine world -s 1 -n seed1
 
 Worlds are generated using plate simulations, erosion, rain shadows, Holdridge life zones model and plenty of other phenomenons.
 
-A finished world can be used for simulating the evolution of a civilization (see project [civs](https://github.com/ftomassetti/civs)).
+The created world can be used for simulating the evolution of a civilization (see project [civs](https://github.com/ftomassetti/civs)).
 
 It is also possible to generate additional maps, for example an ancient looking map:
 
