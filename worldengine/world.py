@@ -89,6 +89,8 @@ class World(object):
                 '''
                 if type(cell) is numpy.bool_:
                     value = bool(cell)
+                elif type(cell) is numpy.uint16:
+                    value = int(cell)
                 else:
                     value = cell
                 if transformation:
@@ -246,7 +248,7 @@ class World(object):
         w.set_elevation(e, e_th)
 
         # Plates
-        w.set_plates(World._from_protobuf_matrix(p_world.plates))
+        w.set_plates(numpy.array(World._from_protobuf_matrix(p_world.plates)))
 
         # Ocean
         w.set_ocean(numpy.array(World._from_protobuf_matrix(p_world.ocean)))
@@ -790,11 +792,7 @@ class World(object):
     #
 
     def n_actual_plates(self):
-        res = -1
-        for row in self.plates:
-            for cell in row:
-                res = max([cell, res])
-        return res + 1
+        return self.plates.max() + 1
 
     #
     # Setters
@@ -809,11 +807,11 @@ class World(object):
         self.elevation = {'data': data, 'thresholds': thresholds}
 
     def set_plates(self, data):
-        if (len(data) != self.height) or (len(data[0]) != self.width):
+        if (data.shape[0] != self.height) or (data.shape[1] != self.width):
             raise Exception(
                 "Setting plates map with wrong dimension. "
                 "Expected %d x %d, found %d x %d" % (
-                    self.width, self.height, len(data[0]), len(data)))
+                    self.width, self.height, data.shape[1], data.shape[0]))
         self.plates = data
 
     def set_biome(self, biome):

@@ -59,28 +59,6 @@ class Counter(object):
         sys.stdout.write(self.to_str)
 
 
-def matrix_min_and_max(matrix):
-    _min = None
-    _max = None
-    for row in matrix:
-        for el in row:
-            val = el
-            if _min is None or val < _min:
-                _min = val
-            if _max is None or val > _max:
-                _max = val
-    return _min, _max
-
-
-def rescale_value(original, prev_min, prev_max, min, max):
-    """Rescale a given value.
-    Given the value, the current min and max and the new min and max
-    produce the rescaled value
-    """
-    f = float(original - prev_min) / (prev_max - prev_min)
-    return min + ((max - min) * f)
-
-
 def anti_alias(map, steps):#TODO: There is probably a bit of numpy-optimization that can be done here.
     """
     Execute the anti_alias operation steps times on the given map
@@ -110,16 +88,6 @@ def anti_alias(map, steps):#TODO: There is probably a bit of numpy-optimization 
         current = _anti_alias_step(current)
     return current
 
-
-def array_to_matrix(array, width, height):
-    if len(array) != (width * height):
-        raise Exception("Array as not expected length")
-    matrix = []
-    for y in range(height):
-        matrix.append([])
-        for x in range(width):
-            matrix[y].append(array[y * width + x])
-    return matrix
 
 def _equal(a, b):
     #recursion on subclasses of types: tuple, list, dict

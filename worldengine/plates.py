@@ -7,7 +7,6 @@ import numpy
 
 from worldengine.generation import Step, add_noise_to_elevation, center_land, generate_world, \
     get_verbose, initialize_ocean_and_thresholds, place_oceans_at_map_borders
-from worldengine.common import array_to_matrix
 from worldengine.world import World
 
 
@@ -48,7 +47,7 @@ def _plates_simulation(name, width, height, seed, temps=
     world = World(name, width, height, seed, num_plates, ocean_level, step, temps,
                   humids, gamma_curve, curve_offset)
     world.set_elevation(numpy.array(e_as_array).reshape(height, width), None)
-    world.set_plates(array_to_matrix(p_as_array, width, height))
+    world.set_plates(numpy.array(p_as_array, dtype=numpy.uint16).reshape(height, width))
     return world
 
 
