@@ -7,7 +7,7 @@ from worldengine.common import set_verbose, print_verbose
 from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
     draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
     draw_temperature_levels_on_file, draw_riversmap_on_file, draw_scatter_plot_on_file, \
-    draw_satellite_on_file, draw_icecaps_on_file
+    draw_hypsographic_plot_on_file, draw_satellite_on_file, draw_icecaps_on_file
 from worldengine.plates import world_gen, generate_plates_simulation
 from worldengine.imex import export
 from worldengine.step import Step
@@ -84,17 +84,26 @@ def generate_rivers_map(world, filename):
     draw_riversmap_on_file(world, filename)
     print("+ rivers map generated in '%s'" % filename)
 
-def draw_scatter_plot(world, filename):
-    draw_scatter_plot_on_file(world, filename)
-    print("+ scatter plot generated in '%s'" % filename)
 
-def draw_satellite_map(world, filename):
+def generate_satellite_map(world, filename):
     draw_satellite_on_file(world, filename)
     print("+ satellite map generated in '%s'" % filename)
 
-def draw_icecaps_map(world, filename):
+
+def generate_icecaps_map(world, filename):
     draw_icecaps_on_file(world, filename)
     print("+ icecap map generated in '%s'" % filename)
+
+
+def generate_scatter_plot(world, filename):
+    draw_scatter_plot_on_file(world, filename)
+    print("+ scatter plot generated in '%s'" % filename)
+
+
+def generate_hypsographic_plot(world, filename):
+    draw_hypsographic_plot_on_file(world, filename)
+    print("+ hypsographic plot generated in '%s'" % filename)
+
 
 def generate_plates(seed, world_name, output_dir, width, height,
                     num_plates=10):
@@ -317,12 +326,14 @@ def main():
     g_generate.add_argument('--not-fade-borders', dest='fade_borders', action="store_false",
                                help="Not fade borders",
                                default=True)
-    g_generate.add_argument('--scatter', dest='scatter_plot',
-                            action="store_true", help="generate scatter plot")
     g_generate.add_argument('--sat', dest='satelite_map',
                             action="store_true", help="generate satellite map")
     g_generate.add_argument('--ice', dest='icecaps_map',
                             action="store_true", help="generate ice caps map")
+    g_generate.add_argument('--scatter', dest='scatter_plot',
+                            action="store_true", help="generate scatter plot")
+    g_generate.add_argument('--hypsographic', dest='hypsographic_plot',
+                            action="store_true", help="generate hypsographic curve")
 
     # -----------------------------------------------------
     g_ancient_map = parser.add_argument_group(
@@ -468,7 +479,9 @@ def main():
         for x in range(0,len(humids)):
             humids[x] = 1 - float(humids[x])
     if args.scatter_plot and not generation_operation:
-        usage(error="Scatter plot can be produced only during world generation")
+        usage(error="Scatter plot can be produced only during world generation.")
+    if args.hypsographic_plot and not generation_operation:
+        usage(error="Hypsograpic curve can be produced only during world generation.")
 
     print('Worldengine - a world generator (v. %s)' % VERSION)
     print('-----------------------')
@@ -486,6 +499,7 @@ def main():
         print(' icecaps heightmap    : %s' % args.icecaps_map)
         print(' rivers map           : %s' % args.rivers_map)
         print(' scatter plot         : %s' % args.scatter_plot)
+        print(' hypsographic plot    : %s' % args.hypsographic_plot)
         print(' satellite map        : %s' % args.satelite_map)
         print(' fade borders         : %s' % args.fade_borders)
         if args.temps:
@@ -542,15 +556,18 @@ def main():
         if args.rivers_map:
             generate_rivers_map(world,
             '%s/%s_rivers.png' % (args.output_dir, world_name))
-        if args.scatter_plot:
-            draw_scatter_plot(world,
-            '%s/%s_scatter.png' % (args.output_dir, world_name))    
         if args.satelite_map:
-            draw_satellite_map(world,
+            generate_satellite_map(world,
             '%s/%s_satellite.png' % (args.output_dir, world_name))
         if args.icecaps_map:
-            draw_icecaps_map(world,
+            generate_icecaps_map(world,
             '%s/%s_icecaps.png' % (args.output_dir, world_name))
+        if args.scatter_plot:
+            generate_scatter_plot(world,
+            '%s/%s_scatter.png' % (args.output_dir, world_name))
+        if args.hypsographic_plot:
+            generate_hypsographic_plot(world,
+            '%s/%s_hypsographic.png' % (args.output_dir, world_name))  
 
     elif operation == 'plates':
         print('')  # empty line

@@ -3,7 +3,8 @@ import os
 import numpy
 from worldengine.draw import _biome_colors, draw_simple_elevation, elevation_color, \
     draw_elevation, draw_riversmap, draw_grayscale_heightmap, draw_ocean, draw_precipitation, \
-    draw_world, draw_temperature_levels, draw_biome, draw_scatter_plot, draw_satellite
+    draw_world, draw_temperature_levels, draw_biome, draw_scatter_plot, draw_hypsographic_plot, \
+    draw_satellite
 from worldengine.biome import Biome
 from worldengine.world import World
 from worldengine.image_io import PNGWriter, PNGReader
@@ -153,6 +154,14 @@ class TestDraw(TestBase):
         target = PNGWriter.rgba_from_dimensions(512, 512)
         draw_scatter_plot(w, 512, target)
         self._assert_img_equal("scatter_28070", target)
+
+    def test_draw_hypsographic_plot(self):
+        x_bins = 800
+        y_bins = 600
+        w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        target = PNGWriter.grayscale_from_dimensions(x_bins, y_bins, channel_bitdepth=8)
+        draw_hypsographic_plot(w, target, x_bins, y_bins)
+        self._assert_img_equal("hypsographic_28070", target)
 
     def test_draw_satellite(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)

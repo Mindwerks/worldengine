@@ -13,9 +13,10 @@ class TestDrawingFunctions(TestBase):
         self.w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
 
     def test_draw_ancient_map(self):
-        target = PNGWriter.rgba_from_dimensions(self.w.width * 3, self.w.height * 3)
-        draw_ancientmap(self.w, target, resize_factor=3)
-        self._assert_img_equal("ancientmap_28070_factor3", target)
+        factor = int(2)
+        target = PNGWriter.rgba_from_dimensions(self.w.width * factor, self.w.height * factor)
+        draw_ancientmap(self.w, target, resize_factor=factor)
+        self._assert_img_equal("ancientmap_28070_factor%i" % factor, target)
 
     def test_gradient(self):
         self._assert_are_colors_equal((10, 20, 40),
