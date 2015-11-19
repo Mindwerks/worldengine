@@ -25,7 +25,7 @@ class IcecapSimulation(object):
         #                       width * height * sizeof(numpy.bool) (temporary)
 
         # constants for convenience (or performance)
-        ocean = world.ocean
+        ocean = world.layers['ocean'].data
         temperature = world.temperature['data']
 
         # primary constants (could be used as global variables at some point); all values should be in [0, 1]
@@ -54,7 +54,7 @@ class IcecapSimulation(object):
 
         for y in range(world.height):
             for x in range(world.width):
-                if ocean[y, x]:  # or world.river_map[y, x] > 0 or world.lake_map[y, x] > 0 or world.watermap['data'][y, x] > 0:
+                if world.is_ocean((x, y)):  # or world.river_map[y, x] > 0 or world.lake_map[y, x] > 0 or world.watermap['data'][y, x] > 0:
                     t = temperature[y, x]
                     if t - temp_min < freeze_threshold:
                         # map temperature to freeze-chance (linear interpolation)

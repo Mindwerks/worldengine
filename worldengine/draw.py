@@ -237,19 +237,19 @@ def get_normalized_elevation_array(world):
 
     e = world.layers['elevation'].data
 
-    mask = numpy.ma.array(e, mask=world.ocean)  # only land
+    mask = numpy.ma.array(e, mask=world.layers['ocean'].data)  # only land
     min_elev_land = mask.min()
     max_elev_land = mask.max()
     elev_delta_land = max_elev_land - min_elev_land
 
-    mask = numpy.ma.array(e, mask=numpy.logical_not(world.ocean))  # only ocean
+    mask = numpy.ma.array(e, mask=numpy.logical_not(world.layers['ocean'].data))  # only ocean
     min_elev_sea = mask.min()
     max_elev_sea = mask.max()
     elev_delta_sea = max_elev_sea - min_elev_sea
 
     c = numpy.empty(e.shape, dtype=numpy.float)
-    c[numpy.invert(world.ocean)] = (e[numpy.invert(world.ocean)] - min_elev_land) * 127 / elev_delta_land + 128
-    c[world.ocean] = (e[world.ocean] - min_elev_sea) * 127 / elev_delta_sea
+    c[numpy.invert(world.layers['ocean'].data)] = (e[numpy.invert(world.layers['ocean'].data)] - min_elev_land) * 127 / elev_delta_land + 128
+    c[world.layers['ocean'].data] = (e[world.layers['ocean'].data] - min_elev_sea) * 127 / elev_delta_sea
     c = numpy.rint(c).astype(dtype=numpy.int32)  # proper rounding
 
     return c
@@ -326,21 +326,21 @@ def draw_simple_elevation(world, sea_level, target):
     e = world.layers['elevation'].data
     c = numpy.empty(e.shape, dtype=numpy.float)
 
-    has_ocean = not (sea_level is None or world.ocean is None or not world.ocean.any())  # or 'not any ocean'
-    mask_land = numpy.ma.array(e, mask=world.ocean if has_ocean else False)  # only land
+    has_ocean = not (sea_level is None or world.layers['ocean'].data is None or not world.layers['ocean'].data.any())  # or 'not any ocean'
+    mask_land = numpy.ma.array(e, mask=world.layers['ocean'].data if has_ocean else False)  # only land
 
     min_elev_land = mask_land.min()
     max_elev_land = mask_land.max()
     elev_delta_land = (max_elev_land - min_elev_land) / 11.0
 
     if has_ocean:
-        land = numpy.logical_not(world.ocean)
+        land = numpy.logical_not(world.layers['ocean'].data)
         mask_ocean = numpy.ma.array(e, mask=land)  # only ocean
         min_elev_sea = mask_ocean.min()
         max_elev_sea = mask_ocean.max()
         elev_delta_sea = max_elev_sea - min_elev_sea
 
-        c[world.ocean] = ((e[world.ocean] - min_elev_sea) / elev_delta_sea)
+        c[world.layers['ocean'].data] = ((e[world.layers['ocean'].data] - min_elev_sea) / elev_delta_sea)
         c[land] = ((e[land] - min_elev_land) / elev_delta_land) + 1
     else:
         c = ((e - min_elev_land) / elev_delta_land) + 1
@@ -376,7 +376,7 @@ def draw_satellite(world, target):
 
     # Get an elevation mask where heights are normalized between 0 and 255
     elevation_mask = get_normalized_elevation_array(world)
-    smooth_mask = numpy.invert(world.ocean)  # all land shall be smoothed (other tiles can be included by setting them to True)
+    smooth_mask = numpy.invert(world.layers['ocean'].data)  # all land shall be smoothed (other tiles can be included by setting them to True)
 
     rng = numpy.random.RandomState(world.seed)  # create our own random generator; necessary for now to make the tests reproducible, even though it is a bit ugly
 
@@ -485,7 +485,7 @@ def draw_elevation(world, shadow, target):
     height = world.height
 
     data = world.layers['elevation'].data
-    ocean = world.ocean
+    ocean = world.layers['ocean'].data
 
     mask = numpy.ma.array(data, mask=ocean)
 
@@ -573,7 +573,7 @@ def draw_world(world, target):
                 biome = world.biome_at((x, y))
                 target.set_pixel(x, y, _biome_colors[biome.name()])
             else:
-                c = int(world.sea_depth[y, x] * 200 + 50)
+                c = int(world.layers['sea_depth'].data[y, x] * 200 + 50)
                 target.set_pixel(x, y, (0, 0, 255 - c, 255))
 
 
@@ -631,8 +631,8 @@ def draw_scatter_plot(world, size, target):
 
     #Find min and max values of humidity and temperature on land so we can
     #normalize temperature and humidity to the chart
-    humid = numpy.ma.masked_array(world.humidity['data'], mask=world.ocean)
-    temp = numpy.ma.masked_array(world.temperature['data'], mask=world.ocean)
+    humid = numpy.ma.masked_array(world.humidity['data'], mask=world.layers['ocean'].data)
+    temp = numpy.ma.masked_array(world.temperature['data'], mask=world.layers['ocean'].data)
     min_humidity = humid.min()
     max_humidity = humid.max()
     min_temperature = temp.min()

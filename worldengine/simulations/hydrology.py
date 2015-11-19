@@ -44,7 +44,7 @@ class WatermapSimulation(object):
                 f = q / tot_lowers
                 for l in lowers:
                     s, p = l
-                    if not world.ocean[p[1], p[0]]:
+                    if not world.is_ocean(p):
                         px, py = p
                         ql = f * s
                         # ql = q
@@ -61,15 +61,11 @@ class WatermapSimulation(object):
             if x is not None and world.precipitation['data'][y, x] > 0:
                 droplet(world, (x, y), world.precipitation['data'][y, x],
                         _watermap_data)
+        ocean = world.layers['ocean'].data
         _watermap = dict()
         _watermap['data'] = _watermap_data
         _watermap['thresholds'] = dict()
-        _watermap['thresholds']['creek'] = find_threshold_f(_watermap_data,
-                                                            0.05,
-                                                            ocean=world.ocean)
-        _watermap['thresholds']['river'] = find_threshold_f(_watermap_data,
-                                                            0.02,
-                                                            ocean=world.ocean)
-        _watermap['thresholds']['main river'] = \
-            find_threshold_f(_watermap_data, 0.007, ocean=world.ocean)
+        _watermap['thresholds']['creek'] = find_threshold_f(_watermap_data, 0.05, ocean=ocean)
+        _watermap['thresholds']['river'] = find_threshold_f(_watermap_data, 0.02, ocean=ocean)
+        _watermap['thresholds']['main river'] = find_threshold_f(_watermap_data, 0.007, ocean=ocean)
         return _watermap

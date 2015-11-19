@@ -56,7 +56,7 @@ class ErosionSimulation(object):
                 river_list.append(river)
                 self.cleanUpFlow(river, world)
                 rx, ry = river[-1]  # find last cell in river
-                if not world.ocean[ry, rx]:
+                if not world.is_ocean((rx, ry)):
                     lake_list.append(river[-1])  # river flowed into a lake
 
         # step four: simulate erosion and updating river map
@@ -206,7 +206,7 @@ class ErosionSimulation(object):
                         return path  # skip the rest, return path
 
             # found a sea?
-            if world.ocean[y, x]:
+            if world.is_ocean((x, y)):
                 break
 
             # find our immediate lowest elevation and flow there

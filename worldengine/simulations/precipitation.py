@@ -16,9 +16,10 @@ class PrecipitationSimulation(object):
         if get_verbose():
             start_time = time.time()
         pre_calculated = self._calculate(seed, world)
+        ocean = world.layers['ocean'].data
         ths = [
-            ('low', find_threshold_f(pre_calculated, 0.75, world.ocean)),
-            ('med', find_threshold_f(pre_calculated, 0.3, world.ocean)),
+            ('low', find_threshold_f(pre_calculated, 0.75, ocean)),
+            ('med', find_threshold_f(pre_calculated, 0.3, ocean)),
             ('hig', None)
         ]
         world.set_precipitation(pre_calculated, ths)

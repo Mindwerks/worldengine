@@ -1,16 +1,6 @@
 import numpy
 
-from worldengine.biome import Biome, BorealDesert, BorealDryScrub, BorealMoistForest, \
-    BorealRainForest, BorealWetForest, CoolTemperateDesertScrub, CoolTemperateDesert, \
-    CoolTemperateMoistForest, CoolTemperateRainForest, CoolTemperateSteppe, CoolTemperateWetForest,\
-    Ice, PolarDesert, SubpolarDryTundra, SubpolarMoistTundra, SubpolarRainTundra, \
-    SubpolarWetTundra, SubtropicalDesert, SubtropicalDesertScrub, SubtropicalDryForest, \
-    SubtropicalMoistForest, SubtropicalRainForest, SubtropicalThornWoodland, SubtropicalWetForest, \
-    WarmTemperateDesert, WarmTemperateDesertScrub, WarmTemperateDryForest, \
-    WarmTemperateMoistForest, WarmTemperateRainForest, WarmTemperateThornScrub, \
-    WarmTemperateWetForest, TropicalDesert, TropicalDesertScrub, TropicalDryForest, \
-    TropicalMoistForest, TropicalRainForest, TropicalThornWoodland, TropicalWetForest, \
-    TropicalVeryDryForest, biome_index_to_name, biome_name_to_index
+from worldengine.biome import *
 import worldengine.protobuf.World_pb2 as Protobuf
 from worldengine.step import Step
 from worldengine.common import _equal
@@ -233,8 +223,8 @@ class World(object):
         self._to_protobuf_matrix(self.layers['plates'].data, p_world.plates)
 
         # Ocean
-        self._to_protobuf_matrix(self.ocean, p_world.ocean)
-        self._to_protobuf_matrix(self.sea_depth, p_world.sea_depth)
+        self._to_protobuf_matrix(self.layers['ocean'].data, p_world.ocean)
+        self._to_protobuf_matrix(self.layers['sea_depth'].data, p_world.sea_depth)
 
         # Biome
         if hasattr(self, 'biome'):
@@ -312,7 +302,7 @@ class World(object):
 
         # Ocean
         w.set_ocean(numpy.array(World._from_protobuf_matrix(p_world.ocean)))
-        w.sea_depth = numpy.array(World._from_protobuf_matrix(p_world.sea_depth))
+        w.set_sea_depth(numpy.array(World._from_protobuf_matrix(p_world.sea_depth)))
 
         # Biome
         if len(p_world.biome.rows) > 0:
@@ -395,18 +385,18 @@ class World(object):
     #
 
     def random_land(self):
-        if self.ocean.all():
+        if self.layers['ocean'].data.all():
             return None, None  # return invalid indices if there is no land at all
-        lands = numpy.invert(self.ocean)
+        lands = numpy.invert(self.layers['ocean'].data)
         lands = numpy.transpose(lands.nonzero())  # returns a list of tuples/indices with land positions
         y, x = lands[numpy.random.randint(0, len(lands))]  # uses global RNG
         return x, y
 
     def is_land(self, pos):
-        return not self.ocean[pos[1], pos[0]]#faster than reversing pos or transposing ocean
+        return not self.layers['ocean'].data[pos[1], pos[0]]#faster than reversing pos or transposing ocean
 
     def is_ocean(self, pos):
-        return self.ocean[pos[1], pos[0]]
+        return self.layers['ocean'].data[pos[1], pos[0]]
 
     def sea_level(self):
         return self.layers['elevation'].thresholds[0][1]
@@ -479,7 +469,7 @@ class World(object):
         return self.layers['elevation'].thresholds[2][1]
 
     def is_mountain(self, pos):
-        if self.ocean[pos[1], pos[0]]:
+        if self.is_ocean(pos):
             return False
         if len(self.layers['elevation'].thresholds) == 4:
             mi = 2
@@ -501,7 +491,7 @@ class World(object):
         return self.layers['elevation'].data[y, x] < mountain_level + 2.0
 
     def level_of_mountain(self, pos):
-        if self.ocean[pos[1], pos[0]]:
+        if self.is_ocean(pos):
             return False
         if len(self.layers['elevation'].thresholds) == 4:
             mi = 2
@@ -526,7 +516,7 @@ class World(object):
         return self.layers['elevation'].data[y, x] > mountain_level + 4.0
 
     def is_hill(self, pos):
-        if self.ocean[pos[1], pos[0]]:
+        if self.is_ocean(pos):
             return False
         if len(self.layers['elevation'].thresholds) == 4:
             hi = 1
@@ -892,7 +882,16 @@ class World(object):
                 "found %d x %d" % (self.width, self.height,
                                    ocean.shape[1], ocean.shape[0]))
 
-        self.ocean = ocean
+        self.layers['ocean'] = Layer(ocean)
+
+    def set_sea_depth(self, data):
+        if (data.shape[0] != self.height) or (data.shape[1] != self.width):
+            raise Exception(
+                "Setting sea depth map with wrong dimension. Expected %d x %d, "
+                "found %d x %d" % (self.width, self.height,
+                                   data.shape[1], data.shape[0]))
+
+        self.layers['sea_depth'] = Layer(data)
 
     def set_precipitation(self, data, thresholds):
         """"Precipitation is a value in [-1,1]"""

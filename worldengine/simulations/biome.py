@@ -13,7 +13,7 @@ class BiomeSimulation(object):
         w = world
         width = world.width
         height = world.height
-        ocean = world.ocean
+        ocean = world.layers['ocean'].data
         cm = {}
         biome_cm = {}
         biome = numpy.zeros((height, width), dtype = object)#this is still kind of expensive memory-wise

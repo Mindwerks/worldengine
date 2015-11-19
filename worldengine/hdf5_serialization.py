@@ -28,10 +28,10 @@ def save_world_to_hdf5(world, filename):
     plates_data.write_direct(world.layers['plates'].data)
 
     ocean_data = f.create_dataset("ocean", (world.height, world.width), dtype=numpy.bool)
-    ocean_data.write_direct(world.ocean)
+    ocean_data.write_direct(world.layers['ocean'].data)
 
     sea_depth_data = f.create_dataset("sea_depth", (world.height, world.width), dtype=numpy.float)
-    sea_depth_data.write_direct(world.sea_depth)
+    sea_depth_data.write_direct(world.layers['sea_depth'].data)
 
     if hasattr(world, 'biome'):
         biome_data = f.create_dataset("biome", (world.height, world.width), dtype=numpy.uint16)
@@ -146,7 +146,7 @@ def load_world_to_hdf5(filename):
 
     # Ocean
     w.set_ocean(numpy.array(f['ocean']))
-    w.sea_depth = numpy.array(f['sea_depth'])
+    w.set_sea_depth(numpy.array(f['sea_depth']))
 
     # Biome
     if 'biome' in f.keys():
