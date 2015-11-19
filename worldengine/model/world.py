@@ -230,7 +230,7 @@ class World(object):
         p_world.heightMapTh_hill = self.layers['elevation'].thresholds[2][1]
 
         # Plates
-        self._to_protobuf_matrix(self.plates, p_world.plates)
+        self._to_protobuf_matrix(self.layers['plates'].data, p_world.plates)
 
         # Ocean
         self._to_protobuf_matrix(self.ocean, p_world.ocean)
@@ -318,7 +318,7 @@ class World(object):
         if len(p_world.biome.rows) > 0:
             w.set_biome(numpy.array(
                 World._from_protobuf_matrix(
-                    p_world.biome, biome_index_to_name), dtype = object))
+                    p_world.biome, biome_index_to_name), dtype=object))
 
         # Humidity
         # FIXME: use setters
@@ -852,7 +852,7 @@ class World(object):
     #
 
     def n_actual_plates(self):
-        return self.plates.max() + 1
+        return self.layers['plates'].data.max() + 1
 
     #
     # Setters
@@ -872,7 +872,7 @@ class World(object):
                 "Setting plates map with wrong dimension. "
                 "Expected %d x %d, found %d x %d" % (
                     self.width, self.height, data.shape[1], data.shape[0]))
-        self.plates = data
+        self.layers['plates'] = Layer(data)
 
     def set_biome(self, biome):
         if biome.shape[0] != self.height:

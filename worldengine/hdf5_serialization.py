@@ -25,7 +25,7 @@ def save_world_to_hdf5(world, filename):
     elevation_data.write_direct(world.layers['elevation'].data)
 
     plates_data = f.create_dataset("plates", (world.height, world.width), dtype=numpy.uint16)
-    plates_data.write_direct(world.plates)
+    plates_data.write_direct(world.layers['plates'].data)
 
     ocean_data = f.create_dataset("ocean", (world.height, world.width), dtype=numpy.bool)
     ocean_data.write_direct(world.ocean)
