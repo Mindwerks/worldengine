@@ -44,6 +44,32 @@ class GenerationParameters(object):
             return False
 
 
+class Layer(object):
+
+    def __init__(self, data):
+        self.data = data
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return _equal(self.data, other.data)
+        else:
+            return False
+
+
+class LayerWithThresholds(Layer):
+
+    def __init__(self, data, thresholds):
+        Layer.__init__(self, data)
+        self.thresholds = thresholds
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+
+            return _equal(self.data, other.data) and _equal(self.thresholds, other.thresholds)
+        else:
+            return False
+
+
 class World(object):
     """A world composed by name, dimensions and all the characteristics of
     each cell.
@@ -62,6 +88,8 @@ class World(object):
         self.curve_offset = curve_offset
 
         self.generation_params = generation_params
+
+        self.layers = {}
 
         # Deprecated
         self.width = size.width
@@ -196,10 +224,10 @@ class World(object):
         p_world.generationData.step = self.step.name
 
         # Elevation
-        self._to_protobuf_matrix(self.elevation['data'], p_world.heightMapData)
-        p_world.heightMapTh_sea = self.elevation['thresholds'][0][1]
-        p_world.heightMapTh_plain = self.elevation['thresholds'][1][1]
-        p_world.heightMapTh_hill = self.elevation['thresholds'][2][1]
+        self._to_protobuf_matrix(self.layers['elevation'].data, p_world.heightMapData)
+        p_world.heightMapTh_sea = self.layers['elevation'].thresholds[0][1]
+        p_world.heightMapTh_plain = self.layers['elevation'].thresholds[1][1]
+        p_world.heightMapTh_hill = self.layers['elevation'].thresholds[2][1]
 
         # Plates
         self._to_protobuf_matrix(self.plates, p_world.plates)
@@ -381,7 +409,7 @@ class World(object):
         return self.ocean[pos[1], pos[0]]
 
     def sea_level(self):
-        return self.elevation['thresholds'][0][1]
+        return self.layers['elevation'].thresholds[0][1]
 
     #
     # Tiles around
@@ -448,69 +476,69 @@ class World(object):
     #
 
     def start_mountain_th(self):
-        return self.elevation['thresholds'][2][1]
+        return self.layers['elevation'].thresholds[2][1]
 
     def is_mountain(self, pos):
         if self.ocean[pos[1], pos[0]]:
             return False
-        if len(self.elevation['thresholds']) == 4:
+        if len(self.layers['elevation'].thresholds) == 4:
             mi = 2
         else:
             mi = 1
-        mountain_level = self.elevation['thresholds'][mi][1]
+        mountain_level = self.layers['elevation'].thresholds[mi][1]
         x, y = pos
-        return self.elevation['data'][y][x] > mountain_level
+        return self.layers['elevation'].data[y][x] > mountain_level
 
     def is_low_mountain(self, pos):
         if not self.is_mountain(pos):
             return False
-        if len(self.elevation['thresholds']) == 4:
+        if len(self.layers['elevation'].thresholds) == 4:
             mi = 2
         else:
             mi = 1
-        mountain_level = self.elevation['thresholds'][mi][1]
+        mountain_level = self.layers['elevation'].thresholds[mi][1]
         x, y = pos
-        return self.elevation['data'][y, x] < mountain_level + 2.0
+        return self.layers['elevation'].data[y, x] < mountain_level + 2.0
 
     def level_of_mountain(self, pos):
         if self.ocean[pos[1], pos[0]]:
             return False
-        if len(self.elevation['thresholds']) == 4:
+        if len(self.layers['elevation'].thresholds) == 4:
             mi = 2
         else:
             mi = 1
-        mountain_level = self.elevation['thresholds'][mi][1]
+        mountain_level = self.layers['elevation'].thresholds[mi][1]
         x, y = pos
-        if self.elevation['data'][y, x] <= mountain_level:
+        if self.layers['elevation'].data[y, x] <= mountain_level:
             return 0
         else:
-            return self.elevation['data'][y, x] - mountain_level
+            return self.layers['elevation'].data[y, x] - mountain_level
 
     def is_high_mountain(self, pos):
         if not self.is_mountain(pos):
             return False
-        if len(self.elevation['thresholds']) == 4:
+        if len(self.layers['elevation'].thresholds) == 4:
             mi = 2
         else:
             mi = 1
-        mountain_level = self.elevation['thresholds'][mi][1]
+        mountain_level = self.layers['elevation'].thresholds[mi][1]
         x, y = pos
-        return self.elevation['data'][y, x] > mountain_level + 4.0
+        return self.layers['elevation'].data[y, x] > mountain_level + 4.0
 
     def is_hill(self, pos):
         if self.ocean[pos[1], pos[0]]:
             return False
-        if len(self.elevation['thresholds']) == 4:
+        if len(self.layers['elevation'].thresholds) == 4:
             hi = 1
         else:
             hi = 0
-        hill_level = self.elevation['thresholds'][hi][1]
-        mountain_level = self.elevation['thresholds'][hi + 1][1]
+        hill_level = self.layers['elevation'].thresholds[hi][1]
+        mountain_level = self.layers['elevation'].thresholds[hi + 1][1]
         x, y = pos
-        return hill_level < self.elevation['data'][y, x] < mountain_level
+        return hill_level < self.layers['elevation'].data[y, x] < mountain_level
 
     def elevation_at(self, pos):
-        return self.elevation['data'][pos[1], pos[0]]
+        return self.layers['elevation'].data[pos[1], pos[0]]
 
     #
     # Precipitations
@@ -836,7 +864,7 @@ class World(object):
                 "Setting elevation map with wrong dimension. "
                 "Expected %d x %d, found %d x %d" % (
                     self.width, self.height, data.shape[1], data.shape[0]))
-        self.elevation = {'data': data, 'thresholds': thresholds}
+        self.layers['elevation'] = LayerWithThresholds(data, thresholds)
 
     def set_plates(self, data):
         if (data.shape[0] != self.height) or (data.shape[1] != self.width):

@@ -18,11 +18,11 @@ def save_world_to_hdf5(world, filename):
 
     elevation_grp = f.create_group("elevation")
     elevation_ths_grp = elevation_grp.create_group("thresholds")
-    elevation_ths_grp["sea"] = world.elevation['thresholds'][0][1]
-    elevation_ths_grp["plain"] = world.elevation['thresholds'][1][1]
-    elevation_ths_grp["hill"] = world.elevation['thresholds'][2][1]
+    elevation_ths_grp["sea"] = world.layers['elevation'].thresholds[0][1]
+    elevation_ths_grp["plain"] = world.layers['elevation'].thresholds[1][1]
+    elevation_ths_grp["hill"] = world.layers['elevation'].thresholds[2][1]
     elevation_data = elevation_grp.create_dataset("data", (world.height, world.width), dtype=numpy.float)
-    elevation_data.write_direct(world.elevation['data'])
+    elevation_data.write_direct(world.layers['elevation'].data)
 
     plates_data = f.create_dataset("plates", (world.height, world.width), dtype=numpy.uint16)
     plates_data.write_direct(world.plates)

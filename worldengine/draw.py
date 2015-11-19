@@ -214,11 +214,13 @@ def _sature_color(color):
 def elevation_color(elevation, sea_level=1.0):
     return _sature_color(_elevation_color(elevation, sea_level))
 
+
 def add_colors(*args):
     ''' Do some *args magic to return a tuple, which has the sums of all tuples in *args '''
     # Adapted from an answer here: http://stackoverflow.com/questions/14180866/sum-each-value-in-a-list-of-tuples
     added = [sum(x) for x in zip(*args)]
     return numpy.clip(added, 0, 255)  # restrict to uint8
+
 
 def average_colors(c1, c2):
     ''' Average the values of two colors together '''
@@ -228,11 +230,12 @@ def average_colors(c1, c2):
 
     return (r, g, b)
 
+
 def get_normalized_elevation_array(world):
     ''' Convert raw elevation into normalized values between 0 and 255,
         and return a numpy array of these values '''
 
-    e = world.elevation['data']
+    e = world.layers['elevation'].data
 
     mask = numpy.ma.array(e, mask=world.ocean)  # only land
     min_elev_land = mask.min()
@@ -320,7 +323,7 @@ def draw_simple_elevation(world, sea_level, target):
     """ This function can be used on a generic canvas (either an image to save
         on disk or a canvas part of a GUI)
     """
-    e = world.elevation['data']
+    e = world.layers['elevation'].data
     c = numpy.empty(e.shape, dtype=numpy.float)
 
     has_ocean = not (sea_level is None or world.ocean is None or not world.ocean.any())  # or 'not any ocean'
@@ -455,13 +458,13 @@ def draw_satellite(world, target):
                 
                 # Build up list of elevations in the previous n tiles, where n is the shadow size.
                 # This goes northwest to southeast
-                prev_elevs = [ world.elevation['data'][y-n, x-n] for n in range(1, SAT_SHADOW_SIZE+1) ]
+                prev_elevs = [ world.layers['elevation'].data[y-n, x-n] for n in range(1, SAT_SHADOW_SIZE+1) ]
 
                 # Take the average of the height of the previous n tiles
                 avg_prev_elev = int( sum(prev_elevs) / len(prev_elevs) )
 
                 # Find the difference between this tile's elevation, and the average of the previous elevations
-                difference = int(world.elevation['data'][y, x] - avg_prev_elev)
+                difference = int(world.layers['elevation'].data[y, x] - avg_prev_elev)
 
                 # Amplify the difference
                 adjusted_difference = difference * SAT_SHADOW_DISTANCE_MULTIPLIER
@@ -481,7 +484,7 @@ def draw_elevation(world, shadow, target):
     width = world.width
     height = world.height
 
-    data = world.elevation['data']
+    data = world.layers['elevation'].data
     ocean = world.ocean
 
     mask = numpy.ma.array(data, mask=ocean)
@@ -752,7 +755,7 @@ def draw_riversmap_on_file(world, filename):
 
 
 def draw_grayscale_heightmap_on_file(world, filename):
-    img = PNGWriter.grayscale_from_array(world.elevation['data'], filename, scale_to_range=True)
+    img = PNGWriter.grayscale_from_array(world.layers['elevation'].data, filename, scale_to_range=True)
     #draw_grayscale_heightmap(world, img)
     img.complete()
 

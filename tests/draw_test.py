@@ -95,14 +95,12 @@ class TestDraw(TestBase):
 
     def test_draw_elevation_shadow(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        data = w.elevation['data']
         target = PNGWriter.rgba_from_dimensions(w.width, w.height)
         draw_elevation(w, True, target)
         self._assert_img_equal("elevation_28070_shadow", target)
 
     def test_draw_elevation_no_shadow(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        data = w.elevation['data']
         target = PNGWriter.rgba_from_dimensions(w.width, w.height)
         draw_elevation(w, False, target)
         self._assert_img_equal("elevation_28070_no_shadow", target)
@@ -115,8 +113,7 @@ class TestDraw(TestBase):
 
     def test_draw_grayscale_heightmap(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        target = PNGWriter.grayscale_from_array(w.elevation['data'], scale_to_range=True)
-        #draw_grayscale_heightmap(w, target)
+        target = PNGWriter.grayscale_from_array(w.layers['elevation'].data, scale_to_range=True)
         self._assert_img_equal("grayscale_heightmap_28070", target)
 
     def test_draw_ocean(self):
