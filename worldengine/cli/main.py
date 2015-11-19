@@ -12,7 +12,7 @@ from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_o
 from worldengine.plates import world_gen, generate_plates_simulation
 from worldengine.imex import export
 from worldengine.step import Step
-from worldengine.model.world import World, Size
+from worldengine.model.world import World, Size, GenerationParameters
 from worldengine.version import __version__
 
 try:
@@ -118,7 +118,7 @@ def generate_plates(seed, world_name, output_dir, width, height,
     elevation, plates = generate_plates_simulation(seed, width, height,
                                                    num_plates=num_plates)
 
-    world = World(world_name, Size(width, height), seed, num_plates, -1.0, "plates")
+    world = World(world_name, Size(width, height), seed, GenerationParameters(num_plates, -1.0, "plates"))
     world.set_elevation(numpy.array(elevation).reshape(height, width), None)
     world.set_plates(numpy.array(plates, dtype=numpy.uint16).reshape(height, width))
 

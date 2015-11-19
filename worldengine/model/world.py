@@ -30,29 +30,45 @@ class Size(object):
             return False
 
 
+class GenerationParameters(object):
+
+    def __init__(self, n_plates, ocean_level, step):
+        self.n_plates = n_plates
+        self.ocean_level = ocean_level
+        self.step = step
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        else:
+            return False
+
+
 class World(object):
     """A world composed by name, dimensions and all the characteristics of
     each cell.
     """
 
-    def __init__(self, name, size, seed, num_plates, ocean_level,
-                 step, temps=[0.874, 0.765, 0.594, 0.439, 0.366, 0.124],
+    def __init__(self, name, size, seed, generation_params,
+                 temps=[0.874, 0.765, 0.594, 0.439, 0.366, 0.124],
                  humids = [.941, .778, .507, .236, 0.073, .014, .002],
                  gamma_curve=1.25, curve_offset=.2):
         self.name = name
         self.size = size
         self.seed = seed
-        self.n_plates = num_plates
-        self.ocean_level = ocean_level
-        self.step = step
         self.temps = temps
         self.humids = humids
         self.gamma_curve = gamma_curve
         self.curve_offset = curve_offset
 
+        self.generation_params = generation_params
+
         # Deprecated
         self.width = size.width
         self.height = size.height
+        self.n_plates = generation_params.n_plates
+        self.step = generation_params.step
+        self.ocean_level = generation_params.ocean_level
 
     #
     # General methods
@@ -251,9 +267,9 @@ class World(object):
     def _from_protobuf_world(cls, p_world):
         w = World(p_world.name, Size(p_world.width, p_world.height),
                   p_world.generationData.seed,
-                  p_world.generationData.n_plates,
-                  p_world.generationData.ocean_level,
-                  Step.get_by_name(p_world.generationData.step))
+                  GenerationParameters(p_world.generationData.n_plates,
+                        p_world.generationData.ocean_level,
+                        Step.get_by_name(p_world.generationData.step)))
 
         # Elevation
         e = numpy.array(World._from_protobuf_matrix(p_world.heightMapData))
