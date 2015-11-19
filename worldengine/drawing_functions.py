@@ -82,7 +82,7 @@ def _find_outer_borders(world, factor, inner_borders):
     #scale ocean
     for y in range(world.height * factor):  # TODO: numpy
         for x in range(world.width * factor):
-            if world.is_ocean(int(x / factor), int(y / factor)):
+            if world.is_ocean((int(x / factor), int(y / factor))):
                 _ocean[y, x] = True
 
     def is_inner_border(pos):
