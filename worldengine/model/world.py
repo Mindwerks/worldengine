@@ -17,18 +17,30 @@ from worldengine.common import _equal
 from worldengine.version import __version__
 
 
+class Size(object):
+
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        else:
+            return False
+
+
 class World(object):
     """A world composed by name, dimensions and all the characteristics of
     each cell.
     """
 
-    def __init__(self, name, width, height, seed, num_plates, ocean_level,
+    def __init__(self, name, size, seed, num_plates, ocean_level,
                  step, temps=[0.874, 0.765, 0.594, 0.439, 0.366, 0.124],
                  humids = [.941, .778, .507, .236, 0.073, .014, .002],
                  gamma_curve=1.25, curve_offset=.2):
         self.name = name
-        self.width = width
-        self.height = height
+        self.size = size
         self.seed = seed
         self.n_plates = num_plates
         self.ocean_level = ocean_level
@@ -38,6 +50,10 @@ class World(object):
         self.gamma_curve = gamma_curve
         self.curve_offset = curve_offset
 
+        # Deprecated
+        self.width = size.width
+        self.height = size.height
+
     #
     # General methods
     #
@@ -46,12 +62,12 @@ class World(object):
         return _equal(self.__dict__, other.__dict__)
 
     #
-    # Serialization/Unserialization
+    # Serialization / Unserialization
     #
 
     @classmethod
     def from_dict(cls, dict):
-        instance = World(dict['name'], dict['width'], dict['height'])
+        instance = World(dict['name'], Size(dict['width'], dict['height']))
         for k in dict:
             instance.__dict__[k] = dict[k]
         return instance
@@ -233,7 +249,7 @@ class World(object):
 
     @classmethod
     def _from_protobuf_world(cls, p_world):
-        w = World(p_world.name, p_world.width, p_world.height,
+        w = World(p_world.name, Size(p_world.width, p_world.height),
                   p_world.generationData.seed,
                   p_world.generationData.n_plates,
                   p_world.generationData.ocean_level,

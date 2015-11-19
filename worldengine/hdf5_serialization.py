@@ -1,8 +1,10 @@
+import numpy
+
 import h5py
+
 from worldengine.version import __version__
 from worldengine.biome import biome_name_to_index, biome_index_to_name
-from worldengine.world import World, Step
-import numpy
+from worldengine.model.world import World, Step, Size
 
 
 def save_world_to_hdf5(world, filename):
@@ -125,8 +127,7 @@ def load_world_to_hdf5(filename):
     f = h5py.File(filename, libver='latest', mode='r')
 
     w = World(f['general/name'].value,
-              f['general/width'].value,
-              f['general/height'].value,
+              Size(f['general/width'].value, f['general/height'].value),
               f['generation_params/seed'].value,
               f['generation_params/n_plates'].value,
               f['generation_params/ocean_level'].value,

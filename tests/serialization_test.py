@@ -1,9 +1,10 @@
 import unittest
-from worldengine.plates import Step, world_gen
-from worldengine.world import World
-from worldengine.common import _equal
 import tempfile
 import os
+
+from worldengine.plates import Step, world_gen
+from worldengine.model.world import World
+from worldengine.common import _equal
 from worldengine.hdf5_serialization import save_world_to_hdf5, load_world_to_hdf5
 
 

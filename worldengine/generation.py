@@ -1,5 +1,8 @@
+import numpy
+
 from noise import snoise2
-from worldengine.world import Step
+
+from worldengine.model.world import Step
 from worldengine.simulations.basic import find_threshold_f
 from worldengine.simulations.hydrology import WatermapSimulation
 from worldengine.simulations.irrigation import IrrigationSimulation
@@ -11,7 +14,7 @@ from worldengine.simulations.precipitation import PrecipitationSimulation
 from worldengine.simulations.biome import BiomeSimulation
 from worldengine.simulations.icecap import IcecapSimulation
 from worldengine.common import anti_alias, get_verbose
-import numpy
+
 
 
 # ------------------

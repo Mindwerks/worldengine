@@ -7,7 +7,7 @@ import numpy
 
 from worldengine.generation import Step, add_noise_to_elevation, center_land, generate_world, \
     get_verbose, initialize_ocean_and_thresholds, place_oceans_at_map_borders
-from worldengine.world import World
+from worldengine.model.world import World, Size
 
 
 def generate_plates_simulation(seed, width, height, sea_level=0.65,
@@ -44,7 +44,7 @@ def _plates_simulation(name, width, height, seed, temps=
                                                         num_plates=num_plates,
                                                         verbose=verbose)
 
-    world = World(name, width, height, seed, num_plates, ocean_level, step, temps,
+    world = World(name, Size(width, height), seed, num_plates, ocean_level, step, temps,
                   humids, gamma_curve, curve_offset)
     world.set_elevation(numpy.array(e_as_array).reshape(height, width), None)
     world.set_plates(numpy.array(p_as_array, dtype=numpy.uint16).reshape(height, width))

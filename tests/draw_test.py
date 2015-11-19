@@ -1,11 +1,12 @@
 import unittest
 import os
 import numpy
+
 from worldengine.draw import _biome_colors, draw_simple_elevation, elevation_color, \
-    draw_elevation, draw_riversmap, draw_grayscale_heightmap, draw_ocean, draw_precipitation, \
+    draw_elevation, draw_riversmap, draw_ocean, draw_precipitation, \
     draw_world, draw_temperature_levels, draw_biome, draw_scatter_plot, draw_satellite
 from worldengine.biome import Biome
-from worldengine.world import World
+from worldengine.model.world import World
 from worldengine.image_io import PNGWriter, PNGReader
 
 
