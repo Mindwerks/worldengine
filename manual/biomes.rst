@@ -12,11 +12,18 @@ Worldengine implements a version of the `Holdridge life zones <https://en.wikipe
 
 .. image:: https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/docs/Holdridge.png
    :align: center
-   :width: 80%
+   :width: 95%
 
 As an example, an area of the planet that is **Boreal** in temperature and **Semiarid** in humidity will be classified as **Boreal Wet Forest**. 
 
-While many people regard the `Köppen climate classification <https://en.wikipedia.org/wiki/K%C3%B6ppen_climate_classification>`_ system as superior it requires the ability to predict seasonal weather. This would require a highly complicated weather simulation system which Worldengine does not currently have. As a result all Temperature and Humidity values are given in terms of yearly averages.
+While many people regard the |Koppen|_  system as superior it requires the ability to predict seasonal weather. This would require a highly complicated weather simulation system which Worldengine does not currently have. As a result all Temperature and Humidity values are given in terms of yearly averages.
+
+
+.. |Koppen| replace:: K |o| ppen climate classification
+.. _Koppen: https://en.wikipedia.org/wiki/K%C3%B6ppen_climate_classification
+
+.. |o| unicode:: 0xf6
+    :trim:
 
 There are thirty nine different land biomes. Most cells hold a single biome and most biomes occupy a single cell. The notable exceptions are Polar Ice which occupies two cells and the biomes of the **Warm Temperate** and **Subtropical** regions, each of which occupy only half a cell.
 
@@ -64,3 +71,9 @@ Each point on this plot is a single point on the landmass of the planet. The Tem
    :align: center
 
 Cells in grey are ones which do not technically occur in the standard Holdridge life zone model and as the example above shows there are certain areas of terrain in the example that are both **Polar** and **Semiarid**. Since there are not too many of them we will not concern ourselves as Worldengine will simply treat them as **Polar** and **Arid** (i.e. classify them as **Polar Ice**).
+
+Biome.png
+---------
+
+.. image:: https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/docs/Biomes.PNG
+   :align: center
