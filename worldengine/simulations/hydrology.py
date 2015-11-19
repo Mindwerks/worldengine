@@ -10,7 +10,8 @@ class WatermapSimulation(object):
 
     def execute(self, world, seed):
         assert seed is not None
-        world.watermap = self._watermap(world, 20000)
+        data, thresholds = self._watermap(world, 20000)
+        world.set_watermap(data, thresholds)
 
     @staticmethod
     def _watermap(world, n):
@@ -58,14 +59,11 @@ class WatermapSimulation(object):
         _watermap_data = numpy.zeros((world.height, world.width), dtype=float)
         for i in range(n):
             x, y = world.random_land()  # will return None for x and y if no land exists
-            if x is not None and world.precipitation['data'][y, x] > 0:
-                droplet(world, (x, y), world.precipitation['data'][y, x],
-                        _watermap_data)
+            if x is not None and world.precipitations_at((x, y)) > 0:
+                droplet(world, (x, y), world.precipitations_at((x, y)), _watermap_data)
         ocean = world.layers['ocean'].data
-        _watermap = dict()
-        _watermap['data'] = _watermap_data
-        _watermap['thresholds'] = dict()
-        _watermap['thresholds']['creek'] = find_threshold_f(_watermap_data, 0.05, ocean=ocean)
-        _watermap['thresholds']['river'] = find_threshold_f(_watermap_data, 0.02, ocean=ocean)
-        _watermap['thresholds']['main river'] = find_threshold_f(_watermap_data, 0.007, ocean=ocean)
-        return _watermap
+        thresholds = dict()
+        thresholds['creek'] = find_threshold_f(_watermap_data, 0.05, ocean=ocean)
+        thresholds['river'] = find_threshold_f(_watermap_data, 0.02, ocean=ocean)
+        thresholds['main river'] = find_threshold_f(_watermap_data, 0.007, ocean=ocean)
+        return _watermap_data, thresholds

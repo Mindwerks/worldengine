@@ -62,8 +62,7 @@ class ErosionSimulation(object):
         # step four: simulate erosion and updating river map
         for river in river_list:
             self.river_erosion(river, world)
-            self.rivermap_update(river, water_flow, river_map,
-                                 world.precipitation['data'])
+            self.rivermap_update(river, water_flow, river_map, world.layers['precipitation'].data)
 
         # step five: rivers with no paths to sea form lakes
         for lake in lake_list:
@@ -141,7 +140,7 @@ class ErosionSimulation(object):
         #     above sea level are marked as 'sources'.
         for x in range(0, world.width - 1):
             for y in range(0, world.height - 1):
-                rain_fall = world.precipitation['data'][y, x]
+                rain_fall = world.layers['precipitation'].data[y, x]
                 water_flow[y, x] = rain_fall
 
                 if water_path[y, x] == 0:
@@ -152,8 +151,7 @@ class ErosionSimulation(object):
                 while not neighbour_seed_found:
 
                     # have we found a seed?
-                    if world.is_mountain((cx, cy)) and \
-                            water_flow[cy, cx] >= RIVER_TH:
+                    if world.is_mountain((cx, cy)) and water_flow[cy, cx] >= RIVER_TH:
 
                         # try not to create seeds around other seeds
                         for seed in river_source_list:

@@ -1,11 +1,11 @@
 import numpy
 
+
 class BiomeSimulation(object):
 
     @staticmethod
     def is_applicable(world):
-        return world.has_humidity() and world.has_temperature() and \
-            (not world.has_biome())
+        return world.has_humidity() and world.has_temperature() and not world.has_biome()
 
     @staticmethod
     def execute(world, seed):
