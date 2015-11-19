@@ -227,25 +227,25 @@ class World(object):
         self._to_protobuf_matrix(self.layers['sea_depth'].data, p_world.sea_depth)
 
         # Biome
-        if hasattr(self, 'biome'):
-            self._to_protobuf_matrix(self.biome, p_world.biome,
+        if self.has_biome():
+            self._to_protobuf_matrix(self.layers['biome'].data, p_world.biome,
                                      biome_name_to_index)
 
         # Humidity
-        if hasattr(self, 'humidity'):
+        if self.has_humidity():
             self._to_protobuf_matrix_with_quantiles(self.humidity,
                                                     p_world.humidity)
 
-        if hasattr(self, 'irrigation'):
-            self._to_protobuf_matrix(self.irrigation, p_world.irrigation)
+        if self.has_irrigation():
+            self._to_protobuf_matrix(self.layers['irrigation'].data, p_world.irrigation)
 
-        if hasattr(self, 'permeability'):
-            self._to_protobuf_matrix(self.permeability['data'],
+        if self.has_permeability():
+            self._to_protobuf_matrix(self.layers['permeability'].data,
                                      p_world.permeabilityData)
-            p_world.permeability_low = self.permeability['thresholds'][0][1]
-            p_world.permeability_med = self.permeability['thresholds'][1][1]
+            p_world.permeability_low = self.layers['permeability'].thresholds[0][1]
+            p_world.permeability_med = self.layers['permeability'].thresholds[1][1]
 
-        if hasattr(self, 'watermap'):
+        if self.has_watermap():
             self._to_protobuf_matrix(self.watermap['data'],
                                      p_world.watermapData)
             p_world.watermap_creek = self.watermap['thresholds']['creek']
@@ -259,13 +259,13 @@ class World(object):
         if hasattr(self, 'river_map'):
             self._to_protobuf_matrix(self.river_map, p_world.rivermap)
 
-        if hasattr(self, 'precipitation'):
+        if self.has_precipitations():
             self._to_protobuf_matrix(self.precipitation['data'],
                                      p_world.precipitationData)
             p_world.precipitation_low = self.precipitation['thresholds'][0][1]
             p_world.precipitation_med = self.precipitation['thresholds'][1][1]
 
-        if hasattr(self, 'temperature'):
+        if self.has_temperature():
             self._to_protobuf_matrix(self.temperature['data'],
                                      p_world.temperatureData)
             p_world.temperature_polar = self.temperature['thresholds'][0][1]
@@ -306,9 +306,7 @@ class World(object):
 
         # Biome
         if len(p_world.biome.rows) > 0:
-            w.set_biome(numpy.array(
-                World._from_protobuf_matrix(
-                    p_world.biome, biome_index_to_name), dtype=object))
+            w.set_biome(numpy.array(World._from_protobuf_matrix(p_world.biome, biome_index_to_name), dtype=object))
 
         # Humidity
         # FIXME: use setters
@@ -318,7 +316,7 @@ class World(object):
             w.humidity['data'] = numpy.array(w.humidity['data'])#numpy conversion
 
         if len(p_world.irrigation.rows) > 0:
-            w.irrigation = numpy.array(World._from_protobuf_matrix(p_world.irrigation))
+            w.set_irrigation(numpy.array(World._from_protobuf_matrix(p_world.irrigation)))
 
         if len(p_world.permeabilityData.rows) > 0:
             p = numpy.array(World._from_protobuf_matrix(p_world.permeabilityData))
@@ -698,7 +696,7 @@ class World(object):
 
     def biome_at(self, pos):
         x, y = pos
-        b = Biome.by_name(self.biome[y, x])
+        b = Biome.by_name(self.layers['biome'].data[y, x])
         if b is None:
             raise Exception('Not found')
         return b
@@ -873,7 +871,7 @@ class World(object):
         if biome.shape[1] != self.width:
             raise Exception("Setting data with wrong width")
 
-        self.biome = biome
+        self.layers['biome'] = Layer(biome)
 
     def set_ocean(self, ocean):
         if (ocean.shape[0] != self.height) or (ocean.shape[1] != self.width):
@@ -903,6 +901,15 @@ class World(object):
 
         self.precipitation = {'data': data, 'thresholds': thresholds}
 
+
+    def set_irrigation(self, data):
+        if data.shape[0] != self.height:
+            raise Exception("Setting data with wrong height")
+        if data.shape[1] != self.width:
+            raise Exception("Setting data with wrong width")
+
+        self.layers['irrigation'] = Layer(data)
+
     def set_temperature(self, data, thresholds):
         if data.shape[0] != self.height:
             raise Exception("Setting data with wrong height")
@@ -917,7 +924,7 @@ class World(object):
         if data.shape[1] != self.width:
             raise Exception("Setting data with wrong width")
 
-        self.permeability = {'data': data, 'thresholds': thresholds}
+        self.layers['permeability'] = LayerWithThresholds(data, thresholds)
 
     def has_ocean(self):
         return hasattr(self, 'ocean')
@@ -929,7 +936,7 @@ class World(object):
         return hasattr(self, 'watermap')
 
     def has_irrigation(self):
-        return hasattr(self, 'irrigation')
+        return 'irrigation' in self.layers
 
     def has_humidity(self):
         return hasattr(self, 'humidity')
@@ -938,10 +945,10 @@ class World(object):
         return hasattr(self, 'temperature')
 
     def has_permeability(self):
-        return hasattr(self, 'permeability')
+        return 'permeability' in self.layers
 
     def has_biome(self):
-        return hasattr(self, 'biome')
+        return 'biome' in self.layers
 
     def set_rivermap(self, river_map):
         self.river_map = river_map

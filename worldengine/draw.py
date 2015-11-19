@@ -272,7 +272,7 @@ def get_biome_color_based_on_elevation(world, elev, x, y, rng):
 
         rng refers to an instance of a random number generator used to draw the random samples needed by this function.
     '''
-    v = world.biome[y, x]
+    v = world.biome_at((x, y)).name()
     biome_color = _biome_satellite_colors[v]
 
     # Default is no noise - will be overwritten if this tile is land
@@ -616,7 +616,7 @@ def draw_biome(world, target):
     width = world.width
     height = world.height
 
-    biome = world.biome
+    biome = world.layers['biome'].data
 
     for y in range(height):
         for x in range(width):

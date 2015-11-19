@@ -20,7 +20,7 @@ class HumiditySimulation(object):
         irrigationWeight = 3
         humidity['data'] = numpy.zeros((world.height, world.width), dtype=float)
 
-        humidity['data'] = (world.precipitation['data'] * precipitationWeight - world.irrigation * irrigationWeight)/(precipitationWeight + irrigationWeight)
+        humidity['data'] = (world.precipitation['data'] * precipitationWeight - world.layers['irrigation'].data * irrigationWeight)/(precipitationWeight + irrigationWeight)
 
         # These were originally evenly spaced at 12.5% each but changing them
         # to a bell curve produced better results
