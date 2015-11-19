@@ -7,7 +7,8 @@ from worldengine.common import set_verbose, print_verbose
 from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
     draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
     draw_temperature_levels_on_file, draw_riversmap_on_file, draw_scatter_plot_on_file, \
-    draw_hypsographic_plot_on_file, draw_satellite_on_file, draw_icecaps_on_file
+    draw_satellite_on_file, draw_icecaps_on_file
+from worldengine.draw_plots import draw_hypsographic_plot_on_file
 from worldengine.plates import world_gen, generate_plates_simulation
 from worldengine.imex import export
 from worldengine.step import Step

@@ -734,64 +734,6 @@ def draw_scatter_plot(world, size, target):
                 target.set_pixel(int(nx), (size - 1) - int(ny), (r, 128, b, 255))
 
 
-def draw_hypsographic_plot(world, target, x_bins, y_bins):
-    # Will draw a Hypsograhpic plot that contains information about the distribution of elevations in the world.
-    # y-axis shows the elevation, x-axis shows how often a certain elevation occurs.
-    # For further details see:
-    #   https://en.wikipedia.org/wiki/Elevation#Hypsography
-    #   http://www.ngdc.noaa.gov/mgg/global/etopo1_surface_histogram.html
-
-    assert int(x_bins) > 0 and int(y_bins) > 0, "Hypsographic curve needs more than 0 bins."
-
-    # set colors
-    color_none = target.get_max_colors()  # white
-    color_full = int(color_none / 2)  # gray
-    color_line = 0  # black
-    color_percent_sep = int(color_none * 0.8)  # light-gray
-
-    # Prepare a list of available elevations. Scale them to the y-axis and put them into a sorted list,
-    # smallest point to highest.
-    e = world.elevation['data']
-    e_min = e.min()
-    e_max = e.max()
-    e = (e - e_min) / (e_max - e_min)  # normalize to [0, 1]
-    e *= int(y_bins) - 0.01  # instead of "- 1", small trick to make the last bin contain more than one point
-    e = numpy.sort(e, axis=None)  # flatten the array and order values by height
-    e = e.astype(dtype=numpy.uint16)  # do not round (the graph wouldn't change, just shift)
-
-    # Fill the plot.
-    # Start by calculating how many points of the heightmap have to be represented by a single bin (n).
-    # Then step through the bins and fill in points from highest to lowest. Every bin is set to the average height of
-    # the n points it represents.
-    # Instead of drawing to [y, x] draw to [y_bins - y - 1, x_bins - x - 1] to flip the output in x- and y-direction.
-    n = e.size / float(x_bins)
-    for x in range(x_bins):
-        avg = sum(e[int(x * n):int((x + 1) * n)])
-        avg = int(avg / float(n))  # average height of n height-points
-        for y in range(y_bins):
-            target[y_bins - y - 1, x_bins - x - 1] = color_none if y > avg else color_full
-
-    # Draw a vertical line every ten percent.
-    step = x_bins / 10.0
-    for i in range(1, 10):  # no lines at 0 and (x_bins - 1)
-        x = int(step * i)
-        for y in range(y_bins):
-            target[y, x_bins - x - 1] = color_percent_sep
-
-    # Map sea-level etc. to appropriate y-positions in the graph.
-    lines = []
-    for threshold in world.elevation['thresholds']:  # see generation.py->initialize_ocean_and_thresholds() for details
-        if threshold[1] is None:
-            continue  # TODO: remove if the thresholds are ever guaranteed to be numbers
-        lines.append(int(numpy.interp(threshold[1], [e_min, e_max], [0, y_bins])))
-
-    # Draw lines for sea-level, hill-level etc. The lines will get lighter with increasing height.
-    for i in range(len(lines)):
-        color = numpy.interp(i, [0, len(lines)], [color_line, color_none])
-        for x in range(x_bins):
-            target[y_bins - lines[i] - 1, x] = color
-
-
 # -------------
 # Draw on files
 # -------------
@@ -866,14 +808,6 @@ def draw_ancientmap_on_file(world, filename, resize_factor=1,
 def draw_scatter_plot_on_file(world, filename):
     img = PNGWriter.rgba_from_dimensions(512, 512, filename)
     draw_scatter_plot(world, 512, img)
-    img.complete()
-
-
-def draw_hypsographic_plot_on_file(world, filename):
-    x_bins = 800
-    y_bins = 600
-    img = PNGWriter.grayscale_from_dimensions(x_bins, y_bins, filename, channel_bitdepth=8)
-    draw_hypsographic_plot(world, img, x_bins, y_bins)
     img.complete()
 
 

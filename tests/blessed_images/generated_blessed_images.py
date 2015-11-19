@@ -10,6 +10,7 @@ A script, generate_blessed_images, can be used to regenerate blessed images
 import os
 from worldengine.world import *
 from worldengine.draw import *
+from worldengine.draw_plots import *
 from worldengine.image_io import PNGWriter
 
 
