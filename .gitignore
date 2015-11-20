@@ -1,5 +1,7 @@
 # images
 *.png
+!worldengine/data/*.png
+!manual/images/*.png
 
 venv
 *.pyc
