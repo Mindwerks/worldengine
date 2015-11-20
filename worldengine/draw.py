@@ -732,7 +732,7 @@ def draw_scatter_plot(world, size, target):
                 ny = (size - 1) * ((p - min_humidity) / humidity_delta)
                     
                 target.set_pixel(int(nx), (size - 1) - int(ny), (r, 128, b, 255))
-    
+
 
 # -------------
 # Draw on files

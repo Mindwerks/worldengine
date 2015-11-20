@@ -10,6 +10,7 @@ A script, generate_blessed_images, can be used to regenerate blessed images
 import os
 from worldengine.world import *
 from worldengine.draw import *
+from worldengine.draw_plots import *
 from worldengine.image_io import PNGWriter
 
 
@@ -27,8 +28,9 @@ def main(blessed_images_dir, tests_data_dir):
     draw_temperature_levels_on_file(w, "%s/temperature_28070.png" % blessed_images_dir)
     draw_biome_on_file(w, "%s/biome_28070.png" % blessed_images_dir)
     draw_scatter_plot_on_file(w, "%s/scatter_28070.png" % blessed_images_dir)
+    draw_hypsographic_plot_on_file(w, "%s/hypsographic_28070.png" % blessed_images_dir)
     draw_satellite_on_file(w, "%s/satellite_28070.png" % blessed_images_dir)
-    draw_ancientmap_on_file(w, "%s/ancientmap_28070_factor3.png" % blessed_images_dir, resize_factor=3)
+    draw_ancientmap_on_file(w, "%s/ancientmap_28070_factor2.png" % blessed_images_dir, resize_factor=2)
 
     img = PNGWriter.rgba_from_dimensions(w.width * 2, w.height * 2, "%s/rivers_28070_factor2.png" % blessed_images_dir)
     draw_rivers_on_image(w, img, factor=2)
