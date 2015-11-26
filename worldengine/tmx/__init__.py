@@ -423,7 +423,7 @@ def base_terrain_mult(world, pos):
     raise Exception(biome)
 
 
-def draw_level(world, tmx_file, water_grid, this_lvl):
+def draw_terrain_level(world, tmx_file, water_grid, this_lvl):
     tmx_file.write('    <data encoding="csv">\n')
 
     slopes_map = numpy.zeros(shape=(world.width * 3, world.height * 3), dtype=numpy.bool)
@@ -602,8 +602,6 @@ def decoration_tile(world, pos):
     return ISO_NONE
 
 
-# 134, 124
-# 153,143
 def draw_decoration_level(world, tmx_file, this_lvl, water_grid):
 
     forest_grid = numpy.zeros(shape=(world.width * 3, world.height * 3), dtype=numpy.uint16)
@@ -638,10 +636,12 @@ def export_to_tmx(world, tmx_filename):
     """
     water_grid = generate_water_grid(world)
 
+    map_size = (world.width * 3, world.height * 3)
+
     tmx_file = open(tmx_filename, "w")
     tmx_file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
     tmx_file.write('<map version="1.0" orientation="isometric" renderorder="right-down" ')
-    tmx_file.write('width="%i" height="%i" ' % (world.width*3, world.height*3))
+    tmx_file.write('width="%i" height="%i" ' % map_size)
     tmx_file.write('tilewidth="256" tileheight="128" nextobjectid="1">\n')
 
     #
@@ -659,15 +659,15 @@ def export_to_tmx(world, tmx_filename):
     # Ground level: this is a bit different from the others
     #
 
-    tmx_file.write('  <layer name="ground" width="%i" height="%i">\n' % (world.width*3, world.height*3))
-    slopes_map = draw_level(world, tmx_file, water_grid, 0)
+    tmx_file.write('  <layer name="ground" width="%i" height="%i">\n' % map_size)
+    slopes_map = draw_terrain_level(world, tmx_file, water_grid, 0)
     tmx_file.write('  </layer>\n')
 
-    tmx_file.write('  <layer name="ground_water" width="%i" height="%i">\n' % (world.width*3, world.height*3))
+    tmx_file.write('  <layer name="ground_water" width="%i" height="%i">\n' % map_size)
     draw_water(world, tmx_file, water_grid, 0, slopes_map)
     tmx_file.write('  </layer>\n')
 
-    tmx_file.write('  <layer name="decoration ground" width="%i" height="%i" offsetx="0" offsety="0">\n' % (world.width*3, world.height*3))
+    tmx_file.write('  <layer name="decoration ground" width="%i" height="%i" offsetx="0" offsety="0">\n' % map_size)
     draw_decoration_level(world, tmx_file, 0, water_grid)
     tmx_file.write('  </layer>\n')
 
@@ -681,10 +681,12 @@ def export_to_tmx(world, tmx_filename):
                    'high_mountain half', 'high_mountain']
     i = 1
     for layer_name in layer_names:
-        tmx_file.write('  <layer name="%s" width="%i" height="%i" offsetx="0" offsety="%i">\n' % (layer_name, world.width*3, world.height*3, -48 * i))
-        draw_level(world, tmx_file, water_grid, i)
+        tmx_file.write('  <layer name="%s" width="%i" height="%i" offsetx="0" offsety="%i">\n' %
+                       (layer_name, map_size[0], map_size[1], -48 * i))
+        draw_terrain_level(world, tmx_file, water_grid, i)
         tmx_file.write('  </layer>\n')
-        tmx_file.write('  <layer name="decoration %s" width="%i" height="%i" offsetx="0" offsety="%i">\n' % (layer_name, world.width*3, world.height*3, -48 * i))
+        tmx_file.write('  <layer name="decoration %s" width="%i" height="%i" offsetx="0" offsety="%i">\n' %
+                       (layer_name, map_size[0], map_size[1], -48 * i))
         draw_decoration_level(world, tmx_file, i, water_grid)
         tmx_file.write('  </layer>\n')
         i += 1
