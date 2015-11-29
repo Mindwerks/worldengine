@@ -10,11 +10,9 @@ class TemperatureSimulation(object):
         return not world.has_temperature()
 
     def execute(self, world, seed):
-        e = world.elevation['data']
-        ml = world.start_mountain_th()  # returns how many percent of the world are mountains
         ocean = world.ocean
 
-        t = self._calculate(world, seed, e, ml)
+        t = self._calculate(world, seed)
         t_th = [
             ('polar', find_threshold_f(t, world.temps[0], ocean)),
             ('alpine', find_threshold_f(t, world.temps[1], ocean)),
@@ -27,13 +25,18 @@ class TemperatureSimulation(object):
         world.set_temperature(t, t_th)
 
     @staticmethod
-    def _calculate(world, seed, elevation, mountain_level):
+    def _calculate(world, seed):
         width = world.width
         height = world.height
+        e = world.elevation['data']
+        mountain_level = world.start_mountain_th()  # returns minimum elevation value for mountains (i.e. hills)
+        highest_mountain_level = e.max() # world.level_of_mountain(numpy.unravel_index(e.argmax(), e.shape))  # height of the highest point relative to mountain_level
 
         rng = numpy.random.RandomState(seed)  # create our own random generator
         base = rng.randint(0, 4096)
         temp = numpy.zeros((height, width), dtype=float)
+        
+        min_altitude_factor = 0.3  # used for the top of the highest mountain; must be in [0, 1]
 
         '''
         Set up variables to take care of some orbital parameters:
@@ -89,13 +92,8 @@ class TemperatureSimulation(object):
                                    base=base) * (border - x) / border)
 
                 t = (latitude_factor * 12 + n * 1) / 13.0 / distance_to_sun
-                if elevation[y, x] > mountain_level:  # vary temperature based on height
-                    if elevation[y, x] > (mountain_level + 29):
-                        altitude_factor = 0.033
-                    else:
-                        altitude_factor = 1.00 - (
-                            float(elevation[y, x] - mountain_level) / 30)
-                    t *= altitude_factor
-                temp[y, x] = t
+
+                # vary temperature based on height
+                temp[y, x] = t * numpy.interp(e[y, x], [mountain_level, highest_mountain_level], [1.00, min_altitude_factor])
 
         return temp

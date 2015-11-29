@@ -100,10 +100,10 @@ def _find_mountains_mask(world, factor):
     _mask = numpy.zeros((factor * world.height, factor * world.width), dtype=float)
     for y in range(factor * world.height):
         for x in range(factor * world.width):
-            if world.is_mountain((int(x / factor), int(y / factor))):
+            if world.is_low_mountain((int(x / factor), int(y / factor)), include_higher=True):  # maybe use is_medium_mountain()?
                 v = len(world.tiles_around((int(x / factor), int(y / factor)),
                                            radius=3,
-                                           predicate=world.is_mountain))
+                                           predicate=lambda pos: world.is_low_mountain(pos, include_higher=True)))
                 if v > 32:
                     _mask[y, x] = v / 4.0  # force conversion to float, Python 2 will *not* do it automatically
     return _mask

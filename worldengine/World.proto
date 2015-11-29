@@ -57,62 +57,65 @@ message World {
     required int32  height = 5;
 
     // Elevation
-    required DoubleMatrix heightMapData  = 6;
-    required double heightMapTh_sea      = 7;
-    required double heightMapTh_plain    = 8;
-    required double heightMapTh_hill     = 9;
+    required DoubleMatrix heightMapData       = 6;
+    required double heightMapTh_sea           = 7;
+    required double heightMapTh_plain         = 8;
+    required double heightMapTh_hill          = 9;
+    required double heightMapTh_low_mountain  = 10;
+    required double heightMapTh_med_mountain  = 11;
+    required double heightMapTh_high_mountain = 12;
 
     // Plates
-    required IntegerMatrix plates        = 10;
+    required IntegerMatrix plates          = 13;
 
     // Ocean
-    required BooleanMatrix ocean         = 11;
-    required DoubleMatrix  sea_depth     = 12;
+    required BooleanMatrix ocean           = 14;
+    required DoubleMatrix  sea_depth       = 15;
 
     // Biome
-    optional IntegerMatrix biome         = 13;
+    optional IntegerMatrix biome           = 16;
 
     // Humidity
-    optional DoubleMatrixWithQuantiles humidity = 14;
+    optional DoubleMatrixWithQuantiles humidity = 17;
 
     // Irrigation
-    optional DoubleMatrix irrigation  = 15;
+    optional DoubleMatrix irrigation       = 18;
 
     // Permeability
-    optional DoubleMatrix permeabilityData = 16;
-    optional double permeability_low       = 17;
-    optional double permeability_med       = 18;
+    optional DoubleMatrix permeabilityData = 19;
+    optional double permeability_low       = 20;
+    optional double permeability_med       = 21;
 
     // Watermap
-    optional DoubleMatrix watermapData     = 19;
-    optional double watermap_creek         = 20;
-    optional double watermap_river         = 21;
-    optional double watermap_mainriver     = 22;
+    optional DoubleMatrix watermapData     = 22;
+    optional double watermap_creek         = 23;
+    optional double watermap_river         = 24;
+    optional double watermap_mainriver     = 25;
 
     // Precipitation
-    optional DoubleMatrix precipitationData = 23;
-    optional double precipitation_low       = 24;
-    optional double precipitation_med       = 25;
+    optional DoubleMatrix precipitationData = 26;
+    optional double precipitation_low       = 27;
+    optional double precipitation_med       = 28;
 
     // Temperature
-    optional DoubleMatrix temperatureData    = 26;
-    optional double temperature_polar        = 27;
-    optional double temperature_alpine       = 28;
-    optional double temperature_boreal       = 29;
-    optional double temperature_cool         = 30;
-    optional double temperature_warm         = 31;
-    optional double temperature_subtropical  = 32;
+    optional DoubleMatrix temperatureData    = 29;
+    optional double temperature_polar        = 30;
+    optional double temperature_alpine       = 31;
+    optional double temperature_boreal       = 32;
+    optional double temperature_cool         = 33;
+    optional double temperature_warm         = 34;
+    optional double temperature_subtropical  = 35;
 
     // Data about generation:
     // introduced in v0.5.3
     // this is optional for backward compatibility reasons
-    optional GenerationData generationData = 33;
+    optional GenerationData generationData = 36;
 
-    optional DoubleMatrix lakemap = 34;
-    optional DoubleMatrix rivermap = 35;
+    optional DoubleMatrix lakemap = 37;
+    optional DoubleMatrix rivermap = 38;
 
     // Ice-caps
-    optional DoubleMatrix icecap  = 36;
+    optional DoubleMatrix icecap  = 39;
 }
 
 

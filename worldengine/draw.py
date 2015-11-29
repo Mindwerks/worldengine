@@ -11,13 +11,6 @@ from worldengine.image_io import PNGWriter
 ### For draw_satellite ###
 NOISE_RANGE = 15 # a random value between -NOISE_RANGE and NOISE_RANGE will be added to the rgb of each pixel
 
-# These are arbitrarily-chosen elevation cutoffs for 4 different height levels. 
-# Some color modifiers will be applied at each level
-HIGH_MOUNTAIN_ELEV = 215
-MOUNTAIN_ELEV      = 175
-HIGH_HILL_ELEV     = 160
-HILL_ELEV          = 145
-
 # These are rgb color values which will be added to the noise, if the elevation is greater than the height specified
 # These are not cumulative
 HIGH_MOUNTAIN_NOISE_MODIFIER = (10, 6,   10)
@@ -279,30 +272,29 @@ def get_biome_color_based_on_elevation(world, elev, x, y, rng):
         ## Generate some random noise to apply to this pixel
         #  There is noise for each element of the rgb value
         #  This noise will be further modified by the height of this tile
-
         noise = rng.randint(-NOISE_RANGE, NOISE_RANGE, size=3)  # draw three random numbers at once
 
-        ####### Case 1 - elevation is very high ########
-        if elev > HIGH_MOUNTAIN_ELEV:     
-            # Modify the noise to make the area slightly brighter to simulate snow-topped mountains.
-            noise = add_colors(noise, HIGH_MOUNTAIN_NOISE_MODIFIER)
-            # Average the biome's color with the MOUNTAIN_COLOR to tint the terrain
-            biome_color = average_colors(biome_color, MOUNTAIN_COLOR)
+    ####### Case 1 - elevation is very high ########
+    if world.is_high_mountain((x, y)):
+        # Modify the noise to make the area slightly brighter to simulate snow-topped mountains.
+        noise = add_colors(noise, HIGH_MOUNTAIN_NOISE_MODIFIER)
+        # Average the biome's color with the MOUNTAIN_COLOR to tint the terrain
+        biome_color = average_colors(biome_color, MOUNTAIN_COLOR)
 
-        ####### Case 2 - elevation is high ########
-        elif elev > MOUNTAIN_ELEV:   
-            # Modify the noise to make this tile slightly darker, especially draining the green
-            noise = add_colors(noise, MOUNTAIN_NOISE_MODIFIER)
-            # Average the biome's color with the MOUNTAIN_COLOR to tint the terrain
-            biome_color = average_colors(biome_color, MOUNTAIN_COLOR)
+    ####### Case 2 - elevation is high ########
+    elif world.is_medium_mountain((x, y)):
+        # Modify the noise to make this tile slightly darker, especially draining the green
+        noise = add_colors(noise, MOUNTAIN_NOISE_MODIFIER)
+        # Average the biome's color with the MOUNTAIN_COLOR to tint the terrain
+        biome_color = average_colors(biome_color, MOUNTAIN_COLOR)
 
-        ####### Case 3 - elevation is somewhat high ########
-        elif elev > HIGH_HILL_ELEV:   
-            noise = add_colors(noise, HIGH_HILL_NOISE_MODIFIER)
+    ####### Case 3 - elevation is somewhat high ########
+    elif world.is_low_mountain((x, y)):
+        noise = add_colors(noise, HIGH_HILL_NOISE_MODIFIER)
 
-        ####### Case 4 - elevation is a little bit high ########
-        elif elev > HILL_ELEV:   
-            noise = add_colors(noise, HILL_NOISE_MODIFIER)
+    ####### Case 4 - elevation is a little bit high ########
+    elif world.is_hill((x, y)):
+        noise = add_colors(noise, HILL_NOISE_MODIFIER)
 
     # There is also a minor base modifier to the pixel's rgb value based on height
     modification_amount = int(elev / BASE_ELEVATION_INTENSITY_MODIFIER)

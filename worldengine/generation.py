@@ -105,12 +105,20 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
     """
     e = world.elevation['data']
     ocean = fill_ocean(e, ocean_level)
-    hl = find_threshold_f(e, 0.10)  # the highest 10% of all (!) land are declared hills
-    ml = find_threshold_f(e, 0.03)  # the highest 3% are declared mountains
+
+    # values chosen to emulate the exponential behavior seen here:
+    # http://www.ngdc.noaa.gov/mgg/global/etopo1_surface_histogram.html
+    pl = find_threshold_f(e, 0.80, ocean=ocean)  # the highest x% of land are declared plains; save some for beaches (?)
+    hl = find_threshold_f(e, 0.40, ocean=ocean)  # the highest x% are declared hills
+    ml = find_threshold_f(e, 0.20, ocean=ocean)  # the highest x% are declared low mountains
+    mml = find_threshold_f(e, 0.10, ocean=ocean)  # the highest x% are declared medium mountains
+    hml = find_threshold_f(e, 0.05, ocean=ocean)  # the highest x% are declared high mountains
     e_th = [('sea', ocean_level),
-            ('plain', hl),
-            ('hill', ml),
-            ('mountain', None)]
+            ('plain', pl),
+            ('hill', hl),
+            ('mountain', ml),
+            ('med_mountain', mml),
+            ('high_mountain', hml)]
     harmonize_ocean(ocean, e, ocean_level)
     world.set_ocean(ocean)
     world.set_elevation(e, e_th)
