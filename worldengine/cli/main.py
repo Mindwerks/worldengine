@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 import os
 import numpy
 import worldengine.generation as geo
-from worldengine.common import array_to_matrix, set_verbose, print_verbose
+from worldengine.common import set_verbose, print_verbose
 from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
     draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
     draw_temperature_levels_on_file, draw_riversmap_on_file, draw_scatter_plot_on_file, \
@@ -114,7 +114,7 @@ def generate_plates(seed, world_name, output_dir, width, height,
 
     world = World(world_name, width, height, seed, num_plates, -1.0, "plates")
     world.set_elevation(numpy.array(elevation).reshape(height, width), None)
-    world.set_plates(array_to_matrix(plates, width, height))
+    world.set_plates(numpy.array(plates, dtype=numpy.uint16).reshape(height, width))
 
     # Generate images
     filename = '%s/plates_%s.png' % (output_dir, world_name)

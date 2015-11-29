@@ -19,6 +19,6 @@ Contents:
    install
    cli
    gui
+   biomes
    scenarios
    contributing
-
