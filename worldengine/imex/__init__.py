@@ -117,7 +117,7 @@ def export(world, export_filetype = 'GTiff', export_datatype = 'float32', path =
 
     # take elevation data and push it into an intermediate GTiff format (some formats don't support being written by Create())
     inter_driver = gdal.GetDriverByName("GTiff")
-    _, inter_file = tempfile.mkstemp()  # returns: (file-handle, absolute path)
+    fh_inter_file, inter_file = tempfile.mkstemp()  # returns: (file-handle, absolute path)
     initial_ds = inter_driver.Create(inter_file, world.width, world.height, 1, gdal_type)
     band = initial_ds.GetRasterBand(1)
     
@@ -129,4 +129,6 @@ def export(world, export_filetype = 'GTiff', export_datatype = 'float32', path =
     initial_ds = gdal.Open(inter_file)
     final_driver.CreateCopy('%s-%d.%s' % (path, bpp, export_filetype), initial_ds)
 
+    initial_ds = None
+    os.close(fh_inter_file)
     os.remove(inter_file)
