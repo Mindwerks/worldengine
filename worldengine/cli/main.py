@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 import os
 import numpy
 import worldengine.generation as geo
+from worldengine.simulations.basic import find_threshold_f
 from worldengine.common import set_verbose, print_verbose
 from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
     draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
@@ -97,7 +98,7 @@ def draw_icecaps_map(world, filename):
     print("+ icecap map generated in '%s'" % filename)
 
 def generate_plates(seed, world_name, output_dir, width, height,
-                    num_plates=10):
+                    ocean_level, num_plates=10):
     """
     Eventually this method should be invoked when generation is called at
     asked to stop at step "plates", it should not be a different operation
@@ -110,6 +111,7 @@ def generate_plates(seed, world_name, output_dir, width, height,
     :return:
     """
     elevation, plates = generate_plates_simulation(seed, width, height,
+                                                   ocean_level=ocean_level,
                                                    num_plates=num_plates)
 
     world = World(world_name, width, height, seed, num_plates, -1.0, "plates")
@@ -118,11 +120,13 @@ def generate_plates(seed, world_name, output_dir, width, height,
 
     # Generate images
     filename = '%s/plates_%s.png' % (output_dir, world_name)
-    draw_simple_elevation_on_file(world, filename, None)
+    sea_level = find_threshold_f(world.elevation['data'], 1.0 - ocean_level,
+                                      ocean=None, max=1.0, mindist=0.000005)    
+    draw_simple_elevation_on_file(world, filename, sea_level)
     print("+ plates image generated in '%s'" % filename)
     geo.center_land(world)
     filename = '%s/centered_plates_%s.png' % (output_dir, world_name)
-    draw_simple_elevation_on_file(world, filename, None)
+    draw_simple_elevation_on_file(world, filename, sea_level)
     print("+ centered plates image generated in '%s'" % filename)
 
 
@@ -293,9 +297,9 @@ def main():
                             dest='grayscale_heightmap', action="store_true",
                             help='produce a grayscale heightmap')
     g_generate.add_argument('--ocean_level', dest='ocean_level', type=float,
-                            help='elevation cut off for sea level " +'
+                            help='amount of surface covered by ocean " +'
                                  '[default = %(default)s]',
-                            metavar="N", default=1.0)
+                            metavar="N", default=0.65)
     g_generate.add_argument('--temps', dest='temps', 
                         help="Provide alternate ranges for temperatures. " +
                              "If not provided, the default values will be used. \n" +
@@ -557,7 +561,8 @@ def main():
         print('starting (it could take a few minutes) ...')
 
         generate_plates(seed, world_name, args.output_dir, args.width,
-                        args.height, num_plates=args.number_of_plates)
+                        args.height, args.ocean_level,
+                        num_plates=args.number_of_plates)
 
     elif operation == 'ancient_map':
         print('')  # empty line

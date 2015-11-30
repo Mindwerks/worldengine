@@ -10,7 +10,7 @@ from worldengine.generation import Step, add_noise_to_elevation, center_land, ge
 from worldengine.world import World
 
 
-def generate_plates_simulation(seed, width, height, sea_level=0.65,
+def generate_plates_simulation(seed, width, height, ocean_level=0.65,
                                erosion_period=60, folding_ratio=0.02,
                                aggr_overlap_abs=1000000, aggr_overlap_rel=0.33,
                                cycle_count=2, num_plates=10,
@@ -18,7 +18,7 @@ def generate_plates_simulation(seed, width, height, sea_level=0.65,
 
     if verbose:
         start_time = time.time()
-    p = platec.create(seed, width, height, sea_level, erosion_period,
+    p = platec.create(seed, width, height, ocean_level, erosion_period,
                       folding_ratio, aggr_overlap_abs, aggr_overlap_rel,
                       cycle_count, num_plates)
     # Note: To rescale the worlds heightmap to roughly Earths scale, multiply by 2000.
@@ -38,9 +38,10 @@ def generate_plates_simulation(seed, width, height, sea_level=0.65,
 def _plates_simulation(name, width, height, seed, temps=
                        [.874, .765, .594, .439, .366, .124], humids=
                        [.941, .778, .507, .236, 0.073, .014, .002], gamma_curve=1.25,
-                       curve_offset=.2, num_plates=10, ocean_level=1.0,
+                       curve_offset=.2, num_plates=10, ocean_level=0.65,
                        step=Step.full(), verbose=get_verbose()):
     e_as_array, p_as_array = generate_plates_simulation(seed, width, height,
+                                                        ocean_level=ocean_level,
                                                         num_plates=num_plates,
                                                         verbose=verbose)
 
@@ -53,7 +54,7 @@ def _plates_simulation(name, width, height, seed, temps=
 
 def world_gen(name, width, height, seed, temps=[.874, .765, .594, .439, .366, .124],
               humids=[.941, .778, .507, .236, 0.073, .014, .002], num_plates=10,
-              ocean_level=1.0, step=Step.full(), gamma_curve=1.25, curve_offset=.2,
+              ocean_level=0.65, step=Step.full(), gamma_curve=1.25, curve_offset=.2,
               fade_borders=True, verbose=get_verbose()):
     if verbose:
         start_time = time.time()
@@ -78,7 +79,7 @@ def world_gen(name, width, height, seed, temps=[.874, .765, .594, .439, .366, .1
         start_time = time.time()
     if fade_borders:
         place_oceans_at_map_borders(world)
-    initialize_ocean_and_thresholds(world)
+    initialize_ocean_and_thresholds(world, ocean_level)
     if verbose:
         elapsed_time = time.time() - start_time
         print("...plates.world_gen: oceans initialized. Elapsed time " +
