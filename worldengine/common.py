@@ -117,4 +117,4 @@ def _equal(a, b):
                 return(False)
         return(t)
     else:#fallback
-        return(a == b)
+        return (a == b)

@@ -1,8 +1,10 @@
+import numpy
+
 import h5py
+
 from worldengine.version import __version__
 from worldengine.biome import biome_name_to_index, biome_index_to_name
-from worldengine.world import World, Step
-import numpy
+from worldengine.model.world import World, Step, Size, GenerationParameters
 
 
 def save_world_to_hdf5(world, filename):
@@ -16,87 +18,88 @@ def save_world_to_hdf5(world, filename):
 
     elevation_grp = f.create_group("elevation")
     elevation_ths_grp = elevation_grp.create_group("thresholds")
-    elevation_ths_grp["sea"] = world.elevation['thresholds'][0][1]
-    elevation_ths_grp["plain"] = world.elevation['thresholds'][1][1]
-    elevation_ths_grp["hill"] = world.elevation['thresholds'][2][1]
+    elevation_ths_grp["sea"] = world.layers['elevation'].thresholds[0][1]
+    elevation_ths_grp["plain"] = world.layers['elevation'].thresholds[1][1]
+    elevation_ths_grp["hill"] = world.layers['elevation'].thresholds[2][1]
     elevation_data = elevation_grp.create_dataset("data", (world.height, world.width), dtype=numpy.float)
-    elevation_data.write_direct(world.elevation['data'])
+    elevation_data.write_direct(world.layers['elevation'].data)
 
     plates_data = f.create_dataset("plates", (world.height, world.width), dtype=numpy.uint16)
-    plates_data.write_direct(world.plates)
+    plates_data.write_direct(world.layers['plates'].data)
 
     ocean_data = f.create_dataset("ocean", (world.height, world.width), dtype=numpy.bool)
-    ocean_data.write_direct(world.ocean)
+    ocean_data.write_direct(world.layers['ocean'].data)
 
     sea_depth_data = f.create_dataset("sea_depth", (world.height, world.width), dtype=numpy.float)
-    sea_depth_data.write_direct(world.sea_depth)
+    sea_depth_data.write_direct(world.layers['sea_depth'].data)
 
-    if hasattr(world, 'biome'):
+    if world.has_biome():
         biome_data = f.create_dataset("biome", (world.height, world.width), dtype=numpy.uint16)
         for y in range(world.height):
             for x in range(world.width):
-                biome_data[y, x] = biome_name_to_index(world.biome[y][x])
+                biome_data[y, x] = biome_name_to_index(world.layers['biome'].data[y][x])
 
-    if hasattr(world, 'humidity'):
+    if world.has_humidity():
         humidity_grp = f.create_group("humidity")
         humidity_quantiles_grp = humidity_grp.create_group("quantiles")
-        for k in world.humidity['quantiles'].keys():
-            humidity_quantiles_grp[k] = world.humidity['quantiles'][k]
+        for k in world.layers['humidity'].quantiles.keys():
+            humidity_quantiles_grp[k] = world.layers['humidity'].quantiles[k]
         humidity_data = humidity_grp.create_dataset("data", (world.height, world.width), dtype=numpy.float)
-        humidity_data.write_direct(world.humidity['data'])
+        humidity_data.write_direct(world.layers['humidity'].data)
 
-    if hasattr(world, 'irrigation'):
+    if world.has_irrigation():
         irrigation_data = f.create_dataset("irrigation", (world.height, world.width), dtype=numpy.float)
-        irrigation_data.write_direct(world.irrigation)
+        irrigation_data.write_direct(world.layers['irrigation'].data)
 
-    if hasattr(world, 'permeability'):
+    if world.has_permeability():
         permeability_grp = f.create_group("permeability")
         permeability_ths_grp = permeability_grp.create_group("thresholds")
-        permeability_ths_grp['low'] = world.permeability['thresholds'][0][1]
-        permeability_ths_grp['med'] = world.permeability['thresholds'][1][1]
+        permeability_ths_grp['low'] = world.layers['permeability'].thresholds[0][1]
+        permeability_ths_grp['med'] = world.layers['permeability'].thresholds[1][1]
         permeability_data = permeability_grp.create_dataset("data", (world.height, world.width), dtype=numpy.float)
-        permeability_data.write_direct(world.permeability['data'])
+        permeability_data.write_direct(world.layers['permeability'].data)
 
-    if hasattr(world, 'watermap'):
+    if world.has_watermap():
         watermap_grp = f.create_group("watermap")
         watermap_ths_grp = watermap_grp.create_group("thresholds")
-        watermap_ths_grp['creek'] = world.watermap['thresholds']['creek']
-        watermap_ths_grp['river'] = world.watermap['thresholds']['river']
-        watermap_ths_grp['mainriver'] = world.watermap['thresholds']['main river']
+        watermap_ths_grp['creek'] = world.layers['watermap'].thresholds['creek']
+        watermap_ths_grp['river'] = world.layers['watermap'].thresholds['river']
+        watermap_ths_grp['mainriver'] = world.layers['watermap'].thresholds['main river']
         watermap_data = watermap_grp.create_dataset("data", (world.height, world.width), dtype=numpy.float)
-        watermap_data.write_direct(world.watermap['data'])
+        watermap_data.write_direct(world.layers['watermap'].data)
 
-    if hasattr(world, 'precipitation'):
+    if world.has_precipitations():
         precipitation_grp = f.create_group("precipitation")
         precipitation_ths_grp = precipitation_grp.create_group("thresholds")
-        precipitation_ths_grp['low'] = world.precipitation['thresholds'][0][1]
-        precipitation_ths_grp['med'] = world.precipitation['thresholds'][1][1]
+        precipitation_ths_grp['low'] = world.layers['precipitation'].thresholds[0][1]
+        precipitation_ths_grp['med'] = world.layers['precipitation'].thresholds[1][1]
         precipitation_data = precipitation_grp.create_dataset("data", (world.height, world.width), dtype=numpy.float)
-        precipitation_data.write_direct(world.precipitation['data'])
+        precipitation_data.write_direct(world.layers['precipitation'].data)
 
-    if hasattr(world, 'temperature'):
+    if world.has_temperature():
         temperature_grp = f.create_group("temperature")
         temperature_ths_grp = temperature_grp.create_group("thresholds")
-        temperature_ths_grp['polar'] = world.temperature['thresholds'][0][1]
-        temperature_ths_grp['alpine'] = world.temperature['thresholds'][1][1]
-        temperature_ths_grp['boreal'] = world.temperature['thresholds'][2][1]
-        temperature_ths_grp['cool'] = world.temperature['thresholds'][3][1]
-        temperature_ths_grp['warm'] = world.temperature['thresholds'][4][1]
-        temperature_ths_grp['subtropical'] = world.temperature['thresholds'][5][1]
+        th = world.layers['temperature'].thresholds
+        temperature_ths_grp['polar'] = th[0][1]
+        temperature_ths_grp['alpine'] = th[1][1]
+        temperature_ths_grp['boreal'] = th[2][1]
+        temperature_ths_grp['cool'] = th[3][1]
+        temperature_ths_grp['warm'] = th[4][1]
+        temperature_ths_grp['subtropical'] = th[5][1]
         temperature_data = temperature_grp.create_dataset("data", (world.height, world.width), dtype=numpy.float)
-        temperature_data.write_direct(world.temperature['data'])
+        temperature_data.write_direct(world.layers['temperature'].data)
 
-    if hasattr(world, 'icecap'):
+    if world.has_icecap():
         icecap_data = f.create_dataset("icecap", (world.height, world.width), dtype=numpy.float)
-        icecap_data.write_direct(world.icecap)
+        icecap_data.write_direct(world.layers['icecap'].data)
 
-    if hasattr(world, 'lake_map'):
+    if world.has_lakemap():
         lake_map_data = f.create_dataset("lake_map", (world.height, world.width), dtype=numpy.float)
-        lake_map_data.write_direct(world.lake_map)
+        lake_map_data.write_direct(world.layers['lake_map'].data)
 
-    if hasattr(world, 'river_map'):
+    if world.has_rivermap():
         river_map_data = f.create_dataset("river_map", (world.height, world.width), dtype=numpy.float)
-        river_map_data.write_direct(world.river_map)
+        river_map_data.write_direct(world.layers['river_map'].data)
 
     generation_params_grp = f.create_group("generation_params")
     generation_params_grp['seed'] = world.seed
@@ -115,22 +118,18 @@ def _from_hdf5_quantiles(p_quantiles):
 
 
 def _from_hdf5_matrix_with_quantiles(p_matrix):
-    matrix = dict()
-    matrix['data'] = p_matrix['data']
-    matrix['quantiles'] = _from_hdf5_quantiles(p_matrix['quantiles'])
-    return matrix
+    return numpy.array(p_matrix['data']), _from_hdf5_quantiles(p_matrix['quantiles'])
 
 
 def load_world_to_hdf5(filename):
     f = h5py.File(filename, libver='latest', mode='r')
 
     w = World(f['general/name'].value,
-              f['general/width'].value,
-              f['general/height'].value,
+              Size(f['general/width'].value, f['general/height'].value),
               f['generation_params/seed'].value,
-              f['generation_params/n_plates'].value,
-              f['generation_params/ocean_level'].value,
-              Step.get_by_name(f['generation_params/step'].value))
+              GenerationParameters(f['generation_params/n_plates'].value,
+                                   f['generation_params/ocean_level'].value,
+                                   Step.get_by_name(f['generation_params/step'].value)))
 
     # Elevation
     e = numpy.array(f['elevation/data'])
@@ -145,7 +144,7 @@ def load_world_to_hdf5(filename):
 
     # Ocean
     w.set_ocean(numpy.array(f['ocean']))
-    w.sea_depth = numpy.array(f['sea_depth'])
+    w.set_sea_depth(numpy.array(f['sea_depth']))
 
     # Biome
     if 'biome' in f.keys():
@@ -159,14 +158,12 @@ def load_world_to_hdf5(filename):
         biome = numpy.array(biome_data, dtype=object)
         w.set_biome(biome)
 
-    # Humidity
-    # FIXME: use setters
     if 'humidity' in f.keys():
-        w.humidity = _from_hdf5_matrix_with_quantiles(f['humidity'])
-        w.humidity['data'] = numpy.array(w.humidity['data']) # numpy conversion
+        data, quantiles = _from_hdf5_matrix_with_quantiles(f['humidity'])
+        w.set_humidity(data, quantiles)
 
     if 'irrigation' in f.keys():
-        w.irrigation = numpy.array(f['irrigation'])
+        w.set_irrigation(numpy.array(f['irrigation']))
 
     if 'permeability' in f.keys():
         p = numpy.array(f['permeability/data'])
@@ -178,12 +175,12 @@ def load_world_to_hdf5(filename):
         w.set_permeability(p, p_th)
 
     if 'watermap' in f.keys():
-        w.watermap = dict()
-        w.watermap['data'] = numpy.array(f['watermap/data'])
-        w.watermap['thresholds'] = {}
-        w.watermap['thresholds']['creek'] = f['watermap/thresholds/creek'].value
-        w.watermap['thresholds']['river'] =  f['watermap/thresholds/river'].value
-        w.watermap['thresholds']['main river'] =  f['watermap/thresholds/mainriver'].value
+        data = numpy.array(f['watermap/data'])
+        thresholds = {}
+        thresholds['creek'] = f['watermap/thresholds/creek'].value
+        thresholds['river'] =  f['watermap/thresholds/river'].value
+        thresholds['main river'] = f['watermap/thresholds/mainriver'].value
+        w.set_watermap(data, thresholds)
 
     if 'precipitation' in f.keys():
         p = numpy.array(f['precipitation/data'])
@@ -208,7 +205,7 @@ def load_world_to_hdf5(filename):
         w.set_temperature(t, t_th)
 
     if 'icecap' in f.keys():
-        w.icecap = numpy.array(f['icecap'])
+        w.set_icecap(numpy.array(f['icecap']))
 
     if 'lake_map' in f.keys():
         m = numpy.array(f['lake_map'])

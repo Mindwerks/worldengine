@@ -1,11 +1,12 @@
 import unittest
 import os
 import numpy
+
 from worldengine.draw import _biome_colors, draw_simple_elevation, elevation_color, \
-    draw_elevation, draw_riversmap, draw_grayscale_heightmap, draw_ocean, draw_precipitation, \
+    draw_elevation, draw_riversmap, draw_ocean, draw_precipitation, \
     draw_world, draw_temperature_levels, draw_biome, draw_scatter_plot, draw_satellite
 from worldengine.biome import Biome
-from worldengine.world import World
+from worldengine.model.world import World
 from worldengine.image_io import PNGWriter, PNGReader
 
 
@@ -94,14 +95,12 @@ class TestDraw(TestBase):
 
     def test_draw_elevation_shadow(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        data = w.elevation['data']
         target = PNGWriter.rgba_from_dimensions(w.width, w.height)
         draw_elevation(w, True, target)
         self._assert_img_equal("elevation_28070_shadow", target)
 
     def test_draw_elevation_no_shadow(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        data = w.elevation['data']
         target = PNGWriter.rgba_from_dimensions(w.width, w.height)
         draw_elevation(w, False, target)
         self._assert_img_equal("elevation_28070_no_shadow", target)
@@ -114,14 +113,13 @@ class TestDraw(TestBase):
 
     def test_draw_grayscale_heightmap(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        target = PNGWriter.grayscale_from_array(w.elevation['data'], scale_to_range=True)
-        #draw_grayscale_heightmap(w, target)
+        target = PNGWriter.grayscale_from_array(w.layers['elevation'].data, scale_to_range=True)
         self._assert_img_equal("grayscale_heightmap_28070", target)
 
     def test_draw_ocean(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
         target = PNGWriter.rgba_from_dimensions(w.width, w.height)
-        draw_ocean(w.ocean, target)
+        draw_ocean(w.layers['ocean'].data, target)
         self._assert_img_equal("ocean_28070", target)
 
     def test_draw_precipitation(self):

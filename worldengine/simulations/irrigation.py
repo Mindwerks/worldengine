@@ -6,7 +6,7 @@ class IrrigationSimulation(object):
         return world.has_watermap() and (not world.has_irrigation())
 
     def execute(self, world, seed):
-        world.irrigation = self._calculate(world)
+        world.set_irrigation(self._calculate(world))
 
     @staticmethod
     def _calculate(world):
@@ -32,7 +32,7 @@ class IrrigationSimulation(object):
         while not it_all.finished:
             x = it_all.multi_index[1]
             y = it_all.multi_index[0]
-            if world.ocean[y, x]:
+            if world.is_ocean((x, y)):
                 #coordinates used for the values-slice (tl = top-left etc.)
                 tl_v = (max(x - radius, 0)        , max(y - radius, 0))
                 br_v = (min(x + radius, width - 1), min(y + radius, height - 1))
@@ -44,7 +44,7 @@ class IrrigationSimulation(object):
                 logs_relevant = logs[tl_l[1]:br_l[1]+1, tl_l[0]:br_l[0]+1]
 
                 #finish calculation
-                values[tl_v[1]:br_v[1]+1, tl_v[0]:br_v[0]+1] += world.watermap['data'][y, x] / logs_relevant
+                values[tl_v[1]:br_v[1]+1, tl_v[0]:br_v[0]+1] += world.layers['watermap'].data[y, x] / logs_relevant
 
             it_all.iternext()
 

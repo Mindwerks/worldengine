@@ -2,6 +2,7 @@ import sys
 from argparse import ArgumentParser
 import os
 import numpy
+
 import worldengine.generation as geo
 from worldengine.common import set_verbose, print_verbose
 from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
@@ -11,8 +12,9 @@ from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_o
 from worldengine.plates import world_gen, generate_plates_simulation
 from worldengine.imex import export
 from worldengine.step import Step
-from worldengine.world import World
+from worldengine.model.world import World, Size, GenerationParameters
 from worldengine.version import __version__
+
 try:
     from worldengine.hdf5_serialization import save_world_to_hdf5
     HDF5_AVAILABLE = True
@@ -52,7 +54,7 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
 
     # Generate images
     filename = '%s/%s_ocean.png' % (output_dir, world_name)
-    draw_ocean_on_file(w.ocean, filename)
+    draw_ocean_on_file(w.layers['ocean'].data, filename)
     print("* ocean image generated in '%s'" % filename)
 
     if step.include_precipitations:
@@ -84,17 +86,21 @@ def generate_rivers_map(world, filename):
     draw_riversmap_on_file(world, filename)
     print("+ rivers map generated in '%s'" % filename)
 
+
 def draw_scatter_plot(world, filename):
     draw_scatter_plot_on_file(world, filename)
     print("+ scatter plot generated in '%s'" % filename)
+
 
 def draw_satellite_map(world, filename):
     draw_satellite_on_file(world, filename)
     print("+ satellite map generated in '%s'" % filename)
 
+
 def draw_icecaps_map(world, filename):
     draw_icecaps_on_file(world, filename)
     print("+ icecap map generated in '%s'" % filename)
+
 
 def generate_plates(seed, world_name, output_dir, width, height,
                     num_plates=10):
@@ -112,7 +118,7 @@ def generate_plates(seed, world_name, output_dir, width, height,
     elevation, plates = generate_plates_simulation(seed, width, height,
                                                    num_plates=num_plates)
 
-    world = World(world_name, width, height, seed, num_plates, -1.0, "plates")
+    world = World(world_name, Size(width, height), seed, GenerationParameters(num_plates, -1.0, "plates"))
     world.set_elevation(numpy.array(elevation).reshape(height, width), None)
     world.set_plates(numpy.array(plates, dtype=numpy.uint16).reshape(height, width))
 

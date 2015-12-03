@@ -1,7 +1,7 @@
 import unittest
-from worldengine.plates import Step, center_land, world_gen
-from worldengine.world import World
 
+from worldengine.plates import Step, center_land, world_gen
+from worldengine.model.world import World
 from tests.draw_test import TestBase
 
 

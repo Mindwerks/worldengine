@@ -10,33 +10,27 @@ class HumiditySimulation(object):
 
     def execute(self, world, seed):
         assert seed is not None
-        world.humidity = self._calculate(world)
+        data, quantiles = self._calculate(world)
+        world.set_humidity(data, quantiles)
 
     @staticmethod
     def _calculate(world):
         humids = world.humids
-        humidity = dict()
         precipitationWeight = 1.0
         irrigationWeight = 3
-        humidity['data'] = numpy.zeros((world.height, world.width), dtype=float)
+        data = numpy.zeros((world.height, world.width), dtype=float)
 
-        humidity['data'] = (world.precipitation['data'] * precipitationWeight - world.irrigation * irrigationWeight)/(precipitationWeight + irrigationWeight)
+        data = (world.layers['precipitation'].data * precipitationWeight - world.layers['irrigation'].data * irrigationWeight)/(precipitationWeight + irrigationWeight)
 
         # These were originally evenly spaced at 12.5% each but changing them
         # to a bell curve produced better results
-        humidity['quantiles'] = {}
-        humidity['quantiles']['12'] = find_threshold_f(humidity['data'], humids[6],
-                                                       world.ocean)
-        humidity['quantiles']['25'] = find_threshold_f(humidity['data'], humids[5],
-                                                       world.ocean)
-        humidity['quantiles']['37'] = find_threshold_f(humidity['data'], humids[4],
-                                                       world.ocean)
-        humidity['quantiles']['50'] = find_threshold_f(humidity['data'], humids[3],
-                                                       world.ocean)
-        humidity['quantiles']['62'] = find_threshold_f(humidity['data'], humids[2],
-                                                       world.ocean)
-        humidity['quantiles']['75'] = find_threshold_f(humidity['data'], humids[1],
-                                                       world.ocean)
-        humidity['quantiles']['87'] = find_threshold_f(humidity['data'], humids[0],
-                                                       world.ocean)
-        return humidity
+        ocean = world.layers['ocean'].data
+        quantiles = {}
+        quantiles['12'] = find_threshold_f(data, humids[6], ocean)
+        quantiles['25'] = find_threshold_f(data, humids[5], ocean)
+        quantiles['37'] = find_threshold_f(data, humids[4], ocean)
+        quantiles['50'] = find_threshold_f(data, humids[3], ocean)
+        quantiles['62'] = find_threshold_f(data, humids[2], ocean)
+        quantiles['75'] = find_threshold_f(data, humids[1], ocean)
+        quantiles['87'] = find_threshold_f(data, humids[0], ocean)
+        return data, quantiles

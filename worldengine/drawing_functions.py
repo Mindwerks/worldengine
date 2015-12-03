@@ -40,11 +40,11 @@ def draw_rivers_on_image(world, target, factor=1):
 
     for y in range(world.height):
         for x in range(world.width):
-            if world.is_land((x, y)) and (world.river_map[y, x] > 0.0):
+            if world.is_land((x, y)) and (world.layers['river_map'].data[y, x] > 0.0):
                 for dx in range(factor):
                     for dy in range(factor):
                         target.set_pixel(x * factor + dx, y * factor + dy, (0, 0, 128, 255))
-            if world.is_land((x, y)) and (world.lake_map[y, x] != 0):
+            if world.is_land((x, y)) and (world.layers['lake_map'].data[y, x] != 0):
                 for dx in range(factor):
                     for dy in range(factor):
                         target.set_pixel(x * factor + dx, y * factor + dy, (0, 100, 128, 255))
@@ -61,7 +61,7 @@ def _find_land_borders(world, factor):
     #scale ocean
     for y in range(world.height * factor):  # TODO: numpy
         for x in range(world.width * factor):
-            if world.ocean[int(y / factor), int(x / factor)]:
+            if world.is_ocean((int(x / factor), int(y / factor))):
                 _ocean[y, x] = True
 
     def my_is_ocean(pos):
@@ -82,7 +82,7 @@ def _find_outer_borders(world, factor, inner_borders):
     #scale ocean
     for y in range(world.height * factor):  # TODO: numpy
         for x in range(world.width * factor):
-            if world.ocean[int(y / factor)][int(x / factor)]:
+            if world.is_ocean((int(x / factor), int(y / factor))):
                 _ocean[y, x] = True
 
     def is_inner_border(pos):
@@ -671,7 +671,7 @@ def draw_ancientmap(world, target, resize_factor=1,
                 target.set_pixel(x, y, border_color)
             elif draw_outer_land_border and outer_borders[y, x]:
                 target.set_pixel(x, y, outer_border_color)
-            elif world.ocean[yf, xf]:
+            elif world.is_ocean((xf, yf)):
                 target.set_pixel(x, y, sea_color)
             else:
                 target.set_pixel(x, y, land_color)

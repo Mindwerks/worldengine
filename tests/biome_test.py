@@ -1,9 +1,10 @@
 import unittest
+import os
+
 from worldengine.biome import Biome, Ocean, PolarDesert, SubpolarDryTundra, \
     CoolTemperateMoistForest, biome_name_to_index, biome_index_to_name
 from worldengine.simulations.biome import BiomeSimulation
-from worldengine.world import World
-import os
+from worldengine.model.world import World
 
 
 class TestBiome(unittest.TestCase):
