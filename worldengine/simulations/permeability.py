@@ -11,7 +11,7 @@ class PermeabilitySimulation(object):
 
     def execute(self, world, seed):
         perm = self._calculate(seed, world.width, world.height)
-        ocean = world.layers['ocean'].data
+        ocean = world.ocean.data
         perm_th = [
             ('low', find_threshold_f(perm, 0.75, ocean)),
             ('med', find_threshold_f(perm, 0.25, ocean)),

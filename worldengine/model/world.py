@@ -232,61 +232,60 @@ class World(object):
         p_world.generationData.step = self.step.name
 
         # Elevation
-        self._to_protobuf_matrix(self.layers['elevation'].data, p_world.heightMapData)
-        p_world.heightMapTh_sea = self.layers['elevation'].thresholds[0][1]
-        p_world.heightMapTh_plain = self.layers['elevation'].thresholds[1][1]
-        p_world.heightMapTh_hill = self.layers['elevation'].thresholds[2][1]
+        self._to_protobuf_matrix(self.elevation.data, p_world.heightMapData)
+        p_world.heightMapTh_sea = self.elevation.thresholds[0][1]
+        p_world.heightMapTh_plain = self.elevation.thresholds[1][1]
+        p_world.heightMapTh_hill = self.elevation.thresholds[2][1]
 
         # Plates
-        self._to_protobuf_matrix(self.layers['plates'].data, p_world.plates)
+        self._to_protobuf_matrix(self.plates.data, p_world.plates)
 
         # Ocean
-        self._to_protobuf_matrix(self.layers['ocean'].data, p_world.ocean)
-        self._to_protobuf_matrix(self.layers['sea_depth'].data, p_world.sea_depth)
+        self._to_protobuf_matrix(self.ocean.data, p_world.ocean)
+        self._to_protobuf_matrix(self.sea_depth.data, p_world.sea_depth)
 
         if self.has_biome():
-            self._to_protobuf_matrix(self.layers['biome'].data, p_world.biome, biome_name_to_index)
+            self._to_protobuf_matrix(self.biome.data, p_world.biome, biome_name_to_index)
 
         if self.has_humidity():
-            self._to_protobuf_matrix_with_quantiles(self.layers['humidity'], p_world.humidity)
+            self._to_protobuf_matrix_with_quantiles(self.humidity, p_world.humidity)
 
         if self.has_irrigation():
-            self._to_protobuf_matrix(self.layers['irrigation'].data, p_world.irrigation)
+            self._to_protobuf_matrix(self.irrigation.data, p_world.irrigation)
 
         if self.has_permeability():
-            self._to_protobuf_matrix(self.layers['permeability'].data,
-                                     p_world.permeabilityData)
-            p_world.permeability_low = self.layers['permeability'].thresholds[0][1]
-            p_world.permeability_med = self.layers['permeability'].thresholds[1][1]
+            self._to_protobuf_matrix(self.permeability.data,p_world.permeabilityData)
+            p_world.permeability_low = self.permeability.thresholds[0][1]
+            p_world.permeability_med = self.permeability.thresholds[1][1]
 
         if self.has_watermap():
-            self._to_protobuf_matrix(self.layers['watermap'].data, p_world.watermapData)
-            p_world.watermap_creek = self.layers['watermap'].thresholds['creek']
-            p_world.watermap_river = self.layers['watermap'].thresholds['river']
-            p_world.watermap_mainriver = self.layers['watermap'].thresholds['main river']
+            self._to_protobuf_matrix(self.watermap.data, p_world.watermapData)
+            p_world.watermap_creek = self.watermap.thresholds['creek']
+            p_world.watermap_river = self.watermap.thresholds['river']
+            p_world.watermap_mainriver = self.watermap.thresholds['main river']
 
         if self.has_lakemap():
-            self._to_protobuf_matrix(self.layers['lake_map'].data, p_world.lakemap)
+            self._to_protobuf_matrix(self.lake_map.data, p_world.lakemap)
 
         if self.has_rivermap():
-            self._to_protobuf_matrix(self.layers['river_map'].data, p_world.rivermap)
+            self._to_protobuf_matrix(self.river_map.data, p_world.rivermap)
 
         if self.has_precipitations():
-            self._to_protobuf_matrix(self.layers['precipitation'].data, p_world.precipitationData)
-            p_world.precipitation_low = self.layers['precipitation'].thresholds[0][1]
-            p_world.precipitation_med = self.layers['precipitation'].thresholds[1][1]
+            self._to_protobuf_matrix(self.precipitation.data, p_world.precipitationData)
+            p_world.precipitation_low = self.precipitation.thresholds[0][1]
+            p_world.precipitation_med = self.precipitation.thresholds[1][1]
 
         if self.has_temperature():
-            self._to_protobuf_matrix(self.layers['temperature'].data, p_world.temperatureData)
-            p_world.temperature_polar = self.layers['temperature'].thresholds[0][1]
-            p_world.temperature_alpine = self.layers['temperature'].thresholds[1][1]
-            p_world.temperature_boreal = self.layers['temperature'].thresholds[2][1]
-            p_world.temperature_cool = self.layers['temperature'].thresholds[3][1]
-            p_world.temperature_warm = self.layers['temperature'].thresholds[4][1]
-            p_world.temperature_subtropical = self.layers['temperature'].thresholds[5][1]
+            self._to_protobuf_matrix(self.temperature.data, p_world.temperatureData)
+            p_world.temperature_polar = self.temperature.thresholds[0][1]
+            p_world.temperature_alpine = self.temperature.thresholds[1][1]
+            p_world.temperature_boreal = self.temperature.thresholds[2][1]
+            p_world.temperature_cool = self.temperature.thresholds[3][1]
+            p_world.temperature_warm = self.temperature.thresholds[4][1]
+            p_world.temperature_subtropical = self.temperature.thresholds[5][1]
 
         if self.has_icecap():
-            self._to_protobuf_matrix(self.layers['icecap'].data, p_world.icecap)
+            self._to_protobuf_matrix(self.icecap.data, p_world.icecap)
 
         return p_world
 
@@ -391,21 +390,21 @@ class World(object):
     #
 
     def random_land(self):
-        if self.layers['ocean'].data.all():
+        if self.ocean.data.all():
             return None, None  # return invalid indices if there is no land at all
-        lands = numpy.invert(self.layers['ocean'].data)
+        lands = numpy.invert(self.ocean.data)
         lands = numpy.transpose(lands.nonzero())  # returns a list of tuples/indices with land positions
         y, x = lands[numpy.random.randint(0, len(lands))]  # uses global RNG
         return x, y
 
     def is_land(self, pos):
-        return not self.layers['ocean'].data[pos[1], pos[0]]#faster than reversing pos or transposing ocean
+        return not self.ocean.data[pos[1], pos[0]]#faster than reversing pos or transposing ocean
 
     def is_ocean(self, pos):
-        return self.layers['ocean'].data[pos[1], pos[0]]
+        return self.ocean.data[pos[1], pos[0]]
 
     def sea_level(self):
-        return self.layers['elevation'].thresholds[0][1]
+        return self.elevation.thresholds[0][1]
 
     #
     # Tiles around
@@ -472,69 +471,69 @@ class World(object):
     #
 
     def start_mountain_th(self):
-        return self.layers['elevation'].thresholds[2][1]
+        return self.elevation.thresholds[2][1]
 
     def is_mountain(self, pos):
         if self.is_ocean(pos):
             return False
-        if len(self.layers['elevation'].thresholds) == 4:
+        if len(self.elevation.thresholds) == 4:
             mi = 2
         else:
             mi = 1
-        mountain_level = self.layers['elevation'].thresholds[mi][1]
+        mountain_level = self.elevation.thresholds[mi][1]
         x, y = pos
-        return self.layers['elevation'].data[y][x] > mountain_level
+        return self.elevation.data[y][x] > mountain_level
 
     def is_low_mountain(self, pos):
         if not self.is_mountain(pos):
             return False
-        if len(self.layers['elevation'].thresholds) == 4:
+        if len(self.elevation.thresholds) == 4:
             mi = 2
         else:
             mi = 1
-        mountain_level = self.layers['elevation'].thresholds[mi][1]
+        mountain_level = self.elevation.thresholds[mi][1]
         x, y = pos
-        return self.layers['elevation'].data[y, x] < mountain_level + 2.0
+        return self.elevation.data[y, x] < mountain_level + 2.0
 
     def level_of_mountain(self, pos):
         if self.is_ocean(pos):
             return False
-        if len(self.layers['elevation'].thresholds) == 4:
+        if len(self.elevation.thresholds) == 4:
             mi = 2
         else:
             mi = 1
-        mountain_level = self.layers['elevation'].thresholds[mi][1]
+        mountain_level = self.elevation.thresholds[mi][1]
         x, y = pos
-        if self.layers['elevation'].data[y, x] <= mountain_level:
+        if self.elevation.data[y, x] <= mountain_level:
             return 0
         else:
-            return self.layers['elevation'].data[y, x] - mountain_level
+            return self.elevation.data[y, x] - mountain_level
 
     def is_high_mountain(self, pos):
         if not self.is_mountain(pos):
             return False
-        if len(self.layers['elevation'].thresholds) == 4:
+        if len(self.elevation.thresholds) == 4:
             mi = 2
         else:
             mi = 1
-        mountain_level = self.layers['elevation'].thresholds[mi][1]
+        mountain_level = self.elevation.thresholds[mi][1]
         x, y = pos
-        return self.layers['elevation'].data[y, x] > mountain_level + 4.0
+        return self.elevation.data[y, x] > mountain_level + 4.0
 
     def is_hill(self, pos):
         if self.is_ocean(pos):
             return False
-        if len(self.layers['elevation'].thresholds) == 4:
+        if len(self.elevation.thresholds) == 4:
             hi = 1
         else:
             hi = 0
-        hill_level = self.layers['elevation'].thresholds[hi][1]
-        mountain_level = self.layers['elevation'].thresholds[hi + 1][1]
+        hill_level = self.elevation.thresholds[hi][1]
+        mountain_level = self.elevation.thresholds[hi + 1][1]
         x, y = pos
-        return hill_level < self.layers['elevation'].data[y, x] < mountain_level
+        return hill_level < self.elevation.data[y, x] < mountain_level
 
     def elevation_at(self, pos):
-        return self.layers['elevation'].data[pos[1], pos[0]]
+        return self.elevation.data[pos[1], pos[0]]
 
     #
     # Precipitations
@@ -542,68 +541,68 @@ class World(object):
 
     def precipitations_at(self, pos):
         x, y = pos
-        return self.layers['precipitation'].data[y, x]
+        return self.precipitation.data[y, x]
 
     def precipitations_thresholds(self):
-        return self.layers['precipitation'].thresholds
+        return self.precipitation.thresholds
 
     #
     # Temperature
     #
 
     def is_temperature_polar(self, pos):
-        th_max = self.layers['temperature'].thresholds[0][1]
+        th_max = self.temperature.thresholds[0][1]
         x, y = pos
-        t = self.layers['temperature'].data[y, x]
+        t = self.temperature.data[y, x]
         return t < th_max
 
     def is_temperature_alpine(self, pos):
-        th_min = self.layers['temperature'].thresholds[0][1]
-        th_max = self.layers['temperature'].thresholds[1][1]
+        th_min = self.temperature.thresholds[0][1]
+        th_max = self.temperature.thresholds[1][1]
         x, y = pos
-        t = self.layers['temperature'].data[y, x]
+        t = self.temperature.data[y, x]
         return th_max > t >= th_min
 
     def is_temperature_boreal(self, pos):
-        th_min = self.layers['temperature'].thresholds[1][1]
-        th_max = self.layers['temperature'].thresholds[2][1]
+        th_min = self.temperature.thresholds[1][1]
+        th_max = self.temperature.thresholds[2][1]
         x, y = pos
-        t = self.layers['temperature'].data[y, x]
+        t = self.temperature.data[y, x]
         return th_max > t >= th_min
 
     def is_temperature_cool(self, pos):
-        th_min = self.layers['temperature'].thresholds[2][1]
-        th_max = self.layers['temperature'].thresholds[3][1]
+        th_min = self.temperature.thresholds[2][1]
+        th_max = self.temperature.thresholds[3][1]
         x, y = pos
-        t = self.layers['temperature'].data[y, x]
+        t = self.temperature.data[y, x]
         return th_max > t >= th_min
 
     def is_temperature_warm(self, pos):
-        th_min = self.layers['temperature'].thresholds[3][1]
-        th_max = self.layers['temperature'].thresholds[4][1]
+        th_min = self.temperature.thresholds[3][1]
+        th_max = self.temperature.thresholds[4][1]
         x, y = pos
-        t = self.layers['temperature'].data[y, x]
+        t = self.temperature.data[y, x]
         return th_max > t >= th_min
 
     def is_temperature_subtropical(self, pos):
-        th_min = self.layers['temperature'].thresholds[4][1]
-        th_max = self.layers['temperature'].thresholds[5][1]
+        th_min = self.temperature.thresholds[4][1]
+        th_max = self.temperature.thresholds[5][1]
         x, y = pos
-        t = self.layers['temperature'].data[y, x]
+        t = self.temperature.data[y, x]
         return th_max > t >= th_min
 
     def is_temperature_tropical(self, pos):
-        th_min = self.layers['temperature'].thresholds[5][1]
+        th_min = self.temperature.thresholds[5][1]
         x, y = pos
-        t = self.layers['temperature'].data[y, x]
+        t = self.temperature.data[y, x]
         return t >= th_min
 
     def temperature_at(self, pos):
         x, y = pos
-        return self.layers['temperature'].data[y, x]
+        return self.temperature.data[y, x]
 
     def temperature_thresholds(self):
-        return self.layers['temperature'].thresholds
+        return self.temperature.thresholds
 
     #
     # Humidity
@@ -611,66 +610,66 @@ class World(object):
 
     def humidity_at(self, pos):
         x, y = pos
-        return self.layers['humidity'].data[y, x]
+        return self.humidity.data[y, x]
 
     def is_humidity_above_quantile(self, pos, q):
-        th = self.layers['humidity'].quantiles[str(q)]
+        th = self.humidity.quantiles[str(q)]
         x, y = pos
-        t = self.layers['humidity'].data[y, x]
+        t = self.humidity.data[y, x]
         return t >= th
 
     def is_humidity_superarid(self, pos):
-        th_max = self.layers['humidity'].quantiles['87']
+        th_max = self.humidity.quantiles['87']
         x, y = pos
-        t = self.layers['humidity'].data[y, x]
+        t = self.humidity.data[y, x]
         return t < th_max
 
     def is_humidity_perarid(self, pos):
-        th_min = self.layers['humidity'].quantiles['87']
-        th_max = self.layers['humidity'].quantiles['75']
+        th_min = self.humidity.quantiles['87']
+        th_max = self.humidity.quantiles['75']
         x, y = pos
-        t = self.layers['humidity'].data[y, x]
+        t = self.humidity.data[y, x]
         return th_max > t >= th_min
 
     def is_humidity_arid(self, pos):
-        th_min = self.layers['humidity'].quantiles['75']
-        th_max = self.layers['humidity'].quantiles['62']
+        th_min = self.humidity.quantiles['75']
+        th_max = self.humidity.quantiles['62']
         x, y = pos
-        t = self.layers['humidity'].data[y, x]
+        t = self.humidity.data[y, x]
         return th_max > t >= th_min
 
     def is_humidity_semiarid(self, pos):
-        th_min = self.layers['humidity'].quantiles['62']
-        th_max = self.layers['humidity'].quantiles['50']
+        th_min = self.humidity.quantiles['62']
+        th_max = self.humidity.quantiles['50']
         x, y = pos
-        t = self.layers['humidity'].data[y, x]
+        t = self.humidity.data[y, x]
         return th_max > t >= th_min
 
     def is_humidity_subhumid(self, pos):
-        th_min = self.layers['humidity'].quantiles['50']
-        th_max = self.layers['humidity'].quantiles['37']
+        th_min = self.humidity.quantiles['50']
+        th_max = self.humidity.quantiles['37']
         x, y = pos
-        t = self.layers['humidity'].data[y, x]
+        t = self.humidity.data[y, x]
         return th_max > t >= th_min
 
     def is_humidity_humid(self, pos):
-        th_min = self.layers['humidity'].quantiles['37']
-        th_max = self.layers['humidity'].quantiles['25']
+        th_min = self.humidity.quantiles['37']
+        th_max = self.humidity.quantiles['25']
         x, y = pos
-        t = self.layers['humidity'].data[y, x]
+        t = self.humidity.data[y, x]
         return th_max > t >= th_min
 
     def is_humidity_perhumid(self, pos):
-        th_min = self.layers['humidity'].quantiles['25']
-        th_max = self.layers['humidity'].quantiles['12']
+        th_min = self.humidity.quantiles['25']
+        th_max = self.humidity.quantiles['12']
         x, y = pos
-        t = self.layers['humidity'].data[y, x]
+        t = self.humidity.data[y, x]
         return th_max > t >= th_min
 
     def is_humidity_superhumid(self, pos):
-        th_min = self.layers['humidity'].quantiles['12']
+        th_min = self.humidity.quantiles['12']
         x, y = pos
-        t = self.layers['humidity'].data[y, x]
+        t = self.humidity.data[y, x]
         return t >= th_min
 
     #
@@ -708,7 +707,7 @@ class World(object):
 
     def biome_at(self, pos):
         x, y = pos
-        b = Biome.by_name(self.layers['biome'].data[y, x])
+        b = Biome.by_name(self.biome.data[y, x])
         if b is None:
             raise Exception('Not found')
         return b
@@ -852,7 +851,67 @@ class World(object):
     #
 
     def n_actual_plates(self):
-        return self.layers['plates'].data.max() + 1
+        return self.plates.data.max() + 1
+
+    #
+    # Accessors
+    #
+
+    @property
+    def elevation(self):
+        return self.layers['elevation']
+
+    @property
+    def plates(self):
+        return self.layers['plates']
+
+    @property
+    def biome(self):
+        return self.layers['biome']
+
+    @property
+    def ocean(self):
+        return self.layers['ocean']
+
+    @property
+    def precipitation(self):
+        return self.layers['precipitation']
+
+    @property
+    def sea_depth(self):
+        return self.layers['sea_depth']
+
+    @property
+    def humidity(self):
+        return self.layers['humidity']
+
+    @property
+    def irrigation(self):
+        return self.layers['irrigation']
+
+    @property
+    def temperature(self):
+        return self.layers['temperature']
+
+    @property
+    def permeability(self):
+        return self.layers['permeability']
+
+    @property
+    def watermap(self):
+        return self.layers['watermap']
+
+    @property
+    def river_map(self):
+        return self.layers['river_map']
+
+    @property
+    def lake_map(self):
+        return self.layers['lake_map']
+
+    @property
+    def icecap(self):
+        return self.layers['icecap']
 
     #
     # Setters

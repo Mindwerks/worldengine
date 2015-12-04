@@ -20,11 +20,11 @@ class HumiditySimulation(object):
         irrigationWeight = 3
         data = numpy.zeros((world.height, world.width), dtype=float)
 
-        data = (world.layers['precipitation'].data * precipitationWeight - world.layers['irrigation'].data * irrigationWeight)/(precipitationWeight + irrigationWeight)
+        data = (world.precipitation.data * precipitationWeight - world.irrigation.data * irrigationWeight)/(precipitationWeight + irrigationWeight)
 
         # These were originally evenly spaced at 12.5% each but changing them
         # to a bell curve produced better results
-        ocean = world.layers['ocean'].data
+        ocean = world.ocean.data
         quantiles = {}
         quantiles['12'] = find_threshold_f(data, humids[6], ocean)
         quantiles['25'] = find_threshold_f(data, humids[5], ocean)
