@@ -235,8 +235,8 @@ def get_normalized_elevation_array(world):
     ''' Convert raw elevation into normalized values between 0 and 255,
         and return a numpy array of these values '''
 
-    e = world.layers['elevation'].data
-    ocean = world.layers['ocean'].data
+    e = world.elevation.data
+    ocean = world.ocean.data
 
     mask = numpy.ma.array(e, mask=ocean)  # only land
     min_elev_land = mask.min()
@@ -327,21 +327,21 @@ def draw_simple_elevation(world, sea_level, target):
     e = world.elevation.data
     c = numpy.empty(e.shape, dtype=numpy.float)
 
-    has_ocean = not (sea_level is None or world.layers['ocean'].data is None or not world.layers['ocean'].data.any())  # or 'not any ocean'
-    mask_land = numpy.ma.array(e, mask=world.layers['ocean'].data if has_ocean else False)  # only land
+    has_ocean = not (sea_level is None or world.ocean.data is None or not world.ocean.data.any())  # or 'not any ocean'
+    mask_land = numpy.ma.array(e, mask=world.ocean.data if has_ocean else False)  # only land
 
     min_elev_land = mask_land.min()
     max_elev_land = mask_land.max()
     elev_delta_land = (max_elev_land - min_elev_land) / 11.0
 
     if has_ocean:
-        land = numpy.logical_not(world.layers['ocean'].data)
+        land = numpy.logical_not(world.ocean.data)
         mask_ocean = numpy.ma.array(e, mask=land)  # only ocean
         min_elev_sea = mask_ocean.min()
         max_elev_sea = mask_ocean.max()
         elev_delta_sea = max_elev_sea - min_elev_sea
 
-        c[world.layers['ocean'].data] = ((e[world.layers['ocean'].data] - min_elev_sea) / elev_delta_sea)
+        c[world.ocean.data] = ((e[world.ocean.data] - min_elev_sea) / elev_delta_sea)
         c[land] = ((e[land] - min_elev_land) / elev_delta_land) + 1
     else:
         c = ((e - min_elev_land) / elev_delta_land) + 1
@@ -377,7 +377,7 @@ def draw_satellite(world, target):
 
     # Get an elevation mask where heights are normalized between 0 and 255
     elevation_mask = get_normalized_elevation_array(world)
-    smooth_mask = numpy.invert(world.layers['ocean'].data)  # all land shall be smoothed (other tiles can be included by setting them to True)
+    smooth_mask = numpy.invert(world.ocean.data)  # all land shall be smoothed (other tiles can be included by setting them to True)
 
     rng = numpy.random.RandomState(world.seed)  # create our own random generator; necessary for now to make the tests reproducible, even though it is a bit ugly
 
@@ -399,7 +399,7 @@ def draw_satellite(world, target):
     ice_color_variation = int(30)  # 0 means perfectly white ice; must be in [0, 255]; only affects R- and G-channel
     for y in range(world.height):
         for x in range(world.width):
-            if world.layers['icecap'].data[y, x] > 0.0:
+            if world.icecap.data[y, x] > 0.0:
                 smooth_mask[y, x] = True  # smooth the frozen areas, too
                 variation = rng.randint(0, ice_color_variation)
                 target.set_pixel(x, y, (255 - ice_color_variation + variation, 255 - ice_color_variation + variation, 255, 255))
@@ -438,14 +438,14 @@ def draw_satellite(world, target):
     for y in range(world.height):
         for x in range(world.width):
             ## Color rivers
-            if world.is_land((x, y)) and (world.layers['river_map'].data[y, x] > 0.0):
+            if world.is_land((x, y)) and (world.river_map.data[y, x] > 0.0):
                 base_color = target[y, x]
 
                 r, g, b = add_colors(base_color, RIVER_COLOR_CHANGE)
                 target.set_pixel(x, y, (r, g, b, 255))
 
             ## Color lakes
-            if world.is_land((x, y)) and (world.layers['lake_map'].data[y, x] != 0):
+            if world.is_land((x, y)) and (world.lake_map.data[y, x] != 0):
                 base_color = target[y, x]
 
                 r, g, b = add_colors(base_color, LAKE_COLOR_CHANGE)
@@ -486,7 +486,7 @@ def draw_elevation(world, shadow, target):
     height = world.height
 
     data = world.elevation.data
-    ocean = world.layers['ocean'].data
+    ocean = world.ocean.data
 
     mask = numpy.ma.array(data, mask=ocean)
 
@@ -574,7 +574,7 @@ def draw_world(world, target):
                 biome = world.biome_at((x, y))
                 target.set_pixel(x, y, _biome_colors[biome.name()])
             else:
-                c = int(world.layers['sea_depth'].data[y, x] * 200 + 50)
+                c = int(world.sea_depth.data[y, x] * 200 + 50)
                 target.set_pixel(x, y, (0, 0, 255 - c, 255))
 
 
@@ -617,7 +617,7 @@ def draw_biome(world, target):
     width = world.width
     height = world.height
 
-    biome = world.layers['biome'].data
+    biome = world.biome.data
 
     for y in range(height):
         for x in range(width):
@@ -632,8 +632,8 @@ def draw_scatter_plot(world, size, target):
 
     #Find min and max values of humidity and temperature on land so we can
     #normalize temperature and humidity to the chart
-    humid = numpy.ma.masked_array(world.layers['humidity'].data, mask=world.layers['ocean'].data)
-    temp = numpy.ma.masked_array(world.layers['temperature'].data, mask=world.layers['ocean'].data)
+    humid = numpy.ma.masked_array(world.humidity.data, mask=world.ocean.data)
+    temp = numpy.ma.masked_array(world.temperature.data, mask=world.ocean.data)
     min_humidity = humid.min()
     max_humidity = humid.max()
     min_temperature = temp.min()
@@ -650,12 +650,12 @@ def draw_scatter_plot(world, size, target):
     h_values = ['62', '50', '37', '25', '12']
     t_values = [   0,    1,    2,   3,    5 ]
     for loop in range(0, 5):
-        h_min = (size - 1) * ((world.layers['humidity'].quantiles[h_values[loop]] - min_humidity) / humidity_delta)
+        h_min = (size - 1) * ((world.humidity.quantiles[h_values[loop]] - min_humidity) / humidity_delta)
         if loop != 4:
-            h_max = (size - 1) * ((world.layers['humidity'].quantiles[h_values[loop + 1]] - min_humidity) / humidity_delta)
+            h_max = (size - 1) * ((world.humidity.quantiles[h_values[loop + 1]] - min_humidity) / humidity_delta)
         else:
             h_max = size
-        v_max = (size - 1) * ((world.layers['temperature'].thresholds[t_values[loop]][1] - min_temperature) / temperature_delta)
+        v_max = (size - 1) * ((world.temperature.thresholds[t_values[loop]][1] - min_temperature) / temperature_delta)
         if h_min < 0:
             h_min = 0
         if h_max > size:
@@ -672,13 +672,13 @@ def draw_scatter_plot(world, size, target):
                     
     #draw lines based on thresholds
     for t in range(0, 6):
-        v = (size - 1) * ((world.layers['temperature'].thresholds[t][1] - min_temperature) / temperature_delta)
+        v = (size - 1) * ((world.temperature.thresholds[t][1] - min_temperature) / temperature_delta)
         if 0 < v < size:
             for y in range(0, size):
                 target.set_pixel(int(v), (size - 1) - y, (0, 0, 0, 255))
     ranges = ['87', '75', '62', '50', '37', '25', '12']
     for p in ranges:
-        h = (size - 1) * ((world.layers['humidity'].quantiles[p] - min_humidity) / humidity_delta)
+        h = (size - 1) * ((world.humidity.quantiles[p] - min_humidity) / humidity_delta)
         if 0 < h < size:
             for x in range(0, size):
                 target.set_pixel(x, (size - 1) - int(h), (0, 0, 0, 255))

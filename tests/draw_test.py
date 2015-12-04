@@ -119,7 +119,7 @@ class TestDraw(TestBase):
     def test_draw_ocean(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
         target = PNGWriter.rgba_from_dimensions(w.width, w.height)
-        draw_ocean(w.layers['ocean'].data, target)
+        draw_ocean(w.ocean.data, target)
         self._assert_img_equal("ocean_28070", target)
 
     def test_draw_precipitation(self):

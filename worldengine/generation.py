@@ -36,7 +36,7 @@ def center_land(world):
 
     latshift = 0
     world.elevation.data = numpy.roll(numpy.roll(world.elevation.data, -y_with_min_sum + latshift, axis=0), - x_with_min_sum, axis=1)
-    world.layers['plates'].data = numpy.roll(numpy.roll(world.layers['plates'].data, -y_with_min_sum + latshift, axis=0), - x_with_min_sum, axis=1)
+    world.plates.data = numpy.roll(numpy.roll(world.plates.data, -y_with_min_sum + latshift, axis=0), - x_with_min_sum, axis=1)
     if get_verbose():
         print("geo.center_land: width complete")
 

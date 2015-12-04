@@ -38,7 +38,7 @@ class TestSerialization(unittest.TestCase):
             serialized = save_world_to_hdf5(w, filename)
             unserialized = load_world_to_hdf5(filename)
             self.assertEqual(Set(w.layers.keys()), Set(unserialized.layers.keys()))
-            self.assertEqual(w.layers['humidity'].quantiles, unserialized.layers['humidity'].quantiles)
+            self.assertEqual(w.humidity.quantiles, unserialized.humidity.quantiles)
             for l in w.layers.keys():
                 self.assertEqual(w.layers[l], unserialized.layers[l], "Comparing %s" % l)
             self.assertTrue(_equal(w.ocean_level,       unserialized.ocean_level))
