@@ -324,7 +324,7 @@ def draw_simple_elevation(world, sea_level, target):
     """ This function can be used on a generic canvas (either an image to save
         on disk or a canvas part of a GUI)
     """
-    e = world.layers['elevation'].data
+    e = world.elevation.data
     c = numpy.empty(e.shape, dtype=numpy.float)
 
     has_ocean = not (sea_level is None or world.layers['ocean'].data is None or not world.layers['ocean'].data.any())  # or 'not any ocean'
@@ -459,13 +459,13 @@ def draw_satellite(world, target):
                 
                 # Build up list of elevations in the previous n tiles, where n is the shadow size.
                 # This goes northwest to southeast
-                prev_elevs = [ world.layers['elevation'].data[y-n, x-n] for n in range(1, SAT_SHADOW_SIZE+1) ]
+                prev_elevs = [ world.elevation.data[y-n, x-n] for n in range(1, SAT_SHADOW_SIZE+1) ]
 
                 # Take the average of the height of the previous n tiles
                 avg_prev_elev = int( sum(prev_elevs) / len(prev_elevs) )
 
                 # Find the difference between this tile's elevation, and the average of the previous elevations
-                difference = int(world.layers['elevation'].data[y, x] - avg_prev_elev)
+                difference = int(world.elevation.data[y, x] - avg_prev_elev)
 
                 # Amplify the difference
                 adjusted_difference = difference * SAT_SHADOW_DISTANCE_MULTIPLIER
@@ -485,7 +485,7 @@ def draw_elevation(world, shadow, target):
     width = world.width
     height = world.height
 
-    data = world.layers['elevation'].data
+    data = world.elevation.data
     ocean = world.layers['ocean'].data
 
     mask = numpy.ma.array(data, mask=ocean)
@@ -756,7 +756,7 @@ def draw_riversmap_on_file(world, filename):
 
 
 def draw_grayscale_heightmap_on_file(world, filename):
-    img = PNGWriter.grayscale_from_array(world.layers['elevation'].data, filename, scale_to_range=True)
+    img = PNGWriter.grayscale_from_array(world.elevation.data, filename, scale_to_range=True)
     img.complete()
 
 

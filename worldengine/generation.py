@@ -24,18 +24,18 @@ def center_land(world):
     """Translate the map horizontally and vertically to put as much ocean as
        possible at the borders. It operates on elevation and plates map"""
 
-    y_sums = world.layers['elevation'].data.sum(1)  # 1 == sum along x-axis
+    y_sums = world.elevation.data.sum(1)  # 1 == sum along x-axis
     y_with_min_sum = y_sums.argmin()
     if get_verbose():
         print("geo.center_land: height complete")
 
-    x_sums = world.layers['elevation'].data.sum(0)  # 0 == sum along y-axis
+    x_sums = world.elevation.data.sum(0)  # 0 == sum along y-axis
     x_with_min_sum = x_sums.argmin()
     if get_verbose():
         print("geo.center_land: width complete")
 
     latshift = 0
-    world.layers['elevation'].data = numpy.roll(numpy.roll(world.layers['elevation'].data, -y_with_min_sum + latshift, axis=0), - x_with_min_sum, axis=1)
+    world.elevation.data = numpy.roll(numpy.roll(world.elevation.data, -y_with_min_sum + latshift, axis=0), - x_with_min_sum, axis=1)
     world.layers['plates'].data = numpy.roll(numpy.roll(world.layers['plates'].data, -y_with_min_sum + latshift, axis=0), - x_with_min_sum, axis=1)
     if get_verbose():
         print("geo.center_land: width complete")
@@ -49,8 +49,8 @@ def place_oceans_at_map_borders(world):
     ocean_border = int(min(30, max(world.width / 5, world.height / 5)))
 
     def place_ocean(x, y, i):
-        world.layers['elevation'].data[y, x] = \
-            (world.layers['elevation'].data[y, x] * i) / ocean_border
+        world.elevation.data[y, x] = \
+            (world.elevation.data[y, x] * i) / ocean_border
 
     for x in range(world.width):
         for i in range(ocean_border):
@@ -69,7 +69,7 @@ def add_noise_to_elevation(world, seed):
     for y in range(world.height):
         for x in range(world.width):
             n = snoise2(x / freq * 2, y / freq * 2, octaves, base=seed)
-            world.layers['elevation'].data[y, x] += n
+            world.elevation.data[y, x] += n
 
 
 def fill_ocean(elevation, sea_level):#TODO: Make more use of numpy?
@@ -105,7 +105,7 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
     :param ocean_level: the elevation representing the ocean level
     :return: nothing, the world will be changed
     """
-    e = world.layers['elevation'].data
+    e = world.elevation.data
     ocean = fill_ocean(e, ocean_level)
     hl = find_threshold_f(e, 0.10)  # the highest 10% of all (!) land are declared hills
     ml = find_threshold_f(e, 0.03)  # the highest 3% are declared mountains
@@ -141,7 +141,7 @@ def harmonize_ocean(ocean, elevation, ocean_level):
 # ----
 
 def sea_depth(world, sea_level):
-    sea_depth = sea_level - world.layers['elevation'].data
+    sea_depth = sea_level - world.elevation.data
     for y in range(world.height):
         for x in range(world.width):
             if world.tiles_around((x, y), radius=1, predicate=world.is_land):

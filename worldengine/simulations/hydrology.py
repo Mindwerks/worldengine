@@ -19,7 +19,7 @@ class WatermapSimulation(object):
             if q < 0:
                 return
             x, y = pos
-            pos_elev = world.layers['elevation'].data[y, x] + _watermap[y, x]
+            pos_elev = world.elevation.data[y, x] + _watermap[y, x]
             lowers = []
             min_higher = None
             min_lower = None
@@ -27,7 +27,7 @@ class WatermapSimulation(object):
             tot_lowers = 0
             for p in world.tiles_around((x, y)):#TODO: switch to numpy
                 px, py = p
-                e = world.layers['elevation'].data[py, px] + _watermap[py, px]
+                e = world.elevation.data[py, px] + _watermap[py, px]
                 if e < pos_elev:
                     dq = int(pos_elev - e) << 2
                     if min_lower is None or e < min_lower:
