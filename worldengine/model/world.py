@@ -862,6 +862,54 @@ class World(object):
     def elevation(self):
         return self.layers['elevation']
 
+    @property
+    def plates(self):
+        return self.layers['plates']
+
+    @property
+    def biome(self):
+        return self.layers['biome']
+
+    @property
+    def ocean(self):
+        return self.layers['ocean']
+
+    @property
+    def precipitation(self):
+        return self.layers['precipitation']
+
+    @property
+    def sea_depth(self):
+        return self.layers['sea_depth']
+
+    @property
+    def humidity(self):
+        return self.layers['humidity']
+
+    @property
+    def irrigation(self):
+        return self.layers['irrigation']
+
+    @property
+    def temperature(self):
+        return self.layers['temperature']
+
+    @property
+    def watermap(self):
+        return self.layers['watermap']
+
+    @property
+    def river_map(self):
+        return self.layers['river_map']
+
+    @property
+    def lake_map(self):
+        return self.layers['lake_map']
+
+    @property
+    def icecap(self):
+        return self.layers['icecap']
+
     #
     # Setters
     #
