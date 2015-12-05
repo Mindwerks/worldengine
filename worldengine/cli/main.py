@@ -273,10 +273,6 @@ def main():
                              "[default=%(default)s]",
                         metavar="N",
                         default='512')
-    parser.add_argument('-q', '--number-of-plates', dest='number_of_plates',
-                        type=int,
-                        help="N = number of plates [default = %(default)s]",
-                        metavar="N", default='10')
     parser.add_argument('--recursion_limit', dest='recursion_limit', type=int,
                         help="Set the recursion limit [default = %(default)s]",
                         metavar="N", default='2000')
@@ -293,6 +289,10 @@ def main():
     g_generate = parser.add_argument_group(
         "Generate Options", "These options are only useful in plate and " +
         "world modes")
+    g_generate.add_argument('-q', '--number-of-plates', dest='number_of_plates',
+                            type=int,
+                            help="N = number of plates [default = %(default)s]",
+                            metavar="N", default='10')
     g_generate.add_argument('-r', '--rivers', dest='rivers_map',
                             action="store_true", help="generate rivers map")
     g_generate.add_argument('--gs', '--grayscale-heightmap',
