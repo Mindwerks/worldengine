@@ -1,6 +1,6 @@
 import worldengine.protobuf.World_pb2 as Protobuf
 from worldengine.step import Step
-from worldengine.model.world import World, Size, GenerationParameters
+from worldengine.model.world import World, Size, GenerationParameters, Layer, LayerWithThresholds, LayerWithQuantiles
 import numpy
 from worldengine.biome import biome_name_to_index, biome_index_to_name
 
@@ -97,6 +97,18 @@ def _from_protobuf_matrix_with_quantiles(p_matrix):
 
 
 def _to_protobuf_world(world):
+
+    def _find_target(p_world, field_name, custom_names):
+        if field_name in custom_names:
+            # elevationData has been called heightMapData
+            return getattr(p_world, custom_names[field_name])
+        elif hasattr(p_world, field_name):
+            return getattr(p_world, field_name)
+        else:
+            # For compatibility we need this because 'rivermap' was mapped to 'river_map'
+            # and 'lakemap' to 'lake_map'
+            return getattr(p_world, field_name.replace('_', ''))
+
     p_world = Protobuf.World()
 
     p_world.worldengine_tag = World.worldengine_tag()
@@ -111,61 +123,60 @@ def _to_protobuf_world(world):
     p_world.generationData.ocean_level = world.ocean_level
     p_world.generationData.step = world.step.name
 
+    transformations = {'biome': biome_name_to_index}
+    custom_names = {'elevationData': 'heightMapData'}
+
+    for layer_name in world.layers:
+        layer = world.layers[layer_name]
+        has_quantiles = isinstance(layer, LayerWithQuantiles)
+        has_thresholds = isinstance(layer, LayerWithThresholds)
+        is_simple_layer = not has_quantiles and not has_thresholds
+        print("Layer %s %s %s" % (layer_name,isinstance(layer,LayerWithThresholds),isinstance(layer,LayerWithQuantiles)))
+        if is_simple_layer:
+            target = _find_target(p_world, layer_name, custom_names)
+            if layer_name in transformations:
+                _to_protobuf_matrix(layer.data, target, transformations[layer_name])
+            else:
+                _to_protobuf_matrix(layer.data, target)
+        elif has_thresholds:
+            target = _find_target(p_world, "%sData" % layer_name, custom_names)
+            if layer_name in transformations:
+                _to_protobuf_matrix(layer.data, target, transformations[layer_name])
+            else:
+                _to_protobuf_matrix(layer.data, target)
+        elif has_quantiles:
+            target = _find_target(p_world, layer_name, custom_names)
+            _to_protobuf_matrix_with_quantiles(layer, target)
+
+    #
+    # Thresholds are still treated explicitly
+    #
+
     # Elevation
-    _to_protobuf_matrix(world.elevation.data, p_world.heightMapData)
     p_world.heightMapTh_sea = world.elevation.thresholds[0][1]
     p_world.heightMapTh_plain = world.elevation.thresholds[1][1]
     p_world.heightMapTh_hill = world.elevation.thresholds[2][1]
 
-    # Plates
-    _to_protobuf_matrix(world.plates.data, p_world.plates)
-
-    # Ocean
-    _to_protobuf_matrix(world.ocean.data, p_world.ocean)
-    _to_protobuf_matrix(world.sea_depth.data, p_world.sea_depth)
-
-    if world.has_biome():
-        _to_protobuf_matrix(world.biome.data, p_world.biome, biome_name_to_index)
-
-    if world.has_humidity():
-        _to_protobuf_matrix_with_quantiles(world.humidity, p_world.humidity)
-
-    if world.has_irrigation():
-        _to_protobuf_matrix(world.irrigation.data, p_world.irrigation)
-
     if world.has_permeability():
-        _to_protobuf_matrix(world.permeability.data,p_world.permeabilityData)
         p_world.permeability_low = world.permeability.thresholds[0][1]
         p_world.permeability_med = world.permeability.thresholds[1][1]
 
     if world.has_watermap():
-        _to_protobuf_matrix(world.watermap.data, p_world.watermapData)
         p_world.watermap_creek = world.watermap.thresholds['creek']
         p_world.watermap_river = world.watermap.thresholds['river']
         p_world.watermap_mainriver = world.watermap.thresholds['main river']
 
-    if world.has_lakemap():
-        _to_protobuf_matrix(world.lake_map.data, p_world.lakemap)
-
-    if world.has_rivermap():
-        _to_protobuf_matrix(world.river_map.data, p_world.rivermap)
-
     if world.has_precipitations():
-        _to_protobuf_matrix(world.precipitation.data, p_world.precipitationData)
         p_world.precipitation_low = world.precipitation.thresholds[0][1]
         p_world.precipitation_med = world.precipitation.thresholds[1][1]
 
     if world.has_temperature():
-        _to_protobuf_matrix(world.temperature.data, p_world.temperatureData)
         p_world.temperature_polar = world.temperature.thresholds[0][1]
         p_world.temperature_alpine = world.temperature.thresholds[1][1]
         p_world.temperature_boreal = world.temperature.thresholds[2][1]
         p_world.temperature_cool = world.temperature.thresholds[3][1]
         p_world.temperature_warm = world.temperature.thresholds[4][1]
         p_world.temperature_subtropical = world.temperature.thresholds[5][1]
-
-    if world.has_icecap():
-        _to_protobuf_matrix(world.icecap.data, p_world.icecap)
 
     return p_world
 
