@@ -1016,8 +1016,9 @@ class World(object):
     def set_icecap(self, icecap):
         self.layers['icecap'] = Layer(icecap)
 
-    def set_wind(self, wind):
-        self.layers['wind'] = Layer(wind)
+    def set_wind_direction(self, wind):
+        """The direction should be a number from 0 to 1 where 0 means North, 0.25 East, 0.5 South and 0.75 West"""
+        self.layers['wind_direction'] = Layer(wind)
 
     def has_ocean(self):
         return 'ocean' in self.layers
@@ -1053,4 +1054,4 @@ class World(object):
         return 'icecap' in self.layers
 
     def has_wind(self):
-        return 'wind' in self.layers
+        return 'wind_direction' in self.layers

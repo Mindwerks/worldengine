@@ -1,7 +1,7 @@
 import numpy
 
 from worldengine.drawing_functions import draw_ancientmap, \
-    draw_rivers_on_image
+    draw_rivers_on_image, gradient
 from worldengine.image_io import PNGWriter
 
 # -------------
@@ -527,6 +527,31 @@ def draw_ocean(ocean, target):
                 target.set_pixel(x, y, (0, 255, 255, 255))
 
 
+def draw_wind(world, target):
+
+    WEST_COLOR = (255, 0, 0)
+    NORTH_COLOR = (0, 255, 0)
+    EAST_COLOR = (0, 0, 255)
+    SOUTH_COLOR = (255, 255, 0)
+
+    def _wind_color(dir):
+        if dir > 0.75:
+            return gradient(dir, 0.75, 1.00, WEST_COLOR, NORTH_COLOR)
+        elif dir > 0.5:
+            return gradient(dir, 0.50, 0.75, SOUTH_COLOR, WEST_COLOR)
+        elif dir > 0.25:
+            return gradient(dir, 0.25, 0.50, EAST_COLOR, SOUTH_COLOR)
+        else:
+            return gradient(dir, 0.00, 0.25, NORTH_COLOR, EAST_COLOR)
+
+    width = world.width
+    height = world.height
+
+    for y in range(height):
+        for x in range(width):
+            target.set_pixel(x, y, _wind_color(world.layers['wind_direction'].data[y, x]))
+
+
 def draw_precipitation(world, target, black_and_white=False):
     # FIXME we are drawing humidity, not precipitations
     width = world.width
@@ -794,6 +819,12 @@ def draw_temperature_levels_on_file(world, filename, black_and_white=False):
 def draw_biome_on_file(world, filename):
     img = PNGWriter.rgba_from_dimensions(world.width, world.height, filename)
     draw_biome(world, img)
+    img.complete()
+
+
+def draw_wind_on_file(world, filename):
+    img = PNGWriter.rgba_from_dimensions(world.width, world.height, filename)
+    draw_wind(world, img)
     img.complete()
 
 

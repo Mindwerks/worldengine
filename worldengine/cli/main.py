@@ -5,10 +5,7 @@ import numpy
 
 import worldengine.generation as geo
 from worldengine.common import set_verbose, print_verbose
-from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
-    draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
-    draw_temperature_levels_on_file, draw_riversmap_on_file, draw_scatter_plot_on_file, \
-    draw_satellite_on_file, draw_icecaps_on_file
+from worldengine.draw import *
 from worldengine.plates import world_gen, generate_plates_simulation
 from worldengine.imex import export
 from worldengine.step import Step
@@ -56,6 +53,11 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
     filename = '%s/%s_ocean.png' % (output_dir, world_name)
     draw_ocean_on_file(w.ocean.data, filename)
     print("* ocean image generated in '%s'" % filename)
+
+    if step.include_wind:
+        filename = '%s/%s_wind.png' % (output_dir, world_name)
+        draw_wind_on_file(w, filename)
+        print("* wind image generated in '%s'" % filename)
 
     if step.include_precipitations:
         filename = '%s/%s_precipitation.png' % (output_dir, world_name)
