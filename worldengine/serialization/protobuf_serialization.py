@@ -4,6 +4,10 @@ from worldengine.model.world import World, Size, GenerationParameters
 import numpy
 from worldengine.biome import biome_name_to_index, biome_index_to_name
 
+###############################################################################
+# Interface
+###############################################################################
+
 
 def protobuf_serialize(world):
     p_world = _to_protobuf_world(world)
@@ -25,6 +29,11 @@ def protobuf_unserialize(serialized):
     p_world = Protobuf.World()
     p_world.ParseFromString(serialized)
     return _from_protobuf_world(p_world)
+
+
+###############################################################################
+# Implementation
+###############################################################################
 
 
 def _to_protobuf_matrix(matrix, p_matrix, transformation=None):
