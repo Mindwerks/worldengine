@@ -1,16 +1,16 @@
 import unittest
 
 from worldengine.drawing_functions import draw_ancientmap, gradient, draw_rivers_on_image
-from worldengine.model.world import World
 from worldengine.image_io import PNGWriter
 from tests.draw_test import TestBase
+from worldengine.serialization.protobuf_serialization import open_protobuf
 
 
 class TestDrawingFunctions(TestBase):
 
     def setUp(self):
         super(TestDrawingFunctions, self).setUp()
-        self.w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        self.w = open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
 
     def test_draw_ancient_map(self):
         target = PNGWriter.rgba_from_dimensions(self.w.width * 3, self.w.height * 3)

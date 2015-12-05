@@ -1,12 +1,12 @@
-import unittest
-import tempfile
 import os
-
-from worldengine.plates import Step, world_gen
-from worldengine.model.world import World
-from worldengine.common import _equal
-from worldengine.hdf5_serialization import save_world_to_hdf5, load_world_to_hdf5
+import tempfile
+import unittest
 from sets import Set
+
+from worldengine.common import _equal
+from worldengine.serialization.protobuf_serialization import protobuf_serialize, protobuf_unserialize
+from worldengine.plates import Step, world_gen
+from worldengine.serialization.hdf5_serialization import save_world_to_hdf5, load_world_to_hdf5
 
 
 class TestSerialization(unittest.TestCase):
@@ -16,8 +16,8 @@ class TestSerialization(unittest.TestCase):
 
     def test_protobuf_serialize_unserialize(self):
         w = world_gen("Dummy", 32, 16, 1, step=Step.get_by_name("full"))
-        serialized = w.protobuf_serialize()
-        unserialized = World.protobuf_unserialize(serialized)
+        serialized = protobuf_serialize(w)
+        unserialized = protobuf_unserialize(serialized)
         self.assertEqual(Set(w.layers.keys()), Set(unserialized.layers.keys()))
         for l in w.layers.keys():
             self.assertEqual(w.layers[l], unserialized.layers[l], "Comparing %s" % l)

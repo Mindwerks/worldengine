@@ -2,7 +2,7 @@ import numpy
 
 from noise import snoise2
 
-from worldengine.model.world import Step
+from worldengine.step import Step
 from worldengine.simulations.basic import find_threshold_f
 from worldengine.simulations.hydrology import WatermapSimulation
 from worldengine.simulations.irrigation import IrrigationSimulation

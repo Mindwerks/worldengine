@@ -1,8 +1,8 @@
 import unittest
 
 from worldengine.plates import Step, center_land, world_gen
-from worldengine.model.world import World
 from tests.draw_test import TestBase
+from worldengine.serialization.protobuf_serialization import open_protobuf
 
 
 class TestGeneration(TestBase):
@@ -29,7 +29,7 @@ class TestGeneration(TestBase):
         return borders_total_elevation / n_cells_on_border
 
     def test_center_land(self):
-        w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        w = open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
 
         # We want to have less land than before at the borders
         el_before = TestGeneration._mean_elevation_at_borders(w)

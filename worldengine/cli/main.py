@@ -1,7 +1,7 @@
+import numpy
+import os
 import sys
 from argparse import ArgumentParser
-import os
-import numpy
 
 import worldengine.generation as geo
 from worldengine.common import set_verbose, print_verbose
@@ -9,14 +9,15 @@ from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_o
     draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
     draw_temperature_levels_on_file, draw_riversmap_on_file, draw_scatter_plot_on_file, \
     draw_satellite_on_file, draw_icecaps_on_file
-from worldengine.plates import world_gen, generate_plates_simulation
 from worldengine.imex import export
-from worldengine.step import Step
 from worldengine.model.world import World, Size, GenerationParameters
+from worldengine.plates import world_gen, generate_plates_simulation
+from worldengine.step import Step
 from worldengine.version import __version__
+from worldengine.serialization.protobuf_serialization import protobuf_serialize, open_protobuf
 
 try:
-    from worldengine.hdf5_serialization import save_world_to_hdf5
+    from worldengine.serialization.hdf5_serialization import save_world_to_hdf5
     HDF5_AVAILABLE = True
 except:
     HDF5_AVAILABLE = False
@@ -44,7 +45,7 @@ def generate_world(world_name, width, height, seed, num_plates, output_dir,
     filename = "%s/%s.world" % (output_dir, world_name)
     if world_format == 'protobuf':
         with open(filename, "wb") as f:
-            f.write(w.protobuf_serialize())
+            f.write(protobuf_serialize(w))
     elif world_format == 'hdf5':
         save_world_to_hdf5(w, filename)
     else:
@@ -205,7 +206,7 @@ def load_world(world_filename):
     pb = __seems_protobuf_worldfile__(world_filename)
     if pb:
         try:
-            return World.open_protobuf(world_filename)
+            return open_protobuf(world_filename)
         except Exception:
             raise Exception("Unable to load the worldfile as protobuf file")
     else:

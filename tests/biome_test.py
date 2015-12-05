@@ -4,7 +4,7 @@ import os
 from worldengine.biome import Biome, Ocean, PolarDesert, SubpolarDryTundra, \
     CoolTemperateMoistForest, biome_name_to_index, biome_index_to_name
 from worldengine.simulations.biome import BiomeSimulation
-from worldengine.model.world import World
+from worldengine.serialization.protobuf_serialization import open_protobuf
 
 
 class TestBiome(unittest.TestCase):
@@ -122,7 +122,7 @@ class TestBiome(unittest.TestCase):
         self.assertEqual('warm temperate wet forest', biome_index_to_name(40))
 
     def test_locate_biomes(self):
-        w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        w = open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
         cm, biome_cm = BiomeSimulation().execute(w, 28070)
 
     @staticmethod
