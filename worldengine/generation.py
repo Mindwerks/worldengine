@@ -13,6 +13,7 @@ from worldengine.simulations.erosion import ErosionSimulation
 from worldengine.simulations.precipitation import PrecipitationSimulation
 from worldengine.simulations.biome import BiomeSimulation
 from worldengine.simulations.icecap import IcecapSimulation
+from worldengine.simulations.wind import WindSimulation
 from worldengine.common import anti_alias, get_verbose
 
 
@@ -178,7 +179,7 @@ def generate_world(w, step):
     if isinstance(step, str):
         step = Step.get_by_name(step)
 
-    if not step.include_precipitations:
+    if not step.include_wind:
         return w
 
     # Prepare sufficient seeds for the different steps of the generation
@@ -194,8 +195,14 @@ def generate_world(w, step):
                  'PermeabilitySimulation':  sub_seeds[ 6],
                  'BiomeSimulation':         sub_seeds[ 7],
                  'IcecapSimulation':        sub_seeds[ 8],
+                 'WindSimulation':          sub_seeds[ 9],
                  '':                        sub_seeds[99]
     }
+
+    WindSimulation().execute(w, seed_dict['WindSimulation'])
+
+    if not step.include_precipitations:
+        return w
 
     TemperatureSimulation().execute(w, seed_dict['TemperatureSimulation'])
     # Precipitation with thresholds

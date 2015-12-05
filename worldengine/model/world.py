@@ -1016,6 +1016,9 @@ class World(object):
     def set_icecap(self, icecap):
         self.layers['icecap'] = Layer(icecap)
 
+    def set_wind(self, wind):
+        self.layers['wind'] = Layer(wind)
+
     def has_ocean(self):
         return 'ocean' in self.layers
 
@@ -1048,3 +1051,6 @@ class World(object):
 
     def has_icecap(self):
         return 'icecap' in self.layers
+
+    def has_wind(self):
+        return 'wind' in self.layers
