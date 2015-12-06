@@ -150,11 +150,12 @@ def sea_depth(world, sea_level):
                 sea_depth[y, x] *= 0.3
             elif world.tiles_around((x, y), radius=3, predicate=world.is_land):
                 sea_depth[y, x] *= 0.5
-            elif world.tiles_around((x, y), radius=4, predicate=world.is_land):
-                sea_depth[y, x] *= 0.7
-            elif world.tiles_around((x, y), radius=5, predicate=world.is_land):
-                sea_depth[y, x] *= 0.9
-    sea_depth = anti_alias(sea_depth, 10)
+            #elif world.tiles_around((x, y), radius=4, predicate=world.is_land):
+            #    sea_depth[y, x] *= 0.7
+            #elif world.tiles_around((x, y), radius=5, predicate=world.is_land):
+            #    sea_depth[y, x] *= 0.9
+    time1 = time.time()
+    sea_depth = anti_alias(sea_depth, 5)
 
     min_depth = sea_depth.min()
     max_depth = sea_depth.max()
