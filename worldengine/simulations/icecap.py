@@ -25,8 +25,8 @@ class IcecapSimulation(object):
         #                       width * height * sizeof(numpy.bool) (temporary)
 
         # constants for convenience (or performance)
-        ocean = world.layers['ocean'].data
-        temperature = world.layers['temperature'].data
+        ocean = world.ocean.data
+        temperature = world.temperature.data
 
         # primary constants (could be used as global variables at some point); all values should be in [0, 1]
         max_freeze_percentage = 0.60  # only the coldest x% of the cold area will freeze (0 = no ice, 1 = all ice)
@@ -35,7 +35,7 @@ class IcecapSimulation(object):
 
         # secondary constants
         temp_min = temperature.min()  # coldest spot in the world
-        freeze_threshold = world.layers['temperature'].thresholds[0][1]  # upper temperature-limit for freezing effects
+        freeze_threshold = world.temperature.thresholds[0][1]  # upper temperature-limit for freezing effects
         # Cold biomes: TODO: find and pick most appropriate threshold
         #    polar: self.temperature['thresholds'][0][1]
         #   alpine: self.temperature['thresholds'][1][1]

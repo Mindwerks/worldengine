@@ -16,7 +16,7 @@ class PrecipitationSimulation(object):
         if get_verbose():
             start_time = time.time()
         pre_calculated = self._calculate(seed, world)
-        ocean = world.layers['ocean'].data
+        ocean = world.ocean.data
         ths = [
             ('low', find_threshold_f(pre_calculated, 0.75, ocean)),
             ('med', find_threshold_f(pre_calculated, 0.3, ocean)),
@@ -65,13 +65,13 @@ class PrecipitationSimulation(object):
         #find ranges
         min_precip = precipitations.min()
         max_precip = precipitations.max()
-        min_temp = world.layers['temperature'].min()
-        max_temp = world.layers['temperature'].max()
+        min_temp = world.temperature.min()
+        max_temp = world.temperature.max()
         precip_delta = (max_precip - min_precip)
         temp_delta = (max_temp - min_temp)
         
         #normalize temperature and precipitation arrays
-        t = (world.layers['temperature'].data - min_temp) / temp_delta
+        t = (world.temperature.data - min_temp) / temp_delta
         p = (precipitations - min_precip) / precip_delta
         
         #modify precipitation based on temperature

@@ -10,9 +10,9 @@ class TemperatureSimulation(object):
         return not world.has_temperature()
 
     def execute(self, world, seed):
-        e = world.layers['elevation'].data
+        e = world.elevation.data
         ml = world.start_mountain_th()  # returns how many percent of the world are mountains
-        ocean = world.layers['ocean'].data
+        ocean = world.ocean.data
 
         t = self._calculate(world, seed, e, ml)
         t_th = [

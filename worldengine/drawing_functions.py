@@ -40,11 +40,11 @@ def draw_rivers_on_image(world, target, factor=1):
 
     for y in range(world.height):
         for x in range(world.width):
-            if world.is_land((x, y)) and (world.layers['river_map'].data[y, x] > 0.0):
+            if world.is_land((x, y)) and (world.river_map.data[y, x] > 0.0):
                 for dx in range(factor):
                     for dy in range(factor):
                         target.set_pixel(x * factor + dx, y * factor + dy, (0, 0, 128, 255))
-            if world.is_land((x, y)) and (world.layers['lake_map'].data[y, x] != 0):
+            if world.is_land((x, y)) and (world.lake_map.data[y, x] != 0):
                 for dx in range(factor):
                     for dy in range(factor):
                         target.set_pixel(x * factor + dx, y * factor + dy, (0, 100, 128, 255))

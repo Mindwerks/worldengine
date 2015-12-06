@@ -1,6 +1,8 @@
 import numpy
 
+
 class IrrigationSimulation(object):
+
     @staticmethod
     def is_applicable(world):
         return world.has_watermap() and (not world.has_irrigation())
@@ -44,7 +46,7 @@ class IrrigationSimulation(object):
                 logs_relevant = logs[tl_l[1]:br_l[1]+1, tl_l[0]:br_l[0]+1]
 
                 #finish calculation
-                values[tl_v[1]:br_v[1]+1, tl_v[0]:br_v[0]+1] += world.layers['watermap'].data[y, x] / logs_relevant
+                values[tl_v[1]:br_v[1]+1, tl_v[0]:br_v[0]+1] += world.watermap.data[y, x] / logs_relevant
 
             it_all.iternext()
 
