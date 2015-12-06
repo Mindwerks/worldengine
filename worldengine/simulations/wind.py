@@ -9,11 +9,11 @@ class WindSimulation(object):
 
     def execute(self, world, seed):
         assert seed is not None
-        direction = self._wind_direction(world, 0.5, seed)
+        direction = self._calculate(world, 0.5, seed)
         world.set_wind_direction(direction)
 
     @staticmethod
-    def _wind_direction(world, distorsion_factor, seed):
+    def _calculate(world, distorsion_factor, seed):
         NORTH = 0.0
         EAST = 0.25
         SOUTH = 0.5
@@ -24,8 +24,7 @@ class WindSimulation(object):
             start_affinity = float(end_y - y) / delta
             end_affinity = 1.0 - start_affinity
             value = start_value * start_affinity + end_value * end_affinity
-            for x in range(world.width):
-                data[y, x] = value
+            data[y] = value
 
         def _wrap(value):
             while value < 0.0:
