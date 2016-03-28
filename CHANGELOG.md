@@ -1,4 +1,8 @@
-Version 0.19-UNRELEASED
+Version 0.20 (UNRELEASED)
+
+* TODO
+
+Version 0.19
 
 * Rivers and grayscale_heightmaps are generated as PNG images, filenames no longer have to be provided.
 * The grayscale_heightmap is now stored as a proper 16 bit grayscale PNG.
