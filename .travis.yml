@@ -27,13 +27,21 @@ matrix:
     - env: TOX_ENV=manifest
 
 install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq cmake build-essential libgdal-dev libhdf5-dev
+  - dpkg -l
+  - sudo rm -fr /opt/python/pypy-2.6.1 /opt/python/pypy3-2.4.0 /usr/local/pypy/bin
+  - echo "yes" | sudo apt-add-repository ppa:psi29a/trusty
+  - echo "yes" | sudo apt-add-repository ppa:pypy/ppa
+  - sudo apt-get update
+  - sudo apt-get remove -y libgdal1h postgresql-9.1-postgis-2.1 postgresql-9.2-postgis-2.1 postgresql-9.3-postgis-2.1 liblwgeom-2.1.8
+  - sudo apt-get install -y libhdf5-dev pypy pypy-dev libgdal1-dev gdal-bin
   - echo "libgdal version `gdal-config --version`"
-  - echo "GCC version `gcc --version`"
+  - echo "GCC version `gcc --version` @ `which gcc`"
+  - echo "Python version `python --version` @ `which python`"
+  - echo "PyPy version `pypy --version` @ `which pypy`"
   - pip install pip --upgrade
   - pip install tox coveralls
   - git clone https://github.com/Mindwerks/worldengine-data.git ../worldengine-data
+  - dpkg -l
 
 # # command to run tests
 script:
