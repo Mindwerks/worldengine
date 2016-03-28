@@ -3,7 +3,9 @@ python: 2.7
 os:
     - linux
     - osx
-sudo: false
+
+dist: trusty
+sudo: required
 cache:
     - pip
     - apt
@@ -24,21 +26,9 @@ matrix:
     - env: TOX_ENV=pyflakes
     - env: TOX_ENV=manifest
 
-addons:
-  apt:
-    sources:
-    - kalakris-cmake
-    - ubuntu-toolchain-r-test
-
-addons:
-  apt:
-    packages:
-    - cmake
-    - build-essential
-    - libgdal-dev
-    - libhdf5-serial-dev
-
 install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq cmake build-essential libgdal-dev libhdf5-dev
   - echo "libgdal version `gdal-config --version`"
   - echo "GCC version `gcc --version`"
   - pip install pip --upgrade
