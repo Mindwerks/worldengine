@@ -1,6 +1,16 @@
 import numpy
 
-from worldengine.biome import *
+from worldengine.biome import biome_name_to_index, biome_index_to_name, Biome, BorealMoistForest, \
+    BorealWetForest, BorealRainForest, CoolTemperateMoistForest, CoolTemperateWetForest, \
+    CoolTemperateRainForest, WarmTemperateMoistForest, WarmTemperateWetForest, \
+    WarmTemperateRainForest, SubtropicalDryForest, TropicalDryForest, SubpolarMoistTundra, \
+    SubpolarWetTundra, SubpolarRainTundra, Ice, PolarDesert, SubtropicalMoistForest, \
+    SubtropicalWetForest, SubtropicalRainForest, TropicalMoistForest, TropicalWetForest, \
+    TropicalRainForest, SubtropicalThornWoodland, TropicalThornWoodland, TropicalVeryDryForest, \
+    WarmTemperateDesert, WarmTemperateDesertScrub, SubtropicalDesert, SubtropicalDesertScrub, \
+    TropicalDesert, TropicalDesertScrub, SubpolarDryTundra, BorealDesert, BorealDryScrub, \
+    CoolTemperateSteppe, CoolTemperateDesert, CoolTemperateDesertScrub, WarmTemperateThornScrub, \
+    WarmTemperateDryForest
 import worldengine.protobuf.World_pb2 as Protobuf
 from worldengine.step import Step
 from worldengine.common import _equal
