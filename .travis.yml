@@ -22,8 +22,6 @@ matrix:
   allow_failures:
     - os: osx
     - env: TOX_ENV=pypy
-    - env: TOX_ENV=pyflakes
-    - env: TOX_ENV=manifest
 
 install:
   - dpkg -l
