@@ -6,7 +6,11 @@ from worldengine.plates import Step, world_gen
 from worldengine.model.world import World
 from worldengine.common import _equal
 from worldengine.hdf5_serialization import save_world_to_hdf5, load_world_to_hdf5
-from sets import Set
+
+try:  # are we python3?
+    set
+except NameError: # apparently not.
+    from sets import Set as set
 
 
 class TestSerialization(unittest.TestCase):
@@ -18,7 +22,7 @@ class TestSerialization(unittest.TestCase):
         w = world_gen("Dummy", 32, 16, 1, step=Step.get_by_name("full"))
         serialized = w.protobuf_serialize()
         unserialized = World.protobuf_unserialize(serialized)
-        self.assertEqual(Set(w.layers.keys()), Set(unserialized.layers.keys()))
+        self.assertEqual(set(w.layers.keys()), set(unserialized.layers.keys()))
         for l in w.layers.keys():
             self.assertEqual(w.layers[l], unserialized.layers[l], "Comparing %s" % l)
         self.assertTrue(_equal(w.ocean_level,       unserialized.ocean_level))
@@ -37,7 +41,7 @@ class TestSerialization(unittest.TestCase):
             filename = f.name
             serialized = save_world_to_hdf5(w, filename)
             unserialized = load_world_to_hdf5(filename)
-            self.assertEqual(Set(w.layers.keys()), Set(unserialized.layers.keys()))
+            self.assertEqual(set(w.layers.keys()), set(unserialized.layers.keys()))
             self.assertEqual(w.layers['humidity'].quantiles, unserialized.layers['humidity'].quantiles)
             for l in w.layers.keys():
                 self.assertEqual(w.layers[l], unserialized.layers[l], "Comparing %s" % l)
