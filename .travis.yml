@@ -48,4 +48,5 @@ notifications:
     email: false
 
 after_success:
-    - coveralls
+  - coveralls
+  - bash <(curl -s https://codecov.io/bash)
