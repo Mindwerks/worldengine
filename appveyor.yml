@@ -48,11 +48,11 @@ install:
   - "%PYTHON%\\Scripts\\pip.exe install -r requirements-dev.txt"
   - mkdir %systemdrive%\temp
   - cd %systemdrive%\temp
-  - appveyor DownloadFile http://download.gisinternals.com/sdk/downloads/release-1400-gdal-1-11-mapserver-6-4/gdal-111-1400-core.msi
+  - appveyor DownloadFile http://download.gisinternals.com/sdk/downloads/release-1600-gdal-1-11-mapserver-6-4/gdal-111-1500-core.msi
 
-  - msiexec /i gdal-111-1400-core.msi /qn
-  - appveyor DownloadFile http://download.gisinternals.com/sdk/downloads/release-1400-gdal-1-11-mapserver-6-4/GDAL-1.11.2.win32-py2.7.msi
-  - msiexec /i GDAL-1.11.2.win32-py2.7.msi /qn
+  - msiexec /i gdal-111-1500-core.msi /qn
+  - appveyor DownloadFile http://download.gisinternals.com/sdk/downloads/release-1600-gdal-1-11-mapserver-6-4/GDAL-1.11.4.win32-py2.7.msi
+  - msiexec /i GDAL-1.11.4.win32-py2.7.msi /qn
   - cd %APPVEYOR_BUILD_FOLDER%
 
 build: off
