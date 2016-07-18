@@ -1,7 +1,7 @@
 WorldEngine - a world generator
 =========================
 
-[![Coverage Status](https://coveralls.io/repos/Mindwerks/worldengine/badge.svg?branch=master&service=github)](https://coveralls.io/github/Mindwerks/worldengine?branch=master) [![Build Status](https://travis-ci.org/Mindwerks/worldengine.svg?branch=master)](https://travis-ci.org/Mindwerks/worldengine) [![Build status](https://ci.appveyor.com/api/projects/status/io4ljim2ra83df23?svg=true)](https://ci.appveyor.com/project/ftomassetti/worldengine)
+[![Build Status](https://travis-ci.org/Mindwerks/worldengine.svg?branch=master)](https://travis-ci.org/Mindwerks/worldengine) [![Build status](https://ci.appveyor.com/api/projects/status/io4ljim2ra83df23?svg=true)](https://ci.appveyor.com/project/ftomassetti/worldengine) [![Coverage Status](https://coveralls.io/repos/Mindwerks/worldengine/badge.svg?branch=master&service=github)](https://coveralls.io/github/Mindwerks/worldengine?branch=master) [![Code Health](https://landscape.io/github/Mindwerks/worldengine/master/landscape.png)](https://landscape.io/github/Mindwerks/worldengine/master) [![codecov.io Coverage Status](https://codecov.io/github/Mindwerks/worldengine/coverage.svg?branch=master)](https://codecov.io/github/Mindwerks/worldengine?branch=master) [![Coverage Status](https://coveralls.io/repos/Mindwerks/worldengine/badge.svg?branch=master&service=github)](https://coveralls.io/github/Mindwerks/worldengine?branch=master) [![Requirements Status](https://requires.io/github/Mindwerks/worldengine/requirements.svg?branch=master)](https://requires.io/github/Mindwerks/worldengine/requirements/?branch=master)
 
 _The current stable version is 0.19.0_
 
