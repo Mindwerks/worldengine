@@ -36,7 +36,7 @@ install:
   - echo "Python version `python --version` @ `which python`"
   - echo "PyPy version `pypy --version` @ `which pypy`"
   - pip install pip --upgrade
-  - pip install tox coveralls
+  - pip install tox codecov coveralls
   - git clone https://github.com/Mindwerks/worldengine-data.git ../worldengine-data
   - dpkg -l
 
@@ -49,4 +49,4 @@ notifications:
 
 after_success:
   - coveralls
-  - bash <(curl -s https://codecov.io/bash)
+  - codecov
