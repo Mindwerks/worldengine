@@ -317,7 +317,7 @@ class World(object):
         w.elevation = (e, e_th)
 
         # Plates
-        w.set_plates(numpy.array(World._from_protobuf_matrix(p_world.plates)))
+        w.plates = numpy.array(World._from_protobuf_matrix(p_world.plates))
 
         # Ocean
         w.set_ocean(numpy.array(World._from_protobuf_matrix(p_world.ocean)))
@@ -886,7 +886,12 @@ class World(object):
                         self.width, self.height, data.shape[1], data.shape[0]))
             self.layers['elevation'] = LayerWithThresholds(data, thresholds)
 
-    def set_plates(self, data):
+    @property
+    def plates(self):
+        return self.layers['plates'].data
+
+    @plates.setter
+    def plates(self, data):
         if (data.shape[0] != self.height) or (data.shape[1] != self.width):
             raise Exception(
                 "Setting plates map with wrong dimension. "

@@ -48,7 +48,7 @@ def _plates_simulation(name, width, height, seed, temps=
                   GenerationParameters(num_plates, ocean_level, step),
                   temps, humids, gamma_curve, curve_offset)
     world.elevation = (numpy.array(e_as_array).reshape(height, width), None)
-    world.set_plates(numpy.array(p_as_array, dtype=numpy.uint16).reshape(height, width))
+    world.plates = numpy.array(p_as_array, dtype=numpy.uint16).reshape(height, width)
     return world
 
 

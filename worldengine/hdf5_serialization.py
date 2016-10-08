@@ -140,7 +140,7 @@ def load_world_to_hdf5(filename):
     w.elevation = (e, e_th)
 
     # Plates
-    w.set_plates(numpy.array(f['plates']))
+    w.plates = numpy.array(f['plates'])
 
     # Ocean
     w.set_ocean(numpy.array(f['ocean']))
