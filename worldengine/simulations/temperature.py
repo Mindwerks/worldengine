@@ -24,7 +24,7 @@ class TemperatureSimulation(object):
             ('subtropical', find_threshold_f(t, world.temps[5], ocean)),
             ('tropical', None)
         ]
-        world.set_temperature(t, t_th)
+        world.temperature = (t, t_th)
 
     @staticmethod
     def _calculate(world, seed, elevation, mountain_level):

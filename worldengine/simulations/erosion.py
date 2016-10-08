@@ -70,8 +70,8 @@ class ErosionSimulation(object):
             lx, ly = lake
             lake_map[ly, lx] = 0.1  # TODO: make this based on rainfall/flow
 
-        world.set_rivermap(river_map)
-        world.set_lakemap(lake_map)
+        world.rivermap = river_map
+        world.lakemap = lake_map
 
     def find_water_flow(self, world, water_path):
         """Find the flow direction for each cell in heightmap"""

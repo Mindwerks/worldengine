@@ -114,9 +114,9 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
             ('hill', ml),
             ('mountain', None)]
     harmonize_ocean(ocean, e, ocean_level)
-    world.set_ocean(ocean)
+    world.ocean = ocean
     world.elevation = (e, e_th)
-    world.set_sea_depth(sea_depth(world, ocean_level))
+    world.sea_depth = sea_depth(world, ocean_level)
 
 
 def harmonize_ocean(ocean, elevation, ocean_level):

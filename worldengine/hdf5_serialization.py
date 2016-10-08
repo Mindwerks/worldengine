@@ -143,8 +143,8 @@ def load_world_to_hdf5(filename):
     w.plates = numpy.array(f['plates'])
 
     # Ocean
-    w.set_ocean(numpy.array(f['ocean']))
-    w.set_sea_depth(numpy.array(f['sea_depth']))
+    w.ocean = numpy.array(f['ocean'])
+    w.sea_depth = numpy.array(f['sea_depth'])
 
     # Biome
     if 'biome' in f.keys():
@@ -156,14 +156,14 @@ def load_world_to_hdf5(filename):
                 row.append(biome_index_to_name(value))
             biome_data.append(row)
         biome = numpy.array(biome_data, dtype=object)
-        w.set_biome(biome)
+        w.biome = biome
 
     if 'humidity' in f.keys():
         data, quantiles = _from_hdf5_matrix_with_quantiles(f['humidity'])
-        w.set_humidity(data, quantiles)
+        w.humidity = (data, quantiles)
 
     if 'irrigation' in f.keys():
-        w.set_irrigation(numpy.array(f['irrigation']))
+        w.irrigation = numpy.array(f['irrigation'])
 
     if 'permeability' in f.keys():
         p = numpy.array(f['permeability/data'])
@@ -172,7 +172,7 @@ def load_world_to_hdf5(filename):
             ('med', f['permeability/thresholds/med'].value),
             ('hig', None)
         ]
-        w.set_permeability(p, p_th)
+        w.permeability = (p, p_th)
 
     if 'watermap' in f.keys():
         data = numpy.array(f['watermap/data'])
@@ -180,7 +180,7 @@ def load_world_to_hdf5(filename):
         thresholds['creek'] = f['watermap/thresholds/creek'].value
         thresholds['river'] =  f['watermap/thresholds/river'].value
         thresholds['main river'] = f['watermap/thresholds/mainriver'].value
-        w.set_watermap(data, thresholds)
+        w.watermap = (data, thresholds)
 
     if 'precipitation' in f.keys():
         p = numpy.array(f['precipitation/data'])
@@ -189,7 +189,7 @@ def load_world_to_hdf5(filename):
             ('med', f['precipitation/thresholds/med'].value),
             ('hig', None)
         ]
-        w.set_precipitation(p, p_th)
+        w.precipitation = (p, p_th)
 
     if 'temperature' in f.keys():
         t = numpy.array(f['temperature/data'])
@@ -202,18 +202,16 @@ def load_world_to_hdf5(filename):
             ('subtropical', f['temperature/thresholds/subtropical'].value),
             ('tropical', None)
         ]
-        w.set_temperature(t, t_th)
+        w.temperature = (t, t_th)
 
     if 'icecap' in f.keys():
-        w.set_icecap(numpy.array(f['icecap']))
+        w.icecap = numpy.array(f['icecap'])
 
     if 'lake_map' in f.keys():
-        m = numpy.array(f['lake_map'])
-        w.set_lakemap(m)
+        w.lakemap = numpy.array(f['lake_map'])
 
     if 'river_map' in f.keys():
-        m = numpy.array(f['river_map'])
-        w.set_rivermap(m)
+        w.rivermap = numpy.array(f['river_map'])
 
     f.close()
 
