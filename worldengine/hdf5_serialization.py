@@ -137,7 +137,7 @@ def load_world_to_hdf5(filename):
             ('plain', f['elevation/thresholds/plain'].value),
             ('hill', f['elevation/thresholds/hill'].value),
             ('mountain', None)]
-    w.set_elevation(e, e_th)
+    w.elevation = (e, e_th)
 
     # Plates
     w.set_plates(numpy.array(f['plates']))

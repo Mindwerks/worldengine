@@ -314,7 +314,7 @@ class World(object):
                 ('plain', p_world.heightMapTh_plain),
                 ('hill', p_world.heightMapTh_hill),
                 ('mountain', None)]
-        w.set_elevation(e, e_th)
+        w.elevation = (e, e_th)
 
         # Plates
         w.set_plates(numpy.array(World._from_protobuf_matrix(p_world.plates)))
@@ -868,13 +868,23 @@ class World(object):
     # Setters
     #
 
-    def set_elevation(self, data, thresholds):
-        if data.shape != (self.height, self.width):
-            raise Exception(
-                "Setting elevation map with wrong dimension. "
-                "Expected %d x %d, found %d x %d" % (
-                    self.width, self.height, data.shape[1], data.shape[0]))
-        self.layers['elevation'] = LayerWithThresholds(data, thresholds)
+    @property
+    def elevation(self):
+        return self.layers['elevation'].data
+
+    @elevation.setter
+    def elevation(self, val):
+        try:
+            data, thresholds = val
+        except ValueError:
+            raise ValueError("Pass an iterable: (data, thresholds)")
+        else:
+            if data.shape != (self.height, self.width):
+                raise Exception(
+                    "Setting elevation map with wrong dimension. "
+                    "Expected %d x %d, found %d x %d" % (
+                        self.width, self.height, data.shape[1], data.shape[0]))
+            self.layers['elevation'] = LayerWithThresholds(data, thresholds)
 
     def set_plates(self, data):
         if (data.shape[0] != self.height) or (data.shape[1] != self.width):
