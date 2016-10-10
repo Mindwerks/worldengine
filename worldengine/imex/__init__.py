@@ -92,7 +92,7 @@ def export(world, export_filetype = 'GTiff', export_datatype = 'float32', path =
         raise TypeError("Type of data not recognized or not supported by GDAL: %s" % export_datatype)
 
     # massage data to scale between the absolute min and max
-    elevation = numpy.copy(world.elevation['data'])
+    elevation = numpy.copy(world.layers['elevation'].data)
 
     # shift data according to minimum possible value
     if signed:
