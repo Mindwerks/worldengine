@@ -22,7 +22,7 @@ class PrecipitationSimulation(object):
             ('med', find_threshold_f(pre_calculated, 0.3, ocean)),
             ('hig', None)
         ]
-        world.set_precipitation(pre_calculated, ths)
+        world.precipitation = (pre_calculated, ths)
         if get_verbose():
             elapsed_time = time.time() - start_time
             print(

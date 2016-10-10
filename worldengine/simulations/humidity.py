@@ -11,7 +11,7 @@ class HumiditySimulation(object):
     def execute(self, world, seed):
         assert seed is not None
         data, quantiles = self._calculate(world)
-        world.set_humidity(data, quantiles)
+        world.humidity = (data, quantiles)
 
     @staticmethod
     def _calculate(world):

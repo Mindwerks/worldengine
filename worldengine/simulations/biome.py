@@ -112,5 +112,5 @@ class BiomeSimulation(object):
                 if not biome[y, x] in biome_cm:
                     biome_cm[biome[y, x]] = 0
                 biome_cm[biome[y, x]] += 1
-        w.set_biome(biome)
+        w.biome = biome
         return cm, biome_cm

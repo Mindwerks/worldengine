@@ -14,7 +14,7 @@ class IcecapSimulation(object):
         return world.has_ocean() and world.has_temperature()
 
     def execute(self, world, seed):
-        world.set_icecap(self._calculate(world, seed))
+        world.icecap = self._calculate(world, seed)
 
     @staticmethod
     def _calculate(world, seed):

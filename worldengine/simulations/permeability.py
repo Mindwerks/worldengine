@@ -17,7 +17,7 @@ class PermeabilitySimulation(object):
             ('med', find_threshold_f(perm, 0.25, ocean)),
             ('hig', None)
         ]
-        world.set_permeability(perm, perm_th)
+        world.permeability = (perm, perm_th)
 
     @staticmethod
     def _calculate(seed, width, height):

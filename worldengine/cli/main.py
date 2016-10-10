@@ -119,8 +119,8 @@ def generate_plates(seed, world_name, output_dir, width, height,
                                                    num_plates=num_plates)
 
     world = World(world_name, Size(width, height), seed, GenerationParameters(num_plates, -1.0, "plates"))
-    world.set_elevation(numpy.array(elevation).reshape(height, width), None)
-    world.set_plates(numpy.array(plates, dtype=numpy.uint16).reshape(height, width))
+    world.elevation = (numpy.array(elevation).reshape(height, width), None)
+    world.plates = numpy.array(plates, dtype=numpy.uint16).reshape(height, width)
 
     # Generate images
     filename = '%s/plates_%s.png' % (output_dir, world_name)
