@@ -102,9 +102,10 @@ def export(world, export_filetype = 'GTiff', export_datatype = 'float32', path =
 
     # rescale data (currently integer-types only)
     if normalize:
-        # elevation maps usually have a range of 0 to 10, maybe 15 - rescaling for integers is essential
+        # elevation maps usually have a range of 0 to 10, maybe 15
+        # rescaling for integers is essential
         if signed:
-            elevation *= (2**(bpp - 1) - 1) / max(abs(elevation.min(), abs(elevation.max())))
+            elevation *= (2**(bpp - 1) - 1) / max(abs(elevation.min()), abs(elevation.max()))
         else:
             elevation *= (2**bpp - 1) / abs(elevation.max())
 
