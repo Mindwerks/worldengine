@@ -1,7 +1,8 @@
 import sys
 from argparse import ArgumentParser
-import os
+
 import numpy
+import os
 
 import worldengine.generation as geo
 from worldengine.common import set_verbose, print_verbose
@@ -9,14 +10,15 @@ from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_o
     draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
     draw_temperature_levels_on_file, draw_riversmap_on_file, draw_scatter_plot_on_file, \
     draw_satellite_on_file, draw_icecaps_on_file
-from worldengine.plates import world_gen, generate_plates_simulation
 from worldengine.imex import export
-from worldengine.step import Step
 from worldengine.model.world import World, Size, GenerationParameters
+from worldengine.plates import world_gen, generate_plates_simulation
+from worldengine.step import Step
 from worldengine.version import __version__
 
 try:
     from worldengine.hdf5_serialization import save_world_to_hdf5
+
     HDF5_AVAILABLE = True
 except:
     HDF5_AVAILABLE = False
@@ -118,7 +120,8 @@ def generate_plates(seed, world_name, output_dir, width, height,
     elevation, plates = generate_plates_simulation(seed, width, height,
                                                    num_plates=num_plates)
 
-    world = World(world_name, Size(width, height), seed, GenerationParameters(num_plates, -1.0, "plates"))
+    world = World(world_name, Size(width, height), seed,
+                  GenerationParameters(num_plates, -1.0, "plates"))
     world.elevation = (numpy.array(elevation).reshape(height, width), None)
     world.plates = numpy.array(plates, dtype=numpy.uint16).reshape(height, width)
 
@@ -292,7 +295,7 @@ def main():
     # -----------------------------------------------------
     g_generate = parser.add_argument_group(
         "Generate Options", "These options are only useful in plate and " +
-        "world modes")
+                            "world modes")
     g_generate.add_argument('-r', '--rivers', dest='rivers_map',
                             action="store_true", help="generate rivers map")
     g_generate.add_argument('--gs', '--grayscale-heightmap',
@@ -302,27 +305,27 @@ def main():
                             help='elevation cut off for sea level " +'
                                  '[default = %(default)s]',
                             metavar="N", default=1.0)
-    g_generate.add_argument('--temps', dest='temps', 
-                        help="Provide alternate ranges for temperatures. " +
-                             "If not provided, the default values will be used. \n" +
-                             "[default = .126/.235/.406/.561/.634/.876]",
+    g_generate.add_argument('--temps', dest='temps',
+                            help="Provide alternate ranges for temperatures. " +
+                                 "If not provided, the default values will be used. \n" +
+                                 "[default = .126/.235/.406/.561/.634/.876]",
                             metavar="#/#/#/#/#/#")
-    g_generate.add_argument('--humidity', dest='humids', 
-                        help="Provide alternate ranges for humidities. " +
-                             "If not provided, the default values will be used. \n" +
-                            "[default = .059/.222/.493/.764/.927/.986/.998]",
+    g_generate.add_argument('--humidity', dest='humids',
+                            help="Provide alternate ranges for humidities. " +
+                                 "If not provided, the default values will be used. \n" +
+                                 "[default = .059/.222/.493/.764/.927/.986/.998]",
                             metavar="#/#/#/#/#/#/#")
     g_generate.add_argument('-gv', '--gamma-value', dest='gv', type=float,
-                        help="N = Gamma value for temperature/precipitation " +
-                             "gamma correction curve. [default = %(default)s]",
-                        metavar="N", default='1.25')
+                            help="N = Gamma value for temperature/precipitation " +
+                                 "gamma correction curve. [default = %(default)s]",
+                            metavar="N", default='1.25')
     g_generate.add_argument('-go', '--gamma-offset', dest='go', type=float,
-                        help="N = Adjustment value for temperature/precipitation " +
-                             "gamma correction curve. [default = %(default)s]",
-                        metavar="N", default='.2')
+                            help="N = Adjustment value for temperature/precipitation " +
+                                 "gamma correction curve. [default = %(default)s]",
+                            metavar="N", default='.2')
     g_generate.add_argument('--not-fade-borders', dest='fade_borders', action="store_false",
-                               help="Not fade borders",
-                               default=True)
+                            help="Not fade borders",
+                            default=True)
     g_generate.add_argument('--scatter', dest='scatter_plot',
                             action="store_true", help="generate scatter plot")
     g_generate.add_argument('--sat', dest='satelite_map',
@@ -333,7 +336,7 @@ def main():
     # -----------------------------------------------------
     g_ancient_map = parser.add_argument_group(
         "Ancient Map Options", "These options are only useful in " +
-        "ancient_map mode")
+                               "ancient_map mode")
     g_ancient_map.add_argument('-w', '--worldfile', dest='world_file',
                                help="FILE to be loaded", metavar="FILE")
     g_ancient_map.add_argument('-g', '--generatedfile', dest='generated_file',
@@ -371,11 +374,16 @@ def main():
         "Export Options", "You can specify the formats you wish the generated output to be in. ")
     export_options.add_argument("--export-format", dest="export_format", type=str,
                                 help="Export to a specific format such as BMP or PNG. " +
-                                "See http://www.gdal.org/formats_list.html for possible formats.",
+                                     "All possible formats: http://www.gdal.org/formats_list.html",
                                 default="PNG", metavar="STR")
     export_options.add_argument("--export-datatype", dest="export_datatype", type=str,
                                 help="Type of stored data, e.g. uint16, int32, float32 etc.",
                                 default="uint16", metavar="STR")
+    export_options.add_argument("--export-dimensions", dest="export_dimensions", type=str,
+                                help="Export to desired dimensions. (e.g. 4096x4096)", default=None,
+                                metavar="STR")
+    export_options.add_argument("--export-normalize", dest="export_normalize", default=False,
+                                help="Normalize the data set to min/max?", action="store_true")
 
     args = parser.parse_args()
 
@@ -415,12 +423,16 @@ def main():
         if not os.path.exists(args.FILE):
             usage("The specified world file does not exist")
 
-    maxseed = numpy.iinfo(numpy.uint16).max  # there is a hard limit somewhere so seeds outside the uint16 range are considered unsafe
+    # there is a hard limit somewhere so seeds outside the uint16 range are considered unsafe
+    maxseed = numpy.iinfo(
+        numpy.uint16).max
     if args.seed is not None:
         seed = int(args.seed)
-        assert 0 <= seed <= maxseed, "Seed has to be in the range between 0 and %s, borders included." % maxseed
+        assert 0 <= seed <= maxseed, \
+            "Seed has to be in the range between 0 and %s, borders included." % maxseed
     else:
-        seed = numpy.random.randint(0, maxseed)  # first-time RNG initialization is done automatically
+        seed = numpy.random.randint(0,
+                                    maxseed)  # first-time RNG initialization is done automatically
     numpy.random.seed(seed)
 
     if args.world_name:
@@ -459,7 +471,7 @@ def main():
     temps = [.874, .765, .594, .439, .366, .124]
     if args.temps:
         temps = args.temps.split('/')
-        for x in range(0,len(temps)):
+        for x in range(0, len(temps)):
             temps[x] = 1 - float(temps[x])
 
     if args.humids and not generation_operation:
@@ -471,7 +483,7 @@ def main():
     humids = [.941, .778, .507, .236, 0.073, .014, .002]
     if args.humids:
         humids = args.humids.split('/')
-        for x in range(0,len(humids)):
+        for x in range(0, len(humids)):
             humids[x] = 1 - float(humids[x])
     if args.scatter_plot and not generation_operation:
         usage(error="Scatter plot can be produced only during world generation")
@@ -509,8 +521,8 @@ def main():
         print(' draw rivers            : %s' % args.draw_rivers)
         print(' draw mountains         : %s' % args.draw_mountains)
         print(' draw land outer border : %s' % args.draw_outer_border)
-        
-    #Warning messages
+
+    # Warning messages
     warnings = []
     if temps != sorted(temps, reverse=True):
         warnings.append("WARNING: Temperature array not in ascending order")
@@ -539,24 +551,24 @@ def main():
         world = generate_world(world_name, args.width, args.height,
                                seed, args.number_of_plates, args.output_dir,
                                step, args.ocean_level, temps, humids, world_format,
-                               gamma_curve=args.gv,curve_offset=args.go,
+                               gamma_curve=args.gv, curve_offset=args.go,
                                fade_borders=args.fade_borders,
                                verbose=args.verbose, black_and_white=args.black_and_white)
         if args.grayscale_heightmap:
             generate_grayscale_heightmap(world,
-            '%s/%s_grayscale.png' % (args.output_dir, world_name))
+                                         '%s/%s_grayscale.png' % (args.output_dir, world_name))
         if args.rivers_map:
             generate_rivers_map(world,
-            '%s/%s_rivers.png' % (args.output_dir, world_name))
+                                '%s/%s_rivers.png' % (args.output_dir, world_name))
         if args.scatter_plot:
             draw_scatter_plot(world,
-            '%s/%s_scatter.png' % (args.output_dir, world_name))    
+                              '%s/%s_scatter.png' % (args.output_dir, world_name))
         if args.satelite_map:
             draw_satellite_map(world,
-            '%s/%s_satellite.png' % (args.output_dir, world_name))
+                               '%s/%s_satellite.png' % (args.output_dir, world_name))
         if args.icecaps_map:
             draw_icecaps_map(world,
-            '%s/%s_icecaps.png' % (args.output_dir, world_name))
+                             '%s/%s_icecaps.png' % (args.output_dir, world_name))
 
     elif operation == 'plates':
         print('')  # empty line
@@ -596,8 +608,9 @@ def main():
     elif operation == 'export':
         world = load_world(args.FILE)
         print_world_info(world)
-        export(world, args.export_format, args.export_datatype,
-               path = '%s/%s_elevation' % (args.output_dir, world_name))
+        export(world, args.export_format, args.export_datatype, args.export_dimensions,
+               args.export_normalize,
+               path='%s/%s_elevation' % (args.output_dir, world.name))
     else:
         raise Exception(
             'Unknown operation: valid operations are %s' % OPERATIONS)
@@ -608,7 +621,7 @@ def main():
 def usage(error=None):
     print(
         ' -------------------------------------------------------------------')
-    print(' Federico Tomassetti and Bret Curtis, 2011-2015')
+    print(' Federico Tomassetti and Bret Curtis, 2011-2017')
     print(' Worldengine - a world generator (v. %s)' % VERSION)
     print(' ')
     print(' worldengine <world_name> [operation] [options]')
@@ -619,6 +632,7 @@ def usage(error=None):
     if error:
         print("ERROR: %s" % error)
     sys.exit(' ')
+
 
 # -------------------------------
 if __name__ == "__main__":

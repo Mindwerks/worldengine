@@ -6,10 +6,19 @@ except ImportError:
     except ImportError:
         print("Unable to load GDAL support, no heightmap export possible.")
 
-import tempfile
 import numpy
 import os
 import sys
+import tempfile
+
+'''
+Useful CLI tools:
+python worldengine export seed_24106.world --export-format envi --export-datatype float32
+gdal_translate -srcwin 375 384 128 128 seed_24106_elevation-32.envi test.envi
+gdal_translate test.envi -r cubicspline -outsize 1000% 1000% test2.envi
+gdal_translate test2.envi -scale -of PNG -ot Byte test.png
+gdal_translate test2.envi -scale -ot int32 test3.envi
+'''
 
 
 '''
@@ -39,7 +48,8 @@ gdal_mapper = {  # TODO: Find a way to make GDAL provide this mapping.
 }
 
 
-def export(world, export_filetype = 'GTiff', export_datatype = 'float32', path = 'seed_output'):
+def export(world, export_filetype='GTiff', export_datatype='float32', export_dimensions=None,
+           export_normalize=False, path='seed_output'):
     try:
         gdal
     except NameError:
@@ -56,80 +66,85 @@ def export(world, export_filetype = 'GTiff', export_datatype = 'float32', path =
     if export_filetype in gdal_mapper:
         export_filetype = gdal_mapper[export_filetype]
 
-    # Note: GDAL will throw informative errors on its own whenever file type and data type cannot be matched.
+    # Note: GDAL will throw informative errors on its own whenever
+    # file type and data type cannot be matched.
 
     # translate export_datatype; http://www.gdal.org/gdal_8h.html#a22e22ce0a55036a96f652765793fb7a4
     export_datatype = export_datatype.lower()
-    if export_datatype in ['gdt_byte', 'uint8', 'int8', 'byte', 'char']:  # GDAL does not support int8
-        bpp, signed, normalize = (8, False, True)
+
+    if export_datatype in ['gdt_byte', 'uint8', 'int8', 'byte', 'char']:
+        bpp, signed = (8, False)  # GDAL does not support int8
         numpy_type = numpy.uint8
-        gdal_type  = gdal.GDT_Byte
+        gdal_type = gdal.GDT_Byte
     elif export_datatype in ['gdt_uint16', 'uint16']:
-        bpp, signed, normalize = (16, False, True)
+        bpp, signed = (16, False)
         numpy_type = numpy.uint16
-        gdal_type  = gdal.GDT_UInt16
+        gdal_type = gdal.GDT_UInt16
     elif export_datatype in ['gdt_uint32', 'uint32']:
-        bpp, signed, normalize = (32, False, True)
+        bpp, signed = (32, False)
         numpy_type = numpy.uint32
-        gdal_type  = gdal.GDT_UInt32
+        gdal_type = gdal.GDT_UInt32
     elif export_datatype in ['gdt_int16', 'int16']:
-        bpp, signed, normalize = (16, True, True)
+        bpp, signed = (16, True)
         numpy_type = numpy.int16
-        gdal_type  = gdal.GDT_Int16
+        gdal_type = gdal.GDT_Int16
     elif export_datatype in ['gdt_int32', 'int32', 'int']:  # fallback for 'int'
-        bpp, signed, normalize = (32, True, True)
+        bpp, signed = (32, True)
         numpy_type = numpy.int32
-        gdal_type  = gdal.GDT_Int32
+        gdal_type = gdal.GDT_Int32
     elif export_datatype in ['gdt_float32', 'float32', 'float']:  # fallback for 'float'
-        bpp, signed, normalize = (32, True, False)
+        bpp, signed = (32, True)
         numpy_type = numpy.float32
-        gdal_type  = gdal.GDT_Float32
+        gdal_type = gdal.GDT_Float32
     elif export_datatype in ['gdt_float64', 'float64']:
-        bpp, signed, normalize = (64, True, False)
+        bpp, signed = (64, True)
         numpy_type = numpy.float64
-        gdal_type  = gdal.GDT_Float64
+        gdal_type = gdal.GDT_Float64
     else:
-        raise TypeError("Type of data not recognized or not supported by GDAL: %s" % export_datatype)
+        raise TypeError(
+            "Type of data not recognized or not supported by GDAL: %s" % export_datatype)
 
     # massage data to scale between the absolute min and max
     elevation = numpy.copy(world.layers['elevation'].data)
 
-    # shift data according to minimum possible value
-    if signed:
-        elevation = elevation - world.sea_level()  # elevation 0.0 now refers to sea-level
-    else:
-        elevation -= elevation.min()  # lowest point at 0.0
-
-    # rescale data (currently integer-types only)
-    if normalize:
-        # elevation maps usually have a range of 0 to 10, maybe 15
-        # rescaling for integers is essential
-        if signed:
-            elevation *= (2**(bpp - 1) - 1) / max(abs(elevation.min()), abs(elevation.max()))
-        else:
-            elevation *= (2**bpp - 1) / abs(elevation.max())
-
-    # round data (integer-types only)
-    if numpy_type != numpy.float32 and numpy_type != numpy.float64:
-        elevation = elevation.round()
-
     # switch to final data type; no rounding performed
     elevation = elevation.astype(numpy_type)
 
-    # take elevation data and push it into an intermediate GTiff format (some formats don't support being written by Create())
-    inter_driver = gdal.GetDriverByName("GTiff")
+    # take elevation data and push it into an intermediate ENVI format,
+    # some formats don't support being written by Create()
+    inter_driver = gdal.GetDriverByName("ENVI")
     fh_inter_file, inter_file = tempfile.mkstemp()  # returns: (file-handle, absolute path)
     initial_ds = inter_driver.Create(inter_file, world.width, world.height, 1, gdal_type)
     band = initial_ds.GetRasterBand(1)
-    
     band.WriteArray(elevation)
     band = None  # dereference band
     initial_ds = None  # save/flush and close
 
-    # take the intermediate GTiff format and convert to final format
+    # take the intermediate ENVI format and convert to final format
     initial_ds = gdal.Open(inter_file)
+
+    # re-size, normalize and blend if necessary
+    width = height = None
+    if export_dimensions is not None:
+        width, height = export_dimensions.lower().split('x')
+
+    # normalize data-set to the min/max allowed by data-type, typical for 8bpp
+    scale_param = None
+    if export_normalize is not None:
+        scale_param = [[elevation.min(), elevation.max(), 0, 65535]]
+
+    if export_dimensions or export_normalize:
+        #  https://svn.osgeo.org/gdal/trunk/autotest/utilities/test_gdal_translate_lib.py
+        #  https://github.com/dezhin/pygdal/blob/master/2.1.2/osgeo/gdal.py
+        initial_ds = gdal.Translate(
+            '', initial_ds, format='MEM', width=width, height=height,
+            scaleParams=scale_param, resampleAlg=gdal.GRA_CubicSpline,
+            #exponents=str(2)
+            )
+
+
     final_driver.CreateCopy('%s-%d.%s' % (path, bpp, export_filetype), initial_ds)
 
-    initial_ds = None
+    initial_ds = None  # dereference
     os.close(fh_inter_file)
     os.remove(inter_file)
