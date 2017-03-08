@@ -377,13 +377,17 @@ def main():
                                      "All possible formats: http://www.gdal.org/formats_list.html",
                                 default="PNG", metavar="STR")
     export_options.add_argument("--export-datatype", dest="export_datatype", type=str,
-                                help="Type of stored data, e.g. uint16, int32, float32 etc.",
+                                help="Type of stored data (e.g. uint16, int32, float32 and etc.)",
                                 default="uint16", metavar="STR")
-    export_options.add_argument("--export-dimensions", dest="export_dimensions", type=str,
-                                help="Export to desired dimensions. (e.g. 4096x4096)", default=None,
-                                metavar="STR")
-    export_options.add_argument("--export-normalize", dest="export_normalize", default=False,
-                                help="Normalize the data set to min/max?", action="store_true")
+    export_options.add_argument("--export-dimensions", dest="export_dimensions", type=int,
+                                help="Export to desired dimensions. (e.g. 4096 4096)", default=None,
+                                nargs=2)
+    export_options.add_argument("--export-normalize", dest="export_normalize", type=int,
+                                help="Normalize the data set to between min and max. (e.g 0 255)",
+                                nargs=2, default=None)
+    export_options.add_argument("--export-subset", dest="export_subset", type=int,
+                                help="Normalize the data set to between min and max?",
+                                nargs=4, default=None)
 
     args = parser.parse_args()
 
@@ -609,7 +613,7 @@ def main():
         world = load_world(args.FILE)
         print_world_info(world)
         export(world, args.export_format, args.export_datatype, args.export_dimensions,
-               args.export_normalize,
+               args.export_normalize, args.export_subset,
                path='%s/%s_elevation' % (args.output_dir, world.name))
     else:
         raise Exception(

@@ -49,7 +49,7 @@ gdal_mapper = {  # TODO: Find a way to make GDAL provide this mapping.
 
 
 def export(world, export_filetype='GTiff', export_datatype='float32', export_dimensions=None,
-           export_normalize=False, path='seed_output'):
+           export_normalize=None, export_subset=None, path='seed_output'):
     try:
         gdal
     except NameError:
@@ -73,31 +73,31 @@ def export(world, export_filetype='GTiff', export_datatype='float32', export_dim
     export_datatype = export_datatype.lower()
 
     if export_datatype in ['gdt_byte', 'uint8', 'int8', 'byte', 'char']:
-        bpp, signed = (8, False)  # GDAL does not support int8
+        bpp = 8  # GDAL does not support int8
         numpy_type = numpy.uint8
         gdal_type = gdal.GDT_Byte
     elif export_datatype in ['gdt_uint16', 'uint16']:
-        bpp, signed = (16, False)
+        bpp = 16
         numpy_type = numpy.uint16
         gdal_type = gdal.GDT_UInt16
     elif export_datatype in ['gdt_uint32', 'uint32']:
-        bpp, signed = (32, False)
+        bpp = 32
         numpy_type = numpy.uint32
         gdal_type = gdal.GDT_UInt32
     elif export_datatype in ['gdt_int16', 'int16']:
-        bpp, signed = (16, True)
+        bpp = 16
         numpy_type = numpy.int16
         gdal_type = gdal.GDT_Int16
     elif export_datatype in ['gdt_int32', 'int32', 'int']:  # fallback for 'int'
-        bpp, signed = (32, True)
+        bpp = 32
         numpy_type = numpy.int32
         gdal_type = gdal.GDT_Int32
     elif export_datatype in ['gdt_float32', 'float32', 'float']:  # fallback for 'float'
-        bpp, signed = (32, True)
+        bpp = 32
         numpy_type = numpy.float32
         gdal_type = gdal.GDT_Float32
     elif export_datatype in ['gdt_float64', 'float64']:
-        bpp, signed = (64, True)
+        bpp = 64
         numpy_type = numpy.float64
         gdal_type = gdal.GDT_Float64
     else:
@@ -114,37 +114,44 @@ def export(world, export_filetype='GTiff', export_datatype='float32', export_dim
     # some formats don't support being written by Create()
     inter_driver = gdal.GetDriverByName("ENVI")
     fh_inter_file, inter_file = tempfile.mkstemp()  # returns: (file-handle, absolute path)
-    initial_ds = inter_driver.Create(inter_file, world.width, world.height, 1, gdal_type)
-    band = initial_ds.GetRasterBand(1)
+    intermediate_ds = inter_driver.Create(inter_file, world.width, world.height, 1, gdal_type)
+    band = intermediate_ds.GetRasterBand(1)
     band.WriteArray(elevation)
     band = None  # dereference band
-    initial_ds = None  # save/flush and close
+    intermediate_ds = None  # save/flush and close
 
     # take the intermediate ENVI format and convert to final format
-    initial_ds = gdal.Open(inter_file)
+    intermediate_ds = gdal.Open(inter_file)
+
+    # For more information about gdal_translate
+    #  https://svn.osgeo.org/gdal/trunk/autotest/utilities/test_gdal_translate_lib.py
+    #  https://github.com/dezhin/pygdal/blob/master/2.1.2/osgeo/gdal.py
 
     # re-size, normalize and blend if necessary
     width = height = None
     if export_dimensions is not None:
-        width, height = export_dimensions.lower().split('x')
+        width, height = export_dimensions
 
     # normalize data-set to the min/max allowed by data-type, typical for 8bpp
     scale_param = None
     if export_normalize is not None:
-        scale_param = [[elevation.min(), elevation.max(), 0, 65535]]
+        min_norm, max_norm = export_normalize
+        scale_param = [[elevation.min(), elevation.max(), min_norm, max_norm]]
 
+    # apply changes to the dataset
     if export_dimensions or export_normalize:
-        #  https://svn.osgeo.org/gdal/trunk/autotest/utilities/test_gdal_translate_lib.py
-        #  https://github.com/dezhin/pygdal/blob/master/2.1.2/osgeo/gdal.py
-        initial_ds = gdal.Translate(
-            '', initial_ds, format='MEM', width=width, height=height,
-            scaleParams=scale_param, resampleAlg=gdal.GRA_CubicSpline,
+        intermediate_ds = gdal.Translate(
+            '', intermediate_ds, format='MEM', width=width, height=height,
+            scaleParams=scale_param, resampleAlg=gdal.GRA_CubicSpline
             #exponents=str(2)
             )
 
+    # only use a specific subset of dataset
+    if export_subset is not None:
+        intermediate_ds = gdal.Translate('', intermediate_ds, format='MEM', srcWin=export_subset)
 
-    final_driver.CreateCopy('%s-%d.%s' % (path, bpp, export_filetype), initial_ds)
+    final_driver.CreateCopy('%s-%d.%s' % (path, bpp, export_filetype), intermediate_ds)
 
-    initial_ds = None  # dereference
+    intermediate_ds = None  # dereference
     os.close(fh_inter_file)
     os.remove(inter_file)
