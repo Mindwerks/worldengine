@@ -10,7 +10,7 @@ Biomes
 
 Worldengine implements a version of the `Holdridge life zones <https://en.wikipedia.org/wiki/Holdridge_life_zones>`_ model for the placement of biomes. While the standard Holdridge life zone model uses three axes Worldengine only concerns itself with the temperature and precipitation axes.
 
-.. image:: https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/docs/Holdridge.png
+.. image:: images/Holdridge.png
    :align: center
    :width: 95%
 
@@ -62,13 +62,32 @@ It should be noted for technical reasons that the curve is actually calculated f
 
 To ensure that the **-gv** and **-go** variables are producing a good curve it may be desirable to generate a scatter plot when the planet is being created.
 
-.. image:: https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/examples/scatter_plot_example.png
-   :align: center
+.. only:: html
+
+   .. image:: images/scatter_plot_example.png
+      :align: center
+
+.. only:: latex
+
+   .. image:: images/scatter_plot_example.png
+      :align: center
+      :width: 50%
+
+
 
 Each point on this plot is a single point on the landmass of the planet. The Temperature runs across the bottom, ranging from **Polar** to **Tropical** while the Humidity runs along the side, ranging from **Superarid** to **Superhumid**. Lines are drawn to show the dividing point between various Temperature and Humidity ranges. While the current routine does not label the rows and columns the following image is provided to help understand how they correspond to the chart:
 
-.. image:: https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/images/examples/scatter_plot-labelled.png
-   :align: center
+.. only:: html
+
+   .. image:: images/scatter_plot-labelled.png
+      :align: center
+
+.. only:: latex
+
+   .. image:: images/scatter_plot-labelled.png
+      :align: center
+      :width: 35%
+
 
 Cells in grey are ones which do not technically occur in the standard Holdridge life zone model and as the example above shows there are certain areas of terrain in the example that are both **Polar** and **Semiarid**. Since there are not too many of them we will not concern ourselves as Worldengine will simply treat them as **Polar** and **Arid** (i.e. classify them as **Polar Ice**).
 
@@ -77,5 +96,13 @@ Biome Images
 
 The following is the color key for biome images, both showing the color and providing the hex code for the color:
 
-.. image:: https://raw.githubusercontent.com/Mindwerks/worldengine-data/master/docs/Biomes.PNG
-   :align: center
+.. only:: html
+
+   .. image:: images/Biomes.png
+      :align: center
+
+.. only:: latex
+
+   .. image:: images/Biomes.png
+      :align: center
+      :width: 75%
