@@ -49,6 +49,10 @@ nosetests.xml
 generator.spec
 *.orig
 *.rej
+
+
+#Visual Studio
 /worldengine.pyproj
 /.vs/worldengine/v14/.suo
 /worldengine.sln
+*.pyperf
