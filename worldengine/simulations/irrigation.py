@@ -6,7 +6,7 @@ class IrrigationSimulation(object):
         return world.has_watermap() and (not world.has_irrigation())
 
     def execute(self, world, seed):
-        world.set_irrigation(self._calculate(world))
+        world.irrigation = self._calculate(world)
 
     @staticmethod
     def _calculate(world):

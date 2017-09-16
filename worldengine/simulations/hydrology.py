@@ -11,7 +11,7 @@ class WatermapSimulation(object):
     def execute(self, world, seed):
         assert seed is not None
         data, thresholds = self._watermap(world, 20000)
-        world.set_watermap(data, thresholds)
+        world.watermap = (data, thresholds)
 
     @staticmethod
     def _watermap(world, n):

@@ -314,27 +314,25 @@ class World(object):
                 ('plain', p_world.heightMapTh_plain),
                 ('hill', p_world.heightMapTh_hill),
                 ('mountain', None)]
-        w.set_elevation(e, e_th)
+        w.elevation = (e, e_th)
 
         # Plates
-        w.set_plates(numpy.array(World._from_protobuf_matrix(p_world.plates)))
+        w.plates = numpy.array(World._from_protobuf_matrix(p_world.plates))
 
         # Ocean
-        w.set_ocean(numpy.array(World._from_protobuf_matrix(p_world.ocean)))
-        w.set_sea_depth(numpy.array(World._from_protobuf_matrix(p_world.sea_depth)))
+        w.ocean = numpy.array(World._from_protobuf_matrix(p_world.ocean))
+        w.sea_depth = numpy.array(World._from_protobuf_matrix(p_world.sea_depth))
 
         # Biome
         if len(p_world.biome.rows) > 0:
-            w.set_biome(numpy.array(World._from_protobuf_matrix(p_world.biome, biome_index_to_name), dtype=object))
+            w.biome = numpy.array(World._from_protobuf_matrix(p_world.biome, biome_index_to_name), dtype=object)
 
         # Humidity
-        # FIXME: use setters
         if len(p_world.humidity.rows) > 0:
-            data, quantiles = World._from_protobuf_matrix_with_quantiles(p_world.humidity)
-            w.set_humidity(numpy.array(data), quantiles)
+            w.humidity = World._from_protobuf_matrix_with_quantiles(p_world.humidity)
 
         if len(p_world.irrigation.rows) > 0:
-            w.set_irrigation(numpy.array(World._from_protobuf_matrix(p_world.irrigation)))
+            w.irrigation = numpy.array(World._from_protobuf_matrix(p_world.irrigation))
 
         if len(p_world.permeabilityData.rows) > 0:
             p = numpy.array(World._from_protobuf_matrix(p_world.permeabilityData))
@@ -343,7 +341,7 @@ class World(object):
                 ('med', p_world.permeability_med),
                 ('hig', None)
             ]
-            w.set_permeability(p, p_th)
+            w.permeability = (p, p_th)
 
         if len(p_world.watermapData.rows) > 0:
             data = numpy.array(World._from_protobuf_matrix(
@@ -352,7 +350,7 @@ class World(object):
             thresholds['creek'] = p_world.watermap_creek
             thresholds['river'] = p_world.watermap_river
             thresholds['main river'] = p_world.watermap_mainriver
-            w.set_watermap(data, thresholds)
+            w.watermap = (data, thresholds)
 
         if len(p_world.precipitationData.rows) > 0:
             p = numpy.array(World._from_protobuf_matrix(p_world.precipitationData))
@@ -361,7 +359,7 @@ class World(object):
                 ('med', p_world.precipitation_med),
                 ('hig', None)
             ]
-            w.set_precipitation(p, p_th)
+            w.precipitation = (p, p_th)
 
         if len(p_world.temperatureData.rows) > 0:
             t = numpy.array(World._from_protobuf_matrix(p_world.temperatureData))
@@ -374,18 +372,16 @@ class World(object):
                 ('subtropical', p_world.temperature_subtropical),
                 ('tropical', None)
             ]
-            w.set_temperature(t, t_th)
+            w.temperature = (t, t_th)
 
         if len(p_world.lakemap.rows) > 0:
-            m = numpy.array(World._from_protobuf_matrix(p_world.lakemap))
-            w.set_lakemap(m)
+            w.lakemap = numpy.array(World._from_protobuf_matrix(p_world.lakemap))
 
         if len(p_world.rivermap.rows) > 0:
-            m = numpy.array(World._from_protobuf_matrix(p_world.rivermap))
-            w.set_rivermap(m)
+            w.rivermap = numpy.array(World._from_protobuf_matrix(p_world.rivermap))
 
         if len(p_world.icecap.rows) > 0:
-            w.set_icecap(numpy.array(World._from_protobuf_matrix(p_world.icecap)))
+            w.icecap = numpy.array(World._from_protobuf_matrix(p_world.icecap))
 
         return w
 
@@ -865,18 +861,33 @@ class World(object):
         return self.layers['plates'].data.max() + 1
 
     #
-    # Setters
+    # Properties
     #
 
-    def set_elevation(self, data, thresholds):
-        if data.shape != (self.height, self.width):
-            raise Exception(
-                "Setting elevation map with wrong dimension. "
-                "Expected %d x %d, found %d x %d" % (
-                    self.width, self.height, data.shape[1], data.shape[0]))
-        self.layers['elevation'] = LayerWithThresholds(data, thresholds)
+    @property
+    def elevation(self):
+        return self.layers['elevation'].data
 
-    def set_plates(self, data):
+    @elevation.setter
+    def elevation(self, val):
+        try:
+            data, thresholds = val
+        except ValueError:
+            raise ValueError("Pass an iterable: (data, thresholds)")
+        else:
+            if data.shape != (self.height, self.width):
+                raise Exception(
+                    "Setting elevation map with wrong dimension. "
+                    "Expected %d x %d, found %d x %d" % (
+                        self.width, self.height, data.shape[1], data.shape[0]))
+            self.layers['elevation'] = LayerWithThresholds(data, thresholds)
+
+    @property
+    def plates(self):
+        return self.layers['plates'].data
+
+    @plates.setter
+    def plates(self, data):
         if (data.shape[0] != self.height) or (data.shape[1] != self.width):
             raise Exception(
                 "Setting plates map with wrong dimension. "
@@ -884,7 +895,12 @@ class World(object):
                     self.width, self.height, data.shape[1], data.shape[0]))
         self.layers['plates'] = Layer(data)
 
-    def set_biome(self, biome):
+    @property
+    def biome(self):
+        return self.layers['biome'].data
+
+    @biome.setter
+    def biome(self, biome):
         if biome.shape[0] != self.height:
             raise Exception(
                 "Setting data with wrong height: biome has height %i while "
@@ -892,80 +908,160 @@ class World(object):
                     biome.shape[0], self.height))
         if biome.shape[1] != self.width:
             raise Exception("Setting data with wrong width")
-
         self.layers['biome'] = Layer(biome)
 
-    def set_ocean(self, ocean):
+    @property
+    def ocean(self):
+        return self.layers['ocean'].data
+
+    @ocean.setter
+    def ocean(self, ocean):
         if (ocean.shape[0] != self.height) or (ocean.shape[1] != self.width):
             raise Exception(
                 "Setting ocean map with wrong dimension. Expected %d x %d, "
                 "found %d x %d" % (self.width, self.height,
                                    ocean.shape[1], ocean.shape[0]))
-
         self.layers['ocean'] = Layer(ocean)
 
-    def set_sea_depth(self, data):
+    @property
+    def sea_depth(self):
+        return self.layers['sea_depth'].data
+
+    @sea_depth.setter
+    def sea_depth(self, data):
         if (data.shape[0] != self.height) or (data.shape[1] != self.width):
             raise Exception(
                 "Setting sea depth map with wrong dimension. Expected %d x %d, "
                 "found %d x %d" % (self.width, self.height,
                                    data.shape[1], data.shape[0]))
-
         self.layers['sea_depth'] = Layer(data)
 
-    def set_precipitation(self, data, thresholds):
+    @property
+    def precipitation(self):
+        return self.layers['precipitation'].data
+
+    @precipitation.setter
+    def precipitation(self, val):
         """"Precipitation is a value in [-1,1]"""
+        try:
+            data, thresholds = val
+        except ValueError:
+            raise ValueError("Pass an iterable: (data, thresholds)")
+        else:
+            if data.shape[0] != self.height:
+                raise Exception("Setting data with wrong height")
+            if data.shape[1] != self.width:
+                raise Exception("Setting data with wrong width")
+            self.layers['precipitation'] = LayerWithThresholds(data, thresholds)
 
+    @property
+    def humidity(self):
+        return self.layers['humidity'].data
+
+    @humidity.setter
+    def humidity(self, val):
+        try:
+            data, quantiles = val
+            data = numpy.array(data)
+        except ValueError:
+            raise ValueError("Pass an iterable: (data, quantiles)")
+        else:
+            if data.shape[0] != self.height:
+                raise Exception("Setting data with wrong height")
+            if data.shape[1] != self.width:
+                raise Exception("Setting data with wrong width")
+            self.layers['humidity'] = LayerWithQuantiles(data, quantiles)
+
+    @property
+    def irrigation(self):
+        return self.layers['irrigation'].data
+
+    @irrigation.setter
+    def irrigation(self, data):
         if data.shape[0] != self.height:
             raise Exception("Setting data with wrong height")
         if data.shape[1] != self.width:
             raise Exception("Setting data with wrong width")
-        self.layers['precipitation'] = LayerWithThresholds(data, thresholds)
-
-    def set_humidity(self, data, quantiles):
-        if data.shape[0] != self.height:
-            raise Exception("Setting data with wrong height")
-        if data.shape[1] != self.width:
-            raise Exception("Setting data with wrong width")
-        self.layers['humidity'] = LayerWithQuantiles(data, quantiles)
-
-    def set_irrigation(self, data):
-        if data.shape[0] != self.height:
-            raise Exception("Setting data with wrong height")
-        if data.shape[1] != self.width:
-            raise Exception("Setting data with wrong width")
-
         self.layers['irrigation'] = Layer(data)
 
-    def set_temperature(self, data, thresholds):
-        if data.shape[0] != self.height:
-            raise Exception("Setting data with wrong height")
-        if data.shape[1] != self.width:
-            raise Exception("Setting data with wrong width")
-        self.layers['temperature'] = LayerWithThresholds(data, thresholds)
+    @property
+    def temperature(self):
+        return self.layers['temperature'].data
 
-    def set_permeability(self, data, thresholds):
-        if data.shape[0] != self.height:
-            raise Exception("Setting data with wrong height")
-        if data.shape[1] != self.width:
-            raise Exception("Setting data with wrong width")
-        self.layers['permeability'] = LayerWithThresholds(data, thresholds)
+    @temperature.setter
+    def temperature(self, val):
+        try:
+            data, thresholds = val
+        except ValueError:
+            raise ValueError("Pass an iterable: (data, thresholds)")
+        else:
+            if data.shape[0] != self.height:
+                raise Exception("Setting data with wrong height")
+            if data.shape[1] != self.width:
+                raise Exception("Setting data with wrong width")
+            self.layers['temperature'] = LayerWithThresholds(data, thresholds)
 
-    def set_watermap(self, data, thresholds):
-        if data.shape[0] != self.height:
-            raise Exception("Setting data with wrong height")
-        if data.shape[1] != self.width:
-            raise Exception("Setting data with wrong width")
-        self.layers['watermap'] = LayerWithThresholds(data, thresholds)
+    @property
+    def permeability(self):
+        return self.layers['permeability'].data
 
-    def set_rivermap(self, river_map):
+    @permeability.setter
+    def permeability(self, val):
+        try:
+            data, thresholds = val
+        except ValueError:
+            raise ValueError("Pass an iterable: (data, thresholds)")
+        else:
+            if data.shape[0] != self.height:
+                raise Exception("Setting data with wrong height")
+            if data.shape[1] != self.width:
+                raise Exception("Setting data with wrong width")
+            self.layers['permeability'] = LayerWithThresholds(data, thresholds)
+
+    @property
+    def watermap(self):
+        return self.layers['watermap'].data
+
+    @watermap.setter
+    def watermap(self, val):
+        try:
+            data, thresholds = val
+        except ValueError:
+            raise ValueError("Pass an iterable: (data, thresholds)")
+        else:
+            if data.shape[0] != self.height:
+                raise Exception("Setting data with wrong height")
+            if data.shape[1] != self.width:
+                raise Exception("Setting data with wrong width")
+            self.layers['watermap'] = LayerWithThresholds(data, thresholds)
+
+    @property
+    def rivermap(self):
+        return self.layers['river_map'].data
+
+    @rivermap.setter
+    def rivermap(self, river_map):
         self.layers['river_map'] = Layer(river_map)
 
-    def set_lakemap(self, lake_map):
+    @property
+    def lakemap(self):
+        return self.layers['lake_map'].data
+
+    @lakemap.setter
+    def lakemap(self, lake_map):
         self.layers['lake_map'] = Layer(lake_map)
 
-    def set_icecap(self, icecap):
+    @property
+    def icecap(self):
+        return self.layers['icecap'].data
+
+    @icecap.setter
+    def icecap(self, icecap):
         self.layers['icecap'] = Layer(icecap)
+
+    #
+    # Testers
+    #
 
     def has_ocean(self):
         return 'ocean' in self.layers
