@@ -141,18 +141,52 @@ def harmonize_ocean(ocean, elevation, ocean_level):
 # ----
 
 def sea_depth(world, sea_level):
+
+    # a dynamic programming approach to gather how far the next land is 
+    # from a given coordinate 
+    # there might be even faster ways but it does the trick
+
+    def next_land_dynamic(ocean, max_radius=5):
+    
+        next_land = numpy.empty(ocean.shape, dtype=int)
+        next_land.fill(-1)
+
+        height, width = ocean.shape
+
+        for y in range(height):
+                for x in range(width):
+                    if not ocean[y,x]:
+                        next_land[y, x]= 0
+
+        for dist in range(max_radius):
+            for y in range(height):
+                for x in range(width):
+                    if next_land[y,x] == -1:
+                        if (y>0 and next_land[y-1,x] == dist) or \
+                            (y+1<height and next_land[y+1,x] == dist) or \
+                            (x>0 and next_land[y, x-1] == dist) or \
+                            (x+1<width and next_land[y,x+1] == dist):
+
+                            next_land[y,x] = dist+1
+
+        return next_land
+
+    next_land = next_land_dynamic(world.layers['ocean'].data)
+
     sea_depth = sea_level - world.layers['elevation'].data
     for y in range(world.height):
         for x in range(world.width):
-            if world.tiles_around((x, y), radius=1, predicate=world.is_land):
+            dist_to_next_land = next_land[y,x]
+
+            if dist_to_next_land == 1:
                 sea_depth[y, x] = 0
-            elif world.tiles_around((x, y), radius=2, predicate=world.is_land):
+            elif dist_to_next_land == 2:
                 sea_depth[y, x] *= 0.3
-            elif world.tiles_around((x, y), radius=3, predicate=world.is_land):
+            elif dist_to_next_land == 3:
                 sea_depth[y, x] *= 0.5
-            elif world.tiles_around((x, y), radius=4, predicate=world.is_land):
+            elif dist_to_next_land == 4:
                 sea_depth[y, x] *= 0.7
-            elif world.tiles_around((x, y), radius=5, predicate=world.is_land):
+            elif dist_to_next_land == 5:
                 sea_depth[y, x] *= 0.9
     sea_depth = anti_alias(sea_depth, 10)
 
