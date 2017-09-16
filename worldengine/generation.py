@@ -143,19 +143,19 @@ def harmonize_ocean(ocean, elevation, ocean_level):
 def sea_depth(world, sea_level):
 
     # a dynamic programming approach to gather how far the next land is 
-    # from a given coordinate 
+    # from a given coordinate up to a maximum distance of max_radius
+    # result is 0 for land coordinates and -1 for coordinates further than
+    # max_radius away from land
     # there might be even faster ways but it does the trick
 
     def next_land_dynamic(ocean, max_radius=5):
     
         next_land = numpy.full_like(ocean, -1)
 
-        height, width = ocean.shape
+        # non ocean tiles are zero distance away from next land
+        next_land[numpy.logical_not(ocean)]=0
 
-        for y in range(height):
-                for x in range(width):
-                    if not ocean[y,x]:
-                        next_land[y, x]= 0
+        height, width = ocean.shape
 
         for dist in range(max_radius):
             for y in range(height):
