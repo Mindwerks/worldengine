@@ -49,3 +49,6 @@ nosetests.xml
 generator.spec
 *.orig
 *.rej
+/worldengine.pyproj
+/.vs/worldengine/v14/.suo
+/worldengine.sln
