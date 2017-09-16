@@ -148,8 +148,7 @@ def sea_depth(world, sea_level):
 
     def next_land_dynamic(ocean, max_radius=5):
     
-        next_land = numpy.empty(ocean.shape, dtype=int)
-        next_land.fill(-1)
+        next_land = numpy.full_like(ocean, -1)
 
         height, width = ocean.shape
 
