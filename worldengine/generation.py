@@ -150,7 +150,7 @@ def sea_depth(world, sea_level):
 
     def next_land_dynamic(ocean, max_radius=5):
     
-        next_land = numpy.full_like(ocean, -1)
+        next_land = numpy.full(ocean.shape, -1)
 
         # non ocean tiles are zero distance away from next land
         next_land[numpy.logical_not(ocean)]=0
@@ -161,12 +161,21 @@ def sea_depth(world, sea_level):
             for y in range(height):
                 for x in range(width):
                     if next_land[y,x] == -1:
-                        if (y>0 and next_land[y-1,x] == dist) or \
-                            (y+1<height and next_land[y+1,x] == dist) or \
-                            (x>0 and next_land[y, x-1] == dist) or \
-                            (x+1<width and next_land[y,x+1] == dist):
+                        for dx in range(-1, 2):
+                            nx = x + dx
+                            if 0 <= nx < width:
+                                for dy in range(-1, 2):
+                                    ny = y + dy
+                                    if 0 <= ny < height and (dx != 0 or dy != 0):
+                                        if next_land[ny,nx] == dist:
+                                            next_land[y,x] = dist+1
 
-                            next_land[y,x] = dist+1
+                        #if (y>0 and next_land[y-1,x] == dist) or \
+                        #    (y+1<height and next_land[y+1,x] == dist) or \
+                        #    (x>0 and next_land[y, x-1] == dist) or \
+                        #    (x+1<width and next_land[y,x+1] == dist):
+
+                        #    next_land[y,x] = dist+1
 
         return next_land
 
