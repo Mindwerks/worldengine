@@ -170,13 +170,6 @@ def sea_depth(world, sea_level):
                                         if next_land[ny,nx] == dist:
                                             next_land[y,x] = dist+1
 
-                        #if (y>0 and next_land[y-1,x] == dist) or \
-                        #    (y+1<height and next_land[y+1,x] == dist) or \
-                        #    (x>0 and next_land[y, x-1] == dist) or \
-                        #    (x+1<width and next_land[y,x+1] == dist):
-
-                        #    next_land[y,x] = dist+1
-
         return next_land
 
     next_land = next_land_dynamic(world.layers['ocean'].data)
