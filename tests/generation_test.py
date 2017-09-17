@@ -72,13 +72,15 @@ class TestGeneration(TestBase):
 
         desired_result = desired_result.reshape([extent,extent])
 
-        #this part is verbatim from the function. It's not part of the test
-        #Some refactoring is in Order to increase test quality
+        # this part is verbatim from the function. It's not part of the test
+        # Some refactoring is in order to increase test quality
         desired_result = anti_alias(desired_result, 10)
 
         min_depth = desired_result.min()
         max_depth = desired_result.max()
         desired_result = (desired_result - min_depth) / (max_depth - min_depth)
+
+        # end of verbatim part
 
         result = sea_depth(w, ocean_level)
 

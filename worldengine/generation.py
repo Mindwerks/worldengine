@@ -172,28 +172,27 @@ def sea_depth(world, sea_level):
 
         return next_land
 
+    # We want to multiply the raw sea_depth by one of these factors 
+    # depending on the distance from the next land
+    # possible TODO: make this a parameter
+    factors = [0.0, 0.3, 0.5, 0.7, 0.9]
+
     next_land = next_land_dynamic(world.layers['ocean'].data)
 
     sea_depth = sea_level - world.layers['elevation'].data
+
     for y in range(world.height):
         for x in range(world.width):
             dist_to_next_land = next_land[y,x]
+            if dist_to_next_land > 0:
+                sea_depth[y,x]*=factors[dist_to_next_land-1]
 
-            if dist_to_next_land == 1:
-                sea_depth[y, x] = 0
-            elif dist_to_next_land == 2:
-                sea_depth[y, x] *= 0.3
-            elif dist_to_next_land == 3:
-                sea_depth[y, x] *= 0.5
-            elif dist_to_next_land == 4:
-                sea_depth[y, x] *= 0.7
-            elif dist_to_next_land == 5:
-                sea_depth[y, x] *= 0.9
     sea_depth = anti_alias(sea_depth, 10)
 
     min_depth = sea_depth.min()
     max_depth = sea_depth.max()
     sea_depth = (sea_depth - min_depth) / (max_depth - min_depth)
+
     return sea_depth
 
 
