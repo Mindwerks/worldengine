@@ -20,7 +20,10 @@ class TestSimulation(unittest.TestCase):
     # In fact it is hard to tell how "correctness" of a Monte Carlo process should
     # be judged.
     # Should it ever be decided that a "correct" implementation needs fewer or 
-    # less calls to the rng, of course compatibility will be broken. 
+    # less calls to the rng, relative to the n parameter,
+    # of course compatibility will be broken. 
+    # Implicitly this is tested by the blessed images but it might be useful to
+    # have a finer grained picture.
 
     def test_watermap_rng_stabilty(self):
         
