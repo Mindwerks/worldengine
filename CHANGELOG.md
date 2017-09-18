@@ -1,6 +1,6 @@
 Version 0.20 (UNRELEASED)
 
-* TODO
+* Caclulation of sea depth is now faster.
 
 Version 0.19
 
