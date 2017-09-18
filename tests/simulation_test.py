@@ -20,7 +20,7 @@ class TestSimulation(unittest.TestCase):
     # In fact it is hard to tell how "correctness" of a Monte Carlo process should
     # be judged.
     # Should it ever be decided that a "correct" implementation needs fewer or 
-    # less calls to the rng, relative to the n parameter,
+    # more calls to the rng, relative to the n parameter,
     # of course compatibility will be broken. 
     # Implicitly this is tested by the blessed images but it might be useful to
     # have a finer grained picture.
@@ -58,7 +58,7 @@ class TestSimulation(unittest.TestCase):
 
     def test_random_land_returns_only_land(self):
         
-        size = Size(100,100)
+        size = Size(100,90)
 
         ocean = numpy.fromfunction(lambda y, x: y>x, (size.height, size.width))
 
