@@ -56,6 +56,21 @@ class TestSimulation(unittest.TestCase):
         d = numpy.random.randint(0,100)
         self.assertEqual(d, 59)
 
+    def test_random_land_returns_only_land(self):
+        
+        size = Size(100,100)
+
+        ocean = numpy.fromfunction(lambda y, x: y>x, (size.height, size.width))
+
+        w = World("random_land",  size, 0, GenerationParameters(0, 1.0, 0))
+        w.ocean = ocean
+
+        num_samples = 1000
+
+        land_indices = w.random_land(num_samples)
+
+        for i in range(0, num_samples, 2):
+            self.assertFalse(ocean[land_indices[i+1],land_indices[i]])
         
 
 if __name__ == '__main__':
