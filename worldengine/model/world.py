@@ -401,7 +401,7 @@ class World(object):
         if self.layers['ocean'].data.all():
             return None, None  # return invalid indices if there is no land at all
 
-        land= numpy.invert(self.layers['ocean'].data)
+        land = numpy.invert(self.layers['ocean'].data)
         land_indices = numpy.transpose(numpy.nonzero(land))  # returns a list of tuples/indices with land positions
 
         result = numpy.zeros(num_samples*2, dtype=int)
