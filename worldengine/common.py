@@ -59,29 +59,75 @@ class Counter(object):
         sys.stdout.write(self.to_str)
 
 
-def anti_alias(map, steps):#TODO: There is probably a bit of numpy-optimization that can be done here.
+# For each step and each x, y the original implementation averaged 
+# over the 9 values in the square from (x-1, y-1) to (x+1,y+1)
+# To that it added, with equal weight, twice the initial value.
+# That makes a total of 11 values.
+# Therefore the original implementation is equivalent to this convolution:
+#
+# current = map
+#
+# map_part = (2/11)*map
+    
+# linear_filter = [[1/11, 1/11, 1/11],
+#                  [1/11, 1/11, 1/11],
+#                  [1/11, 1/11, 1/11]]
+
+# for i in range(steps):
+#   current = signal.convolve2d(current, linear_filter, mode='same', boundary='wrap') + map_part
+# return current
+#
+#
+# Unless we want to add scipy as a dependency we only have 1D convolution at our hands from numpy.
+# So we take advantage of the kernel being seperable.
+
+def anti_alias(map, steps):
     """
     Execute the anti_alias operation steps times on the given map
     """
+
     height, width = map.shape
 
-    def _anti_alias_step(original):
-        anti_aliased = copy.deepcopy(original)
-        for y in range(height):
-            for x in range(width):
-                anti_aliased[y, x] = anti_alias_point(original, x, y)
-        return anti_aliased
+    map_part = (2/11)*map
 
-    def anti_alias_point(original, x, y):
-        n = 2
-        tot = map[y, x] * 2
-        for dy in range(-1, +2):
-            py = (y + dy) % height
-            for dx in range(-1, +2):
-                px = (x + dx) % width
-                n += 1
-                tot += original[py, px]
-        return tot / n
+    # notice how [-1/sqrt(3), -1/sqrt(3), -1/sqrt(3)] * [-1/sqrt(3), -1/sqrt(3), -1/sqrt(3)]^T
+    # equals [[1/3, 1/3, 1/3], [1/3, 1/3, 1/3], [1/3, 1/3, 1/3]]
+    # multiply that by (3/11) and we have the 2d kernel from the example above
+    # therefore the kernel is seperable
+
+    w = -1.0/numpy.sqrt(3.0)
+    kernel = [w, w, w]
+
+    def _anti_alias_step(original):
+
+        # cf. comments above fo the factor
+        # this also makes a copy which might actually be superfluous
+        result = original * (3.0/11.0)
+
+        # we need to handle boundary conditions by hand, unfortunately
+        # there might be a better way but this works (circular boundary)
+        # notice how we'll need to add 2 to width and height later 
+        # because of this
+        result = numpy.append(result, [result[0,:]], 0)
+        result = numpy.append(result, numpy.transpose([result[:,0]]), 1)
+
+        result = numpy.insert(result, [0], [result[-2,:]],0)
+        result = numpy.insert(result, [0], numpy.transpose([result[:,-2]]), 1)
+
+        # with a seperable kernel we can convolve the rows first ...
+        for y in range(height+2):
+            result[y,1:-1] = numpy.convolve(result[y,:], kernel, 'valid')
+
+        # ... and then the columns
+        for x in range(width+2):
+            result[1:-1,x] = numpy.convolve(result[:,x], kernel, 'valid')
+
+        # throw away invalid values at the boundary
+        result = result[1:-1,1:-1]
+
+        result += map_part
+
+        return result
 
     current = map
     for i in range(steps):
