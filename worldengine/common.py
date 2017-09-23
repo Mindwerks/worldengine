@@ -1,5 +1,4 @@
 import sys
-import copy
 import numpy #for the _equal method only
 
 # ----------------
@@ -81,14 +80,14 @@ class Counter(object):
 # Unless we want to add scipy as a dependency we only have 1D convolution at our hands from numpy.
 # So we take advantage of the kernel being seperable.
 
-def anti_alias(map, steps):
+def anti_alias(map_in, steps):
     """
     Execute the anti_alias operation steps times on the given map
     """
 
-    height, width = map.shape
+    height, width = map_in.shape
 
-    map_part = (2/11)*map
+    map_part = (2.0/11.0)*map_in
 
     # notice how [-1/sqrt(3), -1/sqrt(3), -1/sqrt(3)] * [-1/sqrt(3), -1/sqrt(3), -1/sqrt(3)]^T
     # equals [[1/3, 1/3, 1/3], [1/3, 1/3, 1/3], [1/3, 1/3, 1/3]]
@@ -129,7 +128,7 @@ def anti_alias(map, steps):
 
         return result
 
-    current = map
+    current = map_in
     for i in range(steps):
         current = _anti_alias_step(current)
     return current
