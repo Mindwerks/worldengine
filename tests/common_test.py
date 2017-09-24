@@ -1,6 +1,6 @@
 import unittest
 import numpy
-from worldengine.common import Counter, anti_alias, get_verbose, set_verbose
+from worldengine.common import Counter, anti_alias, get_verbose, set_verbose, _equal
 
 
 class TestCommon(unittest.TestCase):
@@ -37,6 +37,18 @@ class TestCommon(unittest.TestCase):
         original = numpy.array([[0.8]])
         antialiased = anti_alias(original, 10)
         self.assertAlmostEquals(0.8, antialiased[0][0])
+
+    def test_dictionary_equality(self):
+        a = {}
+        b = {}
+
+        a['foo'] = 'bar'
+
+        self.assertFalse(_equal(a,b))
+
+        b['foo'] = 'bar'
+
+        self.assertTrue(_equal(a,b))
 
 if __name__ == '__main__':
     unittest.main()
