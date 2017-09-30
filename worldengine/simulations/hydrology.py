@@ -60,13 +60,12 @@ class WatermapSimulation(object):
 
         land_sample = world.random_land(n)
 
-        for i in range(n):
-            x, y = land_sample[2*i], land_sample[2*i+1]
+        if land_sample[0] is not None:
+            for i in range(n):
+                x, y = land_sample[2*i], land_sample[2*i+1]
+                if world.precipitations_at((x, y)) > 0:
+                    droplet(world, (x, y), world.precipitations_at((x, y)), _watermap_data)
 
-            print(x, y)
-
-            if x is not None and world.precipitations_at((x, y)) > 0:
-                droplet(world, (x, y), world.precipitations_at((x, y)), _watermap_data)
         ocean = world.layers['ocean'].data
         thresholds = dict()
         thresholds['creek'] = find_threshold_f(_watermap_data, 0.05, ocean=ocean)
