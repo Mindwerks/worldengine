@@ -1,5 +1,5 @@
 import sys
-import numpy #for the _equal method only
+import numpy
 
 # ----------------
 # Global variables

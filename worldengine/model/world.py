@@ -396,13 +396,21 @@ class World(object):
     # Land/Ocean
     #
 
-    def random_land(self):
+    def random_land(self, num_samples=1):
+
         if self.layers['ocean'].data.all():
             return None, None  # return invalid indices if there is no land at all
-        lands = numpy.invert(self.layers['ocean'].data)
-        lands = numpy.transpose(lands.nonzero())  # returns a list of tuples/indices with land positions
-        y, x = lands[numpy.random.randint(0, len(lands))]  # uses global RNG
-        return x, y
+
+        land = numpy.invert(self.layers['ocean'].data)
+        land_indices = numpy.transpose(numpy.nonzero(land))  # returns a list of tuples/indices with land positions
+
+        result = numpy.zeros(num_samples*2, dtype=int)
+
+        for i in range(0, num_samples*2, 2):
+            r_num = numpy.random.randint(0, len(land_indices)) # uses global RNG
+            result[i+1], result[i] = land_indices[r_num]
+
+        return result
 
     def is_land(self, pos):
         return not self.layers['ocean'].data[pos[1], pos[0]]#faster than reversing pos or transposing ocean
