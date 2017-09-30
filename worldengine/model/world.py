@@ -397,7 +397,6 @@ class World(object):
     #
 
     def random_land(self, num_samples=1):
-
         if self.layers['ocean'].data.all():
             return None, None  # return invalid indices if there is no land at all
 

@@ -58,6 +58,12 @@ class WatermapSimulation(object):
 
         _watermap_data = numpy.zeros((world.height, world.width), dtype=float)
 
+        # This indirectly calls the global rng.
+        # We want different implementations of _watermap 
+        # and internally called functions (especially random_land)
+        # to show the same rng behaviour and not contamine the state of the global rng
+        # should anyone else happen to rely on it.
+
         land_sample = world.random_land(n)
 
         if land_sample[0] is not None:
