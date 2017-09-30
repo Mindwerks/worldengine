@@ -60,7 +60,7 @@ class TestSimulation(unittest.TestCase):
         
         size = Size(100,90)
 
-        ocean = numpy.fromfunction(lambda y, x: y>x, (size.height, size.width))
+        ocean = numpy.fromfunction(lambda y, x: y>=x, (size.height, size.width))
 
         w = World("random_land",  size, 0, GenerationParameters(0, 1.0, 0))
         w.ocean = ocean
@@ -69,7 +69,7 @@ class TestSimulation(unittest.TestCase):
 
         land_indices = w.random_land(num_samples)
 
-        for i in range(0, num_samples, 2):
+        for i in range(0, num_samples*2, 2):
             self.assertFalse(ocean[land_indices[i+1],land_indices[i]])
         
 
