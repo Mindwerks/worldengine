@@ -56,6 +56,22 @@ class TestSimulation(unittest.TestCase):
         d = numpy.random.randint(0,100)
         self.assertEqual(d, 59)
 
+
+    def test_watermap_does_not_break_with_no_land(self):
+
+        seed=12345
+        numpy.random.seed(seed)
+
+        size = Size(16,8)
+
+        ocean = numpy.full((size.height, size.width), True, bool)
+
+        w = World("watermap",  size, seed, GenerationParameters(0, 1.0, 0))
+        w.ocean = ocean
+
+        data, t = WatermapSimulation._watermap(w, 200)
+
+
     def test_random_land_returns_only_land(self):
         
         size = Size(100,90)
