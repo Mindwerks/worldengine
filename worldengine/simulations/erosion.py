@@ -138,8 +138,8 @@ class ErosionSimulation(object):
         #     we mark them as rivers. While looking, the cells with no
         #     out-going flow, above water flow threshold and are still
         #     above sea level are marked as 'sources'.
-        for x in range(0, world.width - 1):
-            for y in range(0, world.height - 1):
+        for y in range(0, world.height - 1):
+            for x in range(0, world.width - 1):
                 rain_fall = world.layers['precipitation'].data[y, x]
                 water_flow[y, x] = rain_fall
 
