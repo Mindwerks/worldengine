@@ -406,7 +406,7 @@ class World(object):
 
         result = numpy.zeros(num_samples*2, dtype=int)
 
-        for i in range(0, num_samples, 2):
+        for i in range(0, num_samples*2, 2):
             r_num = numpy.random.randint(0, len(land_indices)) # uses global RNG
             result[i+1], result[i] = land_indices[r_num]
 
