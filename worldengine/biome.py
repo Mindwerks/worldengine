@@ -93,6 +93,10 @@ class CoolDesert(BiomeGroup):
 
 
 class Chaparral(BiomeGroup):
+    """ Chaparral is a shrubland or heathland plant community.
+
+    For details see http://en.wikipedia.org/wiki/Chaparral.
+    """
     pass
 
 

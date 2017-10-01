@@ -1,9 +1,7 @@
 import numpy
 
 from worldengine.biome import biome_name_to_index, biome_index_to_name, Biome
-from worldengine.biome import BorealForest, CoolTemperateForest, WarmTemperateForest, \
-    TropicalDryForestGroup, Tundra, Iceland, Jungle, Savanna, HotDesert, ColdParklands, \
-    Steppe, CoolDesert, Chaparral
+from worldengine.biome import Iceland
 import worldengine.protobuf.World_pb2 as Protobuf
 from worldengine.step import Step
 from worldengine.common import _equal
@@ -719,43 +717,6 @@ class World(object):
             raise Exception('Not found')
         return b
 
-    def is_boreal_forest(self, pos):
-        for subclass in BorealForest.__subclasses__():
-            if isinstance(self.biome_at(pos), subclass):
-               return True
-
-        return False
-
-
-    def is_temperate_forest(self, pos):
-        for subclass in CoolTemperateForest.__subclasses__():
-            if isinstance(self.biome_at(pos), subclass):
-               return True
-
-        return False
-
-    def is_warm_temperate_forest(self, pos):
-        for subclass in WarmTemperateForest.__subclasses__():
-            if isinstance(self.biome_at(pos), subclass):
-               return True
-
-        return False
-
-    def is_tropical_dry_forest(self, pos):
-        for subclass in TropicalDryForestGroup.__subclasses__():
-            if isinstance(self.biome_at(pos), subclass):
-               return True
-
-        return False
-
-
-    def is_tundra(self, pos):
-        for subclass in Tundra.__subclasses__():
-            if isinstance(self.biome_at(pos), subclass):
-               return True
-
-        return False
-
 
     def is_iceland(self, pos):
         for subclass in Iceland.__subclasses__():
@@ -764,65 +725,6 @@ class World(object):
 
         return False
 
-
-    def is_jungle(self, pos):
-        for subclass in Jungle.__subclasses__():
-            if isinstance(self.biome_at(pos), subclass):
-               return True
-
-        return False
-
-
-    def is_savanna(self, pos):
-        for subclass in Savanna.__subclasses__():
-            if isinstance(self.biome_at(pos), subclass):
-               return True
-
-        return False
-
-
-    def is_hot_desert(self, pos):
-        for subclass in HotDesert.__subclasses__():
-            if isinstance(self.biome_at(pos), subclass):
-               return True
-
-        return False
-
-
-    def is_cold_parklands(self, pos):
-        for subclass in ColdParklands.__subclasses__():
-            if isinstance(self.biome_at(pos), subclass):
-               return True
-
-        return False
-
-
-    def is_steppe(self, pos):
-        for subclass in Steppe.__subclasses__():
-            if isinstance(self.biome_at(pos), subclass):
-               return True
-
-        return False
-
-
-    def is_cool_desert(self, pos):
-        for subclass in CoolDesert.__subclasses__():
-            if isinstance(self.biome_at(pos), subclass):
-               return True
-
-        return False
-
-
-    def is_chaparral(self, pos):
-        """ Chaparral is a shrubland or heathland plant community.
-
-        For details see http://en.wikipedia.org/wiki/Chaparral.
-        """
-        for subclass in Chaparral.__subclasses__():
-            if isinstance(self.biome_at(pos), subclass):
-               return True
-
-        return False
 
     #
     # Plates
