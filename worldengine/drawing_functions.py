@@ -444,33 +444,13 @@ def draw_ancientmap(world, target, resize_factor=1,
         x, y = pos
         biome_masks['jungle'][y, x] = 0
 
-    def unset_tundra_mask(pos):
-        x, y = pos
-        biome_masks['tundra'][y, x] = 0
-
-    def unset_savanna_mask(pos):
-        x, y = pos
-        biome_masks['savanna'][y, x][y, x] = 0
-
     def unset_hot_desert_mask(pos):
         x, y = pos
         biome_masks['hot desert'][y, x] = 0
 
-    def unset_cold_parklands_mask(pos):
-        x, y = pos
-        biome_masks['cold parklands'][y, x] = 0
-
-    def unset_steppe_mask(pos):
-        x, y = pos
-        biome_masks['steppe'][y, x] = 0
-
     def unset_cool_desert_mask(pos):
         x, y = pos
         biome_masks['cool desert'][y, x] = 0
-
-    def unset_chaparral_mask(pos):
-        x, y = pos
-        biome_masks['chaparral'][y, x] = 0
 
     def on_border(pos):
         x, y = pos

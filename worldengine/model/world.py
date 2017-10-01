@@ -426,16 +426,6 @@ class World(object):
                                     dx != 0 or dy != 0):
                         action((nx, ny))
 
-    def on_tiles_around(self, pos, action, radius=1):
-        x, y = pos
-        for dx in range(-radius, radius + 1):
-            nx = x + dx
-            if nx >= 0 and nx < self.width:
-                for dy in range(-radius, radius + 1):
-                    ny = y + dy
-                    if ny >= 0 and ny < self.height and (dx != 0 or dy != 0):
-                        action((nx, ny))
-
     def tiles_around(self, pos, radius=1, predicate=None):
         ps = []
         x, y = pos
@@ -462,14 +452,6 @@ class World(object):
                         if predicate is None or predicate((nx, ny)):
                             ps.append((nx, ny))
         return ps
-
-    def tiles_around_many(self, pos_list, radius=1, predicate=None):
-        tiles = []
-        for pos in pos_list:
-            tiles += self.tiles_around(pos, radius, predicate)
-        # remove duplicates
-        # remove elements in pos
-        return list(set(tiles) - set(pos_list))
 
     #
     # Elevation
