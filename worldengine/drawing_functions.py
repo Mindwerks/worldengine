@@ -141,25 +141,12 @@ def _find_tropical_dry_forest_mask(world, factor):
     return _mask(world, predicate=world.is_tropical_dry_forest, factor=factor)
 
 
-def _draw_glacier(pixels, x, y):
-    rg = 255 - (x ** int(y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
-    pixels[y, x] = (rg, rg, 255, 255)
-
-
-def _draw_tundra(pixels, x, y):
-    b = (x ** int(y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
-    r = 166 - b
-    g = 148 - b
-    b = 75 - b
-    pixels[y, x] = (r, g, b, 255)
-
-
-def _draw_cold_parklands(pixels, x, y):
-    b = (x ** int(y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
-    r = 105 - b
-    g = 96 - b
-    b = 38 - int(b / 2)
-    pixels[y, x] = (r, g, b, 255)
+def _draw_shaded_pixel(pixels, x, y, r, g, b):
+    nb = (x ** int(y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
+    nr = r - nb
+    ng = g - nb
+    nb = b - nb
+    pixels[y, x] = (nr, ng, nb, 255)
 
 
 def _draw_forest_pattern1(pixels, x, y, c, c2):
@@ -261,6 +248,19 @@ def _draw_desert_pattern(pixels, x, y, c):
     pixels[y + 2, x - 7] = c
 
 
+def _draw_glacier(pixels, x, y):
+    rg = 255 - (x ** int(y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
+    pixels[y, x] = (rg, rg, 255, 255)
+
+
+def _draw_cold_parklands(pixels, x, y):
+    b = (x ** int(y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
+    r = 105 - b
+    g = 96 - b
+    b = 38 - int(b / 2)
+    pixels[y, x] = (r, g, b, 255)
+
+
 def _draw_boreal_forest(pixels, x, y, w, h):
     c = (0, 32, 0, 255)
     c2 = (0, 64, 0, 255)
@@ -297,14 +297,6 @@ def _draw_jungle(pixels, x, y, w, h):
     _draw_forest_pattern2(pixels, x, y, c, c2)
 
 
-def _draw_steppe(pixels, x, y):
-    b = (x ** int(y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
-    r = 96 - b
-    g = 192 - b
-    b = 96 - b
-    pixels[y, x] = (r, g, b, 255)
-
-
 def _draw_cool_desert(pixels, x, y, w, h):
     c = (72, 72, 53, 255)
     # c2 = (219, 220, 200, 255)  # TODO: not used?
@@ -317,20 +309,20 @@ def _draw_hot_desert(pixels, x, y, w, h):
     _draw_desert_pattern(pixels, x, y, c)  
 
 
+def _draw_tundra(pixels, x, y):
+    _draw_shaded_pixel(pixels,x, y, 166, 148, 75)
+
+
+def _draw_steppe(pixels, x, y):
+    _draw_shaded_pixel(pixels, x, y, 96, 192, 96)
+
+
 def _draw_chaparral(pixels, x, y):
-    b = (x ** int(y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
-    r = 180 - b
-    g = 171 - b
-    b = 113 - b
-    pixels[y, x] = (r, g, b, 255)
+    _draw_shaded_pixel(pixels, x, y, 180, 171, 113)
 
 
 def _draw_savanna(pixels, x, y):
-    b = (x ** int(y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
-    r = 255 - b
-    g = 246 - b
-    b = 188 - b
-    pixels[y, x] = (r, g, b, 255)
+    _draw_shaded_pixel(pixels, x, y, 255, 246, 188)
 
 
 # TODO: complete and enable this one
@@ -518,8 +510,10 @@ def draw_ancientmap(world, target, resize_factor=1,
 
     if verbose:
         start_time = time.time()
+
     border_color = (0, 0, 0, 255)
     outer_border_color = gradient(0.5, 0, 1.0, rgba_to_rgb(border_color), rgba_to_rgb(sea_color))
+
     for y in range(resize_factor * world.height):
         for x in range(resize_factor * world.width):
             xf = int(x / resize_factor)
