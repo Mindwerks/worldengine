@@ -5,7 +5,7 @@ import numpy
 import os
 
 import worldengine.generation as geo
-from worldengine.common import set_verbose, print_verbose
+from worldengine.common import set_verbose, print_verbose, get_verbose
 from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
     draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
     draw_temperature_levels_on_file, draw_riversmap_on_file, draw_scatter_plot_on_file, \
@@ -149,7 +149,7 @@ def operation_ancient_map(world, map_filename, resize_factor, sea_color,
                           draw_outer_land_border):
     draw_ancientmap_on_file(world, map_filename, resize_factor, sea_color,
                             draw_biome, draw_rivers, draw_mountains,
-                            draw_outer_land_border)
+                            draw_outer_land_border, get_verbose())
     print("+ ancient map generated in '%s'" % map_filename)
 
 
