@@ -162,9 +162,7 @@ def _draw_cold_parklands(pixels, x, y):
     pixels[y, x] = (r, g, b, 255)
 
 
-def _draw_boreal_forest(pixels, x, y, w, h):
-    c = (0, 32, 0, 255)
-    c2 = (0, 64, 0, 255)
+def _draw_forest_pattern1(pixels, x, y, c, c2):
     pixels[y - 4, x + 0] = c
     pixels[y - 3, x + 0] = c
     pixels[y - 2, x - 1] = c
@@ -201,48 +199,7 @@ def _draw_boreal_forest(pixels, x, y, w, h):
     pixels[y + 2, x + 2] = c2
 
 
-def _draw_temperate_forest1(pixels, x, y, w, h):
-    c = (0, 64, 0, 255)
-    c2 = (0, 96, 0, 255)
-    pixels[y - 4, x + 0] = c
-    pixels[y - 3, x + 0] = c
-    pixels[y - 2, x - 1] = c
-    pixels[y - 2, x + 1] = c
-    pixels[y - 1, x - 1] = c
-    pixels[y - 1, x + 1] = c
-    pixels[y + 0, x - 2] = c
-    pixels[y + 0, x + 1] = c
-    pixels[y + 0, x + 2] = c
-    pixels[y + 1, x - 2] = c
-    pixels[y + 1, x + 2] = c
-    pixels[y + 2, x - 3] = c
-    pixels[y + 2, x - 1] = c
-    pixels[y + 2, x + 3] = c
-    pixels[y + 3, x - 3] = c
-    pixels[y + 3, x - 2] = c
-    pixels[y + 3, x - 1] = c
-    pixels[y + 3, x - 0] = c
-    pixels[y + 3, x + 1] = c
-    pixels[y + 3, x + 2] = c
-    pixels[y + 3, x + 3] = c
-    pixels[y + 4, x - 0] = c
-
-    pixels[y - 2, x + 0] = c2
-    pixels[y - 1, x + 0] = c2
-    pixels[y - 0, x - 1] = c2
-    pixels[y - 0, x - 0] = c2
-    pixels[y + 1, x - 1] = c2
-    pixels[y + 1, x - 0] = c2
-    pixels[y + 1, x + 1] = c2
-    pixels[y + 2, x - 2] = c2
-    pixels[y + 2, x - 0] = c2
-    pixels[y + 2, x + 1] = c2
-    pixels[y + 2, x + 2] = c2
-
-
-def _draw_temperate_forest2(pixels, x, y, w, h):
-    c = (0, 64, 0, 255)
-    c2 = (0, 112, 0, 255)
+def _draw_forest_pattern2(pixels, x, y, c, c2):
     pixels[y - 4, x - 1] = c
     pixels[y - 4, x - 0] = c
     pixels[y - 4, x + 1] = c
@@ -277,6 +234,67 @@ def _draw_temperate_forest2(pixels, x, y, w, h):
     pixels[y - 0, x + 1] = c2
     pixels[y + 1, x - 1] = c2
     pixels[y + 1, x - 0] = c2
+
+
+def _draw_desert_pattern(pixels, x, y, c):
+    pixels[y - 2, x - 1] = c
+    pixels[y - 2, x - 0] = c
+    pixels[y - 2, x + 1] = c
+    pixels[y - 2, x + 1] = c
+    pixels[y - 2, x + 2] = c
+    pixels[y - 1, x - 2] = c
+    pixels[y - 1, x - 1] = c
+    pixels[y - 1, x - 0] = c
+    pixels[y - 1, x + 4] = c
+    pixels[y - 0, x - 4] = c
+    pixels[y - 0, x - 3] = c
+    pixels[y - 0, x - 2] = c
+    pixels[y - 0, x - 1] = c
+    pixels[y - 0, x + 1] = c
+    pixels[y - 0, x + 2] = c
+    pixels[y - 0, x + 6] = c
+    pixels[y + 1, x - 5] = c
+    pixels[y + 1, x - 0] = c
+    pixels[y + 1, x + 7] = c
+    pixels[y + 1, x + 8] = c
+    pixels[y + 2, x - 8] = c
+    pixels[y + 2, x - 7] = c
+
+
+def _draw_boreal_forest(pixels, x, y, w, h):
+    c = (0, 32, 0, 255)
+    c2 = (0, 64, 0, 255)
+    _draw_forest_pattern1(pixels, x, y, c, c2)
+
+
+def _draw_warm_temperate_forest(pixels, x, y, w, h):
+    c = (0, 96, 0, 255)
+    c2 = (0, 192, 0, 255)
+    _draw_forest_pattern2(pixels, x, y, c, c2)
+    
+
+def _draw_temperate_forest1(pixels, x, y, w, h):
+    c = (0, 64, 0, 255)
+    c2 = (0, 96, 0, 255)
+    _draw_forest_pattern1(pixels, x, y, c, c2)
+
+
+def _draw_temperate_forest2(pixels, x, y, w, h):
+    c = (0, 64, 0, 255)
+    c2 = (0, 112, 0, 255)
+    _draw_forest_pattern2(pixels, x, y, c, c2)
+
+
+def _draw_tropical_dry_forest(pixels, x, y, w, h):
+    c = (51, 36, 3, 255)
+    c2 = (139, 204, 58, 255)
+    _draw_forest_pattern2(pixels, x, y, c, c2)
+
+
+def _draw_jungle(pixels, x, y, w, h):
+    c = (0, 128, 0, 255)
+    c2 = (0, 255, 0, 255)
+    _draw_forest_pattern2(pixels, x, y, c, c2)
 
 
 def _draw_steppe(pixels, x, y):
@@ -290,68 +308,13 @@ def _draw_steppe(pixels, x, y):
 def _draw_cool_desert(pixels, x, y, w, h):
     c = (72, 72, 53, 255)
     # c2 = (219, 220, 200, 255)  # TODO: not used?
-
-    pixels[y - 2, x - 1] = c
-    pixels[y - 2, x - 0] = c
-    pixels[y - 2, x + 1] = c
-    pixels[y - 2, x + 1] = c
-    pixels[y - 2, x + 2] = c
-    pixels[y - 1, x - 2] = c
-    pixels[y - 1, x - 1] = c
-    pixels[y - 1, x - 0] = c
-    pixels[y - 1, x + 4] = c
-    pixels[y - 0, x - 4] = c
-    pixels[y - 0, x - 3] = c
-    pixels[y - 0, x - 2] = c
-    pixels[y - 0, x - 1] = c
-    pixels[y - 0, x + 1] = c
-    pixels[y - 0, x + 2] = c
-    pixels[y - 0, x + 6] = c
-    pixels[y + 1, x - 5] = c
-    pixels[y + 1, x - 0] = c
-    pixels[y + 1, x + 7] = c
-    pixels[y + 1, x + 8] = c
-    pixels[y + 2, x - 8] = c
-    pixels[y + 2, x - 7] = c
-
-
-def _draw_warm_temperate_forest(pixels, x, y, w, h):
-    c = (0, 96, 0, 255)
-    c2 = (0, 192, 0, 255)
-    pixels[y - 4, x - 1] = c
-    pixels[y - 4, x - 0] = c
-    pixels[y - 4, x + 1] = c
-    pixels[y - 3, x - 2] = c
-    pixels[y - 3, x - 1] = c
-    pixels[y - 3, x + 2] = c
-    pixels[y - 2, x - 2] = c
-    pixels[y - 2, x + 1] = c
-    pixels[y - 2, x + 2] = c
-    pixels[y - 1, x - 2] = c
-    pixels[y - 1, x + 2] = c
-    pixels[y - 0, x - 2] = c
-    pixels[y - 0, x - 1] = c
-    pixels[y - 0, x + 2] = c
-    pixels[y + 1, x - 2] = c
-    pixels[y + 1, x + 1] = c
-    pixels[y + 1, x + 2] = c
-    pixels[y + 2, x - 1] = c
-    pixels[y + 2, x - 0] = c
-    pixels[y + 2, x + 1] = c
-    pixels[y + 3, x - 0] = c
-    pixels[y + 4, x - 0] = c
-
-    pixels[y - 3, x + 0] = c2
-    pixels[y - 3, x + 1] = c2
-    pixels[y - 2, x - 1] = c2
-    pixels[y - 2, x - 0] = c2
-    pixels[y - 1, x - 1] = c2
-    pixels[y - 1, x - 0] = c2
-    pixels[y - 1, x + 1] = c2
-    pixels[y - 0, x - 0] = c2
-    pixels[y - 0, x + 1] = c2
-    pixels[y + 1, x - 1] = c2
-    pixels[y + 1, x - 0] = c2
+    _draw_desert_pattern(pixels, x, y, c)
+    
+    
+def _draw_hot_desert(pixels, x, y, w, h):
+    c = (72, 72, 53, 255)
+    # c2 = (219, 220, 200, 255)  # TODO: not used?
+    _draw_desert_pattern(pixels, x, y, c)  
 
 
 def _draw_chaparral(pixels, x, y):
@@ -360,112 +323,6 @@ def _draw_chaparral(pixels, x, y):
     g = 171 - b
     b = 113 - b
     pixels[y, x] = (r, g, b, 255)
-
-
-def _draw_hot_desert(pixels, x, y, w, h):
-    c = (72, 72, 53, 255)
-    # c2 = (219, 220, 200, 255)  # TODO: not used?
-
-    pixels[y - 2, x - 1] = c
-    pixels[y - 2, x - 0] = c
-    pixels[y - 2, x + 1] = c
-    pixels[y - 2, x + 1] = c
-    pixels[y - 2, x + 2] = c
-    pixels[y - 1, x - 2] = c
-    pixels[y - 1, x - 1] = c
-    pixels[y - 1, x - 0] = c
-    pixels[y - 1, x + 4] = c
-    pixels[y - 0, x - 4] = c
-    pixels[y - 0, x - 3] = c
-    pixels[y - 0, x - 2] = c
-    pixels[y - 0, x - 1] = c
-    pixels[y - 0, x + 1] = c
-    pixels[y - 0, x + 2] = c
-    pixels[y - 0, x + 6] = c
-    pixels[y + 1, x - 5] = c
-    pixels[y + 1, x - 0] = c
-    pixels[y + 1, x + 7] = c
-    pixels[y + 1, x + 8] = c
-    pixels[y + 2, x - 8] = c
-    pixels[y + 2, x - 7] = c
-
-
-def _draw_tropical_dry_forest(pixels, x, y, w, h):
-    c = (51, 36, 3, 255)
-    c2 = (139, 204, 58, 255)
-    pixels[y - 4, x - 1] = c
-    pixels[y - 4, x - 0] = c
-    pixels[y - 4, x + 1] = c
-    pixels[y - 3, x - 2] = c
-    pixels[y - 3, x - 1] = c
-    pixels[y - 3, x + 2] = c
-    pixels[y - 2, x - 2] = c
-    pixels[y - 2, x + 1] = c
-    pixels[y - 2, x + 2] = c
-    pixels[y - 1, x - 2] = c
-    pixels[y - 1, x + 2] = c
-    pixels[y - 0, x - 2] = c
-    pixels[y - 0, x - 1] = c
-    pixels[y - 0, x + 2] = c
-    pixels[y + 1, x - 2] = c
-    pixels[y + 1, x + 1] = c
-    pixels[y + 1, x + 2] = c
-    pixels[y + 2, x - 1] = c
-    pixels[y + 2, x - 0] = c
-    pixels[y + 2, x + 1] = c
-    pixels[y + 3, x - 0] = c
-    pixels[y + 4, x - 0] = c
-
-    pixels[y - 3, x + 0] = c2
-    pixels[y - 3, x + 1] = c2
-    pixels[y - 2, x - 1] = c2
-    pixels[y - 2, x - 0] = c2
-    pixels[y - 1, x - 1] = c2
-    pixels[y - 1, x - 0] = c2
-    pixels[y - 1, x + 1] = c2
-    pixels[y - 0, x - 0] = c2
-    pixels[y - 0, x + 1] = c2
-    pixels[y + 1, x - 1] = c2
-    pixels[y + 1, x - 0] = c2
-
-
-def _draw_jungle(pixels, x, y, w, h):
-    c = (0, 128, 0, 255)
-    c2 = (0, 255, 0, 255)
-    pixels[y - 4, x - 1] = c
-    pixels[y - 4, x - 0] = c
-    pixels[y - 4, x + 1] = c
-    pixels[y - 3, x - 2] = c
-    pixels[y - 3, x - 1] = c
-    pixels[y - 3, x + 2] = c
-    pixels[y - 2, x - 2] = c
-    pixels[y - 2, x + 1] = c
-    pixels[y - 2, x + 2] = c
-    pixels[y - 1, x - 2] = c
-    pixels[y - 1, x + 2] = c
-    pixels[y - 0, x - 2] = c
-    pixels[y - 0, x - 1] = c
-    pixels[y - 0, x + 2] = c
-    pixels[y + 1, x - 2] = c
-    pixels[y + 1, x + 1] = c
-    pixels[y + 1, x + 2] = c
-    pixels[y + 2, x - 1] = c
-    pixels[y + 2, x - 0] = c
-    pixels[y + 2, x + 1] = c
-    pixels[y + 3, x - 0] = c
-    pixels[y + 4, x - 0] = c
-
-    pixels[y - 3, x + 0] = c2
-    pixels[y - 3, x + 1] = c2
-    pixels[y - 2, x - 1] = c2
-    pixels[y - 2, x - 0] = c2
-    pixels[y - 1, x - 1] = c2
-    pixels[y - 1, x - 0] = c2
-    pixels[y - 1, x + 1] = c2
-    pixels[y - 0, x - 0] = c2
-    pixels[y - 0, x + 1] = c2
-    pixels[y + 1, x - 1] = c2
-    pixels[y + 1, x - 0] = c2
 
 
 def _draw_savanna(pixels, x, y):
