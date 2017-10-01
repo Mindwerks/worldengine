@@ -149,24 +149,21 @@ class World(object):
 
     @staticmethod
     def _to_protobuf_matrix(matrix, p_matrix, transformation=None):
-        for row in matrix:
+
+        m = matrix
+        if transformation is not None:
+            t = numpy.vectorize(transformation)
+            m = t(m)
+
+        for row in m:
             p_row = p_matrix.rows.add()
-            for cell in row:
-                '''
-                When using numpy, certain primitive types are replaced with
-                numpy-specifc versions that, even though mostly compatible,
-                cannot be digested by protobuf. This might change at some point;
-                for now a conversion is necessary.
-                '''
-                if type(cell) is numpy.bool_:
-                    value = bool(cell)
-                elif type(cell) is numpy.uint16:
-                    value = int(cell)
-                else:
-                    value = cell
-                if transformation:
-                    value = transformation(value)
-                p_row.cells.append(value)
+            '''
+            When using numpy, certain primitive types are replaced with
+            numpy-specifc versions that, even though mostly compatible,
+            cannot be digested by protobuf. This might change at some point;
+            for now a conversion is necessary.
+            '''
+            p_row.cells.extend(row.tolist())
 
     @staticmethod
     def _to_protobuf_quantiles(quantiles, p_quantiles):
