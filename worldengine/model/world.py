@@ -721,7 +721,7 @@ class World(object):
     def is_iceland(self, pos):
         for subclass in Iceland.__subclasses__():
             if isinstance(self.biome_at(pos), subclass):
-               return True
+                return True
 
         return False
 

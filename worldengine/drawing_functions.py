@@ -8,7 +8,7 @@ import numpy
 import sys
 import time
 from worldengine.common import get_verbose, count_neighbours
-from worldengine.biome import Biome, BiomeGroup, _un_camelize
+from worldengine.biome import BiomeGroup, _un_camelize
 
 
 # -------------------
