@@ -6,13 +6,7 @@ from worldengine.simulations.hydrology import WatermapSimulation
 from worldengine.model.world import World, Size, GenerationParameters
 
 class TestSimulation(unittest.TestCase):
-    
 
-    # The hydrology simulation indirectly calls the global rng.
-    # We want different implementations of _watermap 
-    # and internally called functions (especially random_land)
-    # to show the same rng behaviour and not contamine the state of the global rng
-    # should anyone else happen to rely on it.
     # This does only test that watermap leaves the rng in the state that the 
     # original implementation would have left it in and that a very small sample 
     # of results is the same as the original results.
@@ -26,7 +20,6 @@ class TestSimulation(unittest.TestCase):
     # have a finer grained picture.
 
     def test_watermap_rng_stabilty(self):
-        
         seed=12345
         numpy.random.seed(seed)
 
@@ -56,8 +49,22 @@ class TestSimulation(unittest.TestCase):
         d = numpy.random.randint(0,100)
         self.assertEqual(d, 59)
 
+
+    def test_watermap_does_not_break_with_no_land(self):
+        seed=12345
+        numpy.random.seed(seed)
+
+        size = Size(16,8)
+
+        ocean = numpy.full((size.height, size.width), True, bool)
+
+        w = World("watermap",  size, seed, GenerationParameters(0, 1.0, 0))
+        w.ocean = ocean
+
+        data, t = WatermapSimulation._watermap(w, 200)
+
+
     def test_random_land_returns_only_land(self):
-        
         size = Size(100,90)
 
         ocean = numpy.fromfunction(lambda y, x: y>=x, (size.height, size.width))

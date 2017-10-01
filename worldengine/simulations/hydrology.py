@@ -57,10 +57,21 @@ class WatermapSimulation(object):
                 _watermap[y, x] += q
 
         _watermap_data = numpy.zeros((world.height, world.width), dtype=float)
-        for i in range(n):
-            x, y = world.random_land()  # will return None for x and y if no land exists
-            if x is not None and world.precipitations_at((x, y)) > 0:
-                droplet(world, (x, y), world.precipitations_at((x, y)), _watermap_data)
+
+        # This indirectly calls the global rng.
+        # We want different implementations of _watermap 
+        # and internally called functions (especially random_land)
+        # to show the same rng behaviour and not contamine the state of the global rng
+        # should anyone else happen to rely on it.
+
+        land_sample = world.random_land(n)
+
+        if land_sample[0] is not None:
+            for i in range(n):
+                x, y = land_sample[2*i], land_sample[2*i+1]
+                if world.precipitations_at((x, y)) > 0:
+                    droplet(world, (x, y), world.precipitations_at((x, y)), _watermap_data)
+
         ocean = world.layers['ocean'].data
         thresholds = dict()
         thresholds['creek'] = find_threshold_f(_watermap_data, 0.05, ocean=ocean)
