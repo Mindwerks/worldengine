@@ -1,16 +1,9 @@
 import numpy
 
-from worldengine.biome import biome_name_to_index, biome_index_to_name, Biome, BorealMoistForest, \
-    BorealWetForest, BorealRainForest, CoolTemperateMoistForest, CoolTemperateWetForest, \
-    CoolTemperateRainForest, WarmTemperateMoistForest, WarmTemperateWetForest, \
-    WarmTemperateRainForest, SubtropicalDryForest, TropicalDryForest, SubpolarMoistTundra, \
-    SubpolarWetTundra, SubpolarRainTundra, Ice, PolarDesert, SubtropicalMoistForest, \
-    SubtropicalWetForest, SubtropicalRainForest, TropicalMoistForest, TropicalWetForest, \
-    TropicalRainForest, SubtropicalThornWoodland, TropicalThornWoodland, TropicalVeryDryForest, \
-    WarmTemperateDesert, WarmTemperateDesertScrub, SubtropicalDesert, SubtropicalDesertScrub, \
-    TropicalDesert, TropicalDesertScrub, SubpolarDryTundra, BorealDesert, BorealDryScrub, \
-    CoolTemperateSteppe, CoolTemperateDesert, CoolTemperateDesertScrub, WarmTemperateThornScrub, \
-    WarmTemperateDryForest
+from worldengine.biome import biome_name_to_index, biome_index_to_name, Biome
+from worldengine.biome import BorealForest, CoolTemperateForest, WarmTemperateForest, \
+    TropicalDryForestGroup, Tundra, Iceland, Jungle, Savanna, HotDesert, ColdParklands, \
+    Steppe, CoolDesert, Chaparral
 import worldengine.protobuf.World_pb2 as Protobuf
 from worldengine.step import Step
 from worldengine.common import _equal
@@ -727,138 +720,109 @@ class World(object):
         return b
 
     def is_boreal_forest(self, pos):
-        if isinstance(self.biome_at(pos), BorealMoistForest):
-            return True
-        elif isinstance(self.biome_at(pos), BorealWetForest):
-            return True
-        elif isinstance(self.biome_at(pos), BorealRainForest):
-            return True
-        else:
-            return False
+        for subclass in BorealForest.__subclasses__():
+            if isinstance(self.biome_at(pos), subclass):
+               return True
+
+        return False
+
 
     def is_temperate_forest(self, pos):
-        if isinstance(self.biome_at(pos), CoolTemperateMoistForest):
-            return True
-        elif isinstance(self.biome_at(pos), CoolTemperateWetForest):
-            return True
-        elif isinstance(self.biome_at(pos), CoolTemperateRainForest):
-            return True
-        else:
-            return False
+        for subclass in CoolTemperateForest.__subclasses__():
+            if isinstance(self.biome_at(pos), subclass):
+               return True
+
+        return False
 
     def is_warm_temperate_forest(self, pos):
-        if isinstance(self.biome_at(pos), WarmTemperateMoistForest):
-            return True
-        elif isinstance(self.biome_at(pos), WarmTemperateWetForest):
-            return True
-        elif isinstance(self.biome_at(pos), WarmTemperateRainForest):
-            return True
-        else:
-            return False
+        for subclass in WarmTemperateForest.__subclasses__():
+            if isinstance(self.biome_at(pos), subclass):
+               return True
+
+        return False
 
     def is_tropical_dry_forest(self, pos):
-        if isinstance(self.biome_at(pos), SubtropicalDryForest):
-            return True
-        elif isinstance(self.biome_at(pos), TropicalDryForest):
-            return True
-        else:
-            return False
+        for subclass in TropicalDryForestGroup.__subclasses__():
+            if isinstance(self.biome_at(pos), subclass):
+               return True
+
+        return False
+
 
     def is_tundra(self, pos):
-        if isinstance(self.biome_at(pos), SubpolarMoistTundra):
-            return True
-        elif isinstance(self.biome_at(pos), SubpolarWetTundra):
-            return True
-        elif isinstance(self.biome_at(pos), SubpolarRainTundra):
-            return True
-        else:
-            return False
+        for subclass in Tundra.__subclasses__():
+            if isinstance(self.biome_at(pos), subclass):
+               return True
+
+        return False
+
 
     def is_iceland(self, pos):
-        if isinstance(self.biome_at(pos), Ice):
-            return True
-        elif isinstance(self.biome_at(pos), PolarDesert):
-            return True
-        else:
-            return False
+        for subclass in Iceland.__subclasses__():
+            if isinstance(self.biome_at(pos), subclass):
+               return True
+
+        return False
+
 
     def is_jungle(self, pos):
-        if isinstance(self.biome_at(pos), SubtropicalMoistForest):
-            return True
-        elif isinstance(self.biome_at(pos), SubtropicalWetForest):
-            return True
-        elif isinstance(self.biome_at(pos), SubtropicalRainForest):
-            return True
-        elif isinstance(self.biome_at(pos), TropicalMoistForest):
-            return True
-        elif isinstance(self.biome_at(pos), TropicalWetForest):
-            return True
-        elif isinstance(self.biome_at(pos), TropicalRainForest):
-            return True
-        else:
-            return False
+        for subclass in Jungle.__subclasses__():
+            if isinstance(self.biome_at(pos), subclass):
+               return True
+
+        return False
+
 
     def is_savanna(self, pos):
-        if isinstance(self.biome_at(pos), SubtropicalThornWoodland):
-            return True
-        elif isinstance(self.biome_at(pos), TropicalThornWoodland):
-            return True
-        elif isinstance(self.biome_at(pos), TropicalVeryDryForest):
-            return True
-        else:
-            return False
+        for subclass in Savanna.__subclasses__():
+            if isinstance(self.biome_at(pos), subclass):
+               return True
+
+        return False
+
 
     def is_hot_desert(self, pos):
-        if isinstance(self.biome_at(pos), WarmTemperateDesert):
-            return True
-        elif isinstance(self.biome_at(pos), WarmTemperateDesertScrub):
-            return True
-        elif isinstance(self.biome_at(pos), SubtropicalDesert):
-            return True
-        elif isinstance(self.biome_at(pos), SubtropicalDesertScrub):
-            return True
-        elif isinstance(self.biome_at(pos), TropicalDesert):
-            return True
-        elif isinstance(self.biome_at(pos), TropicalDesertScrub):
-            return True
-        else:
-            return False
+        for subclass in HotDesert.__subclasses__():
+            if isinstance(self.biome_at(pos), subclass):
+               return True
+
+        return False
+
 
     def is_cold_parklands(self, pos):
-        if isinstance(self.biome_at(pos), SubpolarDryTundra):
-            return True
-        elif isinstance(self.biome_at(pos), BorealDesert):
-            return True
-        elif isinstance(self.biome_at(pos), BorealDryScrub):
-            return True
-        else:
-            return False
+        for subclass in ColdParklands.__subclasses__():
+            if isinstance(self.biome_at(pos), subclass):
+               return True
+
+        return False
+
 
     def is_steppe(self, pos):
-        if isinstance(self.biome_at(pos), CoolTemperateSteppe):
-            return True
-        else:
-            return False
+        for subclass in Steppe.__subclasses__():
+            if isinstance(self.biome_at(pos), subclass):
+               return True
+
+        return False
+
 
     def is_cool_desert(self, pos):
-        if isinstance(self.biome_at(pos), CoolTemperateDesert):
-            return True
-        elif isinstance(self.biome_at(pos), CoolTemperateDesertScrub):
-            return True
-        else:
-            return False
+        for subclass in CoolDesert.__subclasses__():
+            if isinstance(self.biome_at(pos), subclass):
+               return True
+
+        return False
+
 
     def is_chaparral(self, pos):
         """ Chaparral is a shrubland or heathland plant community.
 
         For details see http://en.wikipedia.org/wiki/Chaparral.
         """
-        if isinstance(self.biome_at(pos), WarmTemperateThornScrub):
-            return True
-        elif isinstance(self.biome_at(pos), WarmTemperateDryForest):
-            return True
-        else:
-            return False
+        for subclass in Chaparral.__subclasses__():
+            if isinstance(self.biome_at(pos), subclass):
+               return True
+
+        return False
 
     #
     # Plates

@@ -40,6 +40,61 @@ class Biome(with_metaclass(_BiomeMetaclass, object)):
     def name(cls):
         return _un_camelize(cls.__name__)
 
+class BiomeGroup(object):
+    pass
+
+
+class BorealForest(BiomeGroup):
+    pass
+
+
+class CoolTemperateForest(BiomeGroup):
+    pass
+
+
+class WarmTemperateForest(BiomeGroup):
+    pass
+
+
+class TropicalDryForestGroup(BiomeGroup):
+    pass
+
+
+class Tundra(BiomeGroup):
+    pass
+
+
+class Iceland(BiomeGroup):
+    pass
+
+
+class Jungle(BiomeGroup):
+    pass
+
+
+class Savanna(BiomeGroup):
+    pass
+
+
+class HotDesert(BiomeGroup):
+    pass
+
+
+class ColdParklands(BiomeGroup):
+    pass
+
+
+class Steppe(BiomeGroup):
+    pass
+
+
+class CoolDesert(BiomeGroup):
+    pass
+
+
+class Chaparral(BiomeGroup):
+    pass
+
 
 class Ocean(Biome):
     pass
@@ -49,159 +104,159 @@ class Sea(Biome):
     pass
 
 
-class PolarDesert(Biome):
+class PolarDesert(Biome, Iceland):
     pass
 
 
-class Ice(Biome):
+class Ice(Biome, Iceland):
     pass
 
 
-class SubpolarDryTundra(Biome):
+class SubpolarDryTundra(Biome, ColdParklands):
     pass
 
 
-class SubpolarMoistTundra(Biome):
+class SubpolarMoistTundra(Biome, Tundra):
     pass
 
 
-class SubpolarWetTundra(Biome):
+class SubpolarWetTundra(Biome, Tundra):
     pass
 
 
-class SubpolarRainTundra(Biome):
+class SubpolarRainTundra(Biome, Tundra):
     pass
 
 
-class BorealDesert(Biome):
+class BorealDesert(Biome, ColdParklands):
     pass
 
 
-class BorealDryScrub(Biome):
+class BorealDryScrub(Biome, ColdParklands):
     pass
 
 
-class BorealMoistForest(Biome):
+class BorealMoistForest(Biome, BorealForest):
     pass
 
 
-class BorealWetForest(Biome):
+class BorealWetForest(Biome, BorealForest):
     pass
 
 
-class BorealRainForest(Biome):
+class BorealRainForest(Biome, BorealForest):
     pass
 
 
-class CoolTemperateDesert(Biome):
+class CoolTemperateDesert(Biome, CoolDesert):
     pass
 
 
-class CoolTemperateDesertScrub(Biome):
+class CoolTemperateDesertScrub(Biome, CoolDesert):
     pass
 
 
-class CoolTemperateSteppe(Biome):
+class CoolTemperateSteppe(Biome, Steppe):
     pass
 
 
-class CoolTemperateMoistForest(Biome):
+class CoolTemperateMoistForest(Biome, CoolTemperateForest):
     pass
 
 
-class CoolTemperateWetForest(Biome):
+class CoolTemperateWetForest(Biome, CoolTemperateForest):
     pass
 
 
-class CoolTemperateRainForest(Biome):
+class CoolTemperateRainForest(Biome, CoolTemperateForest):
     pass
 
 
-class WarmTemperateDesert(Biome):
+class WarmTemperateDesert(Biome, HotDesert):
     pass
 
 
-class WarmTemperateDesertScrub(Biome):
+class WarmTemperateDesertScrub(Biome, HotDesert):
     pass
 
 
-class WarmTemperateThornScrub(Biome):
+class WarmTemperateThornScrub(Biome, Chaparral):
     pass
 
 
-class WarmTemperateDryForest(Biome):
+class WarmTemperateDryForest(Biome, Chaparral):
     pass
 
 
-class WarmTemperateMoistForest(Biome):
+class WarmTemperateMoistForest(Biome, WarmTemperateForest):
     pass
 
 
-class WarmTemperateWetForest(Biome):
+class WarmTemperateWetForest(Biome, WarmTemperateForest):
     pass
 
 
-class WarmTemperateRainForest(Biome):
+class WarmTemperateRainForest(Biome, WarmTemperateForest):
     pass
 
 
-class SubtropicalDesert(Biome):
+class SubtropicalDesert(Biome, HotDesert):
     pass
 
 
-class SubtropicalDesertScrub(Biome):
+class SubtropicalDesertScrub(Biome, HotDesert):
     pass
 
 
-class SubtropicalThornWoodland(Biome):
+class SubtropicalThornWoodland(Biome, Savanna):
     pass
 
 
-class SubtropicalDryForest(Biome):
+class SubtropicalDryForest(Biome, TropicalDryForestGroup):
     pass
 
 
-class SubtropicalMoistForest(Biome):
+class SubtropicalMoistForest(Biome, Jungle):
     pass
 
 
-class SubtropicalWetForest(Biome):
+class SubtropicalWetForest(Biome, Jungle):
     pass
 
 
-class SubtropicalRainForest(Biome):
+class SubtropicalRainForest(Biome, Jungle):
     pass
 
 
-class TropicalDesert(Biome):
+class TropicalDesert(Biome, HotDesert):
     pass
 
 
-class TropicalDesertScrub(Biome):
+class TropicalDesertScrub(Biome, HotDesert):
     pass
 
 
-class TropicalThornWoodland(Biome):
+class TropicalThornWoodland(Biome, Savanna):
     pass
 
 
-class TropicalVeryDryForest(Biome):
+class TropicalVeryDryForest(Biome, Savanna):
     pass
 
 
-class TropicalDryForest(Biome):
+class TropicalDryForest(Biome, TropicalDryForestGroup):
     pass
 
 
-class TropicalMoistForest(Biome):
+class TropicalMoistForest(Biome, Jungle):
     pass
 
 
-class TropicalWetForest(Biome):
+class TropicalWetForest(Biome, Jungle):
     pass
 
 
-class TropicalRainForest(Biome):
+class TropicalRainForest(Biome, Jungle):
     pass
 
 
