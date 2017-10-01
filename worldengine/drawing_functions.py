@@ -7,7 +7,8 @@ Jython
 import numpy
 import sys
 import time
-from worldengine.common import get_verbose
+from worldengine.common import get_verbose, count_neighbours
+from worldengine.biome import Biome, BiomeGroup, _un_camelize
 
 
 # -------------------
@@ -109,37 +110,27 @@ def _find_mountains_mask(world, factor):
     return _mask
 
 
-def _mask(world, predicate, factor):
-    _mask = numpy.zeros((factor * world.height, factor * world.width), dtype=float)
-    for y in range(factor * world.height):
-        for x in range(factor * world.width):
-            xf = int(x / factor)
-            yf = int(y / factor)
-            if predicate((xf, yf)):
-                v = len(
-                    world.tiles_around((xf, yf), radius=1,
-                                       predicate=predicate))
-                if v > 5:
-                    _mask[y, x] = v
-    return _mask
+def _build_biome_group_masks(world, factor):
 
+    biome_groups = BiomeGroup.__subclasses__()
 
-def _find_boreal_forest_mask(world, factor):
-    return _mask(world, predicate=world.is_boreal_forest, factor=factor)
+    biome_masks = {}
 
+    for group in biome_groups:
+        group_mask = numpy.zeros((world.height, world.width), float)
 
-def _find_temperate_forest_mask(world, factor):
-    return _mask(world, predicate=world.is_temperate_forest, factor=factor)
+        for biome in group.__subclasses__():
+            group_mask[world.biome==_un_camelize(biome.__name__)] += 1.0
+               
+        group_mask[group_mask>0] = count_neighbours(group_mask)[group_mask>0]
 
+        group_mask[group_mask<5.000000001] = 0.0
 
-def _find_warm_temperate_forest_mask(world, factor):
-    return _mask(world, predicate=world.is_warm_temperate_forest,
-                 factor=factor)
+        group_mask = group_mask.repeat(factor, 0).repeat(factor, 1)
 
+        biome_masks[_un_camelize(group.__name__)] = group_mask
 
-def _find_tropical_dry_forest_mask(world, factor):
-    return _mask(world, predicate=world.is_tropical_dry_forest, factor=factor)
-
+    return biome_masks
 
 def _draw_shaded_pixel(pixels, x, y, r, g, b):
     nb = (x ** int(y / 5) + x * 23 + y * 37 + (x * y) * 13) % 75
@@ -421,25 +412,13 @@ def draw_ancientmap(world, target, resize_factor=1,
 
     if draw_mountains:  # TODO: numpy offers masked arrays - maybe they can be leveraged for all this?
         mountains_mask = _find_mountains_mask(world, resize_factor)
+
     if draw_biome:
-        boreal_forest_mask = _find_boreal_forest_mask(world, resize_factor)
-        temperate_forest_mask = _find_temperate_forest_mask(world, resize_factor)
-        warm_temperate_forest_mask = \
-            _find_warm_temperate_forest_mask(world, resize_factor)
-        tropical_dry_forest_mask = _find_tropical_dry_forest_mask(world,
-                                                                   resize_factor)
-        # jungle is actually Tropical Rain Forest and Tropical Seasonal Forest
-        jungle_mask = _mask(world, world.is_jungle,
-                            resize_factor)
-        tundra_mask = _mask(world, world.is_tundra, resize_factor)
-        # savanna is actually Tropical semi-arid
-        savanna_mask = _mask(world, world.is_savanna, resize_factor)
-        cold_parklands_mask = _mask(world, world.is_cold_parklands, resize_factor)
-        steppe_mask = _mask(world, world.is_steppe, resize_factor)
-        cool_desert_mask = _mask(world, world.is_cool_desert, resize_factor)
-        chaparral_mask = _mask(world, world.is_chaparral, resize_factor)
-        hot_desert_mask = _mask(world, world.is_hot_desert, resize_factor)
-        rock_desert_mask = _mask(world, world.is_hot_desert, resize_factor)  # TODO: add is_desert_mask
+        biome_masks = _build_biome_group_masks(world, resize_factor)
+
+        # TODO: there was a stub for a rock desert biome group here
+        # it should be super easy to introduce that group with the new
+        # biome group concept but since it did nothing I removed the stub
 
     def unset_mask(pos):
         x, y = pos
@@ -447,55 +426,51 @@ def draw_ancientmap(world, target, resize_factor=1,
 
     def unset_boreal_forest_mask(pos):
         x, y = pos
-        boreal_forest_mask[y, x] = 0
+        biome_masks['boreal forest'][y, x] = 0
 
     def unset_temperate_forest_mask(pos):
         x, y = pos
-        temperate_forest_mask[y, x] = 0
+        biome_masks['cool temperate forest'][y, x] = 0
 
     def unset_warm_temperate_forest_mask(pos):
         x, y = pos
-        warm_temperate_forest_mask[y, x] = 0
+        biome_masks['warm temperate forest'][y, x] = 0
 
     def unset_tropical_dry_forest_mask(pos):
         x, y = pos
-        tropical_dry_forest_mask[y, x] = 0
+        biome_masks['tropical dry forest group'][y, x] = 0
 
     def unset_jungle_mask(pos):
         x, y = pos
-        jungle_mask[y, x] = 0
+        biome_masks['jungle'][y, x] = 0
 
     def unset_tundra_mask(pos):
         x, y = pos
-        tundra_mask[y, x] = 0
+        biome_masks['tundra'][y, x] = 0
 
     def unset_savanna_mask(pos):
         x, y = pos
-        savanna_mask[y, x] = 0
+        biome_masks['savanna'][y, x][y, x] = 0
 
     def unset_hot_desert_mask(pos):
         x, y = pos
-        hot_desert_mask[y, x] = 0
-
-    def unset_rock_desert_mask(pos):
-        x, y = pos
-        rock_desert_mask[y, x] = 0
+        biome_masks['hot desert'][y, x] = 0
 
     def unset_cold_parklands_mask(pos):
         x, y = pos
-        cold_parklands_mask[y, x] = 0
+        biome_masks['cold parklands'][y, x] = 0
 
     def unset_steppe_mask(pos):
         x, y = pos
-        steppe_mask[y, x] = 0
+        biome_masks['steppe'][y, x] = 0
 
     def unset_cool_desert_mask(pos):
         x, y = pos
-        cool_desert_mask[y, x] = 0
+        biome_masks['cool desert'][y, x] = 0
 
     def unset_chaparral_mask(pos):
         x, y = pos
-        chaparral_mask[y, x] = 0
+        biome_masks['chaparral'][y, x] = 0
 
     def on_border(pos):
         x, y = pos
@@ -592,7 +567,7 @@ def draw_ancientmap(world, target, resize_factor=1,
             start_time = time.time()
         for y in range(resize_factor * world.height):
             for x in range(resize_factor * world.width):
-                if tundra_mask[y, x] > 0:
+                if biome_masks['tundra'][y, x] > 0:
                     _draw_tundra(target, x, y)
         if verbose:
             elapsed_time = time.time() - start_time
@@ -603,31 +578,31 @@ def draw_ancientmap(world, target, resize_factor=1,
         # Draw cold parklands
         for y in range(resize_factor * world.height):
             for x in range(resize_factor * world.width):
-                if cold_parklands_mask[y, x] > 0:
+                if biome_masks['cold parklands'][y, x] > 0:
                     _draw_cold_parklands(target, x, y)
 
         # Draw steppes
         for y in range(resize_factor * world.height):
             for x in range(resize_factor * world.width):
-                if steppe_mask[y, x] > 0:
+                if biome_masks['steppe'][y, x] > 0:
                     _draw_steppe(target, x, y)
 
         # Draw chaparral
         for y in range(resize_factor * world.height):
             for x in range(resize_factor * world.width):
-                if chaparral_mask[y, x] > 0:
+                if biome_masks['chaparral'][y, x] > 0:
                     _draw_chaparral(target, x, y)
 
         # Draw savanna
         for y in range(resize_factor * world.height):
             for x in range(resize_factor * world.width):
-                if savanna_mask[y, x] > 0:
+                if biome_masks['savanna'][y, x] > 0:
                     _draw_savanna(target, x, y)
 
         # Draw cool desert
         for y in range(resize_factor * world.height):
             for x in range(resize_factor * world.width):
-                if cool_desert_mask[y, x] > 0:
+                if biome_masks['cool desert'][y, x] > 0:
                     w = 8
                     h = 2
                     r = 9
@@ -642,7 +617,7 @@ def draw_ancientmap(world, target, resize_factor=1,
         # Draw hot desert
         for y in range(resize_factor * world.height):
             for x in range(resize_factor * world.width):
-                if hot_desert_mask[y, x] > 0:
+                if biome_masks['hot desert'][y, x] > 0:
                     w = 8
                     h = 2
                     r = 9
@@ -657,7 +632,7 @@ def draw_ancientmap(world, target, resize_factor=1,
         # Draw boreal forest
         for y in range(resize_factor * world.height):
             for x in range(resize_factor * world.width):
-                if boreal_forest_mask[y, x] > 0:
+                if biome_masks['boreal forest'][y, x] > 0:
                     w = 4
                     h = 5
                     r = 6
@@ -673,7 +648,7 @@ def draw_ancientmap(world, target, resize_factor=1,
         # Draw temperate forest
         for y in range(resize_factor * world.height):
             for x in range(resize_factor * world.width):
-                if temperate_forest_mask[y, x] > 0:
+                if biome_masks['cool temperate forest'][y, x] > 0:
                     w = 4
                     h = 5
                     r = 6
@@ -692,7 +667,7 @@ def draw_ancientmap(world, target, resize_factor=1,
         # Draw warm temperate forest
         for y in range(resize_factor * world.height):
             for x in range(resize_factor * world.width):
-                if warm_temperate_forest_mask[y, x] > 0:
+                if biome_masks['warm temperate forest'][y, x] > 0:
                     w = 4
                     h = 5
                     r = 6
@@ -708,7 +683,7 @@ def draw_ancientmap(world, target, resize_factor=1,
         # Draw dry tropical forest
         for y in range(resize_factor * world.height):
             for x in range(resize_factor * world.width):
-                if tropical_dry_forest_mask[y, x] > 0:
+                if biome_masks['tropical dry forest group'][y, x] > 0:
                     w = 4
                     h = 5
                     r = 6
@@ -724,7 +699,7 @@ def draw_ancientmap(world, target, resize_factor=1,
         # Draw jungle
         for y in range(resize_factor * world.height):
             for x in range(resize_factor * world.width):
-                if jungle_mask[y, x] > 0:
+                if biome_masks['jungle'][y, x] > 0:
                     w = 4
                     h = 5
                     r = 6
