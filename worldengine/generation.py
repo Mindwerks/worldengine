@@ -158,18 +158,16 @@ def sea_depth(world, sea_level):
         height, width = ocean.shape
 
         for dist in range(max_radius):
-            for y in range(height):
-                for x in range(width):
-                    if next_land[y,x] == -1:
+            indices = numpy.transpose(numpy.where(next_land==dist))
+            for y, x in indices:
+                for dy in range(-1, 2):
+                    ny = y + dy
+                    if 0 <= ny < height:
                         for dx in range(-1, 2):
                             nx = x + dx
                             if 0 <= nx < width:
-                                for dy in range(-1, 2):
-                                    ny = y + dy
-                                    if 0 <= ny < height and (dx != 0 or dy != 0):
-                                        if next_land[ny,nx] == dist:
-                                            next_land[y,x] = dist+1
-
+                                if next_land[ny,nx] == -1:
+                                    next_land[ny,nx] = dist + 1
         return next_land
 
     # We want to multiply the raw sea_depth by one of these factors 
