@@ -8,6 +8,7 @@ import numpy
 import sys
 import time
 from worldengine.common import get_verbose, count_neighbours
+from worldengine.common import anti_alias as anti_alias_channel
 from worldengine.biome import BiomeGroup, _un_camelize
 
 
@@ -469,18 +470,27 @@ def draw_ancientmap(world, target, resize_factor=1,
     border_color = (0, 0, 0, 255)
     outer_border_color = gradient(0.5, 0, 1.0, rgba_to_rgb(border_color), rgba_to_rgb(sea_color))
 
-    for y in range(resize_factor * world.height):
-        for x in range(resize_factor * world.width):
-            xf = int(x / resize_factor)
-            yf = int(y / resize_factor)
-            if borders[y, x]:
-                target.set_pixel(x, y, border_color)
-            elif draw_outer_land_border and outer_borders[y, x]:
-                target.set_pixel(x, y, outer_border_color)
-            elif world.is_ocean((xf, yf)):
-                target.set_pixel(x, y, sea_color)
-            else:
-                target.set_pixel(x, y, land_color)
+    # start in low resolution
+    num_channels = 4
+    channels = numpy.zeros((num_channels, world.height, world.width), int)
+
+    for c in range(num_channels):
+        channels[c] = land_color[c]
+        channels[c][world.ocean] = sea_color[c]
+
+    # now go full resolution
+    channels = channels.repeat(resize_factor, 1).repeat(resize_factor, 2)
+
+    if draw_outer_land_border:
+        for c in range(num_channels):
+            channels[c][outer_borders] = outer_border_color[c]
+
+    for c in range(num_channels):
+            channels[c][borders] = border_color[c]
+
+    for c in range(num_channels):
+        target[:,:,c] = channels[c,:,:]
+
     if verbose:
         elapsed_time = time.time() - start_time
         print(
@@ -521,6 +531,7 @@ def draw_ancientmap(world, target, resize_factor=1,
             _anti_alias_step()
 
     anti_alias(1)
+
     if verbose:
         elapsed_time = time.time() - start_time
         print(
