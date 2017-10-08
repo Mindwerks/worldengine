@@ -488,9 +488,6 @@ def draw_ancientmap(world, target, resize_factor=1,
     for c in range(num_channels):
             channels[c][borders] = border_color[c]
 
-    for c in range(num_channels):
-        target[:,:,c] = channels[c,:,:]
-
     if verbose:
         elapsed_time = time.time() - start_time
         print(
@@ -500,37 +497,16 @@ def draw_ancientmap(world, target, resize_factor=1,
     if verbose:
         start_time = time.time()
 
-    def anti_alias(steps):
+    #don't anti-alias the alpha channel
+    for c in range(num_channels-1):
+        channels[c] = anti_alias_channel(channels[c], 1)
 
-        def _anti_alias_step():
-            for y in range(resize_factor * world.height):
-                for x in range(resize_factor * world.width):
-                    _anti_alias_point(x, y)
+    
+    #hand over to the old implementation
+    #TODO: try to implement more steps of this new style
+    for c in range(num_channels):
+        target[:,:,c] = channels[c,:,:]
 
-        def _anti_alias_point(x, y):
-            n = 2
-            tot_r = target[y, x][0] * 2
-            tot_g = target[y, x][1] * 2
-            tot_b = target[y, x][2] * 2
-            for dy in range(-1, +2):
-                py = y + dy
-                if py > 0 and py < resize_factor * world.height:
-                    for dx in range(-1, +2):
-                        px = x + dx
-                        if px > 0 and px < resize_factor * world.width:
-                            n += 1
-                            tot_r += target[py, px][0]
-                            tot_g += target[py, px][1]
-                            tot_b += target[py, px][2]
-            r = int(tot_r / n)
-            g = int(tot_g / n)
-            b = int(tot_b / n)
-            target[y, x] = (r, g, b, 255)
-
-        for i in range(steps):
-            _anti_alias_step()
-
-    anti_alias(1)
 
     if verbose:
         elapsed_time = time.time() - start_time

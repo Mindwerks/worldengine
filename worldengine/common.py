@@ -80,7 +80,7 @@ class Counter(object):
 # Unless we want to add scipy as a dependency we only have 1D convolution at our hands from numpy.
 # So we take advantage of the kernel being seperable.
 
-def anti_alias(map_in, steps, boundary='circular'):
+def anti_alias(map_in, steps):
     """
     Execute the anti_alias operation steps times on the given map
     """
@@ -107,22 +107,11 @@ def anti_alias(map_in, steps, boundary='circular'):
         # there might be a better way but this works (circular boundary)
         # notice how we'll need to add 2 to width and height later 
         # because of this
-        if boundary == 'circular':
-            result = numpy.append(result, [result[0,:]], 0)
-            result = numpy.append(result, numpy.transpose([result[:,0]]), 1)
+        result = numpy.append(result, [result[0,:]], 0)
+        result = numpy.append(result, numpy.transpose([result[:,0]]), 1)
 
-            result = numpy.insert(result, [0], [result[-2,:]],0)
-            result = numpy.insert(result, [0], numpy.transpose([result[:,-2]]), 1)
-
-        elif boundary == 'zeros':
-            result = numpy.append(result, numpy.zeros((1,width)), 0)
-            result = numpy.append(result, numpy.zeros((height+1,1)), 1)
-
-            result = numpy.insert(result, [0], numpy.zeros((1,width+1)), 0)
-            result = numpy.insert(result, [0], numpy.zeros((height+2,1)), 1)
-        else:
-            raise ValueError("Unknown boundary condition: " + str(boundary))
-
+        result = numpy.insert(result, [0], [result[-2,:]],0)
+        result = numpy.insert(result, [0], numpy.transpose([result[:,-2]]), 1)
 
         # with a seperable kernel we can convolve the rows first ...
         for y in range(height+2):
