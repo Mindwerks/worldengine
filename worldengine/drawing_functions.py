@@ -98,15 +98,21 @@ def _find_outer_borders(world, factor, inner_borders):
 
 
 def _find_mountains_mask(world, factor):
-    _mask = numpy.zeros((factor * world.height, factor * world.width), dtype=float)
-    for y in range(factor * world.height):
-        for x in range(factor * world.width):
-            if world.is_mountain((int(x / factor), int(y / factor))):
-                v = len(world.tiles_around((int(x / factor), int(y / factor)),
-                                           radius=3,
-                                           predicate=world.is_mountain))
-                if v > 32:
-                    _mask[y, x] = v / 4.0  # force conversion to float, Python 2 will *not* do it automatically
+    _mask = numpy.zeros((world.height, world.width), float)
+    _mask[world.elevation>world.get_mountain_level()] = 1.0
+
+    #disregard elevated oceans
+    _mask[world.ocean] = 0.0
+
+    #this is fast but not 100% precise
+    #subsequent steps are fiendishly sensitive to these precision errors
+    #therefore the rounding
+    _mask[_mask>0] = numpy.around(count_neighbours(_mask, 3)[_mask>0], 6)
+
+    _mask[_mask<32.000000001] = 0.0
+    _mask /= 4.0
+    _mask = _mask.repeat(factor, 0).repeat(factor, 1)
+
     return _mask
 
 
