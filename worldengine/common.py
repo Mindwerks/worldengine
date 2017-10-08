@@ -139,10 +139,12 @@ def count_neighbours(mask, radius=1):
 
     height, width = mask.shape
 
-    w = -1.0/numpy.sqrt(3.0)
+    f = 2.0*radius+1.0
+
+    w = -1.0/numpy.sqrt(f)
     kernel = [w]*radius + [w] + [w]*radius
 
-    result = mask * 3.0
+    result = mask * f
 
     for y in range(height):
         result[y,:]  = numpy.convolve(result[y,:], kernel, 'same')
