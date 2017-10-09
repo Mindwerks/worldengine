@@ -60,7 +60,7 @@ def _find_land_borders(world, factor):
     _ocean = numpy.zeros((factor * world.height, factor * world.width), dtype=bool)
     _borders = numpy.zeros((factor * world.height, factor * world.width), dtype=bool)
 
-    #scale ocean
+    # scale ocean
     for y in range(world.height * factor):  # TODO: numpy
         for x in range(world.width * factor):
             if world.is_ocean((int(x / factor), int(y / factor))):
@@ -81,7 +81,7 @@ def _find_outer_borders(world, factor, inner_borders):
     _ocean = numpy.zeros((factor * world.height, factor * world.width), dtype=bool)
     _borders = numpy.zeros((factor * world.height, factor * world.width), dtype=bool)
 
-    #scale ocean
+    # scale ocean
     for y in range(world.height * factor):  # TODO: numpy
         for x in range(world.width * factor):
             if world.is_ocean((int(x / factor), int(y / factor))):
@@ -497,13 +497,13 @@ def draw_ancientmap(world, target, resize_factor=1,
     if verbose:
         start_time = time.time()
 
-    #don't anti-alias the alpha channel
+    # don't anti-alias the alpha channel
     for c in range(num_channels-1):
         channels[c] = anti_alias_channel(channels[c], 1)
 
     
-    #hand over to the old implementation
-    #TODO: try to implement more steps of this new style
+    # hand over to the old implementation
+    # TODO: try to implement more steps of this new style
     for c in range(num_channels):
         target[:,:,c] = channels[c,:,:]
 
