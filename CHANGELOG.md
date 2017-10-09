@@ -3,7 +3,7 @@ Version 0.20 (UNRELEASED)
 * Calculation of sea depth is now faster.
 * Hydrology simulation is now faster.
 * BiomeGroups are now configurable via the class hierarchy.
-* Ancient map now initialises faster.
+* Ancient map is now faster.
 
 Version 0.19
 
