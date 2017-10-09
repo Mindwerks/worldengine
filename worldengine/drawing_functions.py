@@ -102,12 +102,12 @@ def _find_mountains_mask(world, factor):
     _mask = numpy.zeros((world.height, world.width), float)
     _mask[world.elevation>world.get_mountain_level()] = 1.0
 
-    #disregard elevated oceans
+    # disregard elevated oceans
     _mask[world.ocean] = 0.0
 
-    #this is fast but not 100% precise
-    #subsequent steps are fiendishly sensitive to these precision errors
-    #therefore the rounding
+    # this is fast but not 100% precise
+    # subsequent steps are fiendishly sensitive to these precision errors
+    # therefore the rounding
     _mask[_mask>0] = numpy.around(count_neighbours(_mask, 3)[_mask>0], 6)
 
     _mask[_mask<32.000000001] = 0.0
