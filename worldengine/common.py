@@ -133,16 +133,18 @@ def anti_alias(map_in, steps):
         current = _anti_alias_step(current)
     return current
 
-def count_neighbours(mask):
+def count_neighbours(mask, radius=1):
     '''Count how many neighbours of a coordinate are set to one.
     This uses the same principles as anti_alias, compare comments there.'''
 
     height, width = mask.shape
 
-    w = -1.0/numpy.sqrt(3.0)
-    kernel = [w, w, w]
+    f = 2.0*radius+1.0
 
-    result = mask * 3.0
+    w = -1.0/numpy.sqrt(f)
+    kernel = [w]*radius + [w] + [w]*radius
+
+    result = mask * f
 
     for y in range(height):
         result[y,:]  = numpy.convolve(result[y,:], kernel, 'same')

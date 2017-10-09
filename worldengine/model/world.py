@@ -457,16 +457,20 @@ class World(object):
     def start_mountain_th(self):
         return self.layers['elevation'].thresholds[2][1]
 
-    def is_mountain(self, pos):
-        if self.is_ocean(pos):
-            return False
+    def get_mountain_level(self):
         if len(self.layers['elevation'].thresholds) == 4:
             mi = 2
         else:
             mi = 1
-        mountain_level = self.layers['elevation'].thresholds[mi][1]
+        return self.layers['elevation'].thresholds[mi][1]
+
+
+    def is_mountain(self, pos):
+        if self.is_ocean(pos):
+            return False
         x, y = pos
-        return self.layers['elevation'].data[y][x] > mountain_level
+
+        return self.layers['elevation'].data[y][x] > self.get_mountain_level()
 
     def is_low_mountain(self, pos):
         if not self.is_mountain(pos):
@@ -480,13 +484,7 @@ class World(object):
         return self.layers['elevation'].data[y, x] < mountain_level + 2.0
 
     def level_of_mountain(self, pos):
-        if self.is_ocean(pos):
-            return False
-        if len(self.layers['elevation'].thresholds) == 4:
-            mi = 2
-        else:
-            mi = 1
-        mountain_level = self.layers['elevation'].thresholds[mi][1]
+        mountain_level = self.get_mountain_level()
         x, y = pos
         if self.layers['elevation'].data[y, x] <= mountain_level:
             return 0
