@@ -8,6 +8,7 @@ import numpy
 import sys
 import time
 from worldengine.common import get_verbose, count_neighbours
+from worldengine.common import anti_alias as anti_alias_channel
 from worldengine.biome import BiomeGroup, _un_camelize
 
 
@@ -59,7 +60,7 @@ def _find_land_borders(world, factor):
     _ocean = numpy.zeros((factor * world.height, factor * world.width), dtype=bool)
     _borders = numpy.zeros((factor * world.height, factor * world.width), dtype=bool)
 
-    #scale ocean
+    # scale ocean
     for y in range(world.height * factor):  # TODO: numpy
         for x in range(world.width * factor):
             if world.is_ocean((int(x / factor), int(y / factor))):
@@ -80,7 +81,7 @@ def _find_outer_borders(world, factor, inner_borders):
     _ocean = numpy.zeros((factor * world.height, factor * world.width), dtype=bool)
     _borders = numpy.zeros((factor * world.height, factor * world.width), dtype=bool)
 
-    #scale ocean
+    # scale ocean
     for y in range(world.height * factor):  # TODO: numpy
         for x in range(world.width * factor):
             if world.is_ocean((int(x / factor), int(y / factor))):
@@ -101,12 +102,12 @@ def _find_mountains_mask(world, factor):
     _mask = numpy.zeros((world.height, world.width), float)
     _mask[world.elevation>world.get_mountain_level()] = 1.0
 
-    #disregard elevated oceans
+    # disregard elevated oceans
     _mask[world.ocean] = 0.0
 
-    #this is fast but not 100% precise
-    #subsequent steps are fiendishly sensitive to these precision errors
-    #therefore the rounding
+    # this is fast but not 100% precise
+    # subsequent steps are fiendishly sensitive to these precision errors
+    # therefore the rounding
     _mask[_mask>0] = numpy.around(count_neighbours(_mask, 3)[_mask>0], 6)
 
     _mask[_mask<32.000000001] = 0.0
@@ -475,18 +476,24 @@ def draw_ancientmap(world, target, resize_factor=1,
     border_color = (0, 0, 0, 255)
     outer_border_color = gradient(0.5, 0, 1.0, rgba_to_rgb(border_color), rgba_to_rgb(sea_color))
 
-    for y in range(resize_factor * world.height):
-        for x in range(resize_factor * world.width):
-            xf = int(x / resize_factor)
-            yf = int(y / resize_factor)
-            if borders[y, x]:
-                target.set_pixel(x, y, border_color)
-            elif draw_outer_land_border and outer_borders[y, x]:
-                target.set_pixel(x, y, outer_border_color)
-            elif world.is_ocean((xf, yf)):
-                target.set_pixel(x, y, sea_color)
-            else:
-                target.set_pixel(x, y, land_color)
+    # start in low resolution
+    num_channels = 4
+    channels = numpy.zeros((num_channels, world.height, world.width), int)
+
+    for c in range(num_channels):
+        channels[c] = land_color[c]
+        channels[c][world.ocean] = sea_color[c]
+
+    # now go full resolution
+    channels = channels.repeat(resize_factor, 1).repeat(resize_factor, 2)
+
+    if draw_outer_land_border:
+        for c in range(num_channels):
+            channels[c][outer_borders] = outer_border_color[c]
+
+    for c in range(num_channels):
+            channels[c][borders] = border_color[c]
+
     if verbose:
         elapsed_time = time.time() - start_time
         print(
@@ -496,37 +503,17 @@ def draw_ancientmap(world, target, resize_factor=1,
     if verbose:
         start_time = time.time()
 
-    def anti_alias(steps):
+    # don't anti-alias the alpha channel
+    for c in range(num_channels-1):
+        channels[c] = anti_alias_channel(channels[c], 1)
 
-        def _anti_alias_step():
-            for y in range(resize_factor * world.height):
-                for x in range(resize_factor * world.width):
-                    _anti_alias_point(x, y)
+    
+    # hand over to the old implementation
+    # TODO: try to implement more steps of this new style
+    for c in range(num_channels):
+        target[:,:,c] = channels[c,:,:]
 
-        def _anti_alias_point(x, y):
-            n = 2
-            tot_r = target[y, x][0] * 2
-            tot_g = target[y, x][1] * 2
-            tot_b = target[y, x][2] * 2
-            for dy in range(-1, +2):
-                py = y + dy
-                if py > 0 and py < resize_factor * world.height:
-                    for dx in range(-1, +2):
-                        px = x + dx
-                        if px > 0 and px < resize_factor * world.width:
-                            n += 1
-                            tot_r += target[py, px][0]
-                            tot_g += target[py, px][1]
-                            tot_b += target[py, px][2]
-            r = int(tot_r / n)
-            g = int(tot_g / n)
-            b = int(tot_b / n)
-            target[y, x] = (r, g, b, 255)
 
-        for i in range(steps):
-            _anti_alias_step()
-
-    anti_alias(1)
     if verbose:
         elapsed_time = time.time() - start_time
         print(
