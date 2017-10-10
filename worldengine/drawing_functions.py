@@ -402,17 +402,25 @@ def draw_ancientmap(world, target, resize_factor=1,
     if draw_biome:
         biome_masks = _build_biome_group_masks(world, resize_factor)
 
-        # TODO: there was a stub for a rock desert biome group here
-        # it should be super easy to introduce that group with the new
-        # biome group concept but since it did nothing I removed the stub
+        def _draw_biome(name, _func, w, h, r, _alt_func = None):
+            if verbose:
+                start_time = time.time()
 
-    def unset_mask(pos):
-        x, y = pos
-        mountains_mask[y, x] = 0
+            for y in range(resize_factor * world.height):
+                for x in range(resize_factor * world.width):
+                    if biome_masks[name][y, x] > 0:
+                        if r == 0 or border_neighbours[r][y,x] <= 2:
+                            if _alt_func is not None and rng.random_sample() > .5:
+                                _alt_func(target, x, y, w, h)
+                            else:
+                                _func(target, x, y, w, h)
+                            biome_masks[name][y-r:y+r+1,x-r:x+r+1] = 0.0
 
-    def on_border(pos):
-        x, y = pos
-        return borders[y, x]
+            if verbose:
+                elapsed_time = time.time() - start_time
+                print(
+                    "...drawing_functions.draw_ancientmap: " + name +
+                    " Elapsed time " + str(elapsed_time) + " seconds.")
 
     if verbose:
         elapsed_time = time.time() - start_time
@@ -459,8 +467,7 @@ def draw_ancientmap(world, target, resize_factor=1,
         channels[c] = anti_alias_channel(channels[c], 1)
 
     
-    # hand over to the old implementation
-    # TODO: try to implement more steps of this new style
+    # switch from channel major storage to pixel major storage
     for c in range(num_channels):
         target[:,:,c] = channels[c,:,:]
 
@@ -471,23 +478,6 @@ def draw_ancientmap(world, target, resize_factor=1,
             "...drawing_functions.draw_oldmap_on_pixel: anti alias " +
             "Elapsed time " + str(elapsed_time) + " seconds.")
 
-
-    def _draw_biome(name, _func, w, h, r):
-        if verbose:
-            start_time = time.time()
-
-        for y in range(resize_factor * world.height):
-            for x in range(resize_factor * world.width):
-                if biome_masks[name][y, x] > 0:
-                    if r == 0 or border_neighbours[r][y,x] <= 2:
-                        _func(target, x, y, w, h)
-                        biome_masks[name][y-r:y+r+1,x-r:x+r+1] = 0.0
-
-        if verbose:
-            elapsed_time = time.time() - start_time
-            print(
-                "...drawing_functions.draw_ancientmap: " + name +
-                " Elapsed time " + str(elapsed_time) + " seconds.")
     if draw_biome:
         # Draw glacier
         if verbose:
@@ -511,24 +501,15 @@ def draw_ancientmap(world, target, resize_factor=1,
         _draw_biome('cool desert', _draw_cool_desert, 8, 2, 9)
         _draw_biome('hot desert', _draw_hot_desert, 8, 2, 9)
         _draw_biome('boreal forest', _draw_boreal_forest, 4, 5, 6)
-
-        # Draw temperate forest
-        for y in range(resize_factor * world.height):
-            for x in range(resize_factor * world.width):
-                if biome_masks['cool temperate forest'][y, x] > 0:
-                    w = 4
-                    h = 5
-                    r = 6
-                    if border_neighbours[r][y,x] <= 2:
-                        if rng.random_sample() <= .5:
-                            _draw_temperate_forest1(target, x, y, w=w, h=h)
-                        else:
-                            _draw_temperate_forest2(target, x, y, w=w, h=h)
-                        biome_masks['cool temperate forest'][y-r:y+r+1,x-r:x+r+1] = 0.0
-            
+        _draw_biome('cool temperate forest', _draw_temperate_forest1, 4, 5, 6,
+                    _draw_temperate_forest2)            
         _draw_biome('warm temperate forest', _draw_warm_temperate_forest, 4, 5, 6)  
         _draw_biome('tropical dry forest group', _draw_tropical_dry_forest, 4, 5, 6)
         _draw_biome('jungle', _draw_jungle, 4, 5, 6)
+
+        # TODO: there was a stub for a rock desert biome group
+        # it should be super easy to introduce that group with the new
+        # biome group concept but since it did nothing I removed the stub
 
     if draw_rivers:
         draw_rivers_on_image(world, target, resize_factor)
