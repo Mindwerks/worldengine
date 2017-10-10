@@ -17,6 +17,13 @@ class TestDrawingFunctions(TestBase):
         draw_ancientmap(self.w, target, resize_factor=3)
         self._assert_img_equal("ancientmap_28070_factor3", target)
 
+    def test_draw_ancient_map_outer_borders(self):
+        # TODO: So far this only calls the function without testing the result.
+        # Add a blessed image with borders, maybe
+        target = PNGWriter.rgba_from_dimensions(self.w.width * 3, self.w.height * 3)
+        draw_ancientmap(self.w, target, resize_factor=3, draw_outer_land_border=True)
+
+
     def test_gradient(self):
         self._assert_are_colors_equal((10, 20, 40),
                                       gradient(0.0, 0.0, 1.0, (10, 20, 40), (0, 128, 240)))
