@@ -370,12 +370,10 @@ def draw_ancientmap(world, target, resize_factor=1,
     land_color = (
         181, 166, 127, 255)  # TODO: Put this in the argument list too??
 
-
-
-    scaled_ocean = world.ocean.repeat(resize_factor,0).repeat(resize_factor,1)
+    scaled_ocean = world.ocean.repeat(resize_factor, 0).repeat(resize_factor, 1)
     
     borders = numpy.zeros((resize_factor * world.height, resize_factor * world.width), bool)
-    borders[count_neighbours(scaled_ocean)>0] = True
+    borders[count_neighbours(scaled_ocean) > 0] = True
     borders[scaled_ocean] = False
 
     # cache neighbours count at different radii
@@ -390,7 +388,7 @@ def draw_ancientmap(world, target, resize_factor=1,
 
         for i in range(2):
             _outer_borders =  numpy.zeros((resize_factor * world.height, resize_factor * world.width), bool)
-            _outer_borders[count_neighbours(inner_borders)>0] = True
+            _outer_borders[count_neighbours(inner_borders) > 0] = True
             _outer_borders[inner_borders] = False
             _outer_borders[numpy.logical_not(scaled_ocean)] = False
             outer_borders = _outer_borders
