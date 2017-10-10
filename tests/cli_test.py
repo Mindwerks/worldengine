@@ -1,7 +1,7 @@
 import os
 import sys
-from tests.draw_test import TestBase
 import unittest
+from tests.draw_test import TestBase
 from worldengine import __main__
 from worldengine.cli.main import main
 
@@ -74,23 +74,23 @@ class TestCLI(TestBase):
             raise e
 
     def test_smoke_ancient(self):
-            backup_argv = sys.argv
-            sys.argv = ["python", "ancient_map", "-w", self.world]
-            try:
-                main()
-            except Exception as e:
-                raise e
-            sys.argv = backup_argv
+        backup_argv = sys.argv
+        sys.argv = ["python", "ancient_map", "-w", self.world]
+        try:
+            main()
+        except Exception as e:
+            raise e
+        sys.argv = backup_argv
 
     def test_smoke_plates(self):
-            backup_argv = sys.argv
-            sys.argv = ["python", "plates", "--width", "16",
-                        "--height", "16", "--number-of-plates", "2"]
-            try:
-                main()
-            except Exception as e:
-                raise e
-            sys.argv = backup_argv
+        backup_argv = sys.argv
+        sys.argv = ["python", "plates", "--width", "16",
+                    "--height", "16", "--number-of-plates", "2"]
+        try:
+            main()
+        except Exception as e:
+            raise e
+        sys.argv = backup_argv
 
 
 if __name__ == '__main__':

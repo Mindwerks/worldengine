@@ -6,10 +6,10 @@ except ImportError:
     except ImportError:
         print("Unable to load GDAL support, no heightmap export possible.")
 
-import numpy
 import os
 import sys
 import tempfile
+import numpy
 
 '''
 Useful CLI tools:

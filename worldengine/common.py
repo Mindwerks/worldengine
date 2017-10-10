@@ -58,7 +58,7 @@ class Counter(object):
         sys.stdout.write(self.to_str)
 
 
-# For each step and each x, y the original implementation averaged 
+# For each step and each x, y the original implementation averaged
 # over the 9 values in the square from (x-1, y-1) to (x+1,y+1)
 # To that it added, with equal weight, twice the initial value.
 # That makes a total of 11 values.
@@ -67,11 +67,11 @@ class Counter(object):
 # current = map
 #
 # map_part = (2/11)*map
-    
+#    
 # linear_filter = [[1/11, 1/11, 1/11],
 #                  [1/11, 1/11, 1/11],
 #                  [1/11, 1/11, 1/11]]
-
+#
 # for i in range(steps):
 #   current = signal.convolve2d(current, linear_filter, mode='same', boundary='wrap') + map_part
 # return current
@@ -107,22 +107,22 @@ def anti_alias(map_in, steps):
         # there might be a better way but this works (circular boundary)
         # notice how we'll need to add 2 to width and height later 
         # because of this
-        result = numpy.append(result, [result[0,:]], 0)
-        result = numpy.append(result, numpy.transpose([result[:,0]]), 1)
+        result = numpy.append(result, [result[0, :]], 0)
+        result = numpy.append(result, numpy.transpose([result[:, 0]]), 1)
 
-        result = numpy.insert(result, [0], [result[-2,:]],0)
-        result = numpy.insert(result, [0], numpy.transpose([result[:,-2]]), 1)
+        result = numpy.insert(result, [0], [result[-2, :]],0)
+        result = numpy.insert(result, [0], numpy.transpose([result[:, -2]]), 1)
 
         # with a seperable kernel we can convolve the rows first ...
         for y in range(height+2):
-            result[y,1:-1] = numpy.convolve(result[y,:], kernel, 'valid')
+            result[y, 1:-1] = numpy.convolve(result[y, :], kernel, 'valid')
 
         # ... and then the columns
         for x in range(width+2):
-            result[1:-1,x] = numpy.convolve(result[:,x], kernel, 'valid')
+            result[1:-1, x] = numpy.convolve(result[:, x], kernel, 'valid')
 
         # throw away invalid values at the boundary
-        result = result[1:-1,1:-1]
+        result = result[1:-1, 1:-1]
 
         result += map_part
 
@@ -147,10 +147,10 @@ def count_neighbours(mask, radius=1):
     result = mask * f
 
     for y in range(height):
-        result[y,:]  = numpy.convolve(result[y,:], kernel, 'same')
+        result[y, :] = numpy.convolve(result[y,:], kernel, 'same')
 
     for x in range(width):
-        result[:,x] = numpy.convolve(result[:, x], kernel, 'same')
+        result[:, x] = numpy.convolve(result[:, x], kernel, 'same')
 
     return result - mask
 

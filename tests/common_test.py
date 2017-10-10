@@ -44,11 +44,11 @@ class TestCommon(unittest.TestCase):
 
         a['foo'] = 'bar'
 
-        self.assertFalse(_equal(a,b))
+        self.assertFalse(_equal(a, b))
 
         b['foo'] = 'bar'
 
-        self.assertTrue(_equal(a,b))
+        self.assertTrue(_equal(a, b))
 
 if __name__ == '__main__':
     unittest.main()

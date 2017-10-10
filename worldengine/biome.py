@@ -270,8 +270,9 @@ class TropicalRainForest(Biome, Jungle):
 
 def biome_name_to_index(biome_name):
     names = sorted(_BiomeMetaclass.biomes.keys())
-    for i in range(len(names)):
-        if names[i] == biome_name:
+
+    for i, name in enumerate(names):
+        if name == biome_name:
             return i
     raise Exception("Not found")
 
