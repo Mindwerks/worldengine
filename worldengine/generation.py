@@ -142,23 +142,22 @@ def harmonize_ocean(ocean, elevation, ocean_level):
 
 def sea_depth(world, sea_level):
 
-    # a dynamic programming approach to gather how far the next land is 
+    # a dynamic programming approach to gather how far the next land is
     # from a given coordinate up to a maximum distance of max_radius
     # result is 0 for land coordinates and -1 for coordinates further than
     # max_radius away from land
     # there might be even faster ways but it does the trick
 
     def next_land_dynamic(ocean, max_radius=5):
-    
         next_land = numpy.full(ocean.shape, -1, int)
 
         # non ocean tiles are zero distance away from next land
-        next_land[numpy.logical_not(ocean)]=0
+        next_land[numpy.logical_not(ocean)] = 0
 
         height, width = ocean.shape
 
         for dist in range(max_radius):
-            indices = numpy.transpose(numpy.where(next_land==dist))
+            indices = numpy.transpose(numpy.where(next_land == dist))
             for y, x in indices:
                 for dy in range(-1, 2):
                     ny = y + dy
@@ -166,11 +165,11 @@ def sea_depth(world, sea_level):
                         for dx in range(-1, 2):
                             nx = x + dx
                             if 0 <= nx < width:
-                                if next_land[ny,nx] == -1:
-                                    next_land[ny,nx] = dist + 1
+                                if next_land[ny, nx] == -1:
+                                    next_land[ny, nx] = dist + 1
         return next_land
 
-    # We want to multiply the raw sea_depth by one of these factors 
+    # We want to multiply the raw sea_depth by one of these factors
     # depending on the distance from the next land
     # possible TODO: make this a parameter
     factors = [0.0, 0.3, 0.5, 0.7, 0.9]
@@ -181,9 +180,9 @@ def sea_depth(world, sea_level):
 
     for y in range(world.height):
         for x in range(world.width):
-            dist_to_next_land = next_land[y,x]
+            dist_to_next_land = next_land[y, x]
             if dist_to_next_land > 0:
-                sea_depth[y,x]*=factors[dist_to_next_land-1]
+                sea_depth[y, x] *= factors[dist_to_next_land-1]
 
     sea_depth = anti_alias(sea_depth, 10)
 
@@ -248,7 +247,7 @@ def generate_world(w, step):
     PermeabilitySimulation().execute(w, seed_dict['PermeabilitySimulation'])
 
     cm, biome_cm = BiomeSimulation().execute(w, seed_dict['BiomeSimulation'])  # seed not currently used
-    for cl in cm.keys():
+    for cl in cm:
         count = cm[cl]
         if get_verbose():
             print("%s = %i" % (str(cl), count))
@@ -257,7 +256,7 @@ def generate_world(w, step):
         print('')  # empty line
         print('Biome obtained:')
 
-    for cl in biome_cm.keys():
+    for cl in biome_cm:
         count = biome_cm[cl]
         if get_verbose():
             print(" %30s = %7i" % (str(cl), count))

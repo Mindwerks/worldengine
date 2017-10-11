@@ -1,4 +1,4 @@
-from setuptools import setup, Extension, Command
+from setuptools import setup
 # from pip.req import parse_requirements
 # import pip.download
 

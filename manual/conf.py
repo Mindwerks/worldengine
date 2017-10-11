@@ -1,3 +1,5 @@
+# pylint: skip-file
+
 # -*- coding: utf-8 -*-
 #
 # WorldEngine documentation build configuration file, created by

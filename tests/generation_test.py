@@ -1,11 +1,10 @@
 import unittest
-
 import numpy
+
+from tests.draw_test import TestBase
 
 from worldengine.plates import Step, center_land, world_gen
 from worldengine.model.world import World, Size, GenerationParameters
-from tests.draw_test import TestBase
-
 from worldengine.generation import sea_depth
 from worldengine.common import anti_alias
 
@@ -45,12 +44,12 @@ class TestGeneration(TestBase):
     def test_sea_depth(self):
         ocean_level = 1.0
         extent = 11
-        w = World("sea_depth", Size(extent,extent), 0, GenerationParameters(0, ocean_level, 0), None)
+        w = World("sea_depth", Size(extent, extent), 0, GenerationParameters(0, ocean_level, 0), None)
 
-        ocean = numpy.full([extent,extent], True)
-        ocean[5,5]=False
+        ocean = numpy.full([extent, extent], True)
+        ocean[5,5] = False
 
-        elevation = numpy.zeros([extent,extent], float)
+        elevation = numpy.zeros([extent, extent], float)
         elevation[5,5] = 2.0
 
         t = numpy.zeros([extent, extent])
@@ -70,7 +69,7 @@ class TestGeneration(TestBase):
                                 0.9, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.9, \
                                 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9])
 
-        desired_result = desired_result.reshape([extent,extent])
+        desired_result = desired_result.reshape([extent, extent])
 
         # this part is verbatim from the function. It's not part of the test
         # Some refactoring is in order to increase test quality
@@ -86,12 +85,7 @@ class TestGeneration(TestBase):
 
         for y in range(extent):
             for x in range(extent):
-                self.assertAlmostEqual(desired_result[y,x], result[y,x])
-
-        
-
-
-    
+                self.assertAlmostEqual(desired_result[y, x], result[y, x])
 
 
 if __name__ == '__main__':

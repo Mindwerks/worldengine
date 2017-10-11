@@ -178,7 +178,7 @@ def load_world_to_hdf5(filename):
         data = numpy.array(f['watermap/data'])
         thresholds = {}
         thresholds['creek'] = f['watermap/thresholds/creek'].value
-        thresholds['river'] =  f['watermap/thresholds/river'].value
+        thresholds['river'] = f['watermap/thresholds/river'].value
         thresholds['main river'] = f['watermap/thresholds/mainriver'].value
         w.watermap = (data, thresholds)
 

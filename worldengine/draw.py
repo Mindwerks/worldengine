@@ -258,14 +258,14 @@ def get_normalized_elevation_array(world):
 
 def get_biome_color_based_on_elevation(world, elev, x, y, rng):
     ''' This is the "business logic" for determining the base biome color in satellite view.
-        This includes generating some "noise" at each spot in a pixel's rgb value, potentially 
-        modifying the noise based on elevation, and finally incorporating this with the base biome color. 
+        This includes generating some "noise" at each spot in a pixel's rgb value, potentially
+        modifying the noise based on elevation, and finally incorporating this with the base biome color.
 
         The basic rules regarding noise generation are:
         - Oceans have no noise added
         - land tiles start with noise somewhere inside (-NOISE_RANGE, NOISE_RANGE) for each rgb value
-        - land tiles with high elevations further modify the noise by set amounts (to drain some of the 
-          color and make the map look more like mountains) 
+        - land tiles with high elevations further modify the noise by set amounts (to drain some of the
+          color and make the map look more like mountains)
 
         The biome's base color may be interpolated with a predefined mountain brown color if the elevation is high enough.
 
@@ -287,25 +287,25 @@ def get_biome_color_based_on_elevation(world, elev, x, y, rng):
         noise = rng.randint(-NOISE_RANGE, NOISE_RANGE, size=3)  # draw three random numbers at once
 
         ####### Case 1 - elevation is very high ########
-        if elev > HIGH_MOUNTAIN_ELEV:     
+        if elev > HIGH_MOUNTAIN_ELEV:
             # Modify the noise to make the area slightly brighter to simulate snow-topped mountains.
             noise = add_colors(noise, HIGH_MOUNTAIN_NOISE_MODIFIER)
             # Average the biome's color with the MOUNTAIN_COLOR to tint the terrain
             biome_color = average_colors(biome_color, MOUNTAIN_COLOR)
 
         ####### Case 2 - elevation is high ########
-        elif elev > MOUNTAIN_ELEV:   
+        elif elev > MOUNTAIN_ELEV:
             # Modify the noise to make this tile slightly darker, especially draining the green
             noise = add_colors(noise, MOUNTAIN_NOISE_MODIFIER)
             # Average the biome's color with the MOUNTAIN_COLOR to tint the terrain
             biome_color = average_colors(biome_color, MOUNTAIN_COLOR)
 
         ####### Case 3 - elevation is somewhat high ########
-        elif elev > HIGH_HILL_ELEV:   
+        elif elev > HIGH_HILL_ELEV:
             noise = add_colors(noise, HIGH_HILL_NOISE_MODIFIER)
 
         ####### Case 4 - elevation is a little bit high ########
-        elif elev > HILL_ELEV:   
+        elif elev > HILL_ELEV:
             noise = add_colors(noise, HILL_NOISE_MODIFIER)
 
     # There is also a minor base modifier to the pixel's rgb value based on height
@@ -391,7 +391,7 @@ def draw_satellite(world, target):
             # Get a rgb noise value, with some logic to modify it based on the elevation of the tile
             r, g, b = get_biome_color_based_on_elevation(world, elev, x, y, rng)
 
-            # Set pixel to this color. This initial color will be accessed and modified later when 
+            # Set pixel to this color. This initial color will be accessed and modified later when
             # the map is smoothed and shaded.
             target.set_pixel(x, y, (r, g, b, 255))
 
@@ -426,7 +426,7 @@ def draw_satellite(world, target):
                             all_b.append(b)
 
                 # Making sure there is at least one valid tile to be smoothed before we attempt to average the values
-                if len(all_r) > 0:
+                if all_r:
                     avg_r = int(sum(all_r) / len(all_r))
                     avg_g = int(sum(all_g) / len(all_g))
                     avg_b = int(sum(all_b) / len(all_b))
@@ -459,10 +459,10 @@ def draw_satellite(world, target):
                 
                 # Build up list of elevations in the previous n tiles, where n is the shadow size.
                 # This goes northwest to southeast
-                prev_elevs = [ world.layers['elevation'].data[y-n, x-n] for n in range(1, SAT_SHADOW_SIZE+1) ]
+                prev_elevs = [world.layers['elevation'].data[y-n, x-n] for n in range(1, SAT_SHADOW_SIZE+1)]
 
                 # Take the average of the height of the previous n tiles
-                avg_prev_elev = int( sum(prev_elevs) / len(prev_elevs) )
+                avg_prev_elev = int(sum(prev_elevs) / len(prev_elevs))
 
                 # Find the difference between this tile's elevation, and the average of the previous elevations
                 difference = int(world.layers['elevation'].data[y, x] - avg_prev_elev)
@@ -664,7 +664,6 @@ def draw_scatter_plot(world, size, target):
             v_max = 0
         if v_max > (size - 1):
             v_max = size - 1
-            
         if h_max > 0 and h_min < size and v_max > 0:
             for y in range(int(h_min), int(h_max)):
                 for x in range(0, int(v_max)):
@@ -799,7 +798,7 @@ def draw_biome_on_file(world, filename):
 
 def draw_ancientmap_on_file(world, filename, resize_factor=1,
                             sea_color=(212, 198, 169, 255),
-                            draw_biome=True, draw_rivers=True, draw_mountains=True, 
+                            draw_biome=True, draw_rivers=True, draw_mountains=True,
                             draw_outer_land_border=False, verbose=False):
     img = PNGWriter.rgba_from_dimensions(world.width * resize_factor, world.height * resize_factor, filename)
     draw_ancientmap(world, img, resize_factor, sea_color,

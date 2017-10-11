@@ -9,7 +9,7 @@ because the plate simulation steps do not provide the same results on all the pl
 
 import os
 import numpy
-from worldengine.plates import world_gen, _plates_simulation
+from worldengine.plates import world_gen
 
 
 def main(tests_data_dir):
@@ -19,6 +19,6 @@ def main(tests_data_dir):
 
 
 if __name__ == '__main__':
-    blessed_images_dir = os.path.dirname(os.path.realpath(__file__))
-    tests_data_dir = os.path.abspath(os.path.join(blessed_images_dir, '../data'))
-    main(tests_data_dir)
+    BLESSED_IMAGES_DIR = os.path.dirname(os.path.realpath(__file__))
+    TESTS_DATA_DIR = os.path.abspath(os.path.join(BLESSED_IMAGES_DIR, '../data'))
+    main(TESTS_DATA_DIR)

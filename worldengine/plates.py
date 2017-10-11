@@ -1,8 +1,8 @@
 # Every reference to platec has to be kept separated because it is a C
 # extension which is not available when using this project from jython
 
-import platec
 import time
+import platec
 import numpy
 
 from worldengine.generation import Step, add_noise_to_elevation, center_land, generate_world, \
