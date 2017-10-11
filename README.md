@@ -309,6 +309,8 @@ We would like to thank you great people who helped us while working on WorldEngi
 
 * [Stephan](https://github.com/tcld) made WorldEngine make heavy use of numpy, helping to speed up the generation. He also made world-generation much more reproducible and helped improve compatibility with Python 3.
 
+* [Alex](https://github.com/MM1nd) made things generally run faster and look cleaner by better employing numpy.
+
 History
 =======
 
