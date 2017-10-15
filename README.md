@@ -28,7 +28,7 @@ worldengine ancient_map -w seed1.world
 
 We started a [Google group](https://groups.google.com/forum/?hl=en#!forum/worldengine): Should you have ideas, problems, suggestions or want to contribute, please [join us](https://groups.google.com/forum/?hl=en#!forum/worldengine)!
 
-##Manual
+## Manual
 
 The Manual for Worldengine : [http://worldengine.readthedocs.io/en/latest/](http://worldengine.readthedocs.io/en/latest/)
 
