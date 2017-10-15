@@ -35,8 +35,16 @@ def center_land(world):
         print("geo.center_land: width complete")
 
     latshift = 0
-    world.layers['elevation'].data = numpy.roll(numpy.roll(world.layers['elevation'].data, -y_with_min_sum + latshift, axis=0), - x_with_min_sum, axis=1)
-    world.layers['plates'].data = numpy.roll(numpy.roll(world.layers['plates'].data, -y_with_min_sum + latshift, axis=0), - x_with_min_sum, axis=1)
+    world.layers['elevation'].data = numpy.roll(
+        numpy.roll(
+            world.layers['elevation'].data,
+            -y_with_min_sum + latshift, axis=0),
+        - x_with_min_sum, axis=1)
+    world.layers['plates'].data = numpy.roll(
+        numpy.roll(
+            world.layers['plates'].data,
+            -y_with_min_sum + latshift, axis=0),
+        - x_with_min_sum, axis=1)
     if get_verbose():
         print("geo.center_land: width complete")
 
@@ -176,21 +184,21 @@ def sea_depth(world, sea_level):
 
     next_land = next_land_dynamic(world.layers['ocean'].data)
 
-    sea_depth = sea_level - world.layers['elevation'].data
+    result = sea_level - world.layers['elevation'].data
 
     for y in range(world.height):
         for x in range(world.width):
             dist_to_next_land = next_land[y, x]
             if dist_to_next_land > 0:
-                sea_depth[y, x] *= factors[dist_to_next_land-1]
+                result[y, x] *= factors[dist_to_next_land-1]
 
-    sea_depth = anti_alias(sea_depth, 10)
+    result = anti_alias(result, 10)
 
-    min_depth = sea_depth.min()
-    max_depth = sea_depth.max()
-    sea_depth = (sea_depth - min_depth) / (max_depth - min_depth)
+    min_depth = result.min()
+    max_depth = result.max()
+    result = (result - min_depth) / (max_depth - min_depth)
 
-    return sea_depth
+    return result
 
 
 def _around(x, y, width, height):
@@ -213,10 +221,14 @@ def generate_world(w, step):
         return w
 
     # Prepare sufficient seeds for the different steps of the generation
-    rng = numpy.random.RandomState(w.seed)  # create a fresh RNG in case the global RNG is compromised (i.e. has been queried an indefinite amount of times before generate_world() was called)
-    sub_seeds = rng.randint(0, numpy.iinfo(numpy.int32).max, size=100)  # choose lowest common denominator (32 bit Windows numpy cannot handle a larger value)
+    # create a fresh RNG in case the global RNG is compromised
+    # (i.e. has been queried an indefinite amount of times before generate_world() was called)
+    rng = numpy.random.RandomState(w.seed)
+    # choose lowest common denominator (32 bit Windows numpy cannot handle a larger value)
+    sub_seeds = rng.randint(0, numpy.iinfo(numpy.int32).max, size=100)
+     # after 0.19.0 do not ever switch out the seeds here to maximize seed-compatibility
     seed_dict = {
-                 'PrecipitationSimulation': sub_seeds[ 0],  # after 0.19.0 do not ever switch out the seeds here to maximize seed-compatibility
+                 'PrecipitationSimulation': sub_seeds[ 0],
                  'ErosionSimulation':       sub_seeds[ 1],
                  'WatermapSimulation':      sub_seeds[ 2],
                  'IrrigationSimulation':    sub_seeds[ 3],

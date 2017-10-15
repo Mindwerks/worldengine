@@ -58,7 +58,7 @@ def draw_rivers_on_image(world, target, factor=1):
 
 def _find_mountains_mask(world, factor):
     _mask = numpy.zeros((world.height, world.width), float)
-    _mask[world.elevation>world.get_mountain_level()] = 1.0
+    _mask[world.elevation > world.get_mountain_level()] = 1.0
 
     # disregard elevated oceans
     _mask[world.ocean] = 0.0
@@ -86,7 +86,7 @@ def _build_biome_group_masks(world, factor):
 
         for biome in group.__subclasses__():
             group_mask[world.biome == _un_camelize(biome.__name__)] += 1.0
-            
+                    
         group_mask[group_mask > 0] = count_neighbours(group_mask)[group_mask > 0]
 
         group_mask[group_mask < 5.000000001] = 0.0
@@ -227,7 +227,7 @@ def _draw_warm_temperate_forest(pixels, x, y, w, h):
     c = (0, 96, 0, 255)
     c2 = (0, 192, 0, 255)
     _draw_forest_pattern2(pixels, x, y, c, c2)
-    
+
 
 def _draw_temperate_forest1(pixels, x, y, w, h):
     c = (0, 64, 0, 255)
@@ -257,12 +257,12 @@ def _draw_cool_desert(pixels, x, y, w, h):
     c = (72, 72, 53, 255)
     # c2 = (219, 220, 200, 255)  # TODO: not used?
     _draw_desert_pattern(pixels, x, y, c)
-    
-    
+
+
 def _draw_hot_desert(pixels, x, y, w, h):
     c = (72, 72, 53, 255)
     # c2 = (219, 220, 200, 255)  # TODO: not used?
-    _draw_desert_pattern(pixels, x, y, c)  
+    _draw_desert_pattern(pixels, x, y, c)
 
 
 def _draw_tundra(pixels, x, y, w, h):
@@ -370,7 +370,7 @@ def draw_ancientmap(world, target, resize_factor=1,
     land_color = (181, 166, 127, 255)  # TODO: Put this in the argument list too?
 
     scaled_ocean = world.ocean.repeat(resize_factor, 0).repeat(resize_factor, 1)
-    
+
     borders = numpy.zeros((resize_factor * world.height, resize_factor * world.width), bool)
     borders[count_neighbours(scaled_ocean) > 0] = True
     borders[scaled_ocean] = False
@@ -386,7 +386,8 @@ def draw_ancientmap(world, target, resize_factor=1,
         outer_borders = None
 
         for i in range(2):
-            _outer_borders = numpy.zeros((resize_factor * world.height, resize_factor * world.width), bool)
+            _outer_borders = numpy.zeros(
+                (resize_factor * world.height, resize_factor * world.width), bool)
             _outer_borders[count_neighbours(inner_borders) > 0] = True
             _outer_borders[inner_borders] = False
             _outer_borders[numpy.logical_not(scaled_ocean)] = False
@@ -463,11 +464,9 @@ def draw_ancientmap(world, target, resize_factor=1,
     for c in range(num_channels-1):
         channels[c] = anti_alias_channel(channels[c], 1)
 
-    
     # switch from channel major storage to pixel major storage
     for c in range(num_channels):
         target[:, :, c] = channels[c, :, :]
-
 
     if verbose:
         elapsed_time = time.time() - start_time
@@ -489,7 +488,7 @@ def draw_ancientmap(world, target, resize_factor=1,
             print(
                 "...drawing_functions.draw_oldmap_on_pixel: draw glacier " +
                 "Elapsed time " + str(elapsed_time) + " seconds.")
-       
+
         _draw_biome('tundra', _draw_tundra, 0, 0, 0)
         _draw_biome('cold parklands', _draw_cold_parklands, 0, 0, 0)
         _draw_biome('steppe', _draw_steppe, 0, 0, 0)

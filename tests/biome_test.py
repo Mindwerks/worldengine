@@ -122,6 +122,7 @@ class TestBiome(unittest.TestCase):
 
     def test_locate_biomes(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        #TODO: do something to the result
         cm, biome_cm = BiomeSimulation().execute(w, 28070)
 
     @staticmethod

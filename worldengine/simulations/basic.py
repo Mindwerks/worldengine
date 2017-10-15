@@ -46,7 +46,7 @@ def find_threshold(map_data, land_percentage, ocean=None):#never used anywhere?
 
 def find_threshold_f(map_data, land_perc, ocean=None, max=1000.0, mindist=0.005):
     height, width = map_data.shape
-    
+
     #maybe map was already masked when we got it; if not, this will make sure we operate on a mask
     mask = numpy.ma.array(map_data, mask=False, keep_mask=True)
 

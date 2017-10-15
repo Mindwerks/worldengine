@@ -9,7 +9,8 @@ from worldengine.image_io import PNGWriter
 # -------------
 
 ### For draw_satellite ###
-NOISE_RANGE = 15 # a random value between -NOISE_RANGE and NOISE_RANGE will be added to the rgb of each pixel
+# a random value between -NOISE_RANGE and NOISE_RANGE will be added to the rgb of each pixel
+NOISE_RANGE = 15
 
 # These are arbitrarily-chosen elevation cutoffs for 4 different height levels. 
 # Some color modifiers will be applied at each level
@@ -18,14 +19,16 @@ MOUNTAIN_ELEV      = 175
 HIGH_HILL_ELEV     = 160
 HILL_ELEV          = 145
 
-# These are rgb color values which will be added to the noise, if the elevation is greater than the height specified
+# These are rgb color values which will be added to the noise,
+# if the elevation is greater than the height specified
 # These are not cumulative
 HIGH_MOUNTAIN_NOISE_MODIFIER = (10, 6,   10)
 MOUNTAIN_NOISE_MODIFIER =      (-4, -12, -4)
 HIGH_HILL_NOISE_MODIFIER =     (-3, -10, -3)
 HILL_NOISE_MODIFIER =          (-2, -6,  -2)
 
-# This is the base "mountain color". Elevations above this size will have their colors interpolated with this 
+# This is the base "mountain color".
+# Elevations above this size will have their colors interpolated with this
 # color in order to give a more mountainous appearance
 MOUNTAIN_COLOR = (50, 57, 28)
 
@@ -33,7 +36,8 @@ MOUNTAIN_COLOR = (50, 57, 28)
 RIVER_COLOR_CHANGE = (-12, -12, 4)
 LAKE_COLOR_CHANGE = (-12, -12, 10)
 
-# The normalized (0-255) value of an elevation of a tile gets divided by this amount, and added to a tile's color
+# The normalized (0-255) value of an elevation of a tile gets divided by this amount,
+# and added to a tile's color
 BASE_ELEVATION_INTENSITY_MODIFIER = 10
 
 # How many tiles to average together when comparing this tile's elevation to the previous tiles.
@@ -150,6 +154,7 @@ def _elevation_color(elevation, sea_level=1.0):
     :param elevation:
     :return:
     """
+    #TODO: Write me in a way that is more speaking and uses less magic numbers.
     color_step = 1.5
     if sea_level is None:
         sea_level = -1

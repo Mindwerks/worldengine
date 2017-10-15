@@ -67,7 +67,7 @@ class Counter(object):
 # current = map
 #
 # map_part = (2/11)*map
-#    
+# 
 # linear_filter = [[1/11, 1/11, 1/11],
 #                  [1/11, 1/11, 1/11],
 #                  [1/11, 1/11, 1/11]]
@@ -105,12 +105,12 @@ def anti_alias(map_in, steps):
 
         # we need to handle boundary conditions by hand, unfortunately
         # there might be a better way but this works (circular boundary)
-        # notice how we'll need to add 2 to width and height later 
+        # notice how we'll need to add 2 to width and height later
         # because of this
         result = numpy.append(result, [result[0, :]], 0)
         result = numpy.append(result, numpy.transpose([result[:, 0]]), 1)
 
-        result = numpy.insert(result, [0], [result[-2, :]],0)
+        result = numpy.insert(result, [0], [result[-2, :]], 0)
         result = numpy.insert(result, [0], numpy.transpose([result[:, -2]]), 1)
 
         # with a seperable kernel we can convolve the rows first ...
@@ -147,7 +147,7 @@ def count_neighbours(mask, radius=1):
     result = mask * f
 
     for y in range(height):
-        result[y, :] = numpy.convolve(result[y,:], kernel, 'same')
+        result[y, :] = numpy.convolve(result[y, :], kernel, 'same')
 
     for x in range(width):
         result[:, x] = numpy.convolve(result[:, x], kernel, 'same')
@@ -156,8 +156,10 @@ def count_neighbours(mask, radius=1):
 
 
 def _equal(a, b):
-    #recursion on subclasses of types: tuple, list, dict
-    #specifically checks             : float, ndarray
+    # This is probably not a very good idea.
+    # TODO: Remove and replace calls with specific comparisons.
+    # recursion on subclasses of types: tuple, list, dict
+    # specifically checks             : float, ndarray
     if type(a) is float and type(b) is float:#float
         return(numpy.allclose(a, b))
     elif type(a) is numpy.ndarray and type(b) is numpy.ndarray:#ndarray

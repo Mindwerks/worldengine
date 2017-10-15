@@ -16,7 +16,8 @@ class BiomeSimulation(object):
         ocean = world.layers['ocean'].data
         cm = {}
         biome_cm = {}
-        biome = numpy.zeros((height, width), dtype=object)#this is still kind of expensive memory-wise
+        # this is still kind of expensive memory-wise
+        biome = numpy.zeros((height, width), dtype=object)
         for y in range(height):
             for x in range(width):
                 if ocean[y, x]:

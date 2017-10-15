@@ -11,11 +11,8 @@ from worldengine.common import anti_alias
 
 class TestGeneration(TestBase):
 
-    def setUp(self):
-        super(TestGeneration, self).setUp()
-
     def test_world_gen_does_not_explode_badly(self):
-        # FIXME remove me when proper tests are in place
+        # FIXME: remove me when proper tests are in place
         # Very stupid test that just verify nothing explode badly
         world_gen("Dummy", 32, 16, 1, step=Step.get_by_name("full"))
 
@@ -44,13 +41,14 @@ class TestGeneration(TestBase):
     def test_sea_depth(self):
         ocean_level = 1.0
         extent = 11
-        w = World("sea_depth", Size(extent, extent), 0, GenerationParameters(0, ocean_level, 0), None)
+        w = World(
+            "sea_depth", Size(extent, extent), 0, GenerationParameters(0, ocean_level, 0), None)
 
         ocean = numpy.full([extent, extent], True)
-        ocean[5,5] = False
+        ocean[5, 5] = False
 
         elevation = numpy.zeros([extent, extent], float)
-        elevation[5,5] = 2.0
+        elevation[5, 5] = 2.0
 
         t = numpy.zeros([extent, extent])
 

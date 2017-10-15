@@ -2,9 +2,10 @@ import numpy
 
 
 class IcecapSimulation(object):
-    # This class creates an "ice-map", i.e. a numpy array with positive values that describe the thickness of the ice at
-    # a certain spot of the world.
-    # Ice can appear wherever there is an ocean and the temperature is cold enough.
+    """This class creates an "ice-map", i.e. a numpy array with positive values
+    that describe the thickness of the ice at a certain spot of the world.
+    Ice can appear wherever there is an ocean and the temperature is cold enough.
+    """
 
     # TODO: Find out if a desert planet could still freeze or if the freeze-threshold is dynamic.
     # TODO: Freeze rivers etc.
@@ -28,21 +29,32 @@ class IcecapSimulation(object):
         ocean = world.layers['ocean'].data
         temperature = world.layers['temperature'].data
 
-        # primary constants (could be used as global variables at some point); all values should be in [0, 1]
-        max_freeze_percentage = 0.60  # only the coldest x% of the cold area will freeze (0 = no ice, 1 = all ice)
-        freeze_chance_window = 0.20  # the warmest x% of freezable area won't completely freeze (RNG decides)
-        surrounding_tile_influence = 0.5  # chance-modifier to freeze a slightly warm tile when neighbors are frozen
+        # primary constants (could be used as global variables at some point);
+        # all values should be in [0, 1]
+
+        # only the coldest x% of the cold area will freeze (0 = no ice, 1 = all ice)
+        max_freeze_percentage = 0.60
+
+        # the warmest x% of freezable area won't completely freeze (RNG decides)
+        freeze_chance_window = 0.20
+
+        # chance-modifier to freeze a slightly warm tile when neighbors are frozen
+        surrounding_tile_influence = 0.5
 
         # secondary constants
         temp_min = temperature.min()  # coldest spot in the world
-        freeze_threshold = world.layers['temperature'].thresholds[0][1]  # upper temperature-limit for freezing effects
+
+        # upper temperature-limit for freezing effects
+        freeze_threshold = world.layers['temperature'].thresholds[0][1]
         # Cold biomes: TODO: find and pick most appropriate threshold
         #    polar: self.temperature['thresholds'][0][1]
         #   alpine: self.temperature['thresholds'][1][1]
         #   boreal: self.temperature['thresholds'][2][1]
 
         # derived constants
-        freeze_threshold = (freeze_threshold - temp_min) * max_freeze_percentage  # calculate freeze threshold above min
+
+        # calculate freeze threshold above min
+        freeze_threshold = (freeze_threshold - temp_min) * max_freeze_percentage
         freeze_chance_threshold = freeze_threshold * (1.0 - freeze_chance_window)
 
         # local variables

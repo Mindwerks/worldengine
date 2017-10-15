@@ -290,11 +290,12 @@ class World(object):
 
     @classmethod
     def _from_protobuf_world(cls, p_world):
-        w = World(p_world.name, Size(p_world.width, p_world.height),
-                  p_world.generationData.seed,
-                  GenerationParameters(p_world.generationData.n_plates,
-                        p_world.generationData.ocean_level,
-                        Step.get_by_name(p_world.generationData.step)))
+        w = World(
+            p_world.name, Size(p_world.width, p_world.height),
+            p_world.generationData.seed, GenerationParameters(
+                p_world.generationData.n_plates,
+                p_world.generationData.ocean_level,
+                Step.get_by_name(p_world.generationData.step)))
 
         # Elevation
         e = numpy.array(World._from_protobuf_matrix(p_world.heightMapData))
@@ -313,7 +314,9 @@ class World(object):
 
         # Biome
         if p_world.biome.rows:
-            w.biome = numpy.array(World._from_protobuf_matrix(p_world.biome, biome_index_to_name), dtype=object)
+            w.biome = numpy.array(
+                World._from_protobuf_matrix(p_world.biome, biome_index_to_name), 
+                dtype=object)
 
         # Humidity
         if p_world.humidity.rows:
@@ -386,10 +389,12 @@ class World(object):
 
     def random_land(self, num_samples=1):
         if self.layers['ocean'].data.all():
-            return None, None  # return invalid indices if there is no land at all
+            # return invalid indices if there is no land at all
+            return None, None
 
         land = numpy.invert(self.layers['ocean'].data)
-        land_indices = numpy.transpose(numpy.nonzero(land))  # returns a list of tuples/indices with land positions
+        # returns a list of tuples/indices with land positions
+        land_indices = numpy.transpose(numpy.nonzero(land))  
 
         result = numpy.zeros(num_samples*2, dtype=int)
 
@@ -400,7 +405,8 @@ class World(object):
         return result
 
     def is_land(self, pos):
-        return not self.layers['ocean'].data[pos[1], pos[0]]#faster than reversing pos or transposing ocean
+        # faster than reversing pos or transposing ocean
+        return not self.layers['ocean'].data[pos[1], pos[0]]
 
     def is_ocean(self, pos):
         return self.layers['ocean'].data[pos[1], pos[0]]

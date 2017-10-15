@@ -6,15 +6,15 @@ from worldengine.simulations.hydrology import WatermapSimulation
 from worldengine.model.world import World, Size, GenerationParameters
 
 class TestSimulation(unittest.TestCase):
-    # This does only test that watermap leaves the rng in the state that the 
-    # original implementation would have left it in and that a very small sample 
+    # This does only test that watermap leaves the rng in the state that the
+    # original implementation would have left it in and that a very small sample
     # of results is the same as the original results.
-    # It does not test if the implementation is actually correct. 
+    # It does not test if the implementation is actually correct.
     # In fact it is hard to tell how "correctness" of a Monte Carlo process should
     # be judged.
-    # Should it ever be decided that a "correct" implementation needs fewer or 
+    # Should it ever be decided that a "correct" implementation needs fewer or
     # more calls to the rng, relative to the n parameter,
-    # of course compatibility will be broken. 
+    # of course compatibility will be broken.
     # Implicitly this is tested by the blessed images but it might be useful to
     # have a finer grained picture.
 
@@ -57,10 +57,10 @@ class TestSimulation(unittest.TestCase):
 
         ocean = numpy.full((size.height, size.width), True, bool)
 
-        w = World("watermap",  size, seed, GenerationParameters(0, 1.0, 0))
+        w = World("watermap", size, seed, GenerationParameters(0, 1.0, 0))
         w.ocean = ocean
 
-        data, t = WatermapSimulation._watermap(w, 200)
+        WatermapSimulation._watermap(w, 200)
 
 
     def test_random_land_returns_only_land(self):
