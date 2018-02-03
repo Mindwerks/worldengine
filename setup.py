@@ -11,6 +11,8 @@ from setuptools import setup, Extension, Command
 # reqs = [str(ir.req) for ir in install_reqs]
 
 exec(open('worldengine/version.py').read())
+with open("requirements.txt","r") as f:
+    install_reqs=[s for line in f.readlines()]
 
 config = {
     'name': 'worldengine',
@@ -25,8 +27,9 @@ config = {
     'entry_points': {
         'console_scripts': ['worldengine=worldengine.cli.main:main'],
     },
-    'install_requires': ['PyPlatec==1.4.0', 'pypng>=0.0.18', 'numpy',
-                         'argparse', 'noise', 'protobuf==3.0.0a3'],
+    'install_requires': install_reqs,
+    #['PyPlatec==1.4.0', 'pypng>=0.0.18', 'numpy',
+    #'argparse', 'noise', 'protobuf==3.0.0a3'],
     'license': 'MIT License'
 }
 
