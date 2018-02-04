@@ -8,7 +8,7 @@ from worldengine.common import _equal
 from worldengine.version import __version__
 
 
-class Size(object):
+class Size:
 
     def __init__(self, width, height):
         self.width = width
@@ -21,7 +21,7 @@ class Size(object):
             return False
 
 
-class GenerationParameters(object):
+class GenerationParameters:
 
     def __init__(self, n_plates, ocean_level, step):
         self.n_plates = n_plates
@@ -35,7 +35,7 @@ class GenerationParameters(object):
             return False
 
 
-class Layer(object):
+class Layer:
 
     def __init__(self, data):
         self.data = data
