@@ -327,6 +327,10 @@ def arg_parsing():
     args = parser.parse_args()
     arg_dict=vars(args)
     
+    #defaulthing them
+    arg_dict["save"]=True
+    arg_dict["draw"]=True
+    
     if args.version:
         usage()
         

@@ -13,40 +13,27 @@ def main(args,arg_dict):
     generation_operation=arg_dict["generation_operation"]
     operation=arg_dict["operation"]
     
-    
-    #if "seed" in arg_dict:
-    
-    
-    world_format=arg_dict["world_format"]
-    
-    
-    if "output_dir" not in arg_dict:
-        raise ValueError
+    if "save" in arg_dict:
+        if arg_dict["save"]:
+            if "output_dir" not in arg_dict:
+                raise ValueError
         
     #ha the actual operation. Neat.
     if operation == 'world':
         print('')  # empty line
         print('starting (it could take a few minutes) ...')
-        
+        world_kwargs=filter_world_args(arg_dict)
         #this needs some clean up, but later we can use kwargs
-        world = plates.world_gen(arg_dict["seed"],
-                    arg_dict["world_name"],
-                    arg_dict["width"],
-                    arg_dict["height"],
-                    arg_dict["temps"],
-                    arg_dict["humids"],
-                    arg_dict["number_of_plates"], 
-                    arg_dict["ocean_level"],
-                    arg_dict["step"])
+        world = plates.world_gen(**world_kwargs)
                     
-    if operation == 'plates':
+    elif operation == 'plates':
         print('')  # empty line
         print('starting (it could take a few minutes) ...')
 
         generate_plates(seed, world_name, args.output_dir, args.width,
                         args.height, num_plates=args.number_of_plates)
 
-    if operation == 'ancient_map':
+    elif operation == 'ancient_map':
         print('')  # empty line
         print('starting (it could take a few minutes) ...')
         # First, some error checking
@@ -82,15 +69,19 @@ def main(args,arg_dict):
         export(world, args.export_format, args.export_datatype, args.export_dimensions,
                args.export_normalize, args.export_subset,
                path='%s/%s_elevation' % (args.output_dir, world.name))
-        
-        
-        
-    save_data=True
+    
+    
+    else:
+        raise Exception(
+            'Unknown operation: valid operations are %s' % OPERATIONS)
+
+    
+    save_data=arg_dict["save"]
     if save_data and operation in ["world"]:
         w=world
         save.save_world([[world,'protobuf']],arg_dict["output_dir"])
 
-    draw=True
+    draw=arg_dict["draw"]
     if draw and operation in ["world","plates"]:
         
         output_dir=arg_dict["output_dir"]
@@ -102,8 +93,6 @@ def main(args,arg_dict):
             draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
             draw_temperature_levels_on_file, draw_riversmap_on_file, draw_scatter_plot_on_file, \
             draw_satellite_on_file, draw_icecaps_on_file
-        
-        
         
         if operation=="plates":
             # Generate images
@@ -190,9 +179,17 @@ def main(args,arg_dict):
                 #                 '%s/%s_icecaps.png' % (args.output_dir, world_name))
 
     
-    else:
-        raise Exception(
-            'Unknown operation: valid operations are %s' % OPERATIONS)
+def filter_world_args(all_dict):
+    l=["seed", "width","height","temps","humids","number_of_plates",
+    "ocean_level","step"]
+    
+    world_kwargs={}
+    
+    for key in l:
+        if key in all_dict:
+            world_kwargs[key]=all_dict[key]
+            
+    return world_kwargs
 
 def generate_plates(seed, world_name, output_dir, width, height,
                     num_plates=10):
