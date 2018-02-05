@@ -3,7 +3,7 @@ import sys
 from tests.draw_test import TestBase
 import unittest
 from worldengine import main
-from worldengine.cli.main import main
+from worldengine.cli import main
 
 
 class TestCLI(TestBase):
