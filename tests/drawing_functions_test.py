@@ -1,7 +1,7 @@
 import unittest
 
 from worldengine.drawing_functions import draw_ancientmap, gradient, draw_rivers_on_image
-from worldengine.model.world import World
+from worldengine.world import World
 from worldengine.image_io import PNGWriter
 from tests.draw_test import TestBase
 

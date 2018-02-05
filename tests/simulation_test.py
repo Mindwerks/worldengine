@@ -3,7 +3,7 @@ import unittest
 import numpy
 
 from worldengine.simulations.hydrology import WatermapSimulation
-from worldengine.model.world import World, Size, GenerationParameters
+from worldengine.world import World, Size, GenerationParameters
 
 class TestSimulation(unittest.TestCase):
 
