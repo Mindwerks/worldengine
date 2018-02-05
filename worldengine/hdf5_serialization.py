@@ -6,7 +6,7 @@ import h5py
 #fairly certain I should not do this.
 from worldengine.version import __version__
 from worldengine.biome import biome_name_to_index, biome_index_to_name
-from worldengine.model.world import World, Step, Size, GenerationParameters
+from worldengine.world import World, Step, Size, GenerationParameters
 
 def save_world_to_hdf5(world, filename):
     

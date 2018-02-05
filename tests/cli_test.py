@@ -2,7 +2,7 @@ import os
 import sys
 from tests.draw_test import TestBase
 import unittest
-from worldengine import __main__
+from worldengine import main
 from worldengine.cli.main import main
 
 
@@ -13,7 +13,7 @@ class TestCLI(TestBase):
         self.world = "%s/seed_28070.world" % self.tests_data_dir
 
     def test__main__(self):
-        assert __main__
+        assert main
 
     def test_options(self):
         backup_argv = sys.argv
