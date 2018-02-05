@@ -5,9 +5,9 @@ import platec
 import time
 import numpy
 
-from generation import Step, add_noise_to_elevation, center_land, generate_world, \
+from worldengine.generation import Step, add_noise_to_elevation, center_land, generate_world, \
     get_verbose, initialize_ocean_and_thresholds, place_oceans_at_map_borders
-from world import World, Size, GenerationParameters
+from worldengine.world import World, Size, GenerationParameters
 
 
 def generate_plates_simulation(seed, width, height, sea_level=0.65,

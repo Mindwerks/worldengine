@@ -1,4 +1,4 @@
-from simulations.basic import find_threshold_f
+from worldengine.simulations.basic import find_threshold_f
 from noise import snoise2  # http://nullege.com/codes/search/noise.snoise2
 import numpy
 

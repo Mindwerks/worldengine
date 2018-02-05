@@ -1,11 +1,11 @@
 import numpy
 
-from biome import biome_name_to_index, biome_index_to_name, Biome
-from biome import Iceland
-import protobuf.World_pb2 as Protobuf
-from step import Step
-from common import _equal
-from version import __version__
+from worldengine.biome import biome_name_to_index, biome_index_to_name, Biome
+from worldengine.biome import Iceland
+import worldengine.protobuf.World_pb2 as Protobuf
+from worldengine.step import Step
+from worldengine.common import _equal
+from worldengine.version import __version__
 
 
 class Size:

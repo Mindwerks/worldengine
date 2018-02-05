@@ -364,7 +364,6 @@ class proto_world:
         
         if args.OPERATOR == 'info' or args.OPERATOR == 'export':
             if args.FILE is None:
-                parser.print_help()
                 usage("For operation info only the filename should be specified")
             if not os.path.exists(args.FILE):
                 usage("The specified world file does not exist")
@@ -471,7 +470,7 @@ class proto_world:
         if args.OPERATOR is None:
             pass
         elif args.OPERATOR is not None and args.OPERATOR.lower() not in OPERATIONS:
-            parser.print_help()
+            
             usage("Only 1 operation allowed [" + OPERATIONS + "]")
         else:
             operation = args.OPERATOR.lower()

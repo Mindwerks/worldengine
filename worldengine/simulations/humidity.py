@@ -1,4 +1,4 @@
-from simulations.basic import find_threshold_f
+from worldengine.simulations.basic import find_threshold_f
 import numpy
 
 
