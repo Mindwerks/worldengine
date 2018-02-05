@@ -12,7 +12,7 @@ from setuptools import setup, Extension, Command
 
 exec(open('worldengine/version.py').read())
 with open("requirements.txt","r") as f:
-    install_reqs=[s for line in f.readlines()]
+    install_reqs=[line.strip() for line in f.readlines()]
 
 config = {
     'name': 'worldengine',
