@@ -63,6 +63,37 @@ def place_oceans_at_map_borders(world):
             place_ocean(world.width - i - 1, y, i)
 
 
+
+def handle_plates(world,step,verbose,fade_borders=True):
+    center_land(world)
+    
+    if verbose:
+        elapsed_time = time.time() - start_time
+        print("...plates.world_gen: set_elevation, set_plates, center_land " +
+              "complete. Elapsed time " + str(elapsed_time) + " seconds.")
+
+        start_time = time.time()
+        
+    add_noise_to_elevation(world, numpy.random.randint(0, 4096))  # uses the global RNG; this is the very first call to said RNG - should that change, this needs to be taken care of
+    
+    if verbose:
+        elapsed_time = time.time() - start_time
+        print("...plates.world_gen: elevation noise added. Elapsed time " +
+              str(elapsed_time) + " seconds.")
+              
+        start_time = time.time()
+        
+    if fade_borders:
+        place_oceans_at_map_borders(world)
+    initialize_ocean_and_thresholds(world)
+    if verbose:
+        elapsed_time = time.time() - start_time
+        print("...plates.world_gen: oceans initialized. Elapsed time " +
+              str(elapsed_time) + " seconds.")
+
+    return generate_world(world, step)
+
+
 def add_noise_to_elevation(world, seed):
     octaves = 8
     freq = 16.0 * octaves

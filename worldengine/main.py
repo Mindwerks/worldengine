@@ -2,30 +2,35 @@
 import worldengine
 #import worldengine
 import numpy
+
 from worldengine import plates
 from worldengine import save
 from worldengine import step
+
+from worldengine.generation import center_land,handle_plates
 
 def main(args,arg_dict):
 
     #these are all default arguments.
     #they are just explicit right now.
-    generation_operation=arg_dict["generation_operation"]
     operation=arg_dict["operation"]
     
     if "save" in arg_dict:
         if arg_dict["save"]:
             if "output_dir" not in arg_dict:
                 raise ValueError
-        
-    #ha the actual operation. Neat.
+                
     if operation == 'world':
         print('')  # empty line
         print('starting (it could take a few minutes) ...')
         world_kwargs=filter_world_args(arg_dict)
+        if "verbose" not in world_kwargs:
+            world_kwargs["verbose"]=False
+            
         #this needs some clean up, but later we can use kwargs
-        world = plates.world_gen(**world_kwargs)
-                    
+        r_plates = plates.world_gen(**world_kwargs)
+        world=handle_plates(r_plates,arg_dict["step"],world_kwargs["verbose"])       
+        
     elif operation == 'plates':
         print('')  # empty line
         print('starting (it could take a few minutes) ...')
@@ -75,7 +80,6 @@ def main(args,arg_dict):
         raise Exception(
             'Unknown operation: valid operations are %s' % OPERATIONS)
 
-    
     save_data=arg_dict["save"]
     if save_data and operation in ["world"]:
         w=world
@@ -180,7 +184,7 @@ def main(args,arg_dict):
 
     
 def filter_world_args(all_dict):
-    l=["name","seed", "width","height","temps","humids","ocean_level","step"]
+    l=["name","seed", "width","height","temps","humids","ocean_level","step","verbose"]
     
     world_kwargs={}
     
@@ -203,9 +207,7 @@ def generate_plates(seed, world_name, output_dir, width, height,
     :param num_plates:
     :return:
     """
-    
     #are you sure, this is what should be happening?
-    
     elevation, plates = worldengine.plates.generate_plates_simulation(seed, width, height,
                                                    num_plates=num_plates)
 
@@ -213,8 +215,6 @@ def generate_plates(seed, world_name, output_dir, width, height,
                   GenerationParameters(num_plates, -1.0, "plates"))
     world.elevation = (numpy.array(elevation).reshape(height, width), None)
     world.plates = numpy.array(plates, dtype=numpy.uint16).reshape(height, width)
-
-    
     worldengine.generation.center_land(world)
     
 def operation_ancient_map(world, map_filename, resize_factor, sea_color,
@@ -224,9 +224,6 @@ def operation_ancient_map(world, map_filename, resize_factor, sea_color,
                             draw_biome, draw_rivers, draw_mountains,
                             draw_outer_land_border, get_verbose())
     print("+ ancient map generated in '%s'" % map_filename)
-
-
-
 
 def load_world(world_filename):
     pb = __seems_protobuf_worldfile__(world_filename)
