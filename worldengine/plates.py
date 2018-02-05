@@ -5,9 +5,9 @@ import platec
 import time
 import numpy
 
-from worldengine.generation import Step, add_noise_to_elevation, center_land, generate_world, \
+from generation import Step, add_noise_to_elevation, center_land, generate_world, \
     get_verbose, initialize_ocean_and_thresholds, place_oceans_at_map_borders
-from worldengine.model.world import World, Size, GenerationParameters
+from world import World, Size, GenerationParameters
 
 
 def generate_plates_simulation(seed, width, height, sea_level=0.65,
@@ -52,31 +52,49 @@ def _plates_simulation(name, width, height, seed, temps=
     return world
 
 
-def world_gen(name, width, height, seed, temps=[.874, .765, .594, .439, .366, .124],
-              humids=[.941, .778, .507, .236, 0.073, .014, .002], num_plates=10,
-              ocean_level=1.0, step=Step.full(), gamma_curve=1.25, curve_offset=.2,
-              fade_borders=True, verbose=get_verbose()):
+def world_gen(seed,#get the generated seed from somewhere.
+                name=None, 
+                width=512, 
+                height=512, 
+                temps=[.874, .765, .594, .439, .366, .124],
+              humids=[.941, .778, .507, .236, 0.073, .014, .002], 
+              num_plates=10,
+              ocean_level=1.0, 
+              step=Step.full(), 
+              gamma_curve=1.25, 
+              curve_offset=.2,
+              fade_borders=True, 
+              verbose=get_verbose()):
+    
+    #world_format='protobuf',
+                   
+    #            gamma_curve=1.25, curve_offset=.2, fade_borders=True,
+    #               verbose=True, black_and_white=False
+    
     if verbose:
         start_time = time.time()
+        
     world = _plates_simulation(name, width, height, seed, temps, humids, gamma_curve,
                                curve_offset, num_plates, ocean_level, step, verbose)
 
     center_land(world)
+    
     if verbose:
         elapsed_time = time.time() - start_time
         print("...plates.world_gen: set_elevation, set_plates, center_land " +
               "complete. Elapsed time " + str(elapsed_time) + " seconds.")
 
-    if verbose:
         start_time = time.time()
+        
     add_noise_to_elevation(world, numpy.random.randint(0, 4096))  # uses the global RNG; this is the very first call to said RNG - should that change, this needs to be taken care of
+    
     if verbose:
         elapsed_time = time.time() - start_time
         print("...plates.world_gen: elevation noise added. Elapsed time " +
               str(elapsed_time) + " seconds.")
-
-    if verbose:
+              
         start_time = time.time()
+        
     if fade_borders:
         place_oceans_at_map_borders(world)
     initialize_ocean_and_thresholds(world)

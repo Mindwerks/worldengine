@@ -25,7 +25,7 @@ config = {
     'packages': ['worldengine', 'worldengine.cli', 'worldengine.simulations',
                  'worldengine.protobuf', 'worldengine.imex'],
     'entry_points': {
-        'console_scripts': ['worldengine=worldengine.cli.main:main'],
+        'console_scripts': ['worldengine=worldengine.main:with_cli'],
     },
     'install_requires': install_reqs,
     #['PyPlatec==1.4.0', 'pypng>=0.0.18', 'numpy',

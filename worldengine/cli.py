@@ -1,31 +1,21 @@
 #external
 import sys
+
 import argparse
+
 import numpy
 import os
 
 #from this package
 import worldengine
 
-try:
-    from worldengine.hdf5_serialization import save_world_to_hdf5
-
-    HDF5_AVAILABLE = True
-except:
-    HDF5_AVAILABLE = False
+#all of this needs to go.
 
 from worldengine.common import set_verbose, print_verbose, get_verbose
-
-#reeeeally don't think this should be happening here...
-
-from worldengine.draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
-    draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
-    draw_temperature_levels_on_file, draw_riversmap_on_file, draw_scatter_plot_on_file, \
-    draw_satellite_on_file, draw_icecaps_on_file
     
 from worldengine.imex import export
 
-from worldengine.model.world import World, Size, GenerationParameters
+from worldengine.world import World, Size, GenerationParameters
 
 from worldengine.step import Step
 from worldengine.version import __version__
@@ -38,78 +28,7 @@ SEA_COLORS = 'blue|brown'
 STEPS = 'plates|precipitations|full'
 
 
-def generate_world(world_name, width, height, seed, num_plates, step, ocean_level, temps, humids, world_format='protobuf',
-                   gamma_curve=1.25, curve_offset=.2, fade_borders=True,
-                   verbose=True, black_and_white=False):
-    
-    w = worldengine.plates.world_gen(world_name, width, height, seed, temps, humids, num_plates, ocean_level,
-                  step, gamma_curve=gamma_curve, curve_offset=curve_offset,
-                  fade_borders=fade_borders, verbose=verbose)
 
-    print('')
-    print('Producing ouput:')
-    #why is this necessary?
-    sys.stdout.flush()
-    
-    return w
-
-
-def generate_grayscale_heightmap(world, filename):
-    draw_grayscale_heightmap_on_file(world, filename)
-    print("+ grayscale heightmap generated in '%s'" % filename)
-
-
-def generate_rivers_map(world, filename):
-    draw_riversmap_on_file(world, filename)
-    print("+ rivers map generated in '%s'" % filename)
-
-
-def draw_scatter_plot(world, filename):
-    draw_scatter_plot_on_file(world, filename)
-    print("+ scatter plot generated in '%s'" % filename)
-
-
-def draw_satellite_map(world, filename):
-    draw_satellite_on_file(world, filename)
-    print("+ satellite map generated in '%s'" % filename)
-
-
-def draw_icecaps_map(world, filename):
-    draw_icecaps_on_file(world, filename)
-    print("+ icecap map generated in '%s'" % filename)
-
-
-def generate_plates(seed, world_name, output_dir, width, height,
-                    num_plates=10):
-    """
-    Eventually this method should be invoked when generation is called at
-    asked to stop at step "plates", it should not be a different operation
-    :param seed:
-    :param world_name:
-    :param output_dir:
-    :param width:
-    :param height:
-    :param num_plates:
-    :return:
-    """
-    elevation, plates = worldengine.plates.generate_plates_simulation(seed, width, height,
-                                                   num_plates=num_plates)
-
-    world = worldengine.model.world.World(world_name, Size(width, height), seed,
-                  GenerationParameters(num_plates, -1.0, "plates"))
-    world.elevation = (numpy.array(elevation).reshape(height, width), None)
-    world.plates = numpy.array(plates, dtype=numpy.uint16).reshape(height, width)
-
-    # Generate images
-    filename = '%s/plates_%s.png' % (output_dir, world_name)
-    draw_simple_elevation_on_file(world, filename, None)
-    print("+ plates image generated in '%s'" % filename)
-    
-    worldengine.generation.center_land(world)
-    
-    filename = '%s/centered_plates_%s.png' % (output_dir, world_name)
-    draw_simple_elevation_on_file(world, filename, None)
-    print("+ centered plates image generated in '%s'" % filename)
 
 
 def check_step(step_name):
@@ -119,16 +38,6 @@ def check_step(step_name):
         return Step.get_by_name("full")
     else:
         return step
-
-
-def operation_ancient_map(world, map_filename, resize_factor, sea_color,
-                          draw_biome, draw_rivers, draw_mountains,
-                          draw_outer_land_border):
-    draw_ancientmap_on_file(world, map_filename, resize_factor, sea_color,
-                            draw_biome, draw_rivers, draw_mountains,
-                            draw_outer_land_border, get_verbose())
-    print("+ ancient map generated in '%s'" % map_filename)
-
 
 def __get_last_byte__(filename):
     #why does this exist?
@@ -179,18 +88,8 @@ def __get_tag__(filename):
 
 def __seems_protobuf_worldfile__(world_filename):
     tag = __get_tag__(world_filename)
-    return tag == worldengine.model.world.World.worldengine_tag()
+    return tag == worldengine.world.World.worldengine_tag()
 
-
-def load_world(world_filename):
-    pb = __seems_protobuf_worldfile__(world_filename)
-    if pb:
-        try:
-            return worldengine.model.world.World.open_protobuf(world_filename)
-        except Exception:
-            raise Exception("Unable to load the worldfile as protobuf file")
-    else:
-        raise Exception("The given worldfile does not seem to be a protobuf file")
 
 
 def print_world_info(world):
@@ -441,8 +340,9 @@ def arg_parsing():
     return args,arg_dict
 
 def main():
+    #this is just a fancy parser.
     p=proto_world()
-    p.main()
+    return p.main()
 
 class proto_world:
     def arg_errors(self,args):
@@ -537,18 +437,18 @@ class proto_world:
 
     def set_seed(self,args):
         # there is a hard limit somewhere so seeds outside the uint16 range are considered unsafe
-        maxseed = numpy.iinfo(
-            numpy.uint16).max
+        maxseed = numpy.iinfo(numpy.uint16).max
         #seed 
         if args.seed is not None:
             seed = int(args.seed)
             assert 0 <= seed <= maxseed, \
                 "Seed has to be in the range between 0 and %s, borders included." % maxseed
         else:
-            seed = numpy.random.randint(0,
-                                        maxseed)  # first-time RNG initialization is done automatically
+              # first-time RNG initialization is done automatically
         
-        numpy.random.seed(seed)
+            seed = numpy.random.randint(0,maxseed)
+            numpy.random.seed(seed)
+            
         self.arg_dict["seed"]=seed
 
     def set_temps(self,args):
@@ -586,7 +486,7 @@ class proto_world:
         if args.world_name:
             world_name = args.world_name
         else:
-            world_name = "seed_%i" % seed
+            world_name = "seed_%i" % self.arg_dict["seed"]
         self.arg_dict["world_name"]=world_name
 
     def set_world_format(self,args):
@@ -637,138 +537,8 @@ class proto_world:
         #this relates to output. I assume it's printing during generation?
         set_verbose(args.verbose)
 
-        #these are all default arguments.
-        #they are just explicit right now.
-        generation_operation=self.arg_dict["generation_operation"]
-        operation=self.arg_dict["operation"]
-        seed=self.arg_dict["seed"]
-        world_name=self.arg_dict["world_name"]
-        world_format=self.arg_dict["world_format"]
-        step=self.arg_dict["step"]
-        temps=self.arg_dict["temps"]
-        humids=self.arg_dict["humids"]
-        
-        #ha the actual operation. Neat.
-        if operation == 'world':
-            print('')  # empty line
-            print('starting (it could take a few minutes) ...')
-            
-            #ideally I'd just hand it the proto_world_object.
-            
-            #world_name=self.arg_dict["world_name"]
-            
-            
-            world = generate_world(world_name, args.width, args.height,
-                                   seed, args.number_of_plates, args.output_dir,
-                                   step, args.ocean_level, temps, humids, world_format,
-                                   gamma_curve=args.gv, curve_offset=args.go,
-                                   fade_borders=args.fade_borders,
-                                   verbose=args.verbose, black_and_white=args.black_and_white)
-            
-            w=world
-            save_data=True
-            if save_data:
-                # Save data
-                filename = "%s/%s.world" % (output_dir, world_name)
-                if world_format == 'protobuf':
-                    with open(filename, "wb") as f:
-                        f.write(w.protobuf_serialize())
-                elif world_format == 'hdf5':
-                    save_world_to_hdf5(w, filename)
-                else:
-                    print("Unknown format '%s', not saving " % world_format)
-                print("* world data saved in '%s'" % filename)
-                sys.stdout.flush()
-
-                # Generate images
-                filename = '%s/%s_ocean.png' % (output_dir, world_name)
-                draw_ocean_on_file(w.layers['ocean'].data, filename)
-                print("* ocean image generated in '%s'" % filename)
-
-                if step.include_precipitations:
-                    filename = '%s/%s_precipitation.png' % (output_dir, world_name)
-                    draw_precipitation_on_file(w, filename, black_and_white)
-                    print("* precipitation image generated in '%s'" % filename)
-                    filename = '%s/%s_temperature.png' % (output_dir, world_name)
-                    draw_temperature_levels_on_file(w, filename, black_and_white)
-                    print("* temperature image generated in '%s'" % filename)
-
-                if step.include_biome:
-                    filename = '%s/%s_biome.png' % (output_dir, world_name)
-                    draw_biome_on_file(w, filename)
-                    print("* biome image generated in '%s'" % filename)
-
-                filename = '%s/%s_elevation.png' % (output_dir, world_name)
-                sea_level = w.sea_level()
-                draw_simple_elevation_on_file(w, filename, sea_level=sea_level)
-                print("* elevation image generated in '%s'" % filename)
-            
-            draw=True
-            if draw:
-                if args.grayscale_heightmap:
-                    generate_grayscale_heightmap(world,
-                                                 '%s/%s_grayscale.png' % (args.output_dir, world_name))
-                if args.rivers_map:
-                    generate_rivers_map(world,
-                                        '%s/%s_rivers.png' % (args.output_dir, world_name))
-                if args.scatter_plot:
-                    draw_scatter_plot(world,
-                                      '%s/%s_scatter.png' % (args.output_dir, world_name))
-                if args.satelite_map:
-                    draw_satellite_map(world,
-                                       '%s/%s_satellite.png' % (args.output_dir, world_name))
-                if args.icecaps_map:
-                    draw_icecaps_map(world,
-                                     '%s/%s_icecaps.png' % (args.output_dir, world_name))
-
-        elif operation == 'plates':
-            print('')  # empty line
-            print('starting (it could take a few minutes) ...')
-
-            generate_plates(seed, world_name, args.output_dir, args.width,
-                            args.height, num_plates=args.number_of_plates)
-
-        elif operation == 'ancient_map':
-            print('')  # empty line
-            print('starting (it could take a few minutes) ...')
-            # First, some error checking
-            if args.sea_color == "blue":
-                sea_color = (142, 162, 179, 255)
-            elif args.sea_color == "brown":
-                sea_color = (212, 198, 169, 255)
-            else:
-                usage("Unknown sea color: " + args.sea_color +
-                      " Select from [" + SEA_COLORS + "]")
-            if not args.world_file:
-                usage(
-                    "For generating an ancient map is necessary to specify the " +
-                    "world to be used (-w option)")
-            world = load_world(args.world_file)
-
-            print_verbose(" * world loaded")
-
-            if not args.generated_file:
-                args.generated_file = "ancient_map_%s.png" % world.name
-            operation_ancient_map(world, args.generated_file,
-                                  args.resize_factor, sea_color,
-                                  args.draw_biome, args.draw_rivers,
-                                  args.draw_mountains, args.draw_outer_border)
-        elif operation == 'info':
-            world = load_world(args.FILE)
-            print_world_info(world)
-            
-        elif operation == 'export':
-            world = load_world(args.FILE)
-            print_world_info(world)
-            export(world, args.export_format, args.export_datatype, args.export_dimensions,
-                   args.export_normalize, args.export_subset,
-                   path='%s/%s_elevation' % (args.output_dir, world.name))
-        else:
-            raise Exception(
-                'Unknown operation: valid operations are %s' % OPERATIONS)
-
         print('...done')
-
+        return args,arg_dict
 
 
     def normal_print(self,args):
@@ -831,6 +601,3 @@ def usage(error=None):
     sys.exit(' ')
 
 
-# -------------------------------
-if __name__ == "__main__":
-    main()

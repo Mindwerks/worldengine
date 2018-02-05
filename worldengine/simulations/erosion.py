@@ -1,6 +1,6 @@
 import math
 import numpy
-import worldengine.astar
+import astar
 
 # Direction
 NORTH = [0, -1]
@@ -218,7 +218,7 @@ class ErosionSimulation(object):
             is_wrapped, lower_elevation = self.findLowerElevation(
                 current_location, world)
             if lower_elevation and not is_wrapped:
-                lower_path = worldengine.astar.PathFinder().find(
+                lower_path = astar.PathFinder().find(
                     world.layers['elevation'].data, current_location, lower_elevation)
                 if lower_path:
                     path += lower_path
@@ -261,7 +261,7 @@ class ErosionSimulation(object):
                             current_location, lower_elevation))
 
                 # find our way to the edge
-                edge_path = worldengine.astar.PathFinder().find(
+                edge_path = astar.PathFinder().find(
                     world.layers['elevation'].data, [cx, cy], [lx, ly])
                 if not edge_path:
                     # can't find another other path, make it a lake
@@ -272,7 +272,7 @@ class ErosionSimulation(object):
                 current_location = path[-1]
 
                 # find our way to lowest position original found
-                lower_path = worldengine.astar.PathFinder().find(
+                lower_path = astar.PathFinder().find(
                     world.layers['elevation'].data, current_location, lower_elevation)
                 path += lower_path
                 current_location = path[-1]

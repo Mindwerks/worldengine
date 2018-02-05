@@ -1,11 +1,11 @@
 import numpy
 
-from worldengine.biome import biome_name_to_index, biome_index_to_name, Biome
-from worldengine.biome import Iceland
-import worldengine.protobuf.World_pb2 as Protobuf
-from worldengine.step import Step
-from worldengine.common import _equal
-from worldengine.version import __version__
+from biome import biome_name_to_index, biome_index_to_name, Biome
+from biome import Iceland
+import protobuf.World_pb2 as Protobuf
+from step import Step
+from common import _equal
+from version import __version__
 
 
 class Size:
@@ -90,6 +90,9 @@ class World(object):
                  temps=[0.874, 0.765, 0.594, 0.439, 0.366, 0.124],
                  humids = [.941, .778, .507, .236, 0.073, .014, .002],
                  gamma_curve=1.25, curve_offset=.2):
+                     
+                     
+                     
         self.name = name
         self.size = size
         self.seed = seed
