@@ -397,25 +397,27 @@ class proto_world:
             for x in range(len(warnings)):
                 print(warnings[x])
         
-        #more warnings? hm.
-        if not generation_operation:
+        ##more warnings? hm.
+        #if False:#
+            ##these are nonsense. let people do whatever. won't change the output.
+            ##not generation_operation:
 
-            if args.grayscale_heightmap:
-                usage(
-                    error="Grayscale heightmap can be produced only during world " +
-                          "generation")
+            #if args.grayscale_heightmap:
+                #usage(
+                    #error="Grayscale heightmap can be produced only during world " +
+                          #"generation")
 
-            if args.rivers_map:
-                usage(error="Rivers map can be produced only during world generation")
+            #if args.rivers_map:
+                #usage(error="Rivers map can be produced only during world generation")
 
-            if args.temps:
-                usage(error="temps can be assigned only during world generation")
+            #if args.temps:
+                #usage(error="temps can be assigned only during world generation")
 
-            if args.humids:
-                usage(error="humidity can be assigned only during world generation")
+            #if args.humids:
+                #usage(error="humidity can be assigned only during world generation")
         
-            if args.scatter_plot:
-                usage(error="Scatter plot can be produced only during world generation")
+            #if args.scatter_plot:
+                #usage(error="Scatter plot can be produced only during world generation")
     
     
         
