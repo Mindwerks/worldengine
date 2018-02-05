@@ -28,7 +28,7 @@ def main(args,arg_dict):
         
         #this needs some clean up, but later we can use kwargs
         world = plates.world_gen(seed=arg_dict["seed"],
-                    world_name=arg_dict["world_name"]
+                    world_name=arg_dict["world_name"],
                     arg_dict["width"],
                     arg_dict["height"],
                     temps=arg_dict["temps"],
