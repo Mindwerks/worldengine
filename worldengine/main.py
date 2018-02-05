@@ -2,7 +2,9 @@
 import worldengine
 #import worldengine
 import numpy
-
+from worldengine import plates
+from worldengine import save
+from worldengine import step
 
 def main(args,arg_dict):
 
@@ -27,15 +29,15 @@ def main(args,arg_dict):
         print('starting (it could take a few minutes) ...')
         
         #this needs some clean up, but later we can use kwargs
-        world = plates.world_gen(seed=arg_dict["seed"],
-                    world_name=arg_dict["world_name"],
+        world = plates.world_gen(arg_dict["seed"],
+                    arg_dict["world_name"],
                     arg_dict["width"],
                     arg_dict["height"],
-                    temps=arg_dict["temps"],
-                    humids=arg_dict["humids"],
+                    arg_dict["temps"],
+                    arg_dict["humids"],
                     arg_dict["number_of_plates"], 
                     arg_dict["ocean_level"],
-                    step=arg_dict["step"])
+                    arg_dict["step"])
                     
     if operation == 'plates':
         print('')  # empty line
@@ -118,18 +120,18 @@ def main(args,arg_dict):
             draw_ocean_on_file(w.layers['ocean'].data, filename)
             print("* ocean image generated in '%s'" % filename)
 
-            if step.include_precipitations:
-                filename = '%s/%s_precipitation.png' % (output_dir, world_name)
-                draw_precipitation_on_file(w, filename, black_and_white)
-                print("* precipitation image generated in '%s'" % filename)
-                filename = '%s/%s_temperature.png' % (output_dir, world_name)
-                draw_temperature_levels_on_file(w, filename, black_and_white)
-                print("* temperature image generated in '%s'" % filename)
+            #if step.include_precipitations:
+            filename = '%s/%s_precipitation.png' % (output_dir, world_name)
+            draw_precipitation_on_file(w, filename, black_and_white)
+            print("* precipitation image generated in '%s'" % filename)
+            filename = '%s/%s_temperature.png' % (output_dir, world_name)
+            draw_temperature_levels_on_file(w, filename, black_and_white)
+            print("* temperature image generated in '%s'" % filename)
 
-            if step.include_biome:
-                filename = '%s/%s_biome.png' % (output_dir, world_name)
-                draw_biome_on_file(w, filename)
-                print("* biome image generated in '%s'" % filename)
+            #if step.include_biome:
+            filename = '%s/%s_biome.png' % (output_dir, world_name)
+            draw_biome_on_file(w, filename)
+            print("* biome image generated in '%s'" % filename)
 
             
             filename = '%s/%s_elevation.png' % (output_dir, world_name)
