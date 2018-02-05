@@ -72,7 +72,8 @@ def world_gen(seed,#get the generated seed from somewhere.
                    
     #            gamma_curve=1.25, curve_offset=.2, fade_borders=True,
     #               verbose=True, black_and_white=False
-    
+    if name==None:
+        name = "seed_%i" % seed
     if verbose:
         start_time = time.time()
         

@@ -180,8 +180,7 @@ def main(args,arg_dict):
 
     
 def filter_world_args(all_dict):
-    l=["seed", "width","height","temps","humids","number_of_plates",
-    "ocean_level","step"]
+    l=["name","seed", "width","height","temps","humids","ocean_level","step"]
     
     world_kwargs={}
     

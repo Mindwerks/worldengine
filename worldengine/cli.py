@@ -480,6 +480,7 @@ class proto_world:
             world_name = args.world_name
         else:
             world_name = "seed_%i" % self.arg_dict["seed"]
+            
         self.arg_dict["world_name"]=world_name
 
     def set_world_format(self,args):
