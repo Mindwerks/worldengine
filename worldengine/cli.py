@@ -9,14 +9,7 @@ import os
 #from this package
 import worldengine
 
-#all of this needs to go.
-
-from worldengine.common import set_verbose, print_verbose, get_verbose
-    
-from worldengine.imex import export
-
-from worldengine.world import World, Size, GenerationParameters
-
+from worldengine.common import set_verbose
 from worldengine.step import Step
 from worldengine.version import __version__
 
@@ -346,7 +339,6 @@ def main():
 
 class proto_world:
     def arg_errors(self,args):
-        generation_operation=self.arg_dict["generation_operation"]
         
         if os.path.exists(args.output_dir):
             if not os.path.isdir(args.output_dir):
@@ -359,9 +351,6 @@ class proto_world:
         if args.number_of_plates < 1 or args.number_of_plates > 100:
             usage(error="Number of plates should be in [1, 100]")
 
-        if args.hdf5 and not HDF5_AVAILABLE:
-            usage(error="HDF5 requires the presence of native libraries")
-        
         if args.OPERATOR == 'info' or args.OPERATOR == 'export':
             if args.FILE is None:
                 usage("For operation info only the filename should be specified")
@@ -400,7 +389,6 @@ class proto_world:
         ##more warnings? hm.
         #if False:#
             ##these are nonsense. let people do whatever. won't change the output.
-            ##not generation_operation:
 
             #if args.grayscale_heightmap:
                 #usage(

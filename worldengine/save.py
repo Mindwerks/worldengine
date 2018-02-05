@@ -26,4 +26,8 @@ def save_world(things_to_save,output_dir):
         #print("* world data saved in '%s'" % filename)
         #sys.stdout.flush()
     
+def save_world_to_hdf5(world,filename):
+    a=1
+    
+def save_world_to_json(world,filename):
     a=1

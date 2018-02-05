@@ -1,7 +1,8 @@
 
-import save
+import worldengine
 #import worldengine
-import plates
+import numpy
+
 
 def main(args,arg_dict):
 
@@ -10,15 +11,12 @@ def main(args,arg_dict):
     generation_operation=arg_dict["generation_operation"]
     operation=arg_dict["operation"]
     
-    seed=arg_dict["seed"]
+    
     #if "seed" in arg_dict:
     
     
-    world_name=arg_dict["world_name"]
     world_format=arg_dict["world_format"]
-    step=arg_dict["step"]
-    temps=arg_dict["temps"]
-    humids=arg_dict["humids"]
+    
     
     if "output_dir" not in arg_dict:
         raise ValueError
@@ -28,67 +26,94 @@ def main(args,arg_dict):
         print('')  # empty line
         print('starting (it could take a few minutes) ...')
         
-        #ideally I'd just hand it the proto_world_object.
-        
-        #world_name=arg_dict["world_name"]
-        
-        #hmmmmm, I don't like this...
-        
-        
-#def generate_world(world_name, 
-                #width, 
-                #height, 
-                #seed, 
-                #num_plates, 
-                #step, 
-                #ocean_level, 
-                #temps, 
-                #humids, 
-                #world_format='protobuf',
-                   
-                #gamma_curve=1.25, curve_offset=.2, fade_borders=True,
-                   #verbose=True, black_and_white=False):
-    
-        #this just adds default args?
-        world = plates.world_gen(seed,
-                    world_name,
+        #this needs some clean up, but later we can use kwargs
+        world = plates.world_gen(seed=arg_dict["seed"],
+                    world_name=arg_dict["world_name"]
                     arg_dict["width"],
-                    arg_dict["height"], 
-                    temps, 
-                    humids, 
+                    arg_dict["height"],
+                    temps=arg_dict["temps"],
+                    humids=arg_dict["humids"],
                     arg_dict["number_of_plates"], 
                     arg_dict["ocean_level"],
-                    step)
-        
-        #world = generate_world(world_name, 
-                               #seed, args.number_of_plates, args.output_dir,
-                               #step, args.ocean_level, temps, humids, world_format,
-                               #gamma_curve=args.gv, curve_offset=args.go,
-                               #fade_borders=args.fade_borders,
-                               #verbose=args.verbose, black_and_white=args.black_and_white)
-        
-        
-        
-        w=world
-        save_data=True
-        if save_data:
-            save.save_world([[world,'protobuf']],arg_dict["output_dir"])
+                    step=arg_dict["step"])
+                    
+    if operation == 'plates':
+        print('')  # empty line
+        print('starting (it could take a few minutes) ...')
 
-        draw=True
-        if draw:
-            
-            output_dir=arg_dict["output_dir"]
-            world_name=arg_dict["world_name"]
-            
-            black_and_white=False
-            
-            from draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
-                draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
-                draw_temperature_levels_on_file, draw_riversmap_on_file, draw_scatter_plot_on_file, \
-                draw_satellite_on_file, draw_icecaps_on_file
-            
-            
+        generate_plates(seed, world_name, args.output_dir, args.width,
+                        args.height, num_plates=args.number_of_plates)
+
+    if operation == 'ancient_map':
+        print('')  # empty line
+        print('starting (it could take a few minutes) ...')
+        # First, some error checking
+        if args.sea_color == "blue":
+            sea_color = (142, 162, 179, 255)
+        elif args.sea_color == "brown":
+            sea_color = (212, 198, 169, 255)
+        else:
+            usage("Unknown sea color: " + args.sea_color +
+                  " Select from [" + SEA_COLORS + "]")
+        if not args.world_file:
+            usage(
+                "For generating an ancient map is necessary to specify the " +
+                "world to be used (-w option)")
+        world = load_world(args.world_file)
+
+        print_verbose(" * world loaded")
+
+        if not args.generated_file:
+            args.generated_file = "ancient_map_%s.png" % world.name
+        operation_ancient_map(world, args.generated_file,
+                              args.resize_factor, sea_color,
+                              args.draw_biome, args.draw_rivers,
+                              args.draw_mountains, args.draw_outer_border)
+                              
+    elif operation == 'info':
+        world = load_world(args.FILE)
+        print_world_info(world)
+        
+    elif operation == 'export':
+        world = load_world(args.FILE)
+        print_world_info(world)
+        export(world, args.export_format, args.export_datatype, args.export_dimensions,
+               args.export_normalize, args.export_subset,
+               path='%s/%s_elevation' % (args.output_dir, world.name))
+        
+        
+        
+    save_data=True
+    if save_data and operation in ["world"]:
+        w=world
+        save.save_world([[world,'protobuf']],arg_dict["output_dir"])
+
+    draw=True
+    if draw and operation in ["world","plates"]:
+        
+        output_dir=arg_dict["output_dir"]
+        world_name=arg_dict["world_name"]
+        
+        black_and_white=False
+        
+        from draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
+            draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
+            draw_temperature_levels_on_file, draw_riversmap_on_file, draw_scatter_plot_on_file, \
+            draw_satellite_on_file, draw_icecaps_on_file
+        
+        
+        
+        if operation=="plates":
             # Generate images
+            filename = '%s/plates_%s.png' % (output_dir, world_name)
+            draw_simple_elevation_on_file(world, filename, None)
+            print("+ plates image generated in '%s'" % filename)
+            filename = '%s/centered_plates_%s.png' % (output_dir, world_name)
+            draw_simple_elevation_on_file(world, filename, None)
+            print("+ centered plates image generated in '%s'" % filename)
+
+        if operation=="world":
+        # Generate images
             filename = '%s/%s_ocean.png' % (output_dir, world_name)
             draw_ocean_on_file(w.layers['ocean'].data, filename)
             print("* ocean image generated in '%s'" % filename)
@@ -162,48 +187,7 @@ def main(args,arg_dict):
                 #draw_icecaps_map(world,
                 #                 '%s/%s_icecaps.png' % (args.output_dir, world_name))
 
-    elif operation == 'plates':
-        print('')  # empty line
-        print('starting (it could take a few minutes) ...')
-
-        generate_plates(seed, world_name, args.output_dir, args.width,
-                        args.height, num_plates=args.number_of_plates)
-
-    elif operation == 'ancient_map':
-        print('')  # empty line
-        print('starting (it could take a few minutes) ...')
-        # First, some error checking
-        if args.sea_color == "blue":
-            sea_color = (142, 162, 179, 255)
-        elif args.sea_color == "brown":
-            sea_color = (212, 198, 169, 255)
-        else:
-            usage("Unknown sea color: " + args.sea_color +
-                  " Select from [" + SEA_COLORS + "]")
-        if not args.world_file:
-            usage(
-                "For generating an ancient map is necessary to specify the " +
-                "world to be used (-w option)")
-        world = load_world(args.world_file)
-
-        print_verbose(" * world loaded")
-
-        if not args.generated_file:
-            args.generated_file = "ancient_map_%s.png" % world.name
-        operation_ancient_map(world, args.generated_file,
-                              args.resize_factor, sea_color,
-                              args.draw_biome, args.draw_rivers,
-                              args.draw_mountains, args.draw_outer_border)
-    elif operation == 'info':
-        world = load_world(args.FILE)
-        print_world_info(world)
-        
-    elif operation == 'export':
-        world = load_world(args.FILE)
-        print_world_info(world)
-        export(world, args.export_format, args.export_datatype, args.export_dimensions,
-               args.export_normalize, args.export_subset,
-               path='%s/%s_elevation' % (args.output_dir, world.name))
+    
     else:
         raise Exception(
             'Unknown operation: valid operations are %s' % OPERATIONS)
@@ -232,17 +216,9 @@ def generate_plates(seed, world_name, output_dir, width, height,
     world.elevation = (numpy.array(elevation).reshape(height, width), None)
     world.plates = numpy.array(plates, dtype=numpy.uint16).reshape(height, width)
 
-    # Generate images
-    filename = '%s/plates_%s.png' % (output_dir, world_name)
-    draw_simple_elevation_on_file(world, filename, None)
-    print("+ plates image generated in '%s'" % filename)
     
     worldengine.generation.center_land(world)
     
-    filename = '%s/centered_plates_%s.png' % (output_dir, world_name)
-    draw_simple_elevation_on_file(world, filename, None)
-    print("+ centered plates image generated in '%s'" % filename)
-
 def operation_ancient_map(world, map_filename, resize_factor, sea_color,
                           draw_biome, draw_rivers, draw_mountains,
                           draw_outer_land_border):

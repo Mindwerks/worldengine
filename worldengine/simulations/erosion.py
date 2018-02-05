@@ -1,6 +1,6 @@
 import math
 import numpy
-import worldengine.astar
+from worldengine import astar
 
 # Direction
 NORTH = [0, -1]
