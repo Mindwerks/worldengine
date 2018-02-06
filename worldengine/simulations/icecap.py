@@ -6,7 +6,9 @@ class IcecapSimulation(object):
     # a certain spot of the world.
     # Ice can appear wherever there is an ocean and the temperature is cold enough.
 
-    # TODO: Find out if a desert planet could still freeze or if the freeze-threshold is dynamic.
+    # TODO: Find out if a desert planet could still freeze or 
+    # if the freeze-threshold is dynamic.
+    
     # TODO: Freeze rivers etc.
 
     @staticmethod

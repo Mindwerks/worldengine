@@ -1,4 +1,5 @@
 import numpy
+import time
 
 from noise import snoise2
 
@@ -64,7 +65,8 @@ def place_oceans_at_map_borders(world):
 
 
 
-def handle_plates(world,step,verbose,fade_borders=True):
+def other_world_ops(world,step,verbose,fade_borders=True):
+    #whatever.
     center_land(world)
     
     if verbose:
@@ -73,7 +75,8 @@ def handle_plates(world,step,verbose,fade_borders=True):
               "complete. Elapsed time " + str(elapsed_time) + " seconds.")
 
         start_time = time.time()
-        
+    #noise step
+    
     add_noise_to_elevation(world, numpy.random.randint(0, 4096))  # uses the global RNG; this is the very first call to said RNG - should that change, this needs to be taken care of
     
     if verbose:
@@ -85,6 +88,8 @@ def handle_plates(world,step,verbose,fade_borders=True):
         
     if fade_borders:
         place_oceans_at_map_borders(world)
+        
+    #oceans
     initialize_ocean_and_thresholds(world)
     if verbose:
         elapsed_time = time.time() - start_time
@@ -245,8 +250,16 @@ def generate_world(w, step):
         return w
 
     # Prepare sufficient seeds for the different steps of the generation
-    rng = numpy.random.RandomState(w.seed)  # create a fresh RNG in case the global RNG is compromised (i.e. has been queried an indefinite amount of times before generate_world() was called)
-    sub_seeds = rng.randint(0, numpy.iinfo(numpy.int32).max, size=100)  # choose lowest common denominator (32 bit Windows numpy cannot handle a larger value)
+    
+    # create a fresh RNG in case the global RNG is compromised 
+    # (i.e. has been queried an indefinite amount of times before 
+    # generate_world() was called)
+    rng = numpy.random.RandomState(w.seed)  
+    
+    # choose lowest common denominator (32 bit Windows numpy 
+    # cannot handle a larger value)
+    sub_seeds = rng.randint(0, numpy.iinfo(numpy.int32).max, size=100)  
+    
     seed_dict = {
                  'PrecipitationSimulation': sub_seeds[ 0],  # after 0.19.0 do not ever switch out the seeds here to maximize seed-compatibility
                  'ErosionSimulation':       sub_seeds[ 1],
@@ -259,7 +272,9 @@ def generate_world(w, step):
                  'IcecapSimulation':        sub_seeds[ 8],
                  '':                        sub_seeds[99]
     }
-
+    
+    
+    
     TemperatureSimulation().execute(w, seed_dict['TemperatureSimulation'])
     # Precipitation with thresholds
     PrecipitationSimulation().execute(w, seed_dict['PrecipitationSimulation'])
@@ -275,7 +290,7 @@ def generate_world(w, step):
     # FIXME: create setters
     IrrigationSimulation().execute(w, seed_dict['IrrigationSimulation'])  # seed not currently used
     HumiditySimulation().execute(w, seed_dict['HumiditySimulation'])  # seed not currently used
-
+    
     PermeabilitySimulation().execute(w, seed_dict['PermeabilitySimulation'])
 
     cm, biome_cm = BiomeSimulation().execute(w, seed_dict['BiomeSimulation'])  # seed not currently used

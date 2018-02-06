@@ -81,18 +81,29 @@ class LayerWithQuantiles(Layer):
             return False
 
 
-class World(object):
+class World:
     """A world composed by name, dimensions and all the characteristics of
     each cell.
     """
 
-    def __init__(self, name, size, seed, generation_params,
-                 temps=[0.874, 0.765, 0.594, 0.439, 0.366, 0.124],
-                 humids = [.941, .778, .507, .236, 0.073, .014, .002],
-                 gamma_curve=1.25, curve_offset=.2):
-                     
-                     
-                     
+    def __init__(self, name,
+                e_as_array,
+                p_as_array,
+                height,
+                width,
+                seed,
+                step,
+                number_of_plates=10,
+                ocean_level=1.0,
+                temps=[0.874, 0.765, 0.594, 0.439, 0.366, 0.124],
+                humids = [.941, .778, .507, .236, 0.073, .014, .002],
+                gamma_curve=1.25, curve_offset=.2,verbose=False):
+        
+        size=Size(width,height)
+        generation_params=GenerationParameters(number_of_plates,ocean_level,step)
+        
+        
+        
         self.name = name
         self.size = size
         self.seed = seed
@@ -112,6 +123,9 @@ class World(object):
         self.step = generation_params.step
         self.ocean_level = generation_params.ocean_level
 
+        self.elevation = (numpy.array(e_as_array).reshape(height, width), None)
+        self.plates = numpy.array(p_as_array, dtype=numpy.uint16).reshape(height, width)
+        
     #
     # General methods
     #

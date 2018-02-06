@@ -7,7 +7,7 @@ from worldengine import plates
 from worldengine import save
 from worldengine import step
 
-from worldengine.generation import center_land,handle_plates
+from worldengine.generation import other_world_ops
 
 def main(args,arg_dict):
 
@@ -19,7 +19,12 @@ def main(args,arg_dict):
         if arg_dict["save"]:
             if "output_dir" not in arg_dict:
                 raise ValueError
-                
+    
+    if operation in ["world","plates"]:
+        
+        plates_kwargs=filter_plates_args(arg_dict)
+        e_as_array,p_as_array = plates.generate_plates_simulation(**plates_kwargs)
+    
     if operation == 'world':
         print('')  # empty line
         print('starting (it could take a few minutes) ...')
@@ -27,17 +32,25 @@ def main(args,arg_dict):
         if "verbose" not in world_kwargs:
             world_kwargs["verbose"]=False
             
-        #this needs some clean up, but later we can use kwargs
-        r_plates = plates.world_gen(**world_kwargs)
-        world=handle_plates(r_plates,arg_dict["step"],world_kwargs["verbose"])       
+        #arg_dict["number_of_plates":10]
         
-    elif operation == 'plates':
-        print('')  # empty line
-        print('starting (it could take a few minutes) ...')
+        world_kwargs.update({"e_as_array":e_as_array,"p_as_array":p_as_array})
+        world = worldengine.world.World(**world_kwargs)
+        #name, Size(width, height), seed,
+                      #GenerationParameters(num_plates, ocean_level, step),
+                     #temps, humids, gamma_curve, curve_offset)
+        
+        world=other_world_ops(world,arg_dict["step"],world_kwargs["verbose"])       
+        
+    #elif operation == 'plates':
+    #    print('')  # empty line
+    #    print('starting (it could take a few minutes) ...')
 
-        generate_plates(seed, world_name, args.output_dir, args.width,
-                        args.height, num_plates=args.number_of_plates)
-
+    #    generate_plates(seed, world_name, args.output_dir, args.width,
+    #                    args.height, num_plates=args.number_of_plates)
+    
+    #eh. what was this doing again...
+    
     elif operation == 'ancient_map':
         print('')  # empty line
         print('starting (it could take a few minutes) ...')
@@ -93,7 +106,7 @@ def main(args,arg_dict):
         
         black_and_white=False
         
-        from draw import draw_ancientmap_on_file, draw_biome_on_file, draw_ocean_on_file, \
+        from draw import draw_biome_on_file, draw_ocean_on_file, \
             draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
             draw_temperature_levels_on_file, draw_riversmap_on_file, draw_scatter_plot_on_file, \
             draw_satellite_on_file, draw_icecaps_on_file
@@ -182,16 +195,26 @@ def main(args,arg_dict):
                 #draw_icecaps_map(world,
                 #                 '%s/%s_icecaps.png' % (args.output_dir, world_name))
 
-    
+
+def filter_plates_args(all_dict):
+    l=["seed", "width", "height", "sea_level","erosion_period",
+     "folding_ratio","aggr_overlap_abs","aggr_overlap_rel",
+     "cycle_count","number_of_plates"]
+    plates_kwargs={}
+    for key in l:
+        if key in all_dict:
+            plates_kwargs[key]=all_dict[key]
+    return plates_kwargs
+
 def filter_world_args(all_dict):
-    l=["name","seed", "width","height","temps","humids","ocean_level","step","verbose"]
+    l=["name","seed","width","height","temps","humids","number of plates","ocean_level","step","verbose"]
     
     world_kwargs={}
     
     for key in l:
         if key in all_dict:
             world_kwargs[key]=all_dict[key]
-            
+    print("wkwargs",world_kwargs)
     return world_kwargs
 
 def generate_plates(seed, world_name, output_dir, width, height,
@@ -220,6 +243,8 @@ def generate_plates(seed, world_name, output_dir, width, height,
 def operation_ancient_map(world, map_filename, resize_factor, sea_color,
                           draw_biome, draw_rivers, draw_mountains,
                           draw_outer_land_border):
+                              
+    from draw import draw_ancientmap_on_file
     draw_ancientmap_on_file(world, map_filename, resize_factor, sea_color,
                             draw_biome, draw_rivers, draw_mountains,
                             draw_outer_land_border, get_verbose())
