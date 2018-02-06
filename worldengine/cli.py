@@ -84,7 +84,6 @@ def __seems_protobuf_worldfile__(world_filename):
     return tag == worldengine.world.World.worldengine_tag()
 
 
-
 def print_world_info(world):
     print(" name               : %s" % world.name)
     print(" width              : %i" % world.width)
@@ -473,7 +472,9 @@ class proto_world:
         
         self.arg_dict["generation_operation"]=generation_operation
         self.arg_dict["operation"]=operation
-
+        if operation=="ancient map" and not args.world_file:
+            usage("For generating an ancient map is necessary to specify the " +
+                "world to be used (-w option)")
     def set_world_name(self,args):
         
         if args.world_name:

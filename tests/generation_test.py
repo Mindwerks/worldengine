@@ -1,9 +1,9 @@
 import unittest
 
 import numpy
-
-from worldengine.plates import Step, center_land, world_gen
-from worldengine.world import World, Size, GenerationParameters
+from worldengine.step import Step
+from worldengine.plates import center_land, world_gen
+from worldengine.world import World
 from tests.draw_test import TestBase
 
 from worldengine.generation import sea_depth
@@ -15,11 +15,11 @@ class TestGeneration(TestBase):
     def setUp(self):
         super(TestGeneration, self).setUp()
 
-    def test_world_gen_does_not_explode_badly(self):
+    def test_World_does_not_explode_badly(self):
         # FIXME remove me when proper tests are in place
         # Very stupid test that just verify nothing explode badly
-        world_gen(1,"Dummy", 16, 16)#, 1, step=Step.get_by_name("full"))
-
+        World("test",10,10,1)
+        
     @staticmethod
     def _mean_elevation_at_borders(world):
         borders_total_elevation = 0.0
@@ -44,8 +44,8 @@ class TestGeneration(TestBase):
 
     def test_sea_depth(self):
         ocean_level = 1.0
-        extent = 11
-        w = World("sea_depth", Size(extent,extent), 0, GenerationParameters(0, ocean_level, 0), None)
+        extent = 11 
+        w = World("sea_depth", extent,extent, 0, 0, ocean_level, 0, None)
 
         ocean = numpy.full([extent,extent], True)
         ocean[5,5]=False

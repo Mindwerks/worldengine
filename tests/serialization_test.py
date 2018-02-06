@@ -18,7 +18,7 @@ class TestSerialization(unittest.TestCase):
         self.maxDiff = None
 
     def test_protobuf_serialize_unserialize(self):
-        w = World(1,"Dummy", 16, 16)#, 1, step=Step.get_by_name("full"))
+        w = World("Dummy", 16, 16, seed=1)#, 1, step=Step.get_by_name("full"))
         serialized = w.protobuf_serialize()
         unserialized = World.protobuf_unserialize(serialized)
         self.assertEqual(set(w.layers.keys()), set(unserialized.layers.keys()))
@@ -34,7 +34,7 @@ class TestSerialization(unittest.TestCase):
     def test_hdf5_serialize_unserialize(self):
         filename = None
         try:
-            w = World(1,"Dummy", 16, 16)#, 1, step=Step.get_by_name("full"))
+            w = World("Dummy", 16, 16,1)#, 1, step=Step.get_by_name("full"))
             f = tempfile.NamedTemporaryFile(delete=False)
             f.close()
             filename = f.name

@@ -3,7 +3,7 @@ import unittest
 import numpy
 
 from worldengine.simulations.hydrology import WatermapSimulation
-from worldengine.world import World, Size, GenerationParameters
+from worldengine.world import World
 
 class TestSimulation(unittest.TestCase):
 
@@ -23,13 +23,13 @@ class TestSimulation(unittest.TestCase):
         seed=12345
         numpy.random.seed(seed)
 
-        size = Size(16,8)
+        size = (16,8)
 
-        ocean = numpy.fromfunction(lambda y, x: y==x, (size.height, size.width))
+        ocean = numpy.fromfunction(lambda y, x: y==x, (size))
 
-        percipitation = numpy.ones((size.height, size.width))
+        percipitation = numpy.ones(size)
 
-        elevation = numpy.fromfunction(lambda y, x: y*x, (size.height, size.width))
+        elevation = numpy.fromfunction(lambda y, x: y*x, (size))
 
         t = numpy.zeros(5)
         
@@ -54,22 +54,23 @@ class TestSimulation(unittest.TestCase):
         seed=12345
         numpy.random.seed(seed)
 
-        size = Size(16,8)
+        size = (16,8)
 
-        ocean = numpy.full((size.height, size.width), True, bool)
+        ocean = numpy.full(size, True, bool)
 
-        w = World("watermap",  size, seed, GenerationParameters(0, 1.0, 0))
+        w = World("watermap", 16, 8 , seed, 0, 1.0, 0)
         w.ocean = ocean
 
         data, t = WatermapSimulation._watermap(w, 200)
 
 
     def test_random_land_returns_only_land(self):
-        size = Size(100,90)
+        size = (100,90)
 
-        ocean = numpy.fromfunction(lambda y, x: y>=x, (size.height, size.width))
-
-        w = World("random_land",  size, 0, GenerationParameters(0, 1.0, 0))
+        ocean = numpy.fromfunction(lambda y, x: y>=x, (size))
+        
+        w = World("random_land", 100,90, 0, 0, 1.0, 0)
+        
         w.ocean = ocean
 
         num_samples = 1000

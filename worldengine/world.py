@@ -6,34 +6,8 @@ import worldengine.protobuf.World_pb2 as Protobuf
 from worldengine.step import Step
 from worldengine.common import _equal
 from worldengine.version import __version__
-#rom worldengine.generation import other_world_ops
-
-class Size:
-
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.__dict__ == other.__dict__
-        else:
-            return False
-
-
-class GenerationParameters:
-
-    def __init__(self, n_plates, ocean_level, step):
-        self.n_plates = n_plates
-        self.ocean_level = ocean_level
-        self.step = step
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.__dict__ == other.__dict__
-        else:
-            return False
-
+from worldengine import plates
+from worldengine import generation 
 
 class Layer:
 
@@ -52,11 +26,10 @@ class Layer:
     def max(self):
         return self.data.max()
 
-
 class LayerWithThresholds(Layer):
 
     def __init__(self, data, thresholds):
-        Layer.__init__(self, data)
+        self.data = data
         self.thresholds = thresholds
 
     def __eq__(self, other):
@@ -66,11 +39,11 @@ class LayerWithThresholds(Layer):
         else:
             return False
 
-
+#pretty sure this isn't used and "layer" would not be accessible anyway.
 class LayerWithQuantiles(Layer):
 
     def __init__(self, data, quantiles):
-        Layer.__init__(self, data)
+        self.data = data
         self.quantiles = quantiles
 
     def __eq__(self, other):
@@ -79,7 +52,6 @@ class LayerWithQuantiles(Layer):
             return _equal(self.data, other.data) and _equal(self.quantiles, other.quantiles)
         else:
             return False
-
 
 class World:
     """A world composed by name, dimensions and all the characteristics of
@@ -94,32 +66,46 @@ class World:
                 humids = [.941, .778, .507, .236, 0.073, .014, .002],
                 gamma_curve=1.25, curve_offset=.2,verbose=False):
         
-        size=Size(width,height)
-        generation_params=GenerationParameters(number_of_plates,ocean_level,step)
-        
-        
-        
         self.name = name
-        self.size = size
         self.seed = seed
         self.temps = temps
         self.humids = humids
         self.gamma_curve = gamma_curve
         self.curve_offset = curve_offset
 
-        self.generation_params = generation_params
-
         self.layers = {}
-
-        # Deprecated
-        self.width = size.width
-        self.height = size.height
-        self.n_plates = generation_params.n_plates
-        self.step = generation_params.step
-        self.ocean_level = generation_params.ocean_level
+        
+        self.width = width
+        self.height = height
+        self.number_of_plates = number_of_plates
+        self.step = step
+        self.ocean_level = ocean_level
         
         #apparently I need this...
         #other_world_ops(self)
+        
+        #def filter_plates_args(all_dict):
+        #l=["seed", "width", "height", "sea_level","erosion_period",
+        # "folding_ratio","aggr_overlap_abs","aggr_overlap_rel",
+        # "cycle_count","number_of_plates"]
+        #plates_kwargs={}
+        #for key in l:
+        #    if key in all_dict:
+        #        plates_kwargs[key]=all_dict[key]
+        #return plates_kwargs
+        
+        e_as_array,p_as_array=plates.generate_plates_simulation(seed,width,height)
+        
+        self.set_elevation(e_as_array)
+        self.set_plate_map(p_as_array)
+        #name, Size(width, height), seed,
+                      #GenerationParameters(num_plates, ocean_level, step),
+                     #temps, humids, gamma_curve, curve_offset)
+        #if "step" not in arg_dict:
+        #    arg_dict["step"]=step.Step.full()
+        
+        generation.other_world_ops(self,step,verbose)
+        generation.generate_world(self,step)
         
     def set_elevation(self,e_as_array):
         self.elevation = (numpy.array(e_as_array).reshape(self.height,self.width), None)
@@ -242,7 +228,7 @@ class World:
         p_world.height = self.height
 
         p_world.generationData.seed = self.seed
-        p_world.generationData.n_plates = self.n_plates
+        p_world.generationData.n_plates = self.number_of_plates
         p_world.generationData.ocean_level = self.ocean_level
         p_world.generationData.step = self.step.name
 
@@ -307,11 +293,12 @@ class World:
 
     @classmethod
     def _from_protobuf_world(cls, p_world):
-        w = World(p_world.name, Size(p_world.width, p_world.height),
+        
+        w = World(p_world.name, p_world.width, p_world.height,
                   p_world.generationData.seed,
-                  GenerationParameters(p_world.generationData.n_plates,
-                        p_world.generationData.ocean_level,
-                        Step.get_by_name(p_world.generationData.step)))
+                  p_world.generationData.n_plates,
+                  p_world.generationData.ocean_level,
+                  Step.get_by_name(p_world.step))
 
         # Elevation
         e = numpy.array(World._from_protobuf_matrix(p_world.heightMapData))

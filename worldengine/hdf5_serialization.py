@@ -5,7 +5,8 @@ import h5py
 #fairly certain I should not do this.
 from worldengine.version import __version__
 from worldengine.biome import biome_name_to_index, biome_index_to_name
-from worldengine.world import World, Step, Size, GenerationParameters
+from worldengine.world import World
+from worldengine.step import Step
 
 def save_world_to_hdf5(world, filename):
     
@@ -125,12 +126,13 @@ def _from_hdf5_matrix_with_quantiles(p_matrix):
 def load_world_to_hdf5(filename):
     f = h5py.File(filename, libver='latest', mode='r')
 
-    w = World(f['general/name'].value,
-              Size(f['general/width'].value, f['general/height'].value),
-              f['generation_params/seed'].value,
-              GenerationParameters(f['generation_params/n_plates'].value,
-                                   f['generation_params/ocean_level'].value,
-                                   Step.get_by_name(f['generation_params/step'].value)))
+    w = World(name=f['general/name'].value,
+            width=f['general/width'].value, 
+            height=f['general/height'].value,
+            seed=f['generation_params/seed'].value,
+            number_of_plates=f['generation_params/n_plates'].value,
+            ocean_level=f['generation_params/ocean_level'].value,
+            step=Step.get_by_name(f['generation_params/step'].value))
 
     # Elevation
     e = numpy.array(f['elevation/data'])
