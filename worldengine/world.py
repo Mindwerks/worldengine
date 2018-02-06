@@ -92,7 +92,7 @@ class World:
                 height,
                 width,
                 seed,
-                step,
+                step=Step.full(),
                 number_of_plates=10,
                 ocean_level=1.0,
                 temps=[0.874, 0.765, 0.594, 0.439, 0.366, 0.124],

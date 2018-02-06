@@ -27,7 +27,7 @@ def save_world(things_to_save,output_dir):
 
 def save_world_to_protobuf(w,filename):
     with open(filename, "wb") as f:
-        f.write(w.protobuf_serialize()))
+        f.write(w.protobuf_serialize())
 
 def save_world_to_hdf5(world,filename):
     a=1

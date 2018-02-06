@@ -1,9 +1,9 @@
 import unittest
-from worldengine import main
+from worldengine import __main__
 
 class TestMyMain(unittest.TestCase):
     def test_main(self):
-        arg_dict={"world_name":"test",
+        arg_dict={"name":"test",
                     "width":50,
                     "height":50,
                     "seed":1,
@@ -11,7 +11,7 @@ class TestMyMain(unittest.TestCase):
                     "save":False,
                     "operation":"world",
                     "generation_operation":True}
-        main.main(None,arg_dict)
+        __main__.main(None,arg_dict)
         
 if __name__=="__main__":
     unittest.main()

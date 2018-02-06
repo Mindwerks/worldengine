@@ -1,16 +1,10 @@
-
 import worldengine
-#import worldengine
 import numpy
 
-from worldengine import plates
-from worldengine import save
-from worldengine import step
-
+from worldengine import plates,save,step
 from worldengine.generation import other_world_ops
 
 def main(args,arg_dict):
-
     #these are all default arguments.
     #they are just explicit right now.
     operation=arg_dict["operation"]
@@ -39,7 +33,8 @@ def main(args,arg_dict):
         #name, Size(width, height), seed,
                       #GenerationParameters(num_plates, ocean_level, step),
                      #temps, humids, gamma_curve, curve_offset)
-        
+        if "step" not in arg_dict:
+            arg_dict["step"]=step.Step.full()
         world=other_world_ops(world,arg_dict["step"],world_kwargs["verbose"])       
         
     #elif operation == 'plates':
