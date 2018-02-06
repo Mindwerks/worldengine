@@ -63,10 +63,7 @@ def place_oceans_at_map_borders(world):
             place_ocean(i, y, i)
             place_ocean(world.width - i - 1, y, i)
 
-
-
 def other_world_ops(world,step,verbose,fade_borders=True):
-    #whatever.
     center_land(world)
     
     if verbose:

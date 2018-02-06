@@ -6,7 +6,7 @@ import worldengine.protobuf.World_pb2 as Protobuf
 from worldengine.step import Step
 from worldengine.common import _equal
 from worldengine.version import __version__
-
+#rom worldengine.generation import other_world_ops
 
 class Size:
 
@@ -117,10 +117,14 @@ class World:
         self.n_plates = generation_params.n_plates
         self.step = generation_params.step
         self.ocean_level = generation_params.ocean_level
+        
+        #apparently I need this...
+        #other_world_ops(self)
+        
     def set_elevation(self,e_as_array):
-        self.elevation = (numpy.array(e_as_array).reshape(height, width), None)
+        self.elevation = (numpy.array(e_as_array).reshape(self.height,self.width), None)
     def set_plate_map(self,p_as_array):
-        self.plates = numpy.array(p_as_array, dtype=numpy.uint16).reshape(height, width)
+        self.plates = numpy.array(p_as_array, dtype=numpy.uint16).reshape(self.height,self.width)
         
     #
     # General methods
