@@ -6,7 +6,7 @@ import h5py
 from worldengine.version import __version__
 from worldengine.biome import biome_name_to_index, biome_index_to_name
 from worldengine.world import World
-from worldengine.step import Step
+#from worldengine.step import Step
 
 def save_world_to_hdf5(world, filename):
     
@@ -15,9 +15,13 @@ def save_world_to_hdf5(world, filename):
     general_grp = f.create_group("general")
     general_grp["worldengine_version"] = __version__
     general_grp["name"] = world.name
+    general_grp["seed"] = world.seed
     general_grp["width"] = world.width
     general_grp["height"] = world.height
-
+    #general_grp["step"] = str(world.step)
+    general_grp["ocean_level"] = world.ocean_level
+    general_grp["number_of_plates"] = world.number_of_plates
+    
     elevation_grp = f.create_group("elevation")
     elevation_ths_grp = elevation_grp.create_group("thresholds")
     elevation_ths_grp["sea"] = world.layers['elevation'].thresholds[0][1]
@@ -103,11 +107,11 @@ def save_world_to_hdf5(world, filename):
         river_map_data = f.create_dataset("river_map", (world.height, world.width), dtype=numpy.float)
         river_map_data.write_direct(world.layers['river_map'].data)
 
-    generation_params_grp = f.create_group("generation_params")
-    generation_params_grp['seed'] = world.seed
-    generation_params_grp['n_plates'] = world.n_plates
-    generation_params_grp['ocean_level'] = world.ocean_level
-    generation_params_grp['step'] = world.step.name
+    #generation_params_grp = f.create_group("generation_params")
+    #generation_params_grp['seed'] = world.seed
+    #generation_params_grp['n_plates'] = world.number_of_plates
+    #generation_params_grp['ocean_level'] = world.ocean_level
+    #generation_params_grp['step'] = world.step.name
 
     f.close()
 
@@ -129,10 +133,10 @@ def load_world_to_hdf5(filename):
     w = World(name=f['general/name'].value,
             width=f['general/width'].value, 
             height=f['general/height'].value,
-            seed=f['generation_params/seed'].value,
-            number_of_plates=f['generation_params/n_plates'].value,
-            ocean_level=f['generation_params/ocean_level'].value,
-            step=Step.get_by_name(f['generation_params/step'].value))
+            seed=f['general/seed'].value,
+            number_of_plates=f['general/number_of_plates'].value,
+            ocean_level=f['general/ocean_level'].value,)
+            #step=Step.get_by_name(f['general/step'].value))
 
     # Elevation
     e = numpy.array(f['elevation/data'])

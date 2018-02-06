@@ -3,7 +3,9 @@ import numpy
 from worldengine.biome import biome_name_to_index, biome_index_to_name, Biome
 from worldengine.biome import Iceland
 import worldengine.protobuf.World_pb2 as Protobuf
-from worldengine.step import Step
+
+#from worldengine.step import Step
+
 from worldengine.common import _equal
 from worldengine.version import __version__
 from worldengine import plates
@@ -61,10 +63,11 @@ class World:
     def __init__(self, name="test",height=512,width=512,seed=1,#e_as_array, sp_as_array,
                 number_of_plates=10,
                 ocean_level=1.0,
-                step=Step.full(),
+                #step=Step.full(),
                 temps=[0.874, 0.765, 0.594, 0.439, 0.366, 0.124],
                 humids = [.941, .778, .507, .236, 0.073, .014, .002],
                 gamma_curve=1.25, curve_offset=.2,verbose=False):
+        
         
         self.name = name
         self.seed = seed
@@ -78,7 +81,7 @@ class World:
         self.width = width
         self.height = height
         self.number_of_plates = number_of_plates
-        self.step = step
+        #self.step = step
         self.ocean_level = ocean_level
         
         #apparently I need this...
@@ -104,8 +107,8 @@ class World:
         #if "step" not in arg_dict:
         #    arg_dict["step"]=step.Step.full()
         
-        generation.other_world_ops(self,step,verbose)
-        generation.generate_world(self,step)
+        generation.other_world_ops(self,verbose)#"step",
+        generation.generate_world(self)#step
         
     def set_elevation(self,e_as_array):
         self.elevation = (numpy.array(e_as_array).reshape(self.height,self.width), None)
@@ -230,7 +233,7 @@ class World:
         p_world.generationData.seed = self.seed
         p_world.generationData.n_plates = self.number_of_plates
         p_world.generationData.ocean_level = self.ocean_level
-        p_world.generationData.step = self.step.name
+        p_world.generationData.step = "None"#self.step.name
 
         # Elevation
         self._to_protobuf_matrix(self.layers['elevation'].data, p_world.heightMapData)
@@ -297,8 +300,8 @@ class World:
         w = World(p_world.name, p_world.width, p_world.height,
                   p_world.generationData.seed,
                   p_world.generationData.n_plates,
-                  p_world.generationData.ocean_level,
-                  Step.get_by_name(p_world.step))
+                  p_world.generationData.ocean_level)
+                  #Step.get_by_name(p_world.step))
 
         # Elevation
         e = numpy.array(World._from_protobuf_matrix(p_world.heightMapData))

@@ -3,7 +3,7 @@ import time
 
 from noise import snoise2
 
-from worldengine.world import Step
+#from worldengine.world import Step
 from worldengine.simulations.basic import find_threshold_f
 from worldengine.simulations.hydrology import WatermapSimulation
 from worldengine.simulations.irrigation import IrrigationSimulation
@@ -63,7 +63,7 @@ def place_oceans_at_map_borders(world):
             place_ocean(i, y, i)
             place_ocean(world.width - i - 1, y, i)
 
-def other_world_ops(world,step,verbose,fade_borders=True):
+def other_world_ops(world,verbose,fade_borders=True):
     
     #center
     center_land(world)
@@ -94,7 +94,7 @@ def other_world_ops(world,step,verbose,fade_borders=True):
         #elapsed_time = time.time() - start_time
         print("...plates.world_gen: oceans initialized.")
 
-    return generate_world(world, step)
+    return generate_world(world)
 
 
 def add_noise_to_elevation(world, seed):
@@ -240,12 +240,12 @@ def _around(x, y, width, height):
     return ps
 
 
-def generate_world(w, step):
-    if isinstance(step, str):
-        step = Step.get_by_name(step)
+def generate_world(w):#, step):
+    #if isinstance(step, str):
+    #    step = Step.get_by_name(step)
 
-    if not step.include_precipitations:
-        return w
+    #if not step.include_precipitations:
+    #    return w
 
     # Prepare sufficient seeds for the different steps of the generation
     
@@ -277,11 +277,11 @@ def generate_world(w, step):
     # Precipitation with thresholds
     PrecipitationSimulation().execute(w, seed_dict['PrecipitationSimulation'])
 
-    if not step.include_erosion:
-        return w
+    #if not step.include_erosion:
+    #    return w
     ErosionSimulation().execute(w, seed_dict['ErosionSimulation'])  # seed not currently used
-    if get_verbose():
-        print("...erosion calculated")
+    #if get_verbose():
+    #    print("...erosion calculated")
 
     WatermapSimulation().execute(w, seed_dict['WatermapSimulation'])  # seed not currently used
 

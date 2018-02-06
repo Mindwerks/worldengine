@@ -154,8 +154,8 @@ def main(args,arg_dict):
                 #                 '%s/%s_icecaps.png' % (args.output_dir, world_name))
 
 def filter_world_args(all_dict):
-    l=["name","seed","width","height","temps","humids","number of plates","ocean_level","step","verbose"]
-    
+    l=["name","seed","width","height","temps","humids","number of plates","ocean_level","verbose"]
+    #"step",
     world_kwargs={}
     
     for key in l:

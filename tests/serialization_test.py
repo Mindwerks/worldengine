@@ -1,7 +1,7 @@
 import unittest
 import tempfile
 import os
-from worldengine.step import Step
+#from worldengine.step import Step
 from worldengine.world import World
 from worldengine.common import _equal
 from worldengine.hdf5_serialization import save_world_to_hdf5, load_world_to_hdf5
@@ -18,23 +18,23 @@ class TestSerialization(unittest.TestCase):
         self.maxDiff = None
 
     def test_protobuf_serialize_unserialize(self):
-        w = World("Dummy", 16, 16, seed=1)#, 1, step=Step.get_by_name("full"))
+        w = World("Dummy", 16, 16, seed=1)
         serialized = w.protobuf_serialize()
         unserialized = World.protobuf_unserialize(serialized)
         self.assertEqual(set(w.layers.keys()), set(unserialized.layers.keys()))
         for l in w.layers.keys():
             self.assertEqual(w.layers[l], unserialized.layers[l], "Comparing %s" % l)
         self.assertTrue(_equal(w.ocean_level,       unserialized.ocean_level))
-        self.assertEquals(w.seed,                   unserialized.seed)
-        self.assertEquals(w.n_plates,               unserialized.n_plates)
-        self.assertEquals(w.step,                   unserialized.step)
+        self.assertEqual(w.seed,                   unserialized.seed)
+        self.assertEqual(w.number_of_plates,       unserialized.number_of_plates)
+       # self.assertEquals(w.step,                   unserialized.step)
         self.assertEqual(sorted(dir(w)),            sorted(dir(unserialized)))
         self.assertEqual(w, unserialized)
 
     def test_hdf5_serialize_unserialize(self):
         filename = None
         try:
-            w = World("Dummy", 16, 16,1)#, 1, step=Step.get_by_name("full"))
+            w = World("Dummy", 16, 16,1)
             f = tempfile.NamedTemporaryFile(delete=False)
             f.close()
             filename = f.name
@@ -45,14 +45,15 @@ class TestSerialization(unittest.TestCase):
             for l in w.layers.keys():
                 self.assertEqual(w.layers[l], unserialized.layers[l], "Comparing %s" % l)
             self.assertTrue(_equal(w.ocean_level,       unserialized.ocean_level))
-            self.assertEquals(w.seed,                   unserialized.seed)
-            self.assertEquals(w.n_plates,               unserialized.n_plates)
-            self.assertEquals(w.step,                   unserialized.step)
+            self.assertEqual(w.seed,                   unserialized.seed)
+            self.assertEqual(w.number_of_plates,      unserialized.number_of_plates)
+            #self.assertEquals(w.step,                   unserialized.step)
             self.assertEqual(sorted(dir(w)),            sorted(dir(unserialized)))
-            #self.assertEqual(w, unserialized)
+            #self.assertEqual(w, unserialized)        
         finally:
             if filename:
                 os.remove(filename)
 
+                
 if __name__ == '__main__':
     unittest.main()

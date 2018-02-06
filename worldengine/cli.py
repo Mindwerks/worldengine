@@ -10,7 +10,7 @@ import os
 import worldengine
 
 from worldengine.common import set_verbose
-from worldengine.step import Step
+#from worldengine.step import Step
 from worldengine.version import __version__
 
 
@@ -24,13 +24,13 @@ STEPS = 'plates|precipitations|full'
 
 
 
-def check_step(step_name):
-    step = Step.get_by_name(step_name)
-    if step is None:
-        print("ERROR: unknown step name, using default 'full'")
-        return Step.get_by_name("full")
-    else:
-        return step
+#def check_step(step_name):
+    #step = Step.get_by_name(step_name)
+    #if step is None:
+        #print("ERROR: unknown step name, using default 'full'")
+        #return Step.get_by_name("full")
+    #else:
+        #return step
 
 def __get_last_byte__(filename):
     #why does this exist?
@@ -518,8 +518,8 @@ class proto_world:
         self.set_humids(args)
 
         #this is the generation step 
-        step = check_step(args.step)
-        self.arg_dict["step"]=step
+        #step = check_step(args.step)
+        #self.arg_dict["step"]=step
         
         self.arg_errors(args)
         
@@ -556,7 +556,7 @@ class proto_world:
             print(' number of plates     : %i' % args.number_of_plates)
             print(' world format         : %s' % world_format)
             print(' black and white maps : %s' % args.black_and_white)
-            print(' step                 : %s' % step.name)
+            #print(' step                 : %s' % step.name)
             print(' greyscale heightmap  : %s' % args.grayscale_heightmap)
             print(' icecaps heightmap    : %s' % args.icecaps_map)
             print(' rivers map           : %s' % args.rivers_map)
