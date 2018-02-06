@@ -86,15 +86,10 @@ class World:
     each cell.
     """
 
-    def __init__(self, name,
-                e_as_array,
-                p_as_array,
-                height,
-                width,
-                seed,
-                step=Step.full(),
+    def __init__(self, name="test",height=512,width=512,seed=1,#e_as_array, sp_as_array,
                 number_of_plates=10,
                 ocean_level=1.0,
+                step=Step.full(),
                 temps=[0.874, 0.765, 0.594, 0.439, 0.366, 0.124],
                 humids = [.941, .778, .507, .236, 0.073, .014, .002],
                 gamma_curve=1.25, curve_offset=.2,verbose=False):
@@ -122,8 +117,9 @@ class World:
         self.n_plates = generation_params.n_plates
         self.step = generation_params.step
         self.ocean_level = generation_params.ocean_level
-
+    def set_elevation(self,e_as_array):
         self.elevation = (numpy.array(e_as_array).reshape(height, width), None)
+    def set_plate_map(self,p_as_array):
         self.plates = numpy.array(p_as_array, dtype=numpy.uint16).reshape(height, width)
         
     #
@@ -139,7 +135,7 @@ class World:
 
     @classmethod
     def from_dict(cls, dict):
-        instance = World(dict['name'], Size(dict['width'], dict['height']))
+        instance = World(**dict)##dict['name'], Size(dict['width'], dict['height']))
         for k in dict:
             instance.__dict__[k] = dict[k]
         return instance

@@ -32,8 +32,8 @@ class TestSimulation(unittest.TestCase):
         elevation = numpy.fromfunction(lambda y, x: y*x, (size.height, size.width))
 
         t = numpy.zeros(5)
-
-        w = World("watermap",  size, seed, GenerationParameters(0, 1.0, 0))
+        
+        w = World("watermap", 16, 8, seed, 0, 1.0, 0)
         w.ocean = ocean
         w.precipitation = (percipitation, t)
         w.elevation = (elevation, t)

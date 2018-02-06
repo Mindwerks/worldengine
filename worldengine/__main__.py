@@ -27,9 +27,10 @@ def main(args,arg_dict):
             world_kwargs["verbose"]=False
             
         #arg_dict["number_of_plates":10]
-        
-        world_kwargs.update({"e_as_array":e_as_array,"p_as_array":p_as_array})
+        #world_kwargs.update({"e_as_array":e_as_array,"p_as_array":p_as_array})
         world = worldengine.world.World(**world_kwargs)
+        world.set_elevation(e_as_array)
+        world.set_plate_map(p_as_array)
         #name, Size(width, height), seed,
                       #GenerationParameters(num_plates, ocean_level, step),
                      #temps, humids, gamma_curve, curve_offset)
