@@ -22,9 +22,7 @@ class TestSimulation(unittest.TestCase):
     def test_watermap_rng_stabilty(self):
         seed=12345
         numpy.random.seed(seed)
-
-        size = (16,8)
-
+        size=(16,8)
         ocean = numpy.fromfunction(lambda y, x: y==x, (size))
 
         percipitation = numpy.ones(size)
@@ -32,8 +30,7 @@ class TestSimulation(unittest.TestCase):
         elevation = numpy.fromfunction(lambda y, x: y*x, (size))
 
         t = numpy.zeros(5)
-        
-        w = World("watermap", 16, 8, seed, 0, 1.0, 0)
+        w = World("watermap", 16, 8, seed, 1, 1.0)
         w.ocean = ocean
         w.precipitation = (percipitation, t)
         w.elevation = (elevation, t)
@@ -53,23 +50,22 @@ class TestSimulation(unittest.TestCase):
     def test_watermap_does_not_break_with_no_land(self):
         seed=12345
         numpy.random.seed(seed)
-
+        
         size = (16,8)
 
         ocean = numpy.full(size, True, bool)
 
-        w = World("watermap", 16, 8 , seed, 0, 1.0, 0)
+        w = World("watermap", 16, 8 , seed, 1, 1.0)
         w.ocean = ocean
 
         data, t = WatermapSimulation._watermap(w, 200)
 
 
     def test_random_land_returns_only_land(self):
-        size = (100,90)
-
+        size=(100,90)
         ocean = numpy.fromfunction(lambda y, x: y>=x, (size))
         
-        w = World("random_land", 100,90, 0, 0, 1.0, 0)
+        w = World("random_land", 100,90, 1, 1, 1.0)
         
         w.ocean = ocean
 

@@ -1,8 +1,8 @@
 import unittest
 
 import numpy
-from worldengine.step import Step
-from worldengine.plates import center_land, world_gen
+
+#from worldengine.plates import center_land
 from worldengine.world import World
 from tests.draw_test import TestBase
 

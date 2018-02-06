@@ -112,6 +112,7 @@ class World:
         
     def set_elevation(self,e_as_array):
         self.elevation = (numpy.array(e_as_array).reshape(self.height,self.width), None)
+    
     def set_plate_map(self,p_as_array):
         self.plates = numpy.array(p_as_array, dtype=numpy.uint16).reshape(self.height,self.width)
         
