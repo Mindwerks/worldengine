@@ -11,6 +11,18 @@ from worldengine.version import __version__
 from worldengine import plates
 from worldengine import generation 
 
+from worldengine.simulations.basic import find_threshold_f
+from worldengine.simulations.hydrology import WatermapSimulation
+from worldengine.simulations.irrigation import IrrigationSimulation
+from worldengine.simulations.humidity import HumiditySimulation
+from worldengine.simulations.temperature import TemperatureSimulation
+from worldengine.simulations.permeability import PermeabilitySimulation
+from worldengine.simulations.erosion import ErosionSimulation
+from worldengine.simulations.precipitation import PrecipitationSimulation
+from worldengine.simulations.biome import BiomeSimulation
+from worldengine.simulations.icecap import IcecapSimulation
+
+
 class Layer:
 
     def __init__(self, data):
@@ -68,6 +80,9 @@ class World:
                 humids = [.941, .778, .507, .236, 0.073, .014, .002],
                 gamma_curve=1.25, curve_offset=.2,verbose=False):
         
+        #ok the important thing to do now is to separate the generation
+        #of the data from the world object.
+        #the simulation should not have side effects on the world.
         
         self.name = name
         self.seed = seed
@@ -84,31 +99,132 @@ class World:
         #self.step = step
         self.ocean_level = ocean_level
         
-        #apparently I need this...
-        #other_world_ops(self)
+        gen_plates=True
+        if gen_plates:
+            e_as_array,p_as_array=plates.generate_plates_simulation(seed,width,height)
+            self.set_elevation(e_as_array)
+            self.set_plate_map(p_as_array)
         
-        #def filter_plates_args(all_dict):
-        #l=["seed", "width", "height", "sea_level","erosion_period",
-        # "folding_ratio","aggr_overlap_abs","aggr_overlap_rel",
-        # "cycle_count","number_of_plates"]
-        #plates_kwargs={}
-        #for key in l:
-        #    if key in all_dict:
-        #        plates_kwargs[key]=all_dict[key]
-        #return plates_kwargs
+        #the generation functions are functions that transform the 
+        #worlds' data.
         
-        e_as_array,p_as_array=plates.generate_plates_simulation(seed,width,height)
+        center=True
+        if center:
+            elevation_data = self.layers['elevation'].data
+            plate_data = self.layers['plates'].data
+            
+            t = generation.center_land(elevation_data,plate_data,verbose)
+            
+            self.layers['elevation'].data = t[0]
+            self.layers['plates'].data = t[1]
         
-        self.set_elevation(e_as_array)
-        self.set_plate_map(p_as_array)
-        #name, Size(width, height), seed,
-                      #GenerationParameters(num_plates, ocean_level, step),
-                     #temps, humids, gamma_curve, curve_offset)
-        #if "step" not in arg_dict:
-        #    arg_dict["step"]=step.Step.full()
+        noise=True
+        if noise:
+            input_matrix=self.layers['elevation'].data
+            
+            r=generation.add_noise_to_matrix(input_matrix, numpy.random.randint(0, 4096))  # uses the global RNG; this is the very first call to said RNG - should that change, this needs to be taken care of
+            
+            self.layers['elevation'].data=r
+            
+        fade_borders=True
+        if fade_borders:
+            
+            input_data = self.layers['elevation'].data
+    
+            r=generation.place_oceans_at_map_borders(input_data)
+            
+            self.layers['elevation'].data=r
+            
+        ocean_and_thresholds=True
+        if ocean_and_thresholds:
+            el_map=self.layers["elevation"].data
+            ocean,ocean_level,el_tuple=generation.initialize_ocean_and_thresholds(el_map)
+            self.ocean = ocean
+            self.elevation = el_tuple
+            self.sea_depth = generation.sea_depth(self, ocean_level)
+            
+        # Prepare sufficient seeds for the different steps of the generation
         
-        generation.other_world_ops(self,verbose)#"step",
-        generation.generate_world(self)#step
+        # create a fresh RNG in case the global RNG is compromised 
+        # (i.e. has been queried an indefinite amount of times before 
+        # generate_world() was called)
+        #hm how about we just... don't allow it to be compromised instead...
+        
+        #alriiiiight...
+        
+        rng = numpy.random.RandomState(self.seed)  
+        
+        # choose lowest common denominator (32 bit Windows numpy 
+        # cannot handle a larger value)
+        sub_seeds = rng.randint(0, numpy.iinfo(numpy.int32).max, size=100)  
+        
+        seed_dict = {
+                     'PrecipitationSimulation': sub_seeds[ 0],  # after 0.19.0 do not ever switch out the seeds here to maximize seed-compatibility
+                     'ErosionSimulation':       sub_seeds[ 1],
+                     'WatermapSimulation':      sub_seeds[ 2],
+                     'IrrigationSimulation':    sub_seeds[ 3],
+                     'TemperatureSimulation':   sub_seeds[ 4],
+                     'HumiditySimulation':      sub_seeds[ 5],
+                     'PermeabilitySimulation':  sub_seeds[ 6],
+                     'BiomeSimulation':         sub_seeds[ 7],
+                     'IcecapSimulation':        sub_seeds[ 8],
+                     '':                        sub_seeds[99]
+        }
+        
+        
+        temp_sim=True
+        if temp_sim:
+            TemperatureSimulation().execute(self, seed_dict['TemperatureSimulation'])
+        
+        percip_sim=True
+        if percip_sim:
+            # Precipitation with thresholds
+            PrecipitationSimulation().execute(self, seed_dict['PrecipitationSimulation'])
+        
+        erosion_sim=True
+        if erosion_sim:
+            ErosionSimulation().execute(self, seed_dict['ErosionSimulation'])  # seed not currently used
+            if verbose:
+                print("...erosion calculated")
+                
+        watermap_sim=True
+        if watermap_sim:
+            WatermapSimulation().execute(self, seed_dict['WatermapSimulation'])  # seed not currently used
+        
+        irigation_sim=True
+        if irigation_sim:
+            IrrigationSimulation().execute(self, seed_dict['IrrigationSimulation'])  # seed not currently used
+        
+        
+        humidity_sim=True
+        if humidity_sim:
+            HumiditySimulation().execute(self, seed_dict['HumiditySimulation'])  # seed not currently used
+        
+        permeability_sim=True
+        if permeability_sim:
+            PermeabilitySimulation().execute(self, seed_dict['PermeabilitySimulation'])
+        
+        
+        biome_sim=True
+        if biome_sim:
+            cm, biome_cm = BiomeSimulation().execute(self, seed_dict['BiomeSimulation'])  # seed not currently used
+            for cl in cm.keys():
+                count = cm[cl]
+                if verbose:
+                    print("%s = %i" % (str(cl), count))
+
+        if verbose:
+            print('')  # empty line
+            print('Biome obtained:')
+
+            for cl in biome_cm.keys():
+                count = biome_cm[cl]
+                print(" %30s = %7i" % (str(cl), count))
+        
+        icecap_sim=True
+        if icecap_sim:
+            IcecapSimulation().execute(self, seed_dict['IcecapSimulation'])  # makes use of temperature-map
+
         
     def set_elevation(self,e_as_array):
         self.elevation = (numpy.array(e_as_array).reshape(self.height,self.width), None)

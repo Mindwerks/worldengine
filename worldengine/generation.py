@@ -21,89 +21,82 @@ from worldengine.common import anti_alias, get_verbose
 # Initial generation
 # ------------------
 
-def center_land(world):
-    """Translate the map horizontally and vertically to put as much ocean as
-       possible at the borders. It operates on elevation and plates map"""
-
-    y_sums = world.layers['elevation'].data.sum(1)  # 1 == sum along x-axis
-    y_with_min_sum = y_sums.argmin()
-    if get_verbose():
-        print("geo.center_land: height complete")
-
-    x_sums = world.layers['elevation'].data.sum(0)  # 0 == sum along y-axis
+def calculate_minium_map_sums(data):
+    
+    x_sums = data.sum(0)  # 0 == sum along y-axis
     x_with_min_sum = x_sums.argmin()
-    if get_verbose():
-        print("geo.center_land: width complete")
+    
+    y_sums = data.sum(1)  # 1 == sum along x-axis
+    y_with_min_sum = y_sums.argmin()
+            
+    return y_with_min_sum,x_with_min_sum
 
-    latshift = 0
-    world.layers['elevation'].data = numpy.roll(numpy.roll(world.layers['elevation'].data, -y_with_min_sum + latshift, axis=0), - x_with_min_sum, axis=1)
-    world.layers['plates'].data = numpy.roll(numpy.roll(world.layers['plates'].data, -y_with_min_sum + latshift, axis=0), - x_with_min_sum, axis=1)
-    if get_verbose():
-        print("geo.center_land: width complete")
+def center_map(data,delta_y,delta_x):
+    
+    data=numpy.roll(data, -delta_y, axis=0)
+    data=numpy.roll(data, -delta_x, axis=1)
+    
+    return data
 
+def center_land(elevation,plate_map,verbose=False):
+    """Translate the map horizontally and vertically to put as much ocean as
+       possible at the borders. 
+       
+       It takes two numpy matrices representing the elevation and plate map, 
+       calculates the minimum sum and rolls both accordingly"""
+    
+    delta_y , delta_x = calculate_minium_map_sums(elevation)
+    
+    new_elevation = center_map(elevation,delta_y,delta_x)
+    new_plate_map = center_map(plate_map,delta_y,delta_x)
+    
+    if verbose:
+        print("center land complete")
+        
+    return new_elevation, new_plate_map
 
-def place_oceans_at_map_borders(world):
+def place_oceans_at_map_borders(input_data):
+    #this function lowers the values the matrix at the edges
+    #maybe this has some other uses?
+    #can't think of any right now, so I'll keep the name.
     """
     Lower the elevation near the border of the map
     """
+    
+    height,width=input_data.shape
+    ocean_border = int(min(30, max(width / 5, height / 5) ) )
+    
 
-    ocean_border = int(min(30, max(world.width / 5, world.height / 5)))
-
-    def place_ocean(x, y, i):
-        world.layers['elevation'].data[y, x] = \
-            (world.layers['elevation'].data[y, x] * i) / ocean_border
-
-    for x in range(world.width):
+    for x in range(width):
         for i in range(ocean_border):
-            place_ocean(x, i, i)
-            place_ocean(x, world.height - i - 1, i)
+            place_ocean(input_data,ocean_border,x, i, i)
+            place_ocean(input_data,ocean_border,x, height - i - 1, i)
 
-    for y in range(world.height):
+    for y in range(height):
         for i in range(ocean_border):
-            place_ocean(i, y, i)
-            place_ocean(world.width - i - 1, y, i)
-
-def other_world_ops(world,verbose,fade_borders=True):
+            place_ocean(input_data,ocean_border,i, y, i)
+            place_ocean(input_data,ocean_border,width - i - 1, y, i)
+    return input_data
     
-    #center
-    center_land(world)
+def place_ocean(input_data,ocean_border,x, y, i):
+    input_data[y, x] = (input_data[y, x] * i) / ocean_border
+
+def add_noise_to_matrix(input_matrix, seed):
     
-    if verbose:
-        #elapsed_time = time.time() - start_time
-        print("...plates.world_gen: set_elevation, set_plates, center_land " +
-              "complete.")
-
-        #start_time = time.time()
-        
-    #noise step
-    add_noise_to_elevation(world, numpy.random.randint(0, 4096))  # uses the global RNG; this is the very first call to said RNG - should that change, this needs to be taken care of
+    #this has probably more uses than just elevation noise!
     
-    if verbose:
-        #elapsed_time = time.time() - start_time
-        print("...plates.world_gen: elevation noise added.")
-              
-        #start_time = time.time()
-    
-    #fade_borders
-    if fade_borders:
-        place_oceans_at_map_borders(world)
-        
-    #oceans
-    initialize_ocean_and_thresholds(world)
-    if verbose:
-        #elapsed_time = time.time() - start_time
-        print("...plates.world_gen: oceans initialized.")
-
-    return generate_world(world)
-
-
-def add_noise_to_elevation(world, seed):
     octaves = 8
     freq = 16.0 * octaves
-    for y in range(world.height):
-        for x in range(world.width):
+    size=input_matrix.shape
+    height,width=size
+    print("shape",size)
+    
+    for y in range(height):
+        for x in range(width):
             n = snoise2(x / freq * 2, y / freq * 2, octaves, base=seed)
-            world.layers['elevation'].data[y, x] += n
+            input_matrix[y, x] += n
+            
+    return input_matrix
 
 
 def fill_ocean(elevation, sea_level):#TODO: Make more use of numpy?
@@ -132,14 +125,15 @@ def fill_ocean(elevation, sea_level):#TODO: Make more use of numpy?
     return ocean
 
 
-def initialize_ocean_and_thresholds(world, ocean_level=1.0):
+def initialize_ocean_and_thresholds(e, ocean_level=1.0):
     """
     Calculate the ocean, the sea depth and the elevation thresholds
     :param world: a world having elevation but not thresholds
     :param ocean_level: the elevation representing the ocean level
     :return: nothing, the world will be changed
     """
-    e = world.layers['elevation'].data
+    
+    #e = 
     ocean = fill_ocean(e, ocean_level)
     hl = find_threshold_f(e, 0.10)  # the highest 10% of all (!) land are declared hills
     ml = find_threshold_f(e, 0.03)  # the highest 3% are declared mountains
@@ -148,9 +142,9 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
             ('hill', ml),
             ('mountain', None)]
     harmonize_ocean(ocean, e, ocean_level)
-    world.ocean = ocean
-    world.elevation = (e, e_th)
-    world.sea_depth = sea_depth(world, ocean_level)
+    
+    return ocean, ocean_level, (e,e_th)
+   
 
 
 def harmonize_ocean(ocean, elevation, ocean_level):
@@ -241,12 +235,7 @@ def _around(x, y, width, height):
 
 
 def generate_world(w):#, step):
-    #if isinstance(step, str):
-    #    step = Step.get_by_name(step)
-
-    #if not step.include_precipitations:
-    #    return w
-
+    
     # Prepare sufficient seeds for the different steps of the generation
     
     # create a fresh RNG in case the global RNG is compromised 
