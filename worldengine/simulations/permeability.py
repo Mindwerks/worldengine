@@ -36,3 +36,5 @@ class PermeabilitySimulation(object):
                 perm[y, x] = n
 
         return perm
+def permeability_sim():
+    a=1

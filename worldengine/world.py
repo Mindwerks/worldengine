@@ -12,13 +12,13 @@ from worldengine import plates
 from worldengine import generation 
 
 from worldengine.simulations.basic import find_threshold_f
-from worldengine.simulations.hydrology import WatermapSimulation
-from worldengine.simulations.irrigation import IrrigationSimulation
-from worldengine.simulations.humidity import HumiditySimulation
-from worldengine.simulations.temperature import TemperatureSimulation
-from worldengine.simulations.permeability import PermeabilitySimulation
-from worldengine.simulations.erosion import ErosionSimulation
-from worldengine.simulations.precipitation import PrecipitationSimulation
+from worldengine.simulations.hydrology import watermap_sim#WatermapSimulation
+from worldengine.simulations.irrigation import irrigation_sim#IrrigationSimulation
+from worldengine.simulations.humidity import humidity_sim#,HumiditySimulation
+from worldengine.simulations.temperature import temper_sim #TemperatureSimulation
+from worldengine.simulations.permeability import permeability_sim,PermeabilitySimulation
+from worldengine.simulations.erosion import erosion_sim#ErosionSimulation
+from worldengine.simulations.precipitation import precipitation_sim #PrecipitationSimulation
 from worldengine.simulations.biome import BiomeSimulation
 from worldengine.simulations.icecap import IcecapSimulation
 
@@ -83,6 +83,9 @@ class World:
         #ok the important thing to do now is to separate the generation
         #of the data from the world object.
         #the simulation should not have side effects on the world.
+        #the world should instead assign output from simulations to itself
+        #that makes the simulation functions easier to test and reuse.
+        #or replace...
         
         self.name = name
         self.seed = seed
@@ -95,8 +98,7 @@ class World:
         
         self.width = width
         self.height = height
-        self.number_of_plates = number_of_plates
-        #self.step = step
+        self.number_of_plates = number_of_plates        
         self.ocean_level = ocean_level
         
         gen_plates=True
@@ -141,6 +143,8 @@ class World:
             ocean,ocean_level,el_tuple=generation.initialize_ocean_and_thresholds(el_map)
             self.ocean = ocean
             self.elevation = el_tuple
+            thresholds=el_tuple[1]
+            
             self.sea_depth = generation.sea_depth(self, ocean_level)
             
         # Prepare sufficient seeds for the different steps of the generation
@@ -149,65 +153,109 @@ class World:
         # (i.e. has been queried an indefinite amount of times before 
         # generate_world() was called)
         #hm how about we just... don't allow it to be compromised instead...
-        
-        #alriiiiight...
-        
-        rng = numpy.random.RandomState(self.seed)  
-        
-        # choose lowest common denominator (32 bit Windows numpy 
-        # cannot handle a larger value)
-        sub_seeds = rng.randint(0, numpy.iinfo(numpy.int32).max, size=100)  
-        
-        seed_dict = {
-                     'PrecipitationSimulation': sub_seeds[ 0],  # after 0.19.0 do not ever switch out the seeds here to maximize seed-compatibility
-                     'ErosionSimulation':       sub_seeds[ 1],
-                     'WatermapSimulation':      sub_seeds[ 2],
-                     'IrrigationSimulation':    sub_seeds[ 3],
-                     'TemperatureSimulation':   sub_seeds[ 4],
-                     'HumiditySimulation':      sub_seeds[ 5],
-                     'PermeabilitySimulation':  sub_seeds[ 6],
-                     'BiomeSimulation':         sub_seeds[ 7],
-                     'IcecapSimulation':        sub_seeds[ 8],
-                     '':                        sub_seeds[99]
-        }
+        if True:
+            rng = numpy.random.RandomState(self.seed)  
+            
+            # choose lowest common denominator (32 bit Windows numpy 
+            # cannot handle a larger value)
+            sub_seeds = rng.randint(0, numpy.iinfo(numpy.int32).max, size=100)  
+            
+            seed_dict = {
+                         'PrecipitationSimulation': sub_seeds[ 0],  # after 0.19.0 do not ever switch out the seeds here to maximize seed-compatibility
+                         'ErosionSimulation':       sub_seeds[ 1],
+                         'WatermapSimulation':      sub_seeds[ 2],
+                         'IrrigationSimulation':    sub_seeds[ 3],
+                         'TemperatureSimulation':   sub_seeds[ 4],
+                         'HumiditySimulation':      sub_seeds[ 5],
+                         'PermeabilitySimulation':  sub_seeds[ 6],
+                         'BiomeSimulation':         sub_seeds[ 7],
+                         'IcecapSimulation':        sub_seeds[ 8],
+                         '':                        sub_seeds[99]
+            }
         
         
         temp_sim=True
         if temp_sim:
-            TemperatureSimulation().execute(self, seed_dict['TemperatureSimulation'])
+            elevation=self.layers["elevation"].data
+            mountain_level= self.start_mountain_th()
+            ocean=self.layers['ocean'].data
+            #TemperatureSimulation().execute(self, seed_dict['TemperatureSimulation'])
         
+            t,t_th=temper_sim(elevation,mountain_level,ocean,self.temps,self.seed)
+            self.temperature = (t, t_th)
+            
         percip_sim=True
         if percip_sim:
             # Precipitation with thresholds
-            PrecipitationSimulation().execute(self, seed_dict['PrecipitationSimulation'])
-        
-        erosion_sim=True
-        if erosion_sim:
-            ErosionSimulation().execute(self, seed_dict['ErosionSimulation'])  # seed not currently used
-            if verbose:
-                print("...erosion calculated")
+            #PrecipitationSimulation().execute(self, seed_dict['PrecipitationSimulation'])
+            
+            ocean=self.layers["ocean"].data
+            seed=seed_dict["PrecipitationSimulation"]
+            
+            #maybe calculated these earlier?
+            #this isn't used at all. Why?
+            min_temp = self.layers['temperature'].min()
+            max_temp = self.layers['temperature'].max()
+            temp_delta = (max_temp - min_temp)
+            norm_t = (self.layers['temperature'].data - min_temp) / temp_delta
+            
+            ret_t = precipitation_sim(ocean,norm_t,seed,self.gamma_curve,self.curve_offset)
+            
+            self.precipitation = ret_t
+            
+        do_erosion_sim=True
+        if do_erosion_sim:
+            
+            #ErosionSimulation().execute(self, seed_dict['ErosionSimulation'])  # seed not currently used
+            elevation_map = self.layers['elevation'].data
+            precipitation_map = self.layers['precipitation'].data
+            ocean=self.layers["ocean"].data
+            mountain_th = self.layers['elevation'].thresholds[2][1]
+            river_map , lake_map = erosion_sim(elevation_map,precipitation_map,ocean,mountain_th)
+            self.rivermap , self.lakemap = river_map,lake_map
                 
-        watermap_sim=True
-        if watermap_sim:
-            WatermapSimulation().execute(self, seed_dict['WatermapSimulation'])  # seed not currently used
-        
-        irigation_sim=True
-        if irigation_sim:
-            IrrigationSimulation().execute(self, seed_dict['IrrigationSimulation'])  # seed not currently used
-        
-        
-        humidity_sim=True
-        if humidity_sim:
-            HumiditySimulation().execute(self, seed_dict['HumiditySimulation'])  # seed not currently used
-        
-        permeability_sim=True
-        if permeability_sim:
+        do_watermap_sim=True
+        if do_watermap_sim:
+            ##WatermapSimulation().execute(self, )  # seed not currently used
+            seed=seed_dict['WatermapSimulation']
+            elevation=self.layers['elevation'].data
+            precipitation=self.layers['precipitation'].data
+            ocean=self.layers["ocean"].data
+            r_t=watermap_sim(elevation,precipitation,ocean)
+            self.watermap=r_t
+            
+        do_irrigation_sim=True
+        if do_irrigation_sim:
+            
+            #IrrigationSimulation().execute(self, seed_dict['IrrigationSimulation'])
+            # seed not currently used
+            seed=seed_dict['IrrigationSimulation']
+            ocean=self.layers["ocean"].data
+            watermap=self.layers['watermap'].data
+            
+            r=self.irrigation=irrigation_sim(watermap,ocean,seed)
+            self.irrigation=r
+            
+        do_humidity_sim=True
+        if do_humidity_sim:
+            
+            #HumiditySimulation().execute(self, seed_dict['HumiditySimulation'])  # seed not currently used
+            irrigation=self.layers['irrigation'].data
+            precipitation=self.layers['precipitation'].data
+            ocean=self.layers['ocean'].data
+            humid_tuple=humidity_sim(self.humids,precipitation,irrigation,ocean)
+            self.humidity=humid_tuple
+            
+        do_permeability_sim=False
+        if do_permeability_sim:
+            #it's just random noise.
+            #like... why bother.
             PermeabilitySimulation().execute(self, seed_dict['PermeabilitySimulation'])
-        
+            #permeability_sim()
         
         biome_sim=True
         if biome_sim:
-            cm, biome_cm = BiomeSimulation().execute(self, seed_dict['BiomeSimulation'])  # seed not currently used
+            cm, biome_cm = BiomeSimulation.execute(self, seed_dict['BiomeSimulation'])  # seed not currently used
             for cl in cm.keys():
                 count = cm[cl]
                 if verbose:
@@ -568,7 +616,7 @@ class World:
         if self.is_ocean(pos):
             return False
         x, y = pos
-
+        #[y][x]      
         return self.layers['elevation'].data[y][x] > self.get_mountain_level()
 
     def is_low_mountain(self, pos):
