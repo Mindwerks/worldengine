@@ -16,11 +16,11 @@ from worldengine.simulations.hydrology import watermap_sim#WatermapSimulation
 from worldengine.simulations.irrigation import irrigation_sim#IrrigationSimulation
 from worldengine.simulations.humidity import humidity_sim#,HumiditySimulation
 from worldengine.simulations.temperature import temper_sim #TemperatureSimulation
-from worldengine.simulations.permeability import permeability_sim,PermeabilitySimulation
+#from worldengine.simulations.permeability import permeability_sim,PermeabilitySimulation
 from worldengine.simulations.erosion import erosion_sim#ErosionSimulation
 from worldengine.simulations.precipitation import precipitation_sim #PrecipitationSimulation
-from worldengine.simulations.biome import BiomeSimulation
-from worldengine.simulations.icecap import IcecapSimulation
+from worldengine.simulations.biome import create_biome_map,BiomeSimulation
+from worldengine.simulations.icecap import icecap_sim#IcecapSimulation
 
 
 class Layer:
@@ -87,6 +87,8 @@ class World:
         #that makes the simulation functions easier to test and reuse.
         #or replace...
         
+        self.verbose=verbose
+        
         self.name = name
         self.seed = seed
         self.temps = temps
@@ -101,179 +103,226 @@ class World:
         self.number_of_plates = number_of_plates        
         self.ocean_level = ocean_level
         
-        gen_plates=True
-        if gen_plates:
-            e_as_array,p_as_array=plates.generate_plates_simulation(seed,width,height)
-            self.set_elevation(e_as_array)
-            self.set_plate_map(p_as_array)
+        self.simulations()
         
-        #the generation functions are functions that transform the 
-        #worlds' data.
-        
-        center=True
-        if center:
-            elevation_data = self.layers['elevation'].data
-            plate_data = self.layers['plates'].data
-            
-            t = generation.center_land(elevation_data,plate_data,verbose)
-            
-            self.layers['elevation'].data = t[0]
-            self.layers['plates'].data = t[1]
-        
-        noise=True
-        if noise:
-            input_matrix=self.layers['elevation'].data
-            
-            r=generation.add_noise_to_matrix(input_matrix, numpy.random.randint(0, 4096))  # uses the global RNG; this is the very first call to said RNG - should that change, this needs to be taken care of
-            
-            self.layers['elevation'].data=r
-            
-        fade_borders=True
-        if fade_borders:
-            
-            input_data = self.layers['elevation'].data
+    def gen_plates(self):
+        seed=self.seed
+        height,width=self.height,self.width
+        e_as_array,p_as_array=plates.generate_plates_simulation(seed,width,height)
+        self.set_elevation(e_as_array)
+        self.set_plate_map(p_as_array)
     
-            r=generation.place_oceans_at_map_borders(input_data)
+    def center_maps(self):
+        elevation_data = self.layers['elevation'].data
+        plate_data = self.layers['plates'].data
+        
+        t = generation.center_land(elevation_data,plate_data,self.verbose)
+        
+        self.layers['elevation'].data = t[0]
+        self.layers['plates'].data = t[1]
+    
+    def add_noise_to_elevation(self):
+        input_matrix=self.layers['elevation'].data
+        
+        r=generation.add_noise_to_matrix(input_matrix, numpy.random.randint(0, 4096))  # uses the global RNG; this is the very first call to said RNG - should that change, this needs to be taken care of
+        
+        self.layers['elevation'].data=r
+        
+    def fade_borders(self):
+        input_data = self.layers['elevation'].data
+
+        r=generation.place_oceans_at_map_borders(input_data)
+        
+        self.layers['elevation'].data=r
+    
+    def ocean_and_thresholds(self):
+        el_map=self.layers["elevation"].data
+        ocean,ocean_level,el_tuple=generation.initialize_ocean_and_thresholds(el_map)
+        self.ocean = ocean
+        self.elevation = el_tuple
+        thresholds=el_tuple[1]
+        self.sea_depth = generation.sea_depth(self, ocean_level)
+    
+    def fake_temps(self):
+        elevation=self.layers["elevation"].data
+        mountain_level= self.start_mountain_th()
+        print("mountain_level",mountain_level)
+        ocean=self.layers['ocean'].data
+        #TemperatureSimulation().execute(self, seed_dict['TemperatureSimulation'])
+        
+        t,t_th=temper_sim(elevation,mountain_level,ocean,self.temps,self.seed)
+        print(self.temps)
+        print(t_th)
+        self.temperature = (t, t_th)
+    
+    def precipitation_sim(self):
+        # Precipitation with thresholds
+        #PrecipitationSimulation().execute(self, seed_dict['PrecipitationSimulation'])
+        
+        ocean=self.layers["ocean"].data
+        seed=self.seed_dict["PrecipitationSimulation"]
+        
+        #maybe calculated these earlier?
+        #this isn't used at all. Why?
+        min_temp = self.layers['temperature'].min()
+        max_temp = self.layers['temperature'].max()
+        temp_delta = (max_temp - min_temp)
+        norm_t = (self.layers['temperature'].data - min_temp) / temp_delta
+        
+        ret_t = precipitation_sim(ocean,norm_t,seed,self.gamma_curve,self.curve_offset)
+        
+        self.precipitation = ret_t
+    
+    def erosion_sim(self):
+        #ErosionSimulation().execute(self, seed_dict['ErosionSimulation'])  # seed not currently used
+        elevation_map = self.layers['elevation'].data
+        precipitation_map = self.layers['precipitation'].data
+        ocean=self.layers["ocean"].data
+        mountain_th = self.layers['elevation'].thresholds[2][1]
+        river_map , lake_map = erosion_sim(elevation_map,precipitation_map,ocean,mountain_th)
+        self.rivermap , self.lakemap = river_map,lake_map
             
-            self.layers['elevation'].data=r
-            
-        ocean_and_thresholds=True
-        if ocean_and_thresholds:
-            el_map=self.layers["elevation"].data
-            ocean,ocean_level,el_tuple=generation.initialize_ocean_and_thresholds(el_map)
-            self.ocean = ocean
-            self.elevation = el_tuple
-            thresholds=el_tuple[1]
-            
-            self.sea_depth = generation.sea_depth(self, ocean_level)
-            
+    def watermap_sim(self):
+        ##WatermapSimulation().execute(self, )  # seed not currently used
+        seed=self.seed_dict['WatermapSimulation']
+        elevation=self.layers['elevation'].data
+        precipitation=self.layers['precipitation'].data
+        ocean=self.layers["ocean"].data
+        r_t=watermap_sim(elevation,precipitation,ocean)
+        self.watermap=r_t
+    
+    def irrigation_sim(self):
+        #IrrigationSimulation().execute(self, seed_dict['IrrigationSimulation'])
+        # seed not currently used
+        seed=self.seed_dict['IrrigationSimulation']
+        ocean=self.layers["ocean"].data
+        watermap=self.layers['watermap'].data
+        
+        r=self.irrigation=irrigation_sim(watermap,ocean,seed)
+        self.irrigation=r
+    
+    def humidity_sim(self):
+        #HumiditySimulation().execute(self, seed_dict['HumiditySimulation'])  # seed not currently used
+        irrigation=self.layers['irrigation'].data
+        precipitation=self.layers['precipitation'].data
+        ocean=self.layers['ocean'].data
+        humid_tuple=humidity_sim(self.humids,precipitation,irrigation,ocean)
+        self.humidity=humid_tuple
+    
+    def assign_biomes(self):
+        #cm, biome_cm = BiomeSimulation.execute(self, seed_dict['BiomeSimulation'])  # seed not currently used
+        o_m=self.layers["ocean"].data
+        t_m=self.layers["temperature"].data
+        t_th=self.layers['temperature'].thresholds
+        h_m=self.layers["humidity"].data
+        h_qs=self.layers["humidity"].quantiles
+        
+        biome_cm,biome_map=create_biome_map(o_m,t_m,t_th,h_m,h_qs)
+        self.biome=biome_map
+        
+        b_cm,new_biome_map=BiomeSimulation.execute(self,self.seed)
+        print("equal?")
+        print(biome_map==new_biome_map)
+    def icecap_sim(self):
+        #IcecapSimulation().execute(self, seed_dict['IcecapSimulation'])  # makes use of temperature-map
+        freeze_threshold = self.layers['temperature'].thresholds[0][1]
+        ocean = self.layers['ocean'].data
+        temperature = self.layers['temperature'].data
+        r=icecap_sim(ocean,temperature,freeze_threshold,self.seed)
+        self.icecap=r
+    
+
+    def more_random(self):
         # Prepare sufficient seeds for the different steps of the generation
         
         # create a fresh RNG in case the global RNG is compromised 
         # (i.e. has been queried an indefinite amount of times before 
         # generate_world() was called)
         #hm how about we just... don't allow it to be compromised instead...
-        if True:
-            rng = numpy.random.RandomState(self.seed)  
-            
-            # choose lowest common denominator (32 bit Windows numpy 
-            # cannot handle a larger value)
-            sub_seeds = rng.randint(0, numpy.iinfo(numpy.int32).max, size=100)  
-            
-            seed_dict = {
-                         'PrecipitationSimulation': sub_seeds[ 0],  # after 0.19.0 do not ever switch out the seeds here to maximize seed-compatibility
-                         'ErosionSimulation':       sub_seeds[ 1],
-                         'WatermapSimulation':      sub_seeds[ 2],
-                         'IrrigationSimulation':    sub_seeds[ 3],
-                         'TemperatureSimulation':   sub_seeds[ 4],
-                         'HumiditySimulation':      sub_seeds[ 5],
-                         'PermeabilitySimulation':  sub_seeds[ 6],
-                         'BiomeSimulation':         sub_seeds[ 7],
-                         'IcecapSimulation':        sub_seeds[ 8],
-                         '':                        sub_seeds[99]
-            }
+        rng = numpy.random.RandomState(self.seed)  
         
+        # choose lowest common denominator (32 bit Windows numpy 
+        # cannot handle a larger value)
+        sub_seeds = rng.randint(0, numpy.iinfo(numpy.int32).max, size=100)  
+        
+        self.seed_dict = {
+                     'PrecipitationSimulation': sub_seeds[ 0],  # after 0.19.0 do not ever switch out the seeds here to maximize seed-compatibility
+                     'ErosionSimulation':       sub_seeds[ 1],
+                     'WatermapSimulation':      sub_seeds[ 2],
+                     'IrrigationSimulation':    sub_seeds[ 3],
+                     'TemperatureSimulation':   sub_seeds[ 4],
+                     'HumiditySimulation':      sub_seeds[ 5],
+                     'PermeabilitySimulation':  sub_seeds[ 6],
+                     'BiomeSimulation':         sub_seeds[ 7],
+                     'IcecapSimulation':        sub_seeds[ 8],
+                     '':                        sub_seeds[99]
+        }
+    
+    
+    
+    def simulations(self):
+        gen_plates=True
+        if gen_plates:
+            self.gen_plates()
+            
+        center=True
+        if center:
+            self.center_maps()
+    
+        noise=True
+        if noise:
+            self.add_noise_to_elevation()
+            
+        fade_borders=True
+        if fade_borders:
+            self.fade_borders()
+            
+        ocean_and_thresholds=True
+        if ocean_and_thresholds:
+            self.ocean_and_thresholds()
+        
+        self.more_random()
         
         temp_sim=True
         if temp_sim:
-            elevation=self.layers["elevation"].data
-            mountain_level= self.start_mountain_th()
-            ocean=self.layers['ocean'].data
-            #TemperatureSimulation().execute(self, seed_dict['TemperatureSimulation'])
-        
-            t,t_th=temper_sim(elevation,mountain_level,ocean,self.temps,self.seed)
-            self.temperature = (t, t_th)
-            
-        percip_sim=True
-        if percip_sim:
-            # Precipitation with thresholds
-            #PrecipitationSimulation().execute(self, seed_dict['PrecipitationSimulation'])
-            
-            ocean=self.layers["ocean"].data
-            seed=seed_dict["PrecipitationSimulation"]
-            
-            #maybe calculated these earlier?
-            #this isn't used at all. Why?
-            min_temp = self.layers['temperature'].min()
-            max_temp = self.layers['temperature'].max()
-            temp_delta = (max_temp - min_temp)
-            norm_t = (self.layers['temperature'].data - min_temp) / temp_delta
-            
-            ret_t = precipitation_sim(ocean,norm_t,seed,self.gamma_curve,self.curve_offset)
-            
-            self.precipitation = ret_t
+            self.fake_temps()
+    
+        precip_sim=True
+        if precip_sim:
+            self.precipitation_sim()
             
         do_erosion_sim=True
         if do_erosion_sim:
+            self.erosion_sim()
             
-            #ErosionSimulation().execute(self, seed_dict['ErosionSimulation'])  # seed not currently used
-            elevation_map = self.layers['elevation'].data
-            precipitation_map = self.layers['precipitation'].data
-            ocean=self.layers["ocean"].data
-            mountain_th = self.layers['elevation'].thresholds[2][1]
-            river_map , lake_map = erosion_sim(elevation_map,precipitation_map,ocean,mountain_th)
-            self.rivermap , self.lakemap = river_map,lake_map
-                
         do_watermap_sim=True
         if do_watermap_sim:
-            ##WatermapSimulation().execute(self, )  # seed not currently used
-            seed=seed_dict['WatermapSimulation']
-            elevation=self.layers['elevation'].data
-            precipitation=self.layers['precipitation'].data
-            ocean=self.layers["ocean"].data
-            r_t=watermap_sim(elevation,precipitation,ocean)
-            self.watermap=r_t
-            
+            self.watermap_sim()
+        
         do_irrigation_sim=True
         if do_irrigation_sim:
-            
-            #IrrigationSimulation().execute(self, seed_dict['IrrigationSimulation'])
-            # seed not currently used
-            seed=seed_dict['IrrigationSimulation']
-            ocean=self.layers["ocean"].data
-            watermap=self.layers['watermap'].data
-            
-            r=self.irrigation=irrigation_sim(watermap,ocean,seed)
-            self.irrigation=r
+            self.irrigation_sim()
             
         do_humidity_sim=True
         if do_humidity_sim:
-            
-            #HumiditySimulation().execute(self, seed_dict['HumiditySimulation'])  # seed not currently used
-            irrigation=self.layers['irrigation'].data
-            precipitation=self.layers['precipitation'].data
-            ocean=self.layers['ocean'].data
-            humid_tuple=humidity_sim(self.humids,precipitation,irrigation,ocean)
-            self.humidity=humid_tuple
+            self.humidity_sim()
             
         do_permeability_sim=False
         if do_permeability_sim:
             #it's just random noise.
             #like... why bother.
-            PermeabilitySimulation().execute(self, seed_dict['PermeabilitySimulation'])
+            a=1
+            #PermeabilitySimulation().execute(self, seed_dict['PermeabilitySimulation'])
             #permeability_sim()
         
         biome_sim=True
         if biome_sim:
-            cm, biome_cm = BiomeSimulation.execute(self, seed_dict['BiomeSimulation'])  # seed not currently used
-            for cl in cm.keys():
-                count = cm[cl]
-                if verbose:
-                    print("%s = %i" % (str(cl), count))
-
-        if verbose:
-            print('')  # empty line
-            print('Biome obtained:')
-
-            for cl in biome_cm.keys():
-                count = biome_cm[cl]
-                print(" %30s = %7i" % (str(cl), count))
-        
-        icecap_sim=True
-        if icecap_sim:
-            IcecapSimulation().execute(self, seed_dict['IcecapSimulation'])  # makes use of temperature-map
-
-        
+            self.assign_biomes()
+            
+        do_icecap_sim=True
+        if do_icecap_sim:
+            self.icecap_sim()
+            
     def set_elevation(self,e_as_array):
         self.elevation = (numpy.array(e_as_array).reshape(self.height,self.width), None)
     

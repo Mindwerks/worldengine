@@ -135,8 +135,9 @@ def planetary_parameters(rng,distance_to_sun=0.12,axial_tilt=0.07):
     # TODO: an atmoshphere would soften the effect of distance_to_sun by *some* factor
     axial_tilt = rng.normal(scale=axial_tilt_hwhm / 1.177410023)
     axial_tilt = min(max(-0.5, axial_tilt), 0.5)  # cut off Gaussian
-    
+    print("distance to sun",distance_to_sun)
     return distance_to_sun,axial_tilt
+    
 def temp_noise(x,y,n_scale,freq,octaves,base,border,width):
 
     #--v erm, this is just another stupid noise function?
@@ -201,14 +202,18 @@ def temper_sim(elevation,mountain_level,ocean,wtemps,seed):
             temp[y, x] = t
     
     #this is biome stuff, actually. what is this doing here.
+    #the thresholds normalize the whole thing...
+    
     t=temp
     t_th = [
-        ('polar', find_threshold_f(t, wtemps[0], ocean)),
-        ('alpine', find_threshold_f(t, wtemps[1], ocean)),
-        ('boreal', find_threshold_f(t, wtemps[2], ocean)),
-        ('cool', find_threshold_f(t, wtemps[3], ocean)),
-        ('warm', find_threshold_f(t, wtemps[4], ocean)),
-        ('subtropical', find_threshold_f(t, wtemps[5], ocean)),
+        ('polar', wtemps[5]),#find_threshold_f(t, wtemps[0], ocean)),
+        ('alpine', wtemps[4]),#find_threshold_f(t, wtemps[1], ocean)),
+        ('boreal', wtemps[3]),#find_threshold_f(t, wtemps[2], ocean)),
+        ('cool', wtemps[2]),#find_threshold_f(t, wtemps[3], ocean)),
+        ('warm', wtemps[1]),#find_threshold_f(t, wtemps[4], ocean)),
+        ('subtropical', wtemps[0]),#find_threshold_f(t, wtemps[5], ocean)),
         ('tropical', None)
     ]
+    
+    
     return temp,t_th
