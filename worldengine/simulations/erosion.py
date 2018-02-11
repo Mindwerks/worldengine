@@ -118,8 +118,9 @@ def river_sources(elevation,precipitation,mountain_th):
 
 
 def erosion_sim(elevation,precipitation,ocean,mountain_th):
-    shape=elevation.shape
+    #hmmm I broke this somewhere...
     
+    shape=elevation.shape
     
     river_list = []
     lake_list = []
@@ -132,7 +133,7 @@ def erosion_sim(elevation,precipitation,ocean,mountain_th):
 
     # step two: find river sources (seeds)
     river_sources_list,water_flow,water_path = river_sources(elevation,precipitation,mountain_th)
-
+    
     # step three: for each source, find a path to sea
     for source in river_sources_list:
         river = river_flow(source, world, river_list, lake_list)
@@ -153,7 +154,6 @@ def erosion_sim(elevation,precipitation,ocean,mountain_th):
         # print "Found lake at:",lake
         lx, ly = lake
         lake_map[ly, lx] = 0.1  # TODO: make this based on rainfall/flow
-
     return river_map,lake_map
     
 

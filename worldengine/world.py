@@ -5,7 +5,6 @@ from worldengine.version import __version__
 from worldengine import plates
 from worldengine import generation 
 
-from worldengine.simulations.basic import find_threshold_f
 from worldengine.simulations.hydrology import watermap_sim#WatermapSimulation
 from worldengine.simulations.irrigation import irrigation_sim#IrrigationSimulation
 from worldengine.simulations.humidity import humidity_sim#,HumiditySimulation
@@ -168,8 +167,9 @@ class LayerWithQuantiles(Layer):
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-
-            return _equal(self.data, other.data) and _equal(self.quantiles, other.quantiles)
+            data_eq = (self.data.all()==other.data.all())
+            qu_eq   = (self.quantiles == other.quantiles)
+            return (data_eq and qu_eq)
         else:
             return False
 
@@ -245,7 +245,6 @@ class World:
         ocean,ocean_level,el_tuple=generation.initialize_ocean_and_thresholds(el_map)
         self.ocean = ocean
         self.elevation = el_tuple
-        thresholds=el_tuple[1]
         self.sea_depth = generation.sea_depth(self, ocean_level)
     
     def fake_temps(self):
@@ -284,11 +283,12 @@ class World:
         ocean=self.layers["ocean"].data
         mountain_th = self.layers['elevation'].thresholds[2][1]
         river_map , lake_map = erosion_sim(elevation_map,precipitation_map,ocean,mountain_th)
+        
+        #print(river_map,lake_map)
         self.rivermap , self.lakemap = river_map,lake_map
             
     def watermap_sim(self):
         ##WatermapSimulation().execute(self, )  # seed not currently used
-        seed=self.seed_dict['WatermapSimulation']
         elevation=self.layers['elevation'].data
         precipitation=self.layers['precipitation'].data
         ocean=self.layers["ocean"].data
@@ -392,7 +392,7 @@ class World:
         if precip_sim:
             self.precipitation_sim()
             
-        do_erosion_sim=True
+        do_erosion_sim=False
         if do_erosion_sim:
             self.erosion_sim()
             
@@ -407,14 +407,6 @@ class World:
         do_humidity_sim=True
         if do_humidity_sim:
             self.humidity_sim()
-            
-        do_permeability_sim=False
-        if do_permeability_sim:
-            #it's just random noise.
-            #like... why bother.
-            a=1
-            #PermeabilitySimulation().execute(self, seed_dict['PermeabilitySimulation'])
-            #permeability_sim()
         
         biome_sim=True
         if biome_sim:
@@ -616,7 +608,6 @@ class World:
                   p_world.generationData.seed,
                   p_world.generationData.n_plates,
                   p_world.generationData.ocean_level)
-                  #Step.get_by_name(p_world.step))
 
         # Elevation
         e = numpy.array(World._from_protobuf_matrix(p_world.heightMapData))
@@ -727,8 +718,8 @@ class World:
     def is_ocean(self, pos):
         return self.layers['ocean'].data[pos[1], pos[0]]
 
-    def sea_level(self):
-        return self.layers['elevation'].thresholds[0][1]
+    #def sea_level(self):
+     #   return self.layers['elevation'].thresholds[0][1]
 
     #
     # Tiles around
@@ -987,18 +978,7 @@ class World:
     def biome_at(self, pos):
         x, y = pos
         b = Biome.by_name(self.layers['biome'].data[y, x])
-        if b is None:
-            raise Exception('Not found')
         return b
-
-
-    def is_iceland(self, pos):
-        for subclass in Iceland.__subclasses__():
-            if isinstance(self.biome_at(pos), subclass):
-                return True
-
-        return False
-
 
     #
     # Plates

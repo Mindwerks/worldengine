@@ -102,8 +102,6 @@ _biome_satellite_colors = {
     'tropical very dry forest': (87, 81, 49),
 }
 
-
-
 def map_value(x,y,val_map,values,val_keys):
 
     val= val_map[x,y]

@@ -1,4 +1,3 @@
-from worldengine.simulations.basic import find_threshold_f
 from noise import snoise2  # http://nullege.com/codes/search/noise.snoise2
 import numpy
 
@@ -67,9 +66,6 @@ def single_temp(x,y,n,elevation,mountain_level,latitude_factor,distance_to_sun):
     return t
 
 def temper_sim(elevation,ocean,mountain_level,wtemps=[0.874, 0.765, 0.594, 0.439, 0.366, 0.124],seed=1): 
-    e=elevation
-    ml=mountain_level
-
     height,width=ocean.shape
     
     rng = numpy.random.RandomState(seed)  # create our own random generator

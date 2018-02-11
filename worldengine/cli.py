@@ -6,28 +6,13 @@ import os
 
 #from this package
 import worldengine
-
-#from worldengine.step import Step
 from worldengine.version import __version__
-
 
 VERSION = __version__
 
 OPERATIONS = 'world|plates|ancient_map|info|export'
 SEA_COLORS = 'blue|brown'
 STEPS = 'plates|precipitations|full'
-
-
-
-
-
-#def check_step(step_name):
-    #step = Step.get_by_name(step_name)
-    #if step is None:
-        #print("ERROR: unknown step name, using default 'full'")
-        #return Step.get_by_name("full")
-    #else:
-        #return step
 
 def __get_last_byte__(filename):
     #why does this exist?
