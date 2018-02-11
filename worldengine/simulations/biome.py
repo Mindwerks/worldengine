@@ -206,6 +206,7 @@ def threshold_map(value,thresholds):
     
     c=0
     m=len(thresholds)
+    r_value=None
     while c < m-1:
         value_min = thresholds[c][1]
         value_max = thresholds[c+1][1]
@@ -213,6 +214,9 @@ def threshold_map(value,thresholds):
             r_value=thresholds[c+1][0]
             break
         c+=1
+        
+    if r_value==None:
+        r_value=thresholds[-1][0]
         
     return r_value
     

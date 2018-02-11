@@ -5,14 +5,11 @@ from worldengine.basic_map_operations import distance, index_of_nearest
 
 class TestBasicMapOperations(unittest.TestCase):
 
-    def setUp(self):
-        pass
-
     def test_distance(self):
-        self.assertAlmostEquals(22.360679774997898, distance((0, 0), (10, 20)))
-        self.assertAlmostEquals(22.360679774997898, distance((-1, -1), (9, 19)))
-        self.assertAlmostEquals(22.360679774997898, distance((-1, 9), (9, 29)))
-        self.assertAlmostEquals(22.360679774997898, distance((9, -1), (19, 19)))
+        self.assertAlmostEqual(22.360679774997898, distance((0, 0), (10, 20)))
+        self.assertAlmostEqual(22.360679774997898, distance((-1, -1), (9, 19)))
+        self.assertAlmostEqual(22.360679774997898, distance((-1, 9), (9, 29)))
+        self.assertAlmostEqual(22.360679774997898, distance((9, -1), (19, 19)))
 
     def test_index_of_nearest(self):
         self.assertTrue(index_of_nearest((0, 0), []) is None)

@@ -2,21 +2,8 @@ import numpy
 import time
 
 from noise import snoise2
-
-#from worldengine.world import Step
+from worldengine.common import anti_alias
 from worldengine.simulations.basic import find_threshold_f
-from worldengine.simulations.hydrology import WatermapSimulation
-from worldengine.simulations.irrigation import IrrigationSimulation
-from worldengine.simulations.humidity import HumiditySimulation
-from worldengine.simulations.temperature import TemperatureSimulation
-from worldengine.simulations.permeability import PermeabilitySimulation
-from worldengine.simulations.erosion import ErosionSimulation
-from worldengine.simulations.precipitation import PrecipitationSimulation
-from worldengine.simulations.biome import BiomeSimulation
-from worldengine.simulations.icecap import IcecapSimulation
-from worldengine.common import anti_alias, get_verbose
-
-
 # ------------------
 # Initial generation
 # ------------------
@@ -232,69 +219,3 @@ def _around(x, y, width, height):
                 if 0 <= ny < height and (dx != 0 or dy != 0):
                     ps.append((nx, ny))
     return ps
-
-
-def generate_world(w):#, step):
-    
-    # Prepare sufficient seeds for the different steps of the generation
-    
-    # create a fresh RNG in case the global RNG is compromised 
-    # (i.e. has been queried an indefinite amount of times before 
-    # generate_world() was called)
-    rng = numpy.random.RandomState(w.seed)  
-    
-    # choose lowest common denominator (32 bit Windows numpy 
-    # cannot handle a larger value)
-    sub_seeds = rng.randint(0, numpy.iinfo(numpy.int32).max, size=100)  
-    
-    seed_dict = {
-                 'PrecipitationSimulation': sub_seeds[ 0],  # after 0.19.0 do not ever switch out the seeds here to maximize seed-compatibility
-                 'ErosionSimulation':       sub_seeds[ 1],
-                 'WatermapSimulation':      sub_seeds[ 2],
-                 'IrrigationSimulation':    sub_seeds[ 3],
-                 'TemperatureSimulation':   sub_seeds[ 4],
-                 'HumiditySimulation':      sub_seeds[ 5],
-                 'PermeabilitySimulation':  sub_seeds[ 6],
-                 'BiomeSimulation':         sub_seeds[ 7],
-                 'IcecapSimulation':        sub_seeds[ 8],
-                 '':                        sub_seeds[99]
-    }
-    
-    
-    
-    TemperatureSimulation().execute(w, seed_dict['TemperatureSimulation'])
-    # Precipitation with thresholds
-    PrecipitationSimulation().execute(w, seed_dict['PrecipitationSimulation'])
-
-    #if not step.include_erosion:
-    #    return w
-    ErosionSimulation().execute(w, seed_dict['ErosionSimulation'])  # seed not currently used
-    #if get_verbose():
-    #    print("...erosion calculated")
-
-    WatermapSimulation().execute(w, seed_dict['WatermapSimulation'])  # seed not currently used
-
-    # FIXME: create setters
-    IrrigationSimulation().execute(w, seed_dict['IrrigationSimulation'])  # seed not currently used
-    HumiditySimulation().execute(w, seed_dict['HumiditySimulation'])  # seed not currently used
-    
-    PermeabilitySimulation().execute(w, seed_dict['PermeabilitySimulation'])
-
-    cm, biome_cm = BiomeSimulation().execute(w, seed_dict['BiomeSimulation'])  # seed not currently used
-    for cl in cm.keys():
-        count = cm[cl]
-        if get_verbose():
-            print("%s = %i" % (str(cl), count))
-
-    if get_verbose():
-        print('')  # empty line
-        print('Biome obtained:')
-
-    for cl in biome_cm.keys():
-        count = biome_cm[cl]
-        if get_verbose():
-            print(" %30s = %7i" % (str(cl), count))
-
-    IcecapSimulation().execute(w, seed_dict['IcecapSimulation'])  # makes use of temperature-map
-
-    return w

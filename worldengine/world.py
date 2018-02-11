@@ -1,12 +1,6 @@
 import numpy
 
-from worldengine.biome import biome_name_to_index, biome_index_to_name, Biome
-from worldengine.biome import Iceland
 import worldengine.protobuf.World_pb2 as Protobuf
-
-#from worldengine.step import Step
-
-from worldengine.common import _equal
 from worldengine.version import __version__
 from worldengine import plates
 from worldengine import generation 
@@ -23,6 +17,117 @@ from worldengine.simulations.biome import create_biome_map#,BiomeSimulation
 from worldengine.simulations.icecap import icecap_sim#IcecapSimulation
 
 
+
+biome_colors = {
+    'ocean': (23, 94, 145),
+    'sea': (23, 94, 145),
+    'ice': (255, 255, 255),
+    
+    'subpolar dry tundra': (128, 128, 128),
+    'subpolar moist tundra': (96, 128, 128),
+    'subpolar wet tundra': (64, 128, 128),
+    'subpolar rain tundra': (32, 128, 192),
+    
+    'polar desert': (192, 192, 192),
+    'boreal desert': (160, 160, 128),
+    'cool temperate desert': (192, 192, 128),
+    'warm temperate desert': (224, 224, 128),
+    'subtropical desert': (240, 240, 128),
+    'tropical desert': (255, 255, 128),
+    
+    'boreal rain forest': (32, 160, 192),
+    'cool temperate rain forest': (32, 192, 192),
+    'warm temperate rain forest': (32, 224, 192),
+    'subtropical rain forest': (32, 240, 176),
+    'tropical rain forest': (32, 255, 160),
+    'boreal wet forest': (64, 160, 144),
+    'cool temperate wet forest': (64, 192, 144),
+    'warm temperate wet forest': (64, 224, 144),
+    'subtropical wet forest': (64, 240, 144),
+    'tropical wet forest': (64, 255, 144),
+    'boreal moist forest': (96, 160, 128),
+    'cool temperate moist forest': (96, 192, 128),
+    'warm temperate moist forest': (96, 224, 128),
+    'subtropical moist forest': (96, 240, 128),
+    'tropical moist forest': (96, 255, 128),
+    'warm temperate dry forest': (128, 224, 128),
+    'subtropical dry forest': (128, 240, 128),
+    'tropical dry forest': (128, 255, 128),
+    
+    'boreal dry scrub': (128, 160, 128),
+    'cool temperate desert scrub': (160, 192, 128),
+    'warm temperate desert scrub': (192, 224, 128),
+    'subtropical desert scrub': (208, 240, 128),
+    'tropical desert scrub': (224, 255, 128),
+    'cool temperate steppe': (128, 192, 128),
+    'warm temperate thorn scrub': (160, 224, 128),
+    
+    'subtropical thorn woodland': (176, 240, 128),
+    'tropical thorn woodland': (192, 255, 128),
+    'tropical very dry forest': (160, 255, 128),
+}
+
+# These colors are used when drawing the satellite view map
+# The rgb values were hand-picked from an actual high-resolution 
+# satellite map of earth. However, many values are either too similar
+# to each other or otherwise need to be updated. It is recommended that
+# further research go into these values, making sure that each rgb is
+# actually picked from a region on earth that has the matching biome
+_biome_satellite_colors = {
+    'ocean': (23, 94, 145),
+    'sea': (23, 94, 145),
+    'ice': (255, 255, 255),
+    'subpolar dry tundra': (186, 199, 206),
+    'subpolar moist tundra': (186, 195, 202),
+    'subpolar wet tundra': (186, 195, 204),
+    'subpolar rain tundra': (186, 200, 210),
+    'polar desert': (182, 195, 201),
+    'boreal desert': (132, 146, 143),
+    'cool temperate desert': (183, 163, 126),
+    'warm temperate desert': (166, 142, 104),
+    'subtropical desert': (205, 181, 137),
+    'tropical desert': (203, 187, 153),
+    'boreal rain forest': (21, 29, 8),
+    'cool temperate rain forest': (25, 34, 15),
+    'warm temperate rain forest': (19, 28, 7),
+    'subtropical rain forest': (48, 60, 24),
+    'tropical rain forest': (21, 38, 6),
+    'boreal wet forest': (6, 17, 11),
+    'cool temperate wet forest': (6, 17, 11),
+    'warm temperate wet forest': (44, 48, 19),
+    'subtropical wet forest': (23, 36, 10),
+    'tropical wet forest': (23, 36, 10),
+    'boreal moist forest': (31, 39, 18),
+    'cool temperate moist forest': (31, 39, 18),
+    'warm temperate moist forest': (36, 42, 19),
+    'subtropical moist forest': (23, 31, 10),
+    'tropical moist forest': (24, 36, 11),
+    'warm temperate dry forest': (52, 51, 30),
+    'subtropical dry forest': (53, 56, 30),
+    'tropical dry forest': (54, 60, 30),
+    'boreal dry scrub': (73, 70, 61),
+    'cool temperate desert scrub': (80, 58, 44),
+    'warm temperate desert scrub': (92, 81, 49),
+    'subtropical desert scrub': (68, 57, 35),
+    'tropical desert scrub': (107, 87, 60),
+    'cool temperate steppe': (95, 82, 50),
+    'warm temperate thorn scrub': (77, 81, 48),
+    'subtropical thorn woodland': (27, 40, 12),
+    'tropical thorn woodland': (40, 62, 15),
+    'tropical very dry forest': (87, 81, 49),
+}
+
+def biome_name_to_index(biome_name):
+    keyl=list(biome_colors.keys())
+    keyl.sort()
+    return keyl.index(biome_name)
+
+def biome_index_to_name(biome_index):
+    keyl=list(biome_colors.keys())
+    keyl.sort()
+    return keyl[biome_index]
+    
+
 class Layer:
 
     def __init__(self, data):
@@ -30,7 +135,7 @@ class Layer:
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return _equal(self.data, other.data)
+            return self.data == other.data
         else:
             return False
 
@@ -48,8 +153,9 @@ class LayerWithThresholds(Layer):
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-
-            return _equal(self.data, other.data) and _equal(self.thresholds, other.thresholds)
+            data_eq = (self.data.all()==other.data.all())
+            th_eq   = (self.thresholds == other.thresholds)
+            return (data_eq and th_eq)
         else:
             return False
 
@@ -329,7 +435,7 @@ class World:
     #
 
     def __eq__(self, other):
-        return _equal(self.__dict__, other.__dict__)
+        return self.__dict__== other.__dict__
 
     #
     # Serialization / Unserialization

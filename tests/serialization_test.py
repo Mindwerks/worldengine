@@ -3,7 +3,6 @@ import tempfile
 import os
 #from worldengine.step import Step
 from worldengine.world import World
-from worldengine.common import _equal
 from worldengine.hdf5_serialization import save_world_to_hdf5, load_world_to_hdf5
 
 try:  # are we python3?
@@ -23,11 +22,10 @@ class TestSerialization(unittest.TestCase):
         unserialized = World.protobuf_unserialize(serialized)
         self.assertEqual(set(w.layers.keys()), set(unserialized.layers.keys()))
         for l in w.layers.keys():
-            self.assertEqual(w.layers[l], unserialized.layers[l], "Comparing %s" % l)
-        self.assertTrue(_equal(w.ocean_level,       unserialized.ocean_level))
+            self.assertEqual(w.layers[l].all(), unserialized.layers[l].all())
+        self.assertEqual(w.ocean_level,       unserialized.ocean_level)
         self.assertEqual(w.seed,                   unserialized.seed)
         self.assertEqual(w.number_of_plates,       unserialized.number_of_plates)
-       # self.assertEquals(w.step,                   unserialized.step)
         self.assertEqual(sorted(dir(w)),            sorted(dir(unserialized)))
         self.assertEqual(w, unserialized)
 
@@ -43,13 +41,11 @@ class TestSerialization(unittest.TestCase):
             self.assertEqual(set(w.layers.keys()), set(unserialized.layers.keys()))
             self.assertEqual(w.layers['humidity'].quantiles, unserialized.layers['humidity'].quantiles)
             for l in w.layers.keys():
-                self.assertEqual(w.layers[l], unserialized.layers[l], "Comparing %s" % l)
-            self.assertTrue(_equal(w.ocean_level,       unserialized.ocean_level))
+                self.assertEqual(w.layers[l].all(), unserialized.layers[l].all())
+            self.assertEqual(w.ocean_level,       unserialized.ocean_level)
             self.assertEqual(w.seed,                   unserialized.seed)
             self.assertEqual(w.number_of_plates,      unserialized.number_of_plates)
-            #self.assertEquals(w.step,                   unserialized.step)
             self.assertEqual(sorted(dir(w)),            sorted(dir(unserialized)))
-            #self.assertEqual(w, unserialized)        
         finally:
             if filename:
                 os.remove(filename)

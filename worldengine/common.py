@@ -13,28 +13,6 @@ verbose = False
 # Functions
 # -------
 
-
-def get_verbose():
-    global verbose
-    if 'verbose' not in globals():
-        return False
-    else:
-        return verbose
-
-
-def set_verbose(value):
-    """
-    Set the level of verbosity for all the operations executed in Worldengine
-    """
-    global verbose
-    verbose = value
-
-
-def print_verbose(msg):
-    if get_verbose():
-        print(msg)
-
-
 class Counter(object):
 
     def __init__(self):
@@ -154,33 +132,34 @@ def count_neighbours(mask, radius=1):
 
     return result - mask
 
+#I think this recursive stuff is done automatically for standard types.
 
-def _equal(a, b):
-    #recursion on subclasses of types: tuple, list, dict
-    #specifically checks             : float, ndarray
-    if type(a) is float and type(b) is float:#float
-        return(numpy.allclose(a, b))
-    elif type(a) is numpy.ndarray and type(b) is numpy.ndarray:#ndarray
-        return(numpy.array_equiv(a, b))#alternative for float-arrays: numpy.allclose(a, b[, rtol, atol])
-    elif isinstance(a, dict) and isinstance(b, dict):#dict
-        if len(a) != len(b):
-            return(False)
-        t = True
-        for key, val in a.items():
-            if key not in b:
-                return(False)
-            t = _equal(val, b[key])
-            if not t:
-                return(False)
-        return(t)
-    elif (isinstance(a, list) and isinstance(b, list)) or (isinstance(a, tuple) and isinstance(b, tuple)):#list, tuples
-        if len(a) != len(b):
-            return(False)
-        t = True
-        for vala, valb in zip(a, b):
-            t = _equal(vala, valb)
-            if not t:
-                return(False)
-        return(t)
-    else:#fallback
-        return (a == b)
+#def _equal(a, b):
+    ##recursion on subclasses of types: tuple, list, dict
+    ##specifically checks             : float, ndarray
+    #if type(a) is float and type(b) is float:#float
+        #return(numpy.allclose(a, b))
+    #elif type(a) is numpy.ndarray and type(b) is numpy.ndarray:#ndarray
+        #return(numpy.array_equiv(a, b))#alternative for float-arrays: numpy.allclose(a, b[, rtol, atol])
+    #elif isinstance(a, dict) and isinstance(b, dict):#dict
+        #if len(a) != len(b):
+            #return(False)
+        #t = True
+        #for key, val in a.items():
+            #if key not in b:
+                #return(False)
+            #t = _equal(val, b[key])
+            #if not t:
+                #return(False)
+        #return(t)
+    #elif (isinstance(a, list) and isinstance(b, list)) or (isinstance(a, tuple) and isinstance(b, tuple)):#list, tuples
+        #if len(a) != len(b):
+            #return(False)
+        #t = True
+        #for vala, valb in zip(a, b):
+            #t = _equal(vala, valb)
+            #if not t:
+                #return(False)
+        #return(t)
+    #else:#fallback
+        #return (a == b)

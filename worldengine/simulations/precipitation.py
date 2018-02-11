@@ -1,46 +1,15 @@
 import numpy
 from noise import snoise2
 
-from worldengine.simulations.basic import find_threshold_f
+from worldengine.simulations.basic import find_threshold_f, base_noise_map
     
-def precipitation_sim(ocean,norm_t,seed,gamma_curve,curve_offset):
+def precipitation_sim(ocean,norm_t,seed,curve_gamma,curve_bonus):
     """Precipitation is a value in [-1,1]"""
-       
-
-    #again the random.
-    rng = numpy.random.RandomState(seed)  # create our own random generator
-    base = rng.randint(0, 4096)
-
-    curve_gamma = gamma_curve #world stat
-    curve_bonus = curve_offset
     
-    height, width = ocean.shape
-    
-    border = width / 4
-    precipitations = numpy.zeros((height, width), dtype=float)
-    
-    octaves = 6
-    freq = 64.0 * octaves
-    
-    n_scale = 1024 / float(height) #This is a variable I am adding. It exists
-                                   #so that worlds sharing a common seed but
-                                   #different sizes will have similar patterns
-
-    for y in range(height):#TODO: numpy
-        for x in range(width):
-            n = snoise2((x * n_scale) / freq, (y * n_scale) / freq, octaves, base=base)
-
-            # Added to allow noise pattern to wrap around right and left.
-            if x < border:
-                n = (snoise2( (x * n_scale) / freq, (y * n_scale) / freq, octaves,
-                             base=base) * x / border) + (
-                    snoise2(( (x * n_scale) + width) / freq, (y * n_scale) / freq, octaves,
-                            base=base) * (border - x) / border)
-                            
-            #waaaaait a MINUTE. THis is just the regular noise!
-            
-            precipitations[y, x] = n
-
+    shape = ocean.shape
+        
+    precipitations=base_noise_map(shape,seed)
+           
     #find ranges
     min_precip = precipitations.min()
     max_precip = precipitations.max()

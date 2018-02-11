@@ -1,15 +1,12 @@
 #external
 import sys
-
 import argparse
-
 import numpy
 import os
 
 #from this package
 import worldengine
 
-from worldengine.common import set_verbose
 #from worldengine.step import Step
 from worldengine.version import __version__
 
@@ -530,9 +527,6 @@ class proto_world:
         
         self.normal_print(args)
         
-        #this relates to output. I assume it's printing during generation?
-        set_verbose(args.verbose)
-
         print('...done')
         return args,arg_dict
 

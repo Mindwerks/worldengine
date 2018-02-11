@@ -7,7 +7,7 @@ Jython
 import numpy
 import sys
 import time
-from worldengine.common import get_verbose, count_neighbours
+from worldengine.common import  count_neighbours
 from worldengine.common import anti_alias as anti_alias_channel
 from worldengine.biome import BiomeGroup, _un_camelize
 
@@ -361,7 +361,7 @@ def _draw_a_mountain(pixels, x, y, w=3, h=3):
 def draw_ancientmap(world, target, resize_factor=1,
                     sea_color=(212, 198, 169, 255),
                     draw_biome = True, draw_rivers = True, draw_mountains = True,
-                    draw_outer_land_border = False, verbose=get_verbose()):
+                    draw_outer_land_border = False, verbose=False):
     rng = numpy.random.RandomState(world.seed)  # create our own random generator
 
     if verbose:

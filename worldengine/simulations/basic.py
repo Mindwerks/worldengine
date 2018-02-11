@@ -1,5 +1,35 @@
 import numpy
+from noise import snoise2  # http://nullege.com/codes/search/noise.snoise2
 
+
+def base_noise_map(shape,seed):
+        
+    rng = numpy.random.RandomState(seed)  # create our own random generator
+    base = rng.randint(0, 4096)
+    height,width=shape
+    noise_map = numpy.zeros(shape, dtype=float)
+    
+    octaves = 6
+    freq = 64.0 * octaves
+    
+    n_scale = 1024 / float(height) #This is a variable I am adding. It exists
+                                   #so that worlds sharing a common seed but
+                                   #different sizes will have similar patterns
+    border = width / 4
+    
+    for y in range(height):#TODO: numpy
+        for x in range(width):
+            n = snoise2((x * n_scale) / freq, (y * n_scale) / freq, octaves, base=base)
+
+            # Added to allow noise pattern to wrap around right and left.
+            if x < border:
+                n = (snoise2( (x * n_scale) / freq, (y * n_scale) / freq, octaves,
+                             base=base) * x / border) + (
+                    snoise2(( (x * n_scale) + width) / freq, (y * n_scale) / freq, octaves,
+                            base=base) * (border - x) / border)
+            
+            noise_map[y,x]=n
+    return noise_map
 
 def find_threshold(map_data, land_percentage, ocean=None):#never used anywhere?
     height, width = map_data.shape
