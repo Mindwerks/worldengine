@@ -28,16 +28,6 @@ def in_circle(radius, center_x, center_y, x, y):
     return square_dist <= radius ** 2
 
 
-class ErosionSimulation(object):
-    def __init__(self):
-        self.wrap = True
-
-    def is_applicable(self, world):
-        return world.has_precipitations()
-
-    #def execute(self, world, seed):
-
-
 def gradient_map(shape,elevation):
     """calculate the gradient map"""#Find the flow direction for each cell in heightmap"""
     

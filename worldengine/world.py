@@ -19,7 +19,7 @@ from worldengine.simulations.temperature import temper_sim #TemperatureSimulatio
 #from worldengine.simulations.permeability import permeability_sim,PermeabilitySimulation
 from worldengine.simulations.erosion import erosion_sim#ErosionSimulation
 from worldengine.simulations.precipitation import precipitation_sim #PrecipitationSimulation
-from worldengine.simulations.biome import create_biome_map,BiomeSimulation
+from worldengine.simulations.biome import create_biome_map#,BiomeSimulation
 from worldengine.simulations.icecap import icecap_sim#IcecapSimulation
 
 
@@ -75,7 +75,6 @@ class World:
     def __init__(self, name="test",height=512,width=512,seed=1,#e_as_array, sp_as_array,
                 number_of_plates=10,
                 ocean_level=1.0,
-                #step=Step.full(),
                 temps=[0.874, 0.765, 0.594, 0.439, 0.366, 0.124],
                 humids = [.941, .778, .507, .236, 0.073, .014, .002],
                 gamma_curve=1.25, curve_offset=.2,verbose=False):
@@ -146,13 +145,12 @@ class World:
     def fake_temps(self):
         elevation=self.layers["elevation"].data
         mountain_level= self.start_mountain_th()
-        print("mountain_level",mountain_level)
+        
         ocean=self.layers['ocean'].data
         #TemperatureSimulation().execute(self, seed_dict['TemperatureSimulation'])
         
-        t,t_th=temper_sim(elevation,mountain_level,ocean,self.temps,self.seed)
-        print(self.temps)
-        print(t_th)
+        t,t_th=temper_sim(elevation,ocean,mountain_level,self.temps,self.seed)
+        
         self.temperature = (t, t_th)
     
     def precipitation_sim(self):
@@ -220,9 +218,6 @@ class World:
         biome_cm,biome_map=create_biome_map(o_m,t_m,t_th,h_m,h_qs)
         self.biome=biome_map
         
-        b_cm,new_biome_map=BiomeSimulation.execute(self,self.seed)
-        print("equal?")
-        print(biome_map==new_biome_map)
     def icecap_sim(self):
         #IcecapSimulation().execute(self, seed_dict['IcecapSimulation'])  # makes use of temperature-map
         freeze_threshold = self.layers['temperature'].thresholds[0][1]

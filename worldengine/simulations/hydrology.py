@@ -1,18 +1,5 @@
 from worldengine.simulations.basic import find_threshold_f
 import numpy
-
-
-class WatermapSimulation(object):
-
-    @staticmethod
-    def is_applicable(world):
-        return world.has_precipitations() and (not world.has_watermap())
-
-    def execute(self, world, seed):
-        assert seed is not None
-        data, thresholds = self._watermap(world, 20000)
-        world.watermap = (data, thresholds)
-
     
 def droplet(elevation, pos, q, _watermap):
     #what does this even do?
