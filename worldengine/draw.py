@@ -3,7 +3,7 @@ import numpy
 from worldengine.drawing_functions import draw_ancientmap, \
     draw_rivers_on_image
 from worldengine.image_io import PNGWriter
-from worldengine.simulations.biome import threshold_map, reformat_humidity_thresholds
+from worldengine.simulations.biome import temp_threshold,threshold_map, reformat_humidity_thresholds
 # -------------
 # Helper values
 # -------------
@@ -558,10 +558,10 @@ def draw_temperature_levels(temp_map,t_ths ,target, black_and_white=False):
         for y in range(height):
             for x in range(width):
                 value=temp_map[y][x]
-                key=threshold_map(value,t_ths)
+                key=temp_threshold(value)#threshold_map(value,t_ths)
                 if key=="polar":
                     c=(0, 0, 255, 255)
-                elif key=="alpine":
+                elif key=="subpolar":
                     c=(42, 0, 213, 255)
                 elif key=="boreal":
                     c=(85, 0, 170, 255)
@@ -581,7 +581,7 @@ def draw_biome(biome_map, target):
     for y in range(height):
         for x in range(width):
             v = biome_map[y, x]
-            target.set_pixel(x, y, _biome_colors[v])
+            target.set_pixel(x, y, v.color)
 
 
 def draw_scatter_plot(humid,h_quants,temp,t_ths, ocean, size, gamma_curve,curve_offset,  target):

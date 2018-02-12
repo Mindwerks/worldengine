@@ -73,8 +73,9 @@ def main(args,arg_dict):
 
     save_data=arg_dict["save"]
     if save_data and operation in ["world"]:
-        world
-        save.save_world([[world,'protobuf']],arg_dict["output_dir"])
+        #world
+        #save.save_world([[world,'protobuf']],arg_dict["output_dir"])
+        False
 
     draw=arg_dict["draw"]
     if draw and operation in ["world","plates"]:
@@ -85,17 +86,17 @@ def main(args,arg_dict):
         black_and_white=False
         
         from draw import draw_biome_on_file, draw_ocean_on_file, \
-            draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_simple_elevation_on_file, \
+            draw_precipitation_on_file, draw_grayscale_heightmap_on_file, draw_elevation_on_file, \
             draw_temperature_levels_on_file, draw_riversmap_on_file, draw_scatter_plot_on_file, \
             draw_satellite_on_file, draw_icecaps_on_file
         
         if operation=="plates":
             # Generate images
             filename = '%s/plates_%s.png' % (output_dir, world_name)
-            draw_simple_elevation_on_file(world, filename, None)
+            draw_elevation_on_file(world, filename, None)
             print("+ plates image generated in '%s'" % filename)
             filename = '%s/centered_plates_%s.png' % (output_dir, world_name)
-            draw_simple_elevation_on_file(world, filename, None)
+            draw_elevation_on_file(world, filename, None)
             print("+ centered plates image generated in '%s'" % filename)
 
         if operation=="world":
@@ -105,54 +106,28 @@ def main(args,arg_dict):
             print("* ocean image generated in '%s'" % filename)
 
             #if step.include_precipitations:
-            filename = '%s/%s_precipitation.png' % (output_dir, world_name)
-            draw_precipitation_on_file(world, filename, black_and_white)
-            print("* precipitation image generated in '%s'" % filename)
+            #filename = '%s/%s_precipitation.png' % (output_dir, world_name)
+            #draw_precipitation_on_file(world.layers["precipitation"].data, filename, black_and_white)
+            #print("* precipitation image generated in '%s'" % filename)
+            
             filename = '%s/%s_temperature.png' % (output_dir, world_name)
-            draw_temperature_levels_on_file(world, filename, black_and_white)
+            t_map=world.layers["temperature"].data
+            th_map=world.layers["temperature"].thresholds
+            
+            draw_temperature_levels_on_file(t_map,th_map,filename, black_and_white)
             print("* temperature image generated in '%s'" % filename)
 
             filename = '%s/%s_biome.png' % (output_dir, world_name)
-            draw_biome_on_file(world, filename)
+            draw_biome_on_file(world.layers["biome"].data, filename)
             print("* biome image generated in '%s'" % filename)
 
             filename = '%s/%s_elevation.png' % (output_dir, world_name)
-            sea_level = world.sea_level()
-            draw_simple_elevation_on_file(world, filename, sea_level=sea_level)
+            ocean=world.layers["ocean"].data
+            elevation=world.layers["elevation"].data
+            sea_level=world.ocean_level
+            draw_elevation_on_file(elevation, ocean,sea_level,filename)
             print("* elevation image generated in '%s'" % filename)
         
-            if args.grayscale_heightmap:
-                #generate_grayscale_heightmap(world,
-                #                             '%s/%s_grayscale.png' % (args.output_dir, world_name))
-                draw_grayscale_heightmap_on_file(world, filename)
-                print("+ grayscale heightmap generated in '%s'" % filename)
-            
-            if args.rivers_map:
-                draw_riversmap_on_file(world, filename)
-                #print("+ rivers map generated in '%s'" % filename)
-
-             #   generate_rivers_map(world,
-             #                       '%s/%s_rivers.png' % (args.output_dir, world_name))
-            if args.scatter_plot:
-                draw_scatter_plot_on_file(world, filename)
-                #print("+ scatter plot generated in '%s'" % filename)
-
-                
-                #draw_scatter_plot(world,
-                #                  '%s/%s_scatter.png' % (args.output_dir, world_name))
-            if args.satelite_map:
-            #def draw_satellite_map(world, filename):
-                draw_satellite_on_file(world, filename)
-            #    print("+ satellite map generated in '%s'" % filename) 
-                #draw_satellite_map(world,
-                #                   '%s/%s_satellite.png' % (args.output_dir, world_name))
-            if args.icecaps_map:
-                #def draw_icecaps_map(world, filename):
-                draw_icecaps_on_file(world, filename)
-                #    print("+ icecap map generated in '%s'" % filename)
-                #draw_icecaps_map(world,
-                #                 '%s/%s_icecaps.png' % (args.output_dir, world_name))
-
 def filter_world_args(all_dict):
     l=["name","seed","width","height","temps","humids","number of plates","ocean_level","verbose"]
     #"step",

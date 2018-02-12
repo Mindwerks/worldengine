@@ -320,8 +320,8 @@ class World:
         t_th=self.layers['temperature'].thresholds
         h_m=self.layers["humidity"].data
         h_qs=self.layers["humidity"].quantiles
-        
-        biome_cm,biome_map=create_biome_map(o_m,t_m,t_th,h_m,h_qs)
+        #t_th,,h_qs
+        biome_cm,biome_map=create_biome_map(o_m,t_m,h_m)
         self.biome=biome_map
         
     def icecap_sim(self):

@@ -8,8 +8,7 @@ class TestMyTempSim(unittest.TestCase):
         el=numpy.array([[40,1],[0,2]])
         oc=numpy.array([[0,0],[1,0]])
         ml=1
-        r=temper_sim(el,oc,ml)
-        print(r)
+        temper_sim(el,oc,ml)
 
 if __name__=="__main__":
     unittest.main()

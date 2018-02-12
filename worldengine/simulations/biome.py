@@ -1,63 +1,12 @@
 import numpy
 
-
-
-
-biome_colors = {
-    'ocean': (23, 94, 145),
-    'sea': (23, 94, 145),
-    'ice': (255, 255, 255),
-    
-    'subpolar dry tundra': (128, 128, 128),
-    'subpolar moist tundra': (96, 128, 128),
-    'subpolar wet tundra': (64, 128, 128),
-    'subpolar rain tundra': (32, 128, 192),
-    
-    'polar desert': (192, 192, 192),
-    'boreal desert': (160, 160, 128),
-    'cool temperate desert': (192, 192, 128),
-    'warm temperate desert': (224, 224, 128),
-    'subtropical desert': (240, 240, 128),
-    'tropical desert': (255, 255, 128),
-    
-    'boreal rain forest': (32, 160, 192),
-    'cool temperate rain forest': (32, 192, 192),
-    'warm temperate rain forest': (32, 224, 192),
-    'subtropical rain forest': (32, 240, 176),
-    'tropical rain forest': (32, 255, 160),
-    'boreal wet forest': (64, 160, 144),
-    'cool temperate wet forest': (64, 192, 144),
-    'warm temperate wet forest': (64, 224, 144),
-    'subtropical wet forest': (64, 240, 144),
-    'tropical wet forest': (64, 255, 144),
-    'boreal moist forest': (96, 160, 128),
-    'cool temperate moist forest': (96, 192, 128),
-    'warm temperate moist forest': (96, 224, 128),
-    'subtropical moist forest': (96, 240, 128),
-    'tropical moist forest': (96, 255, 128),
-    'warm temperate dry forest': (128, 224, 128),
-    'subtropical dry forest': (128, 240, 128),
-    'tropical dry forest': (128, 255, 128),
-    
-    'boreal dry scrub': (128, 160, 128),
-    'cool temperate desert scrub': (160, 192, 128),
-    'warm temperate desert scrub': (192, 224, 128),
-    'subtropical desert scrub': (208, 240, 128),
-    'tropical desert scrub': (224, 255, 128),
-    'cool temperate steppe': (128, 192, 128),
-    'warm temperate thorn scrub': (160, 224, 128),
-    
-    'subtropical thorn woodland': (176, 240, 128),
-    'tropical thorn woodland': (192, 255, 128),
-    'tropical very dry forest': (160, 255, 128),
-}
-
 # These colors are used when drawing the satellite view map
 # The rgb values were hand-picked from an actual high-resolution 
 # satellite map of earth. However, many values are either too similar
 # to each other or otherwise need to be updated. It is recommended that
 # further research go into these values, making sure that each rgb is
 # actually picked from a region on earth that has the matching biome
+
 _biome_satellite_colors = {
     'ocean': (23, 94, 145),
     'sea': (23, 94, 145),
@@ -117,89 +66,31 @@ def map_value(x,y,val_map,values,val_keys):
             
     return val_key
 
-def humidity_keys():
-    
-    aridity=["arid","humid"]
-    quantifiers=["super","per"," ","semi","sub"]
-    
-    ard_q=[]
-    #for gq in aridity:
-    r=[]
-    gq="arid"
-    for q in quantifiers:
-        r.append((q+gq).strip())
-    r2=[]
-    gq="humid"
-    for q in quantifiers:
-        r2.append((q+gq).strip())
-    r2.reverse()
-    ard_q=r[:-1]+r2
-    return ard_q
 
+def temp_threshold(t):
+    
+    temps=[float("inf"),0.874, 0.765, 0.594, 0.439, 0.366, 0.124,-float("inf")]
+    
+    temp_keys=["polar","subpolar","boreal","cool","warm","subtropical","tropical"]
+    
+    temps.reverse()
+    #temp_keys.reverse()
+    
+    r=l_threshold_map(t,temps,temp_keys)
+    
+    return r[0]
 
-class real_Biome:
-    def __init__(self,temp_range,humidity_range,color):
-        self.temperature_range=temp_range
-        self.humidity_range=humidity_range
-        self.color=color
-        
-    def name(self):
-        n=""
-        return n
+def humid_threshold(h):
     
+    humids=[float("inf"),.941, .778, .507, .236, 0.073, .014, .002,-float("inf")]
+    h_keys=["superarid","perarid","arid","semiarid","subhumid","humid","perhumid","superhumid"]
+    
+    humids.reverse()
+    
+    r=l_threshold_map(h,humids,h_keys)
+    
+    return r[0]
 
-def pick_biome(x,y,biomes):
-    a=1
-    
-def assign_biomes(temp_map,humid_map):
-    #height,width=ocean.shape
-    
-    biomes=[]
-    
-    temps=[0.874, 0.765, 0.594, 0.439, 0.366, 0.124,0]
-    
-    
-    
-    temperatures_keys=["polar","subpolar","boreal","cool","warm","subtropical","tropical"]
-    
-    #shape=(10,10)
-    
-    for y in [1,2]:#range([0,shape[0]):
-        for x in [1,2]:#range([0,shape[1]]):
-            s=""
-            
-            b=pick_biome(x,y,biomes)
-            #map [x,y] = b
-            continue
-            t_key=map_value(x,y,temps_map,temps,temperatures_keys)
-            s+=t_key
-            
-            h_key=map_value(x,y,humid_map,humids,humid_keys)
-            s+=h_key
-        
-    
-    x,y=0,0
-    
-    veg_adj=["thorn","rain"]
-    
-    t_to_veg={"alpine":["tundra"],
-            "boreal":["desert","scrub","forest"],
-            "cool":["desert","scrub","forets"],
-            "warm":["desert","scrub","forets"],
-            "subtropical":["desert","scrub","forets"],
-            "tropical":["desert","scrub","woodland","forest"]
-            }
-            
-    fake_humids=[.941, .778, .507, .236, 0.073, .014, .002]
-    vegetation_keys=["desert","steppe","scrub","woodland","forest"]
-    humidities_keys=["dry","moist","rain"]
-
-class Biome:
-    def __init__(self,name):
-        self.temp_range=None
-        self.hum_range=None
-        self.name=name
-    
 def threshold_map(value,thresholds):
     
     c=0
@@ -224,11 +115,11 @@ def med(t1,t2):
 def l_threshold_map(value,ts,names):
     c=0
     while c < len(ts)-1:
-        if ts[c] >= value >=ts[c+1]:
+        if ts[c] <= value <=ts[c+1]:
             name=names[c]
             break
         c+=1
-    return name
+    return [ name , c , [ts[c],ts[c+1]] ]
 
 
 class Biome:
@@ -236,25 +127,103 @@ class Biome:
         self.name=name
         self.temp_range=temp_range
         self.humid_range=humid_range
+        self.color=color
 
     def temp_check(self,t):
         return self.temp_range[0] <= t <=self.temp_range[1]
         
     def humid_check(self,h):
         return self.humid_range[0] <= t <=self.humid_range[1]
+        
+        
+def assemble_biome_name(t_key,h_key):
+    #"very dry",
+    #humid_adj_list=["dry","moist","wet","rain"]
     
+    #humid_adj={ "superarid":"",
+                #"perarid":"",
+                #"arid":"very dry",
+                #"semiarid":"dry",
+                #"subhumid":"",
+                #"humid":"wet",
+                #"perhumid":"rain",
+                #"superhumid":"rain"}
+    
+    #humid_keys=list(humid_adj.keys())
+    
+    humid_veg={"superarid":"desert",
+                "perarid":"scrub",
+                "arid":"steppe",
+                "semiarid":"dry woodland",
+                "subhumid":"woodland",
+                "humid":"forest",
+                "perhumid":"wet forest",
+                "superhumid":"rain forest"}
+                
+    #adj=humid_adj[h_key]
+    vegetation=humid_veg[h_key]
+    
+    if t_key in ["warm","cool"]:
+        t_key+=" temperate"
+        
+    if t_key == "subpolar":
+        vegetation="tundra"
+    
+    if t_key=="polar" and h_key=="superarid":
+        s=""
+        s+=t_key+" "+humid_veg[h_key]
+        return s
+    elif t_key=="polar":
+        return "ice"
+    
+    s=t_key+" "+vegetation
+    s=s.split()
+    sn=""
+    for i in s:
+        sn+=" "+i
+    s=sn
+    s=s.strip()
+    
+    return s
+    
+def biome_color(temp,humidity,hum_frac):
+    
+    if temp=="polar" and humidity!="superarid":
+        color=(255, 255, 255) #ice 
+        #maybe I can do something similar
+        #for snow later.
+        
+        #'sea': (23, 94, 145),
+        return color
+    
+    colors={
+            "polar":(192, 192, 192),
+            "subpolar":(128,128,128),#"tundra"
+            "boreal":(160,160,128),
+            "cool":(192,192,128),
+            "warm":(224,224,128),
+            "subtropical":(240,240,128),
+            "tropical":(255,255,128)}
+    #"ice":(255, 255, 255),
+    
+    color=colors[temp]
+    color=(int((1-hum_frac)*color[0]),color[1],color[2])
+    
+    return color
 
 def biome_matrix():
+    
     temps=[float("inf"),0.874, 0.765, 0.594, 0.439, 0.366, 0.124,-float("inf")]
-    temp_keys=["polar","alpine","boreal","cool","warm","subtropical","tropical"]
-    print(temp_keys)
+    temps.reverse()
+    temp_keys=["polar","subpolar","boreal","cool","warm","subtropical","tropical"]
+    #print(temp_keys)
     humids=[float("inf"),.941, .778, .507, .236, 0.073, .014, .002,-float("inf")]
+    humids.reverse()
     h_keys=["superarid","perarid","arid","semiarid","subhumid","humid","perhumid","superhumid"]
     
-    
-    #a=numpy.zeros((len(humids)-1,len(temps)-1),type=tuple)
     t=temps
     h=humids
+    
     c=0
     a=[]
     while c < len(temps)-1:
@@ -266,135 +235,42 @@ def biome_matrix():
         c+=1
     
     height,width=len(humids)-1,len(temps)-1
-    #biome=numpy.zeros((height-1,width-1),type=tuple)
     
+    mismatching=0
+    total=0
     biome_cm={}
     
+    all_bs={}
     biome=[]
     for y in range(height):
         biome.append([0]*width)
         for x in range(width):
             
-            t = a[x][y][0]#temperature_map[y
-            h = a[x][y][1]#humidity_map[y,x]
+            t = a[x][y][0]
+            h = a[x][y][1]
             
-            if True:
+            temp_zone,temp_index,temp_range=l_threshold_map(t,temps,temp_keys)
+            
+            humidity_zone,hum_index,hum_range=l_threshold_map(h,humids,h_keys)
+            
+            name=assemble_biome_name(temp_zone,humidity_zone)
+            
+            hum_frac=hum_index/len(humids)
+            color=biome_color(temp_zone,humidity_zone,hum_frac)
+            
+            B=Biome(name,temp_range,hum_range,color)
+            
+            if name not in all_bs:
+                all_bs.update({name:B})
                 
-                temp_zone=l_threshold_map(t,temps,temp_keys)
-                humidity_zone=l_threshold_map(h,humids,h_keys)
-                #temp_zone = threshold_map(t,t_thresholds)
-                #humidity_zone = threshold_map(h,h_thresholds)
-                #polar
-                
-                if temp_zone=="polar":
-                    #w.is_humidity_superarid((x, y)):
-                    if humidity_zone=="superarid":
-                        biome[y][x] = 'polar desert'
-                    else:
-                        biome[y][x] = 'ice'
-                        
-                #elif w.is_temperature_alpine((x, y)):
-                elif temp_zone=="alpine":
-                    if humidity_zone=="superarid":  #w.is_humidity_superarid((x, y)):
-                        biome[y][x] = 'subpolar dry tundra'
-                    elif humidity_zone=="perarid":  #w.is_humidity_perarid((x, y)):
-                        biome[y][x] = 'subpolar moist tundra'
-                    elif humidity_zone=="arid":     #    w.is_humidity_arid((x, y)):
-                        biome[y][x] = 'subpolar wet tundra'
-                    else:
-                        biome[y][x] = 'subpolar rain tundra'
-                elif temp_zone=="boreal":
-                #elif w.is_temperature_boreal((x, y)):
-                    if humidity_zone=="superarid":  #w.is_humidity_superarid((x, y)):
-                        biome[y][x] = 'boreal desert'
-                    elif humidity_zone=="perarid":  #w.is_humidity_perarid((x, y)):
-                        biome[y][x] = 'boreal dry scrub'
-                    elif  humidity_zone=="arid":     #w.is_humidity_arid((x, y)):
-                        biome[y][x] = 'boreal moist forest'
-                    elif humidity_zone=="semiarid": # w.is_humidity_semiarid((x, y)):
-                        biome[y][x] = 'boreal wet forest'
-                    else:
-                        biome[y][x] = 'boreal rain forest'
-                elif temp_zone=="cool":
-                #elif w.is_temperature_cool((x, y)):
-                    if humidity_zone=="superarid":# w.is_humidity_superarid((x, y)):
-                        biome[y][x] = 'cool temperate desert'
-                    elif humidity_zone=="perarid":  #w.is_humidity_perarid((x, y)):
-                        biome[y][x] = 'cool temperate desert scrub'
-                    elif humidity_zone=="arid":     #w.is_humidity_arid((x, y)):
-                        biome[y][x] = 'cool temperate steppe'
-                    elif  humidity_zone=="semiarid": #w.is_humidity_semiarid((x, y)):
-                        biome[y][x] = 'cool temperate moist forest'
-                    elif humidity_zone=="subhumid": #w.is_humidity_subhumid((x, y)):
-                        biome[y][x] = 'cool temperate wet forest'
-                    else:
-                        biome[y][x] = 'cool temperate rain forest'
-                elif temp_zone=="warm":             #w.is_temperature_warm((x, y)):
-                    if humidity_zone=="superarid":  #w.is_humidity_superarid((x, y)):
-                        biome[y][x] = 'warm temperate desert'
-                    elif humidity_zone=="perarid":  #w.is_humidity_perarid((x, y)):
-                        biome[y][x] = 'warm temperate desert scrub'
-                    elif humidity_zone=="arid":     #w.is_humidity_arid((x, y)):
-                        biome[y][x] = 'warm temperate thorn scrub'
-                    elif humidity_zone=="semiarid":     #w.is_humidity_semiarid((x, y)):
-                        biome[y][x] = 'warm temperate dry forest'
-                    elif humidity_zone=="subhumid":     # w.is_humidity_subhumid((x, y)):
-                        biome[y][x] = 'warm temperate moist forest'
-                    elif humidity_zone=="humid":     #w.is_humidity_humid((x, y)):
-                        biome[y][x] = 'warm temperate wet forest'
-                    else:
-                        biome[y][x] = 'warm temperate rain forest'
-                elif temp_zone=="subtropical":
-                #elif w.is_temperature_subtropical((x, y)):
-                    if humidity_zone=="superarid":     #w.is_humidity_superarid((x, y)):
-                        biome[y][x] = 'subtropical desert'
-                    elif humidity_zone=="perarid":     #w.is_humidity_perarid((x, y)):
-                        biome[y][x] = 'subtropical desert scrub'
-                    elif humidity_zone=="arid":     #w.is_humidity_arid((x, y)):
-                        biome[y][x] = 'subtropical thorn woodland'
-                    elif humidity_zone=="semiarid":     #w.is_humidity_semiarid((x, y)):
-                        biome[y][x] = 'subtropical dry forest'
-                    elif humidity_zone=="subhumid":     #w.is_humidity_subhumid((x, y)):
-                        biome[y][x] = 'subtropical moist forest'
-                    elif humidity_zone=="humid":     # w.is_humidity_humid((x, y)):
-                        biome[y][x] = 'subtropical wet forest'
-                    else:
-                        biome[y][x] = 'subtropical rain forest'
-                elif temp_zone=="tropical":
-#                elif w.is_temperature_tropical((x, y)):
-                    if humidity_zone=="superarid":     #w.is_humidity_superarid((x, y)):
-                        biome[y][x] = 'tropical desert'
-                    elif humidity_zone=="perarid":     #w.is_humidity_perarid((x, y)):
-                        biome[y][x] = 'tropical desert scrub'
-                    elif humidity_zone=="arid":     #w.is_humidity_arid((x, y)):
-                        biome[y][x] = 'tropical thorn woodland'
-                    elif humidity_zone=="semiarid":     #w.is_humidity_semiarid((x, y)):
-                        biome[y][x] = 'tropical very dry forest'
-                    elif humidity_zone=="subhumid":     #w.is_humidity_subhumid((x, y)):
-                        biome[y][x] = 'tropical dry forest'
-                    elif humidity_zone=="humid":     #w.is_humidity_humid((x, y)):
-                        biome[y][x] = 'tropical moist forest'
-                    elif humidity_zone=="perhumid":     #w.is_humidity_perhumid((x, y)):
-                        biome[y][x] = 'tropical wet forest'
-                    else:
-                        biome[y][x] = 'tropical rain forest'
-                else:
-                    biome[y][x] = 'bare rock'
-                
-                
+            biome[y][x]=B
+            
             if not biome[y][x] in biome_cm:
                 biome_cm[biome[y][x]] = 0
             biome_cm[biome[y][x]] += 1
-    s1=set(biome_cm.keys())
-    s2=set(biome_colors.keys())
-    d1=s1.difference(s2)
-    d2=s2.difference(s1)
-    print("unused_keys")
-    print(d1)
-    print(d2)
-    
+                
     biome=numpy.array(biome)
-    return a,biome
+    return biome , all_bs   #biome_dict
     
 
 def reformat_humidity_thresholds(h_thresholds):
@@ -406,13 +282,9 @@ def reformat_humidity_thresholds(h_thresholds):
     c=0
     for q in h_thresholds:
         
-        #r_i=h_thresholds[q]
         new_key=int(q)
         l.append(new_key)
-        #new_hs[new_key]=r_i
-        #c+=1
         
-    #h_thresholds=new_hs
     l.sort()
     n_l=[]
     c=0
@@ -421,31 +293,23 @@ def reformat_humidity_thresholds(h_thresholds):
         n_l.append((hum_strs[c],value))
         c+=1
     h_thresholds=n_l
-    #n_hs={}
-    #for key in l:
-        #val=h_thresholds[key]
-        #n_hs[c]=(hum_strs[c-1],val)
-        #c+=1
+    
     h_thresholds.insert(0,("none",h_thresholds[0][1]+0.1))
     h_thresholds.append(("superarid",h_thresholds[-1][1]-0.1))
     
     h_thresholds.reverse()
     return h_thresholds
     
-def create_biome_map(ocean,temperature_map,t_thresholds,humidity_map,h_thresholds):
+def create_biome_map(ocean,temperature_map,humidity_map):#h_thresholds):
+    
+    simple_array,biome_dict=biome_matrix()
+        
     shape=ocean.shape
     height,width=shape
     
-    #things to make the iteration function work
-    thingy=("none",0)
-    t_thresholds.insert(0,thingy)
-    t_thresholds[-1]=('tropical', float("inf"))
-    
-    h_thresholds=reformat_humidity_thresholds(h_thresholds)
-    
     biome_cm = {}
     biome = numpy.zeros((height, width), dtype = object)#this is still kind of expensive memory-wise
-    
+    ocean_B=Biome("ocean",None,None,(23, 94, 145))
     for y in range(height):
         for x in range(width):
             
@@ -453,110 +317,22 @@ def create_biome_map(ocean,temperature_map,t_thresholds,humidity_map,h_threshold
             h = humidity_map[y,x]
             
             if ocean[y, x]:
-                biome[y, x] = 'ocean'
-            else:
-                temp_zone = threshold_map(t,t_thresholds)
-                humidity_zone = threshold_map(h,h_thresholds)
-                #polar
+                biome[y, x] = ocean_B
                 
-                if temp_zone=="polar":
-                    #w.is_humidity_superarid((x, y)):
-                    if humidity_zone=="superarid":
-                        biome[y, x] = 'polar desert'
-                    else:
-                        biome[y, x] = 'ice'
-                        
-                #elif w.is_temperature_alpine((x, y)):
-                elif temp_zone=="alpine":
-                    if humidity_zone=="superarid":  #w.is_humidity_superarid((x, y)):
-                        biome[y, x] = 'subpolar dry tundra'
-                    elif humidity_zone=="perarid":  #w.is_humidity_perarid((x, y)):
-                        biome[y, x] = 'subpolar moist tundra'
-                    elif humidity_zone=="arid":     #    w.is_humidity_arid((x, y)):
-                        biome[y, x] = 'subpolar wet tundra'
-                    else:
-                        biome[y, x] = 'subpolar rain tundra'
-                elif temp_zone=="boreal":
-                #elif w.is_temperature_boreal((x, y)):
-                    if humidity_zone=="superarid":  #w.is_humidity_superarid((x, y)):
-                        biome[y, x] = 'boreal desert'
-                    elif humidity_zone=="perarid":  #w.is_humidity_perarid((x, y)):
-                        biome[y, x] = 'boreal dry scrub'
-                    elif  humidity_zone=="arid":     #w.is_humidity_arid((x, y)):
-                        biome[y, x] = 'boreal moist forest'
-                    elif humidity_zone=="semiarid": # w.is_humidity_semiarid((x, y)):
-                        biome[y, x] = 'boreal wet forest'
-                    else:
-                        biome[y, x] = 'boreal rain forest'
-                elif temp_zone=="cool":
-                #elif w.is_temperature_cool((x, y)):
-                    if humidity_zone=="superarid":# w.is_humidity_superarid((x, y)):
-                        biome[y, x] = 'cool temperate desert'
-                    elif humidity_zone=="perarid":  #w.is_humidity_perarid((x, y)):
-                        biome[y, x] = 'cool temperate desert scrub'
-                    elif humidity_zone=="arid":     #w.is_humidity_arid((x, y)):
-                        biome[y, x] = 'cool temperate steppe'
-                    elif  humidity_zone=="semiarid": #w.is_humidity_semiarid((x, y)):
-                        biome[y, x] = 'cool temperate moist forest'
-                    elif humidity_zone=="subhumid": #w.is_humidity_subhumid((x, y)):
-                        biome[y, x] = 'cool temperate wet forest'
-                    else:
-                        biome[y, x] = 'cool temperate rain forest'
-                elif temp_zone=="warm":             #w.is_temperature_warm((x, y)):
-                    if humidity_zone=="superarid":  #w.is_humidity_superarid((x, y)):
-                        biome[y, x] = 'warm temperate desert'
-                    elif humidity_zone=="perarid":  #w.is_humidity_perarid((x, y)):
-                        biome[y, x] = 'warm temperate desert scrub'
-                    elif humidity_zone=="arid":     #w.is_humidity_arid((x, y)):
-                        biome[y, x] = 'warm temperate thorn scrub'
-                    elif humidity_zone=="semiarid":     #w.is_humidity_semiarid((x, y)):
-                        biome[y, x] = 'warm temperate dry forest'
-                    elif humidity_zone=="subhumid":     # w.is_humidity_subhumid((x, y)):
-                        biome[y, x] = 'warm temperate moist forest'
-                    elif humidity_zone=="humid":     #w.is_humidity_humid((x, y)):
-                        biome[y, x] = 'warm temperate wet forest'
-                    else:
-                        biome[y, x] = 'warm temperate rain forest'
-                elif temp_zone=="subtropical":
-                #elif w.is_temperature_subtropical((x, y)):
-                    if humidity_zone=="superarid":     #w.is_humidity_superarid((x, y)):
-                        biome[y, x] = 'subtropical desert'
-                    elif humidity_zone=="perarid":     #w.is_humidity_perarid((x, y)):
-                        biome[y, x] = 'subtropical desert scrub'
-                    elif humidity_zone=="arid":     #w.is_humidity_arid((x, y)):
-                        biome[y, x] = 'subtropical thorn woodland'
-                    elif humidity_zone=="semiarid":     #w.is_humidity_semiarid((x, y)):
-                        biome[y, x] = 'subtropical dry forest'
-                    elif humidity_zone=="subhumid":     #w.is_humidity_subhumid((x, y)):
-                        biome[y, x] = 'subtropical moist forest'
-                    elif humidity_zone=="humid":     # w.is_humidity_humid((x, y)):
-                        biome[y, x] = 'subtropical wet forest'
-                    else:
-                        biome[y, x] = 'subtropical rain forest'
-                elif temp_zone=="tropical":
-#                elif w.is_temperature_tropical((x, y)):
-                    if humidity_zone=="superarid":     #w.is_humidity_superarid((x, y)):
-                        biome[y, x] = 'tropical desert'
-                    elif humidity_zone=="perarid":     #w.is_humidity_perarid((x, y)):
-                        biome[y, x] = 'tropical desert scrub'
-                    elif humidity_zone=="arid":     #w.is_humidity_arid((x, y)):
-                        biome[y, x] = 'tropical thorn woodland'
-                    elif humidity_zone=="semiarid":     #w.is_humidity_semiarid((x, y)):
-                        biome[y, x] = 'tropical very dry forest'
-                    elif humidity_zone=="subhumid":     #w.is_humidity_subhumid((x, y)):
-                        biome[y, x] = 'tropical dry forest'
-                    elif humidity_zone=="humid":     #w.is_humidity_humid((x, y)):
-                        biome[y, x] = 'tropical moist forest'
-                    elif humidity_zone=="perhumid":     #w.is_humidity_perhumid((x, y)):
-                        biome[y, x] = 'tropical wet forest'
-                    else:
-                        biome[y, x] = 'tropical rain forest'
-                else:
-                    biome[y, x] = 'bare rock'
+            else:
+                temp_zone = temp_threshold(t)#l_threshold_map(t,temps,temp_keys)#t_thresholds)
+                humidity_zone = humid_threshold(h)# l_threshold_map(h,humids,h_keys)#h_thresholds)
+                
+                name=assemble_biome_name(temp_zone,humidity_zone)
+                
+                B=biome_dict[name]
+                biome[y,x]=B
+                
             if not biome[y, x] in biome_cm:
                 biome_cm[biome[y, x]] = 0
             biome_cm[biome[y, x]] += 1
-            
+    
+    #print(new_m[0][0])
     return biome_cm, biome
 
 def blow_up_matrix(m,factor=10):
@@ -591,6 +367,6 @@ if __name__=="__main__":
     from worldengine.draw import draw_biome_on_file
     
     #biome_matrix()
-    a,m=biome_matrix()
+    m,biome_dict=biome_matrix()
     m=blow_up_matrix(m)
     draw_biome_on_file(m,"testbiome.png")
