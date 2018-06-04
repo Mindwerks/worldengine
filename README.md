@@ -53,6 +53,14 @@ An experimental (and limited!) GUI is available as a separate project: [https://
 Install
 =======
 
+### Using Docker
+
+First, git clone or download the code, then:
+
+```
+bin/run_in_docker.sh
+```
+
 ### Using pip
 
 ```
