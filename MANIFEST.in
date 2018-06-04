@@ -2,6 +2,8 @@ include *.md
 include *.scm
 include *.sh
 include *.txt
+include Dockerfile
+recursive-include bin *.sh
 recursive-include worldengine *.py
 recursive-include worldengine *.sh
 recursive-include worldengine *.proto
