@@ -11,8 +11,8 @@ environment:
     WITH_COMPILER: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_compiler.cmd"
 
   matrix:
-    - PYTHON: "C:\\Python27"
-      PYTHON_VERSION: "2.7.8"
+    - PYTHON: "C:\\Python36"
+      PYTHON_VERSION: "3.6.6"
       PYTHON_ARCH: "32"
 
     # - PYTHON: "C:\\Python33"
