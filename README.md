@@ -244,7 +244,7 @@ Remember, be consistent if you are either win32 or win64 and everything you down
 and install is either one or the other, but not both.
 
 You'll want to install msysgit: https://msysgit.github.io/ which will get you
-a Linux like environment. After that, clone the repo and install Python 2.7 for
+a Linux like environment. After that, clone the repo and install Python 3.6 for
 windows: https://www.python.org/downloads/windows/ This will get you also pip
 which is required for the rest. You'll first need to pip install virtualenv.
 
@@ -256,24 +256,22 @@ venv/Scripts/pip install -r requirements.txt
 
 Numpy install will fail, so you'll need download a pre-compiled wheel file and
 install it with pip. http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
-numpy‑1.9.2+mkl‑cp27‑none‑win_amd64.whl
+numpy‑1.17.4+mkl‑cp36‑none‑win_amd64.whl
 Pick one for your arch, 32 or 64.
 ```bash
-venv/Scripts/pip install ../numpy‑1.9.2+mkl‑cp27‑none‑win_amd64.whl
+venv/Scripts/pip install ../numpy‑1.17.4+mkl‑cp36‑none‑win_amd64.whl
 ```
 
 Next step is to get pywin32 which are win32api hooks for python, when downloading,
 you'll need to pick either 32 or 64-bit otherwise it won't work. You'll also
 install it via pip. http://sourceforge.net/projects/pywin32/files/pywin32/
 ```bash
-venv/Scripts/pip install ../pywin32-219.win-amd64-py2.7.exe
+venv/Scripts/pip install ../pywin32-221.win-amd64-py3.6.exe
 ```
 
-The last step is to get pyinstaller installed and this can be tricky
-because as of right now, we have to use a specific revision that "good-enough".
-The issue is being tracked here: https://github.com/pyinstaller/pyinstaller/issues/1291
+The last step is to get pyinstaller
 ```bash
-venv/Scripts/pip install git+https://github.com/pyinstaller/pyinstaller.git@67610f2
+venv/Scripts/pip install pyinstaller
 venv/Scripts/pyinstaller --clean --console -F -n worldengine worldengine/__main__.py
 ```
 

@@ -1,0 +1,20 @@
+# Dependencies
+argparse==1.2.1
+noise==1.2.2
+numpy>=1.17.4
+pypng==0.0.18
+PyPlatec==1.4.0
+protobuf==3.0.0a3
+six==1.10.0
+
+# Optional dependencies
+pygdal==2.2.3.*
+Cython
+h5py==2.5.0
+
+# Dev dependencies
+nose
+pytest
+pdbpp
+sphinx
+sphinx-autobuild

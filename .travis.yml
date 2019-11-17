@@ -1,5 +1,5 @@
 language: python
-python: 2.7
+python: 3.6
 os:
     - linux
     - osx
@@ -11,8 +11,7 @@ cache:
     - apt
 
 env:
-    - TOX_ENV=py27
-    - TOX_ENV=py34
+    - TOX_ENV=py36
     - TOX_ENV=pypy
     - TOX_ENV=pyflakes
     - TOX_ENV=manifest
