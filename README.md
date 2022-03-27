@@ -5,7 +5,7 @@ WorldEngine - a world generator
 
 _The current stable version is 0.19.0_
 
-You can generate the data for your own world, including a number of images (heigthmap, biomes, etc.).
+You can generate the data for your own world, including a number of images (heightmap, biomes, etc.).
 
 For example:
 
