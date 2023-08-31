@@ -5,7 +5,7 @@ WorldEngine - a world generator
 
 _The current stable version is 0.19.0_
 
-You can generate the data for your own world, including a number of images (heigthmap, biomes, etc.).
+You can generate the data for your own world, including a number of images (heightmap, biomes, etc.).
 
 For example:
 
@@ -28,7 +28,7 @@ worldengine ancient_map -w seed1.world
 
 We started a [Google group](https://groups.google.com/forum/?hl=en#!forum/worldengine): Should you have ideas, problems, suggestions or want to contribute, please [join us](https://groups.google.com/forum/?hl=en#!forum/worldengine)!
 
-##Manual
+## Manual
 
 The Manual for Worldengine : [http://worldengine.readthedocs.io/en/latest/](http://worldengine.readthedocs.io/en/latest/)
 
@@ -52,6 +52,14 @@ An experimental (and limited!) GUI is available as a separate project: [https://
 
 Install
 =======
+
+### Using Docker
+
+First, git clone or download the code, then:
+
+```
+bin/run_in_docker.sh
+```
 
 ### Using pip
 

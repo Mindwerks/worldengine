@@ -25,7 +25,7 @@ config = {
     'entry_points': {
         'console_scripts': ['worldengine=worldengine.cli.main:main'],
     },
-    'install_requires': ['PyPlatec==1.4.0', 'pypng>=0.0.18', 'numpy>=1.9.2, <= 1.10.0.post2',
+    'install_requires': ['PyPlatec==1.4.0', 'pypng>=0.0.18', 'numpy>=1.22.2',
                          'argparse==1.2.1', 'noise==1.2.2', 'protobuf==3.0.0a3'],
     'license': 'MIT License'
 }
