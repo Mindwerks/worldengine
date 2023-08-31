@@ -88,7 +88,7 @@ class World(object):
 
     def __init__(self, name, size, seed, generation_params,
                  temps=[0.874, 0.765, 0.594, 0.439, 0.366, 0.124],
-                 humids = [.941, .778, .507, .236, 0.073, .014, .002],
+                 humids=[.941, .778, .507, .236, 0.073, .014, .002],
                  gamma_curve=1.25, curve_offset=.2):
         self.name = name
         self.size = size
@@ -121,10 +121,10 @@ class World(object):
     #
 
     @classmethod
-    def from_dict(cls, dict):
-        instance = World(dict['name'], Size(dict['width'], dict['height']))
-        for k in dict:
-            instance.__dict__[k] = dict[k]
+    def from_dict(cls, in_dict):
+        instance = World(in_dict['name'], Size(in_dict['width'], in_dict['height']))
+        for k in in_dict:
+            instance.__dict__[k] = in_dict[k]
         return instance
 
     def protobuf_serialize(self):
@@ -290,11 +290,12 @@ class World(object):
 
     @classmethod
     def _from_protobuf_world(cls, p_world):
-        w = World(p_world.name, Size(p_world.width, p_world.height),
-                  p_world.generationData.seed,
-                  GenerationParameters(p_world.generationData.n_plates,
-                        p_world.generationData.ocean_level,
-                        Step.get_by_name(p_world.generationData.step)))
+        w = World(
+            p_world.name, Size(p_world.width, p_world.height),
+            p_world.generationData.seed, GenerationParameters(
+                p_world.generationData.n_plates,
+                p_world.generationData.ocean_level,
+                Step.get_by_name(p_world.generationData.step)))
 
         # Elevation
         e = numpy.array(World._from_protobuf_matrix(p_world.heightMapData))
@@ -312,17 +313,19 @@ class World(object):
         w.sea_depth = numpy.array(World._from_protobuf_matrix(p_world.sea_depth))
 
         # Biome
-        if len(p_world.biome.rows) > 0:
-            w.biome = numpy.array(World._from_protobuf_matrix(p_world.biome, biome_index_to_name), dtype=object)
+        if p_world.biome.rows:
+            w.biome = numpy.array(
+                World._from_protobuf_matrix(p_world.biome, biome_index_to_name), 
+                dtype=object)
 
         # Humidity
-        if len(p_world.humidity.rows) > 0:
+        if p_world.humidity.rows:
             w.humidity = World._from_protobuf_matrix_with_quantiles(p_world.humidity)
 
-        if len(p_world.irrigation.rows) > 0:
+        if p_world.irrigation.rows:
             w.irrigation = numpy.array(World._from_protobuf_matrix(p_world.irrigation))
 
-        if len(p_world.permeabilityData.rows) > 0:
+        if p_world.permeabilityData.rows:
             p = numpy.array(World._from_protobuf_matrix(p_world.permeabilityData))
             p_th = [
                 ('low', p_world.permeability_low),
@@ -331,7 +334,7 @@ class World(object):
             ]
             w.permeability = (p, p_th)
 
-        if len(p_world.watermapData.rows) > 0:
+        if p_world.watermapData.rows:
             data = numpy.array(World._from_protobuf_matrix(
                 p_world.watermapData))
             thresholds = {}
@@ -340,7 +343,7 @@ class World(object):
             thresholds['main river'] = p_world.watermap_mainriver
             w.watermap = (data, thresholds)
 
-        if len(p_world.precipitationData.rows) > 0:
+        if p_world.precipitationData.rows:
             p = numpy.array(World._from_protobuf_matrix(p_world.precipitationData))
             p_th = [
                 ('low', p_world.precipitation_low),
@@ -349,7 +352,7 @@ class World(object):
             ]
             w.precipitation = (p, p_th)
 
-        if len(p_world.temperatureData.rows) > 0:
+        if p_world.temperatureData.rows:
             t = numpy.array(World._from_protobuf_matrix(p_world.temperatureData))
             t_th = [
                 ('polar', p_world.temperature_polar),
@@ -362,13 +365,13 @@ class World(object):
             ]
             w.temperature = (t, t_th)
 
-        if len(p_world.lakemap.rows) > 0:
+        if p_world.lakemap.rows:
             w.lakemap = numpy.array(World._from_protobuf_matrix(p_world.lakemap))
 
-        if len(p_world.rivermap.rows) > 0:
+        if p_world.rivermap.rows:
             w.rivermap = numpy.array(World._from_protobuf_matrix(p_world.rivermap))
 
-        if len(p_world.icecap.rows) > 0:
+        if p_world.icecap.rows:
             w.icecap = numpy.array(World._from_protobuf_matrix(p_world.icecap))
 
         return w
@@ -386,10 +389,12 @@ class World(object):
 
     def random_land(self, num_samples=1):
         if self.layers['ocean'].data.all():
-            return None, None  # return invalid indices if there is no land at all
+            # return invalid indices if there is no land at all
+            return None, None
 
         land = numpy.invert(self.layers['ocean'].data)
-        land_indices = numpy.transpose(numpy.nonzero(land))  # returns a list of tuples/indices with land positions
+        # returns a list of tuples/indices with land positions
+        land_indices = numpy.transpose(numpy.nonzero(land))  
 
         result = numpy.zeros(num_samples*2, dtype=int)
 
@@ -400,7 +405,8 @@ class World(object):
         return result
 
     def is_land(self, pos):
-        return not self.layers['ocean'].data[pos[1], pos[0]]#faster than reversing pos or transposing ocean
+        # faster than reversing pos or transposing ocean
+        return not self.layers['ocean'].data[pos[1], pos[0]]
 
     def is_ocean(self, pos):
         return self.layers['ocean'].data[pos[1], pos[0]]

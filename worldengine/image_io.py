@@ -75,7 +75,7 @@ class PNGWriter(object):
         Calling the generic constructor gives full control over the created PNG
         file but it is very much recommended to use the appropriate static
         constructors instead (or add one if it is missing).
-        
+
         The default settings are chosen to represent a standard RGB image.
         """
         self.img = None
@@ -229,18 +229,23 @@ class PNGReader(object):
         self.filename = filename
 
         reader = png.Reader(filename=filename)
-        pngdata = reader.asDirect()  # returns (width, height, pixels, meta), pixels as 'boxed row, flat pixel'
+        # returns (width, height, pixels, meta), pixels as 'boxed row, flat pixel'
+        pngdata = reader.asDirect()
 
         self.width = pngdata[0]
         self.height = pngdata[1]
 
-        self.array = numpy.vstack(tuple(map(numpy.uint16, pngdata[2])))  # creates a 2-dimensional array (flat pixels)
+        # creates a 2-dimensional array (flat pixels)
+        self.array = numpy.vstack(tuple(map(numpy.uint16, pngdata[2])))
+
         if pngdata[3]['planes'] > 1:  # 'unflatten' the pixels
-            self.array = self.array.reshape(self.height, self.width, -1)  # height, width, depth (-1 = automatic)
+            # height, width, depth (-1 = automatic)
+            self.array = self.array.reshape(self.height, self.width, -1)
 
     def __getitem__(self, item):
         return self.array[item]
 
     def __eq__(self, other):
-        #palettes do not need to be compared since asDirect() automatically maps the pixels to their colors
+        # palettes do not need to be compared
+        # since asDirect() automatically maps the pixels to their colors
         return numpy.array_equiv(self.array, other.array)

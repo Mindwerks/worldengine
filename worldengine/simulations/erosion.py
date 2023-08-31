@@ -32,9 +32,6 @@ class ErosionSimulation(object):
     def __init__(self):
         self.wrap = True
 
-    def is_applicable(self, world):
-        return world.has_precipitations()
-
     def execute(self, world, seed):
         water_flow = numpy.zeros((world.height, world.width))
         water_path = numpy.zeros((world.height, world.width), dtype=int)
@@ -52,7 +49,7 @@ class ErosionSimulation(object):
         # step three: for each source, find a path to sea
         for source in river_sources:
             river = self.river_flow(source, world, river_list, lake_list)
-            if len(river) > 0:
+            if river:
                 river_list.append(river)
                 self.cleanUpFlow(river, world)
                 rx, ry = river[-1]  # find last cell in river

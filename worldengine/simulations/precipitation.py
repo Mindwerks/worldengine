@@ -69,17 +69,17 @@ class PrecipitationSimulation(object):
         max_temp = world.layers['temperature'].max()
         precip_delta = (max_precip - min_precip)
         temp_delta = (max_temp - min_temp)
-        
+
         #normalize temperature and precipitation arrays
         t = (world.layers['temperature'].data - min_temp) / temp_delta
         p = (precipitations - min_precip) / precip_delta
-        
+
         #modify precipitation based on temperature
 
         #--------------------------------------------------------------------------------
         #
         # Ok, some explanation here because why the formula is doing this may be a
-        # little confusing. We are going to generate a modified gamma curve based on 
+        # little confusing. We are going to generate a modified gamma curve based on
         # normalized temperature and multiply our precipitation amounts by it.
         #
         # numpy.power(t,curve_gamma) generates a standard gamma curve. However
@@ -97,12 +97,12 @@ class PrecipitationSimulation(object):
         # renormalizing.
         #
         #--------------------------------------------------------------------------------
-        
+
         curve = (numpy.power(t, curve_gamma) * (1-curve_bonus)) + curve_bonus
         precipitations = numpy.multiply(p, curve)
 
-        #Renormalize precipitation because the precipitation 
-        #changes will probably not fully extend from -1 to 1.
+        # Renormalize precipitation because the precipitation
+        # changes will probably not fully extend from -1 to 1.
         min_precip = precipitations.min()
         max_precip = precipitations.max()
         precip_delta = (max_precip - min_precip)

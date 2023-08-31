@@ -62,7 +62,7 @@ class TemperatureSimulation(object):
         distance_to_sun = rng.normal(loc=1.0, scale=distance_to_sun_hwhm / 1.177410023)
         distance_to_sun = max(0.1, distance_to_sun)  # clamp value; no planets inside the star allowed
         distance_to_sun *= distance_to_sun  # prepare for later usage; use inverse-square law
-        # TODO: an atmoshphere would soften the effect of distance_to_sun by *some* factor
+        # TODO: an atmosphere would soften the effect of distance_to_sun by *some* factor
         axial_tilt = rng.normal(scale=axial_tilt_hwhm / 1.177410023)
         axial_tilt = min(max(-0.5, axial_tilt), 0.5)  # cut off Gaussian
 
@@ -74,8 +74,8 @@ class TemperatureSimulation(object):
         for y in range(0, height):  # TODO: Check for possible numpy optimizations.
             y_scaled = float(y) / height - 0.5  # -0.5...0.5
 
-            #map/linearly interpolate y_scaled to latitude measured from where the most sunlight hits the world:
-            #1.0 = hottest zone, 0.0 = coldest zone
+            # map/linearly interpolate y_scaled to latitude measured from where the most sunlight hits the world:
+            # 1.0 = hottest zone, 0.0 = coldest zone
             latitude_factor = numpy.interp(y_scaled, [axial_tilt - 0.5, axial_tilt, axial_tilt + 0.5],
                                            [0.0, 1.0, 0.0], left=0.0, right=0.0)
             for x in range(0, width):

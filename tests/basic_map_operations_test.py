@@ -1,4 +1,3 @@
-import numpy
 import unittest
 from worldengine.basic_map_operations import distance, index_of_nearest
 

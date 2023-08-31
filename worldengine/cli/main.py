@@ -1,8 +1,7 @@
 import sys
-from argparse import ArgumentParser
-
-import numpy
 import os
+from argparse import ArgumentParser
+import numpy
 
 import worldengine.generation as geo
 from worldengine.common import set_verbose, print_verbose, get_verbose

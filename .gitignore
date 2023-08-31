@@ -55,3 +55,4 @@ generator.spec
 /.vs/worldengine/v14/.suo
 /worldengine.sln
 *.pyperf
+*.pylintrc

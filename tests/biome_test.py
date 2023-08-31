@@ -13,7 +13,6 @@ class TestBiome(unittest.TestCase):
         tests_dir = os.path.dirname(os.path.realpath(__file__))
         self.tests_data_dir = os.path.abspath(os.path.join(
             tests_dir, "../../worldengine-data/tests/data"))
-        pass
 
     def test_biome_by_name(self):
         self.assertRaises(Exception, Biome.by_name, "unexisting biome")
@@ -123,6 +122,7 @@ class TestBiome(unittest.TestCase):
 
     def test_locate_biomes(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
+        #TODO: do something to the result
         cm, biome_cm = BiomeSimulation().execute(w, 28070)
 
     @staticmethod

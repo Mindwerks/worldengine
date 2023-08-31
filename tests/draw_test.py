@@ -44,23 +44,23 @@ class TestBase(unittest.TestCase):
                         "and/or amount of channels. Blessed %s, drawn %s"
                         % (str(blessed_img.array.shape), str(drawn_image.array.shape)))
 
-        # compare images; cmp_array will be an array of booleans in case of equal shapes (and a pure boolean otherwise)
+        # compare images;
+        # cmp_array will be an array of booleans in case of equal shapes
+        # and a pure boolean otherwise
         cmp_array = blessed_img.array != drawn_image.array
 
         # avoid calling assertTrue if shapes differed; results would be weird (and meaningless)
         if numpy.any(cmp_array):
             diff = numpy.transpose(numpy.nonzero(cmp_array))  # list of tuples of differing indices
-            self.assertTrue(False,
-                            "Pixels at %i, %i are different. Blessed %s, drawn %s"
-                            % (diff[0][0], diff[0][1],
-                            blessed_img.array[diff[0][0], diff[0][1]],
-                            drawn_image.array[diff[0][0], diff[0][1]]))
+            self.assertTrue(
+                False,
+                "Pixels at %i, %i are different. Blessed %s, drawn %s" % (
+                    diff[0][0], diff[0][1],
+                    blessed_img.array[diff[0][0], diff[0][1]],
+                    drawn_image.array[diff[0][0], diff[0][1]]))
 
 
 class TestDraw(TestBase):
-
-    def setUp(self):
-        super(TestDraw, self).setUp()
 
     def test_biome_colors(self):
         self.assertEqual(Biome.all_names(), sorted(_biome_colors.keys()))
@@ -68,10 +68,10 @@ class TestDraw(TestBase):
     def test_elevation_color(self):
         for i in range(0, 20):
             v = i / 2.0
-            c = ra, ga, ba = elevation_color(v)
+            c = elevation_color(v)
             delta = 0.0000001
-            c_low = rb, gb, bb = elevation_color(v - delta)
-            c_high = rc, gc, bc = elevation_color(v + delta)
+            c_low = elevation_color(v - delta)
+            c_high = elevation_color(v + delta)
 
             # we want values to be in range
             self._assert_is_valid_color(c, "color for %f" % v)
@@ -79,7 +79,10 @@ class TestDraw(TestBase):
             self._assert_is_valid_color(c_high, "color for %f (high)" % (v + delta))
 
             # we look for discontinuities
-            # TODO verify this
+            # TODO: verify this; probably move it to a seperate test
+            # ra, ga, ba = c
+            # rb, gb, bb = c_low
+            # rc, gc, bc = c_high
             #self.assertAlmostEqual(ra, rb, 5, "value %f, red, low, from %f to %f" % (v, ra, rb))
             #self.assertAlmostEqual(ra, rc, 5, "value %f, red, high, from %f to %f" % (v, ra, rc))
             #self.assertAlmostEqual(ga, gb, 5, "value %f, green, low, from %f to %f" % (v, ga, gb))

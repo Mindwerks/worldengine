@@ -35,8 +35,16 @@ def center_land(world):
         print("geo.center_land: width complete")
 
     latshift = 0
-    world.layers['elevation'].data = numpy.roll(numpy.roll(world.layers['elevation'].data, -y_with_min_sum + latshift, axis=0), - x_with_min_sum, axis=1)
-    world.layers['plates'].data = numpy.roll(numpy.roll(world.layers['plates'].data, -y_with_min_sum + latshift, axis=0), - x_with_min_sum, axis=1)
+    world.layers['elevation'].data = numpy.roll(
+        numpy.roll(
+            world.layers['elevation'].data,
+            -y_with_min_sum + latshift, axis=0),
+        - x_with_min_sum, axis=1)
+    world.layers['plates'].data = numpy.roll(
+        numpy.roll(
+            world.layers['plates'].data,
+            -y_with_min_sum + latshift, axis=0),
+        - x_with_min_sum, axis=1)
     if get_verbose():
         print("geo.center_land: width complete")
 
@@ -142,23 +150,22 @@ def harmonize_ocean(ocean, elevation, ocean_level):
 
 def sea_depth(world, sea_level):
 
-    # a dynamic programming approach to gather how far the next land is 
+    # a dynamic programming approach to gather how far the next land is
     # from a given coordinate up to a maximum distance of max_radius
     # result is 0 for land coordinates and -1 for coordinates further than
     # max_radius away from land
     # there might be even faster ways but it does the trick
 
     def next_land_dynamic(ocean, max_radius=5):
-    
         next_land = numpy.full(ocean.shape, -1, int)
 
         # non ocean tiles are zero distance away from next land
-        next_land[numpy.logical_not(ocean)]=0
+        next_land[numpy.logical_not(ocean)] = 0
 
         height, width = ocean.shape
 
         for dist in range(max_radius):
-            indices = numpy.transpose(numpy.where(next_land==dist))
+            indices = numpy.transpose(numpy.where(next_land == dist))
             for y, x in indices:
                 for dy in range(-1, 2):
                     ny = y + dy
@@ -166,32 +173,32 @@ def sea_depth(world, sea_level):
                         for dx in range(-1, 2):
                             nx = x + dx
                             if 0 <= nx < width:
-                                if next_land[ny,nx] == -1:
-                                    next_land[ny,nx] = dist + 1
+                                if next_land[ny, nx] == -1:
+                                    next_land[ny, nx] = dist + 1
         return next_land
 
-    # We want to multiply the raw sea_depth by one of these factors 
+    # We want to multiply the raw sea_depth by one of these factors
     # depending on the distance from the next land
     # possible TODO: make this a parameter
     factors = [0.0, 0.3, 0.5, 0.7, 0.9]
 
     next_land = next_land_dynamic(world.layers['ocean'].data)
 
-    sea_depth = sea_level - world.layers['elevation'].data
+    result = sea_level - world.layers['elevation'].data
 
     for y in range(world.height):
         for x in range(world.width):
-            dist_to_next_land = next_land[y,x]
+            dist_to_next_land = next_land[y, x]
             if dist_to_next_land > 0:
-                sea_depth[y,x]*=factors[dist_to_next_land-1]
+                result[y, x] *= factors[dist_to_next_land-1]
 
-    sea_depth = anti_alias(sea_depth, 10)
+    result = anti_alias(result, 10)
 
-    min_depth = sea_depth.min()
-    max_depth = sea_depth.max()
-    sea_depth = (sea_depth - min_depth) / (max_depth - min_depth)
+    min_depth = result.min()
+    max_depth = result.max()
+    result = (result - min_depth) / (max_depth - min_depth)
 
-    return sea_depth
+    return result
 
 
 def _around(x, y, width, height):
@@ -214,10 +221,14 @@ def generate_world(w, step):
         return w
 
     # Prepare sufficient seeds for the different steps of the generation
-    rng = numpy.random.RandomState(w.seed)  # create a fresh RNG in case the global RNG is compromised (i.e. has been queried an indefinite amount of times before generate_world() was called)
-    sub_seeds = rng.randint(0, numpy.iinfo(numpy.int32).max, size=100)  # choose lowest common denominator (32 bit Windows numpy cannot handle a larger value)
+    # create a fresh RNG in case the global RNG is compromised
+    # (i.e. has been queried an indefinite amount of times before generate_world() was called)
+    rng = numpy.random.RandomState(w.seed)
+    # choose lowest common denominator (32 bit Windows numpy cannot handle a larger value)
+    sub_seeds = rng.randint(0, numpy.iinfo(numpy.int32).max, size=100)
+     # after 0.19.0 do not ever switch out the seeds here to maximize seed-compatibility
     seed_dict = {
-                 'PrecipitationSimulation': sub_seeds[ 0],  # after 0.19.0 do not ever switch out the seeds here to maximize seed-compatibility
+                 'PrecipitationSimulation': sub_seeds[ 0],
                  'ErosionSimulation':       sub_seeds[ 1],
                  'WatermapSimulation':      sub_seeds[ 2],
                  'IrrigationSimulation':    sub_seeds[ 3],
@@ -248,7 +259,7 @@ def generate_world(w, step):
     PermeabilitySimulation().execute(w, seed_dict['PermeabilitySimulation'])
 
     cm, biome_cm = BiomeSimulation().execute(w, seed_dict['BiomeSimulation'])  # seed not currently used
-    for cl in cm.keys():
+    for cl in cm:
         count = cm[cl]
         if get_verbose():
             print("%s = %i" % (str(cl), count))
@@ -257,7 +268,7 @@ def generate_world(w, step):
         print('')  # empty line
         print('Biome obtained:')
 
-    for cl in biome_cm.keys():
+    for cl in biome_cm:
         count = biome_cm[cl]
         if get_verbose():
             print(" %30s = %7i" % (str(cl), count))

@@ -29,13 +29,17 @@ def main(blessed_images_dir, tests_data_dir):
     draw_biome_on_file(w, "%s/biome_28070.png" % blessed_images_dir)
     draw_scatter_plot_on_file(w, "%s/scatter_28070.png" % blessed_images_dir)
     draw_satellite_on_file(w, "%s/satellite_28070.png" % blessed_images_dir)
-    draw_ancientmap_on_file(w, "%s/ancientmap_28070_factor3.png" % blessed_images_dir, resize_factor=3)
+    draw_ancientmap_on_file(
+        w, "%s/ancientmap_28070_factor3.png" % blessed_images_dir, resize_factor=3)
 
-    img = PNGWriter.rgba_from_dimensions(w.width * 2, w.height * 2, "%s/rivers_28070_factor2.png" % blessed_images_dir)
+    img = PNGWriter.rgba_from_dimensions(
+        w.width * 2, w.height * 2, "%s/rivers_28070_factor2.png" % blessed_images_dir)
     draw_rivers_on_image(w, img, factor=2)
     img.complete()
 
 if __name__ == '__main__':
-    blessed_images_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../../worldengine-data/tests/images"))
-    tests_data_dir = os.path.abspath(os.path.join(blessed_images_dir, '../data'))
-    main(blessed_images_dir, tests_data_dir)
+    BLESSED_IMAGES_DIR = os.path.abspath(
+        os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "../../../worldengine-data/tests/images"))
+    TESTS_DATA_DIR = os.path.abspath(os.path.join(BLESSED_IMAGES_DIR, '../data'))
+    main(BLESSED_IMAGES_DIR, TESTS_DATA_DIR)
