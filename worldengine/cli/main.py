@@ -463,7 +463,7 @@ def main():
     if args.temps and not generation_operation:
         usage(error="temps can be assigned only during world generation")
 
-    if args.temps and len(args.temps.split('/')) is not 6:
+    if args.temps and len(args.temps.split('/')) != 6:
         usage(error="temps must have exactly 6 values")
 
     if args.go >= 1 or args.go < 0:
@@ -481,7 +481,7 @@ def main():
     if args.humids and not generation_operation:
         usage(error="humidity can be assigned only during world generation")
 
-    if args.humids and len(args.humids.split('/')) is not 7:
+    if args.humids and len(args.humids.split('/')) != 7:
         usage(error="humidity must have exactly 7 values")
 
     humids = [.941, .778, .507, .236, 0.073, .014, .002]

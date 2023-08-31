@@ -234,7 +234,7 @@ class PNGReader(object):
         self.width = pngdata[0]
         self.height = pngdata[1]
 
-        self.array = numpy.vstack(map(numpy.uint16, pngdata[2]))  # creates a 2-dimensional array (flat pixels)
+        self.array = numpy.vstack(tuple(map(numpy.uint16, pngdata[2])))  # creates a 2-dimensional array (flat pixels)
         if pngdata[3]['planes'] > 1:  # 'unflatten' the pixels
             self.array = self.array.reshape(self.height, self.width, -1)  # height, width, depth (-1 = automatic)
 
