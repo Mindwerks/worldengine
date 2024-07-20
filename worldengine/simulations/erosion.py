@@ -173,128 +173,132 @@ class ErosionSimulation(object):
         return river_source_list
 
     def river_flow(self, source, world, river_list, lake_list):
-        """simulate fluid dynamics by using starting point and flowing to the
-        lowest available point"""
+        """Simulate fluid dynamics by using starting point and flowing to the lowest available point."""
+    
+        def find_nearest_river(x, y):
+            """Check if there's a nearby river to merge with."""
+            for river in river_list:
+                if [x, y] in river:
+                    return river
+            return None
+
+        def handle_wrapping(current_location, lower_elevation, world):
+            """Handle wrapping around the world boundaries."""
+            cx, cy = current_location
+            lx, ly = lower_elevation
+            max_radius = 40
+
+            if not in_circle(max_radius, cx, cy, lx, cy):
+                lx, nx = (0, world.width - 1) if cx - lx < 0 else (world.width - 1, 0)
+                ly, ny = (cy + ly) / 2, (cy + ly) / 2
+            elif not in_circle(max_radius, cx, cy, cx, ly):
+                ly, ny = (0, world.height - 1) if cy - ly < 0 else (world.height - 1, 0)
+                lx, nx = (cx + lx) / 2, (cx + lx) / 2
+            else:
+                raise Exception("BUG: We are not in circle: %s %s" % (current_location, lower_elevation))
+
+            return [lx, ly], [nx, ny]
+
+        def add_path(path, new_path, new_location):
+            """Append new path segments and update current location."""
+            path.extend(new_path)
+            path.append(new_location)
+            return new_location
+
         current_location = source
         path = [source]
 
-        # start the flow
         while True:
             x, y = current_location
+            
+            # Check if flowing into a nearby river
+            nearby_river = find_nearest_river(x, y)
+            if nearby_river:
+                for rx, ry in nearby_river:
+                    path.append([rx, ry])
+                return path
 
-            # is there a river nearby, flow into it
-            for dx, dy in DIR_NEIGHBORS:
-                ax, ay = x + dx, y + dy
-                if self.wrap:
-                    ax, ay = overflow(ax, world.width), overflow(ay,
-                                                                 world.height)
-
-                for river in river_list:
-                    if [ax, ay] in river:
-                        merge = False
-                        for rx, ry in river:
-                            if [ax, ay] == [rx, ry]:
-                                merge = True
-                                path.append([rx, ry])
-                            elif merge:
-                                path.append([rx, ry])
-                        return path  # skip the rest, return path
-
-            # found a sea?
+            # Check if we have reached the ocean
             if world.is_ocean((x, y)):
                 break
 
-            # find our immediate lowest elevation and flow there
+            # Attempt to find a quick path
             quick_section = self.find_quick_path(current_location, world)
-
             if quick_section:
-                path.append(quick_section)
-                current_location = quick_section
-                continue  # stop here and enter back into loop
+                current_location = add_path(path, [quick_section], quick_section)
+                continue
 
-            is_wrapped, lower_elevation = self.findLowerElevation(
-                current_location, world)
-            if lower_elevation and not is_wrapped:
-                lower_path = worldengine.astar.PathFinder().find(
-                    world.layers['elevation'].data, current_location, lower_elevation)
-                if lower_path:
-                    path += lower_path
-                    current_location = path[-1]
-                else:
-                    break
-            elif lower_elevation and is_wrapped:
-                # TODO: make this more natural
-                max_radius = 40
-
-                cx, cy = current_location
-                lx, ly = lower_elevation
-
-                if x < 0 or y < 0 or x > world.width or y > world.height:
-                    raise Exception(
-                        "BUG: fix me... we shouldn't be here: %s %s" % (
-                            current_location, lower_elevation))
-
-                if not in_circle(max_radius, cx, cy, lx, cy):
-                    # are we wrapping on x axis?
-                    if cx - lx < 0:
-                        lx = 0  # move to left edge
-                        nx = world.width - 1  # next step is wrapped around
+            # Find the lowest elevation point to flow towards
+            is_wrapped, lower_elevation = self.findLowerElevation(current_location, world)
+            if lower_elevation:
+                if not is_wrapped:
+                    lower_path = worldengine.astar.PathFinder().find(
+                        world.layers['elevation'].data, current_location, lower_elevation)
+                    if lower_path:
+                        current_location = add_path(path, lower_path, lower_path[-1])
                     else:
-                        lx = world.width - 1  # move to right edge
-                        nx = 0  # next step is wrapped around
-                    ly = ny = int((cy + ly) / 2)  # move halfway
-                elif not in_circle(max_radius, cx, cy, cx, ly):
-                    # are we wrapping on y axis?
-                    if cy - ly < 0:
-                        ly = 0  # move to top edge
-                        ny = world.height - 1  # next step is wrapped around
-                    else:
-                        ly = world.height - 1  # move to bottom edge
-                        ny = 0  # next step is wrapped around
-                    lx = nx = int((cx + lx) / 2)  # move halfway
+                        break
                 else:
-                    raise Exception(
-                        "BUG: fix me... we are not in circle: %s %s" % (
-                            current_location, lower_elevation))
-
-                # find our way to the edge
-                edge_path = worldengine.astar.PathFinder().find(
-                    world.layers['elevation'].data, [cx, cy], [lx, ly])
-                if not edge_path:
-                    # can't find another other path, make it a lake
-                    lake_list.append(current_location)
-                    break
-                path += edge_path  # add our newly found path
-                path.append([nx, ny])  # finally add our overflow to other side
-                current_location = path[-1]
-
-                # find our way to lowest position original found
-                lower_path = worldengine.astar.PathFinder().find(
-                    world.layers['elevation'].data, current_location, lower_elevation)
-                path += lower_path
-                current_location = path[-1]
-
-            else:  # can't find any other path, make it a lake
+                    edge_path = worldengine.astar.PathFinder().find(
+                        world.layers['elevation'].data, current_location, lower_elevation)
+                    if edge_path:
+                        edge_destination = handle_wrapping(current_location, lower_elevation, world)
+                        current_location = add_path(path, edge_path, edge_destination[1])
+                    else:
+                        lake_list.append(current_location)
+                        break
+                    # Find path back to the lowest position
+                    lower_path = worldengine.astar.PathFinder().find(
+                        world.layers['elevation'].data, current_location, lower_elevation)
+                    current_location = add_path(path, lower_path, lower_path[-1])
+            else:
                 lake_list.append(current_location)
-                break  # end of river
+                break
 
             if not world.contains(current_location):
-                print("Why are we here:", current_location)
+                print("Unexpected location:", current_location)
 
         return path
 
     def cleanUpFlow(self, river, world):
-        '''Validate that for each point in river is equal to or lower than the
-        last'''
-        celevation = 1.0
+        '''Validate that each point in the river is at or below the elevation of the previous point and remove isolated points.'''
+        
+        if not river:
+            return []
+
+        # Initialize variables
+        cleaned_river = []
+        celevation = float('inf')  # Start with a high elevation to ensure first point is always added
+        
         for r in river:
             rx, ry = r
             relevation = world.layers['elevation'].data[ry, rx]
+            
+            # Ensure the elevation is valid and update if needed
             if relevation <= celevation:
+                cleaned_river.append(r)
                 celevation = relevation
-            elif relevation > celevation:
+            else:
+                # Adjust elevation to maintain the non-increasing order
                 world.layers['elevation'].data[ry, rx] = celevation
-        return river
+                
+        # Remove isolated points (lone points) that do not conform to surrounding points
+        final_river = []
+        for i in range(len(cleaned_river)):
+            if i == 0 or i == len(cleaned_river) - 1:
+                final_river.append(cleaned_river[i])  # Keep the first and last points
+            
+            else:
+                prev_point = cleaned_river[i - 1]
+                next_point = cleaned_river[i + 1]
+                current_point = cleaned_river[i]
+                
+                # Check if the current point is surrounded by valid points
+                if (current_point[1] == prev_point[1] and abs(current_point[0] - prev_point[0]) == 1) or \
+                (current_point[1] == next_point[1] and abs(current_point[0] - next_point[0]) == 1):
+                    final_river.append(current_point)
+
+        return final_river
 
     def findLowerElevation(self, source, world):
         '''Try to find a lower elevation with in a range of an increasing
@@ -343,6 +347,7 @@ class ErosionSimulation(object):
         # print "Wrapped lower elevation found:", rx, ry, "!"
         return isWrapped, destination
 
+    
     def river_erosion(self, river, world):
         """ Simulate erosion in heightmap based on river path.
             * current location must be equal to or less than previous location
@@ -350,17 +355,21 @@ class ErosionSimulation(object):
             * sides of river are also eroded to slope into riverbed.
         """
 
-        # erosion around river, create river valley
+        def in_circle(radius, rx, ry, x, y):
+            return (x - rx) ** 2 + (y - ry) ** 2 <= radius ** 2
+
+        def overflow(value, max_value):
+            return value % max_value
+
+        radius = 2
+
         for r in river:
             rx, ry = r
-            radius = 2
-            for x in range(rx - radius, rx + radius):
-                for y in range(ry - radius, ry + radius):
-                    if not self.wrap and not world.contains(
-                            (x, y)):  # ignore edges of map
+            for x in range(rx - radius, rx + radius + 1):
+                for y in range(ry - radius, ry + radius + 1):
+                    if not self.wrap and not world.contains((x, y)):  # ignore edges of map
                         continue
                     x, y = overflow(x, world.width), overflow(y, world.height)
-                    curve = 1.0
                     if [x, y] == [0, 0]:  # ignore center
                         continue
                     if [x, y] in river:  # ignore river itself
@@ -368,23 +377,22 @@ class ErosionSimulation(object):
                     if world.layers['elevation'].data[y, x] <= world.layers['elevation'].data[ry, rx]:
                         # ignore areas lower than river itself
                         continue
-                    if not in_circle(radius, rx, ry, x,
-                                     y):  # ignore things outside a circle
+                    if not in_circle(radius, rx, ry, x, y):  # ignore things outside a circle
                         continue
 
                     adx, ady = math.fabs(rx - x), math.fabs(ry - y)
+                    curve = 1.0
                     if adx == 1 or ady == 1:
                         curve = 0.2
                     elif adx == 2 or ady == 2:
                         curve = 0.05
 
                     diff = world.layers['elevation'].data[ry, rx] - world.layers['elevation'].data[y, x]
-                    newElevation = world.layers['elevation'].data[y, x] + (
-                        diff * curve)
-                    if newElevation <= world.layers['elevation'].data[ry, rx]:
-                        print('newElevation is <= than river, fix me...')
-                        newElevation = world.layers['elevation'].data[r, x]
-                    world.layers['elevation'].data[y, x] = newElevation
+                    new_elevation = world.layers['elevation'].data[y, x] + (diff * curve)
+                    if new_elevation <= world.layers['elevation'].data[ry, rx]:
+                        print('newElevation is <= than river at point ({}, {}), fixing...'.format(x, y))
+                        new_elevation = world.layers['elevation'].data[ry, rx]
+                    world.layers['elevation'].data[y, x] = new_elevation
         return
 
     def rivermap_update(self, river, water_flow, rivermap, precipitations):
