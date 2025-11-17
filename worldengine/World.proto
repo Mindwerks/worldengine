@@ -25,11 +25,11 @@ message World {
 
     message BooleanMatrix {
         repeated BooleanRow rows = 1;
-    }    
+    }
 
     message IntegerMatrix {
         repeated IntegerRow rows = 1;
-    }   
+    }
 
     message DoubleQuantile {
         required int32 key = 1;
@@ -114,5 +114,3 @@ message World {
     // Ice-caps
     optional DoubleMatrix icecap  = 36;
 }
-
-

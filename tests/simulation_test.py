@@ -2,8 +2,9 @@ import unittest
 
 import numpy
 
+from worldengine.model.world import GenerationParameters, Size, World
 from worldengine.simulations.hydrology import WatermapSimulation
-from worldengine.model.world import World, Size, GenerationParameters
+
 
 class TestSimulation(unittest.TestCase):
     # This does only test that watermap leaves the rng in the state that the
@@ -28,7 +29,7 @@ class TestSimulation(unittest.TestCase):
 
         percipitation = numpy.ones((size.height, size.width))
 
-        elevation = numpy.fromfunction(lambda y, x: y*x, (size.height, size.width))
+        elevation = numpy.fromfunction(lambda y, x: y * x, (size.height, size.width))
 
         t = numpy.zeros(5)
 
@@ -48,7 +49,6 @@ class TestSimulation(unittest.TestCase):
         d = numpy.random.randint(0, 100)
         self.assertEqual(d, 59)
 
-
     def test_watermap_does_not_break_with_no_land(self):
         seed = 12345
         numpy.random.seed(seed)
@@ -62,7 +62,6 @@ class TestSimulation(unittest.TestCase):
 
         WatermapSimulation._watermap(w, 200)
 
-
     def test_random_land_returns_only_land(self):
         size = Size(100, 90)
 
@@ -75,9 +74,9 @@ class TestSimulation(unittest.TestCase):
 
         land_indices = w.random_land(num_samples)
 
-        for i in range(0, num_samples*2, 2):
-            self.assertFalse(ocean[land_indices[i+1], land_indices[i]])
-        
+        for i in range(0, num_samples * 2, 2):
+            self.assertFalse(ocean[land_indices[i + 1], land_indices[i]])
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

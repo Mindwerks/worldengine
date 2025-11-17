@@ -1,15 +1,14 @@
 import unittest
 
-from worldengine.drawing_functions import draw_ancientmap, gradient, draw_rivers_on_image
-from worldengine.model.world import World
-from worldengine.image_io import PNGWriter
 from tests.draw_test import TestBase
+from worldengine.drawing_functions import draw_ancientmap, draw_rivers_on_image, gradient
+from worldengine.image_io import PNGWriter
+from worldengine.model.world import World
 
 
 class TestDrawingFunctions(TestBase):
-
     def setUp(self):
-        super(TestDrawingFunctions, self).setUp()
+        super().setUp()
         self.w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
 
     def test_draw_ancient_map(self):
@@ -23,19 +22,16 @@ class TestDrawingFunctions(TestBase):
         target = PNGWriter.rgba_from_dimensions(self.w.width * 3, self.w.height * 3)
         draw_ancientmap(self.w, target, resize_factor=3, draw_outer_land_border=True)
 
-
     def test_gradient(self):
-        self._assert_are_colors_equal((10, 20, 40),
-                                      gradient(0.0, 0.0, 1.0, (10, 20, 40), (0, 128, 240)))
-        self._assert_are_colors_equal((0, 128, 240),
-                                      gradient(1.0, 0.0, 1.0, (10, 20, 40), (0, 128, 240)))
-        self._assert_are_colors_equal((5, 74, 140),
-                                      gradient(0.5, 0.0, 1.0, (10, 20, 40), (0, 128, 240)))
+        self._assert_are_colors_equal((10, 20, 40), gradient(0.0, 0.0, 1.0, (10, 20, 40), (0, 128, 240)))
+        self._assert_are_colors_equal((0, 128, 240), gradient(1.0, 0.0, 1.0, (10, 20, 40), (0, 128, 240)))
+        self._assert_are_colors_equal((5, 74, 140), gradient(0.5, 0.0, 1.0, (10, 20, 40), (0, 128, 240)))
 
     def test_draw_rivers_on_image(self):
         target = PNGWriter.rgba_from_dimensions(self.w.width * 2, self.w.height * 2)
         draw_rivers_on_image(self.w, target, factor=2)
         self._assert_img_equal("rivers_28070_factor2", target)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

@@ -1,7 +1,8 @@
 WorldEngine - a world generator
 =========================
 
-[![Build Status](https://travis-ci.org/Mindwerks/worldengine.svg?branch=master)](https://travis-ci.org/Mindwerks/worldengine) [![Build status](https://ci.appveyor.com/api/projects/status/io4ljim2ra83df23?svg=true)](https://ci.appveyor.com/project/ftomassetti/worldengine) [![Coverage Status](https://coveralls.io/repos/Mindwerks/worldengine/badge.svg?branch=master&service=github)](https://coveralls.io/github/Mindwerks/worldengine?branch=master) [![Code Health](https://landscape.io/github/Mindwerks/worldengine/master/landscape.png)](https://landscape.io/github/Mindwerks/worldengine/master) [![codecov.io Coverage Status](https://codecov.io/github/Mindwerks/worldengine/coverage.svg?branch=master)](https://codecov.io/github/Mindwerks/worldengine?branch=master) [![Coverage Status](https://coveralls.io/repos/Mindwerks/worldengine/badge.svg?branch=master&service=github)](https://coveralls.io/github/Mindwerks/worldengine?branch=master) [![Requirements Status](https://requires.io/github/Mindwerks/worldengine/requirements.svg?branch=master)](https://requires.io/github/Mindwerks/worldengine/requirements/?branch=master)
+[![CI](https://github.com/Mindwerks/worldengine/actions/workflows/ci.yml/badge.svg)](https://github.com/Mindwerks/worldengine/actions/workflows/ci.yml)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 
 _The current stable version is 0.19.0_
 
@@ -53,30 +54,57 @@ An experimental (and limited!) GUI is available as a separate project: [https://
 Install
 =======
 
+**Python 3.9+ required**. WorldEngine supports Python 3.9 through 3.14.
+
 ### Using Docker
 
 First, git clone or download the code, then:
 
-```
+```bash
 bin/run_in_docker.sh
 ```
 
 ### Using pip
 
-```
+```bash
 # Currently not yet released on pypi, you may want to still use Lands or WorldSynth
 # or alternatively download the source
 pip install worldengine
 ```
 
+### Using uv (Recommended - Fast!)
+
+[uv](https://github.com/astral-sh/uv) is a fast Python package installer (10-100x faster than pip):
+
+```bash
+# Install uv if you haven't already
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create environment and install
+uv venv
+uv pip install -e ".[hdf5,dev]"
+```
+
 ### From source code
 
-```
-git clone or download the code
+```bash
+git clone https://github.com/Mindwerks/worldengine.git
+cd worldengine
 
-# for unit-testing: also clone worldengine-data
-git clone git@github.com:Mindwerks/worldengine-data.git ../worldengine-data
-nosetest tests
+# Quick setup with provided script (requires pyenv)
+./setup_venv.sh
+source venv/bin/activate
+
+# Or manual setup
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -e ".[dev]"
+
+# Run tests
+pytest -v tests
+
+# Or test across all Python versions (requires tox)
+tox
 ```
 
 ### _On Windows_
@@ -90,7 +118,11 @@ Note: you need also a copy of the worldengine src directory in the same folder a
 Dependencies
 ============
 
-The gui is based on QT, so you will need to install them
+Core dependencies are managed via `pyproject.toml`. Optional dependencies:
+- `hdf5`: For HDF5 world format support (requires h5py)
+- `dev`: Development tools (pytest, tox, etc.)
+
+The GUI (separate project) is based on Qt
 
 Output
 ======
@@ -188,28 +220,41 @@ The world generation algorithm goes through different phases:
 Development
 ===========
 
-Using virtualenv you can create a sandbox in which to develop.
+**Python 3.9-3.14 supported**. Using the provided setup script or virtualenv you can create a sandbox in which to develop.
 
-Python 2
---------
+## Quick Setup with uv (Fast!)
 
 ```bash
-virtualenv venv
-source venv/bin/activate
-pip install --upgrade pip setuptools
-pip install -r requirements-dev.txt
-python worldengine
+# Install uv if needed
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Setup environment
+uv venv
+uv pip install -e ".[hdf5,dev]"
+
+# Setup pre-commit hooks (recommended)
+pre-commit install
+
+# Run tests
+pytest -v tests
+
+# Test across all Python versions (blazing fast with tox-uv)
+tox
 ```
 
-Python 3
---------
+## Traditional Setup
 
 ```bash
-virtualenv venv -p /usr/bin/python3
+# Using the provided setup script (requires pyenv)
+./setup_venv.sh
+source venv/bin/activate
+
+# Or manually
+python -m venv venv
 source venv/bin/activate
 pip install --upgrade pip setuptools
-pip install -r requirements-dev.txt
-python worldengine
+pip install -e ".[dev]"
+pytest -v tests
 ```
 
 Distribution
@@ -244,14 +289,14 @@ Remember, be consistent if you are either win32 or win64 and everything you down
 and install is either one or the other, but not both.
 
 You'll want to install msysgit: https://msysgit.github.io/ which will get you
-a Linux like environment. After that, clone the repo and install Python 2.7 for
-windows: https://www.python.org/downloads/windows/ This will get you also pip
-which is required for the rest. You'll first need to pip install virtualenv.
+a Linux like environment. After that, clone the repo and install Python 3.14+ for
+Windows: https://www.python.org/downloads/windows/ This will get you pip as well,
+which is required for the rest.
 
 The layout is a bit different than in Linux.
 ```bash
-virtualenv venv
-venv/Scripts/pip install -r requirements.txt
+python -m venv venv
+venv\Scripts\pip install -e .
 ```
 
 Numpy install will fail, so you'll need download a pre-compiled wheel file and

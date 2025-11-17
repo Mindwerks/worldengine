@@ -1,7 +1,0 @@
--r requirements.txt
-nose
-pytest
-pdbpp
-# for the documentation
-sphinx 
-sphinx-autobuild

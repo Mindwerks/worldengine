@@ -14,7 +14,7 @@ Worldengine implements a version of the `Holdridge life zones <https://en.wikipe
    :align: center
    :width: 95%
 
-As an example, an area of the planet that is **Boreal** in temperature and **Semiarid** in humidity will be classified as **Boreal Wet Forest**. 
+As an example, an area of the planet that is **Boreal** in temperature and **Semiarid** in humidity will be classified as **Boreal Wet Forest**.
 
 While many people regard the |Koppen|_  system as superior it requires the ability to predict seasonal weather. This would require a highly complicated weather simulation system which Worldengine does not currently have. As a result all Temperature and Humidity values are given in terms of yearly averages.
 
