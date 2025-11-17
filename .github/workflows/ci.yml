@@ -19,12 +19,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        path: worldengine
 
     - name: Checkout worldengine-data
       uses: actions/checkout@v4
       with:
         repository: Mindwerks/worldengine-data
-        path: ../worldengine-data
+        path: worldengine-data
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
@@ -38,14 +40,17 @@ jobs:
         enable-cache: true
 
     - name: Install dependencies
+      working-directory: worldengine
       run: |
         uv pip install --system -e ".[hdf5,dev]"
 
     - name: Run tests
+      working-directory: worldengine
       run: |
         pytest -v tests --tb=short
 
     - name: Test worldengine command
+      working-directory: worldengine
       run: |
         worldengine --help
         worldengine world -s 42 -n test_world -x 512 -y 512
@@ -56,6 +61,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        path: worldengine
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -66,18 +73,22 @@ jobs:
       uses: astral-sh/setup-uv@v4
 
     - name: Install dependencies
+      working-directory: worldengine
       run: |
         uv pip install --system -e ".[dev]"
 
     - name: Run pre-commit
+      working-directory: worldengine
       run: |
         pre-commit run --all-files
 
     - name: Run ruff check
+      working-directory: worldengine
       run: |
         ruff check worldengine/
 
     - name: Run mypy
+      working-directory: worldengine
       run: |
         mypy worldengine/ --ignore-missing-imports
       continue-on-error: true
@@ -91,6 +102,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        path: worldengine
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -103,10 +116,12 @@ jobs:
 
     - name: Build sdist (Ubuntu only)
       if: matrix.os == 'ubuntu-latest'
+      working-directory: worldengine
       run: |
         python -m build --sdist
 
     - name: Build wheel
+      working-directory: worldengine
       run: |
         python -m build --wheel
 
@@ -114,7 +129,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: wheels-${{ matrix.os }}
-        path: dist/*
+        path: worldengine/dist/*
 
   docker:
     name: Test Docker build
@@ -122,6 +137,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        path: worldengine
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -129,7 +146,7 @@ jobs:
     - name: Build Docker image
       uses: docker/build-push-action@v6
       with:
-        context: .
+        context: ./worldengine
         push: false
         tags: worldengine:test
         cache-from: type=gha
