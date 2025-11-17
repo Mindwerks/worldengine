@@ -11,7 +11,8 @@ from setuptools import setup
 # e.g. ['django==1.5.1', 'mezzanine==1.4.6']
 # reqs = [str(ir.req) for ir in install_reqs]
 
-exec(open("worldengine/version.py").read())  # noqa: S102 - defines __version__
+with open("worldengine/version.py") as f:
+    exec(f.read())  # noqa: S102 - defines __version__
 
 config = {
     "name": "worldengine",
