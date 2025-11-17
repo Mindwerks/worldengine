@@ -1,5 +1,3 @@
-import numpy
-
 from worldengine.simulations.basic import find_threshold_f
 
 
@@ -18,7 +16,6 @@ class HumiditySimulation:
         humids = world.humids
         precipitationWeight = 1.0
         irrigationWeight = 3
-        data = numpy.zeros((world.height, world.width), dtype=float)
 
         data = (
             world.layers["precipitation"].data * precipitationWeight
