@@ -1,6 +1,5 @@
 # Taken from: https://packaging.python.org/en/latest/appveyor.html
-# For now considering only Python 2.7, looking to support soon Python 2.6
-# and Python 3 in the future
+# Python 3.14+ only
 
 environment:
 

@@ -5,4 +5,3 @@ numpy>=1.24.0
 pypng>=0.0.18
 PyPlatec==1.4.0
 protobuf>=4.21.0
-six>=1.16.0

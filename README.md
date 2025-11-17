@@ -188,24 +188,20 @@ The world generation algorithm goes through different phases:
 Development
 ===========
 
-Using virtualenv you can create a sandbox in which to develop.
+Python 3.14+ is required. Using the provided setup script or virtualenv you can create a sandbox in which to develop.
 
-Python 2
---------
+## Quick Setup
 
 ```bash
-virtualenv venv
+# Using the provided setup script (requires pyenv)
+./setup_venv.sh
 source venv/bin/activate
-pip install --upgrade pip setuptools
-pip install -r requirements-dev.txt
-python worldengine
 ```
 
-Python 3
---------
+## Manual Setup
 
 ```bash
-virtualenv venv -p /usr/bin/python3
+python -m venv venv
 source venv/bin/activate
 pip install --upgrade pip setuptools
 pip install -r requirements-dev.txt
@@ -244,14 +240,14 @@ Remember, be consistent if you are either win32 or win64 and everything you down
 and install is either one or the other, but not both.
 
 You'll want to install msysgit: https://msysgit.github.io/ which will get you
-a Linux like environment. After that, clone the repo and install Python 2.7 for
-windows: https://www.python.org/downloads/windows/ This will get you also pip
-which is required for the rest. You'll first need to pip install virtualenv.
+a Linux like environment. After that, clone the repo and install Python 3.14+ for
+Windows: https://www.python.org/downloads/windows/ This will get you pip as well,
+which is required for the rest.
 
 The layout is a bit different than in Linux.
 ```bash
-virtualenv venv
-venv/Scripts/pip install -r requirements.txt
+python -m venv venv
+venv\Scripts\pip install -r requirements.txt
 ```
 
 Numpy install will fail, so you'll need download a pre-compiled wheel file and

@@ -3,7 +3,6 @@ This file contains all possible Biome as separate classes.
 """
 
 import re
-from six import with_metaclass
 
 
 def _un_camelize(name):
@@ -19,12 +18,13 @@ class _BiomeMetaclass(type):
         un_camelized_name = _un_camelize(name)
         created_class = super(_BiomeMetaclass, mcs).__new__(mcs, name,
                                                             parents, dct)
-        if object not in parents:
+        # Don't register the base Biome class itself, only subclasses
+        if name != 'Biome' and parents:
             _BiomeMetaclass.biomes[un_camelized_name] = created_class
         return created_class
 
 
-class Biome(with_metaclass(_BiomeMetaclass, object)):
+class Biome(metaclass=_BiomeMetaclass):
 
     @classmethod
     def by_name(cls, name):

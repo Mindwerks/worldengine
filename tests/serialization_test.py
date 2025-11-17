@@ -7,11 +7,6 @@ from worldengine.model.world import World
 from worldengine.common import _equal
 from worldengine.hdf5_serialization import save_world_to_hdf5, load_world_to_hdf5
 
-try:  # are we python3?
-    set
-except NameError: # apparently not.
-    from sets import Set as set
-
 
 class TestSerialization(unittest.TestCase):
 
