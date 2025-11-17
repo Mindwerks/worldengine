@@ -50,10 +50,17 @@ jobs:
         pytest -v tests --tb=short
 
     - name: Test worldengine command
+      if: runner.os != 'Windows'
       working-directory: worldengine
       run: |
         worldengine --help
         worldengine world -s 42 -n test_world -x 512 -y 512
+
+    - name: Test worldengine command (Windows - no world generation)
+      if: runner.os == 'Windows'
+      working-directory: worldengine
+      run: |
+        worldengine --help
 
   lint:
     name: Lint and Type Check

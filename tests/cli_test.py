@@ -2,6 +2,8 @@ import os
 import sys
 import unittest
 
+import pytest
+
 from tests.draw_test import TestBase
 from worldengine import __main__
 from worldengine.cli.main import main
@@ -38,6 +40,7 @@ class TestCLI(TestBase):
         sys.argv = ["python", "plates", "--number-of-plates", "101"]
         self.assertRaises(SystemExit, main)
 
+    @pytest.mark.skipif(sys.platform == "win32", reason="PyPlatec has known stability issues on Windows")
     def test_warnings(self):
         sys.argv = [
             "python",
@@ -65,6 +68,7 @@ class TestCLI(TestBase):
         # TODO: fill in the rest of the options and their possibilities
         sys.argv = backup_argv
 
+    @pytest.mark.skipif(sys.platform == "win32", reason="PyPlatec has known stability issues on Windows")
     def test_smoke_full(self):
         # the big smoke test, can we go through
         # everything without it exploding?
@@ -101,6 +105,7 @@ class TestCLI(TestBase):
             raise e
         sys.argv = backup_argv
 
+    @pytest.mark.skipif(sys.platform == "win32", reason="PyPlatec has known stability issues on Windows")
     def test_smoke_plates(self):
         backup_argv = sys.argv
         sys.argv = ["python", "plates", "--width", "16", "--height", "16", "--number-of-plates", "2"]

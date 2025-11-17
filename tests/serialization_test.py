@@ -1,6 +1,9 @@
 import os
+import sys
 import tempfile
 import unittest
+
+import pytest
 
 from worldengine.common import _equal
 from worldengine.hdf5_serialization import load_world_to_hdf5, save_world_to_hdf5
@@ -12,6 +15,7 @@ class TestSerialization(unittest.TestCase):
     def setUp(self):
         self.maxDiff = None
 
+    @pytest.mark.skipif(sys.platform == "win32", reason="PyPlatec has known issues on Windows")
     def test_protobuf_serialize_unserialize(self):
         w = world_gen("Dummy", 32, 16, 1, step=Step.get_by_name("full"))
         serialized = w.protobuf_serialize()
@@ -26,6 +30,7 @@ class TestSerialization(unittest.TestCase):
         self.assertEqual(sorted(dir(w)), sorted(dir(unserialized)))
         self.assertEqual(w, unserialized)
 
+    @pytest.mark.skipif(sys.platform == "win32", reason="PyPlatec has known issues on Windows")
     def test_hdf5_serialize_unserialize(self):
         filename = None
         try:

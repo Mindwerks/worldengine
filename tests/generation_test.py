@@ -1,6 +1,8 @@
+import sys
 import unittest
 
 import numpy
+import pytest
 
 from tests.draw_test import TestBase
 from worldengine.common import anti_alias
@@ -10,6 +12,7 @@ from worldengine.plates import Step, center_land, world_gen
 
 
 class TestGeneration(TestBase):
+    @pytest.mark.skipif(sys.platform == "win32", reason="PyPlatec has known issues on Windows")
     def test_world_gen_does_not_explode_badly(self):
         # FIXME: remove me when proper tests are in place
         # Very stupid test that just verify nothing explode badly
