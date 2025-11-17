@@ -20,6 +20,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Checkout worldengine-data
+      uses: actions/checkout@v4
+      with:
+        repository: Mindwerks/worldengine-data
+        path: ../worldengine-data
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
@@ -128,6 +134,7 @@ jobs:
         tags: worldengine:test
         cache-from: type=gha
         cache-to: type=gha,mode=max
+        load: true
 
     - name: Test Docker image
       run: |
