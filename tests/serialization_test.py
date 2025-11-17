@@ -26,9 +26,9 @@ class TestSerialization(unittest.TestCase):
         for l in w.layers.keys():
             self.assertEqual(w.layers[l], unserialized.layers[l], "Comparing %s" % l)
         self.assertTrue(_equal(w.ocean_level,       unserialized.ocean_level))
-        self.assertEquals(w.seed,                   unserialized.seed)
-        self.assertEquals(w.n_plates,               unserialized.n_plates)
-        self.assertEquals(w.step,                   unserialized.step)
+        self.assertEqual(w.seed,                   unserialized.seed)
+        self.assertEqual(w.n_plates,               unserialized.n_plates)
+        self.assertEqual(w.step,                   unserialized.step)
         self.assertEqual(sorted(dir(w)),            sorted(dir(unserialized)))
         self.assertEqual(w, unserialized)
 
@@ -48,9 +48,9 @@ class TestSerialization(unittest.TestCase):
             for l in w.layers.keys():
                 self.assertEqual(w.layers[l], unserialized.layers[l], "Comparing %s" % l)
             self.assertTrue(_equal(w.ocean_level,       unserialized.ocean_level))
-            self.assertEquals(w.seed,                   unserialized.seed)
-            self.assertEquals(w.n_plates,               unserialized.n_plates)
-            self.assertEquals(w.step,                   unserialized.step)
+            self.assertEqual(w.seed,                   unserialized.seed)
+            self.assertEqual(w.n_plates,               unserialized.n_plates)
+            self.assertEqual(w.step,                   unserialized.step)
             self.assertEqual(sorted(dir(w)),            sorted(dir(unserialized)))
             #self.assertEqual(w, unserialized)
         finally:

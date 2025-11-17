@@ -223,7 +223,8 @@ def elevation_color(elevation, sea_level=1.0):
 def add_colors(*args):
     ''' Do some *args magic to return a tuple, which has the sums of all tuples in *args '''
     # Adapted from an answer here: http://stackoverflow.com/questions/14180866/sum-each-value-in-a-list-of-tuples
-    added = [sum(x) for x in zip(*args)]
+    # Convert to int to avoid overflow issues with uint8 arrays in NumPy 2.x
+    added = [sum(int(x) if isinstance(x, (numpy.integer, numpy.uint8)) else x for x in vals) for vals in zip(*args)]
     return numpy.clip(added, 0, 255)  # restrict to uint8
 
 
@@ -253,7 +254,7 @@ def get_normalized_elevation_array(world):
     max_elev_sea = mask.max()
     elev_delta_sea = max_elev_sea - min_elev_sea
 
-    c = numpy.empty(e.shape, dtype=numpy.float)
+    c = numpy.empty(e.shape, dtype=numpy.float64)
     c[numpy.invert(ocean)] = (e[numpy.invert(ocean)] - min_elev_land) * 127 / elev_delta_land + 128
     c[ocean] = (e[ocean] - min_elev_sea) * 127 / elev_delta_sea
     c = numpy.rint(c).astype(dtype=numpy.int32)  # proper rounding
@@ -330,7 +331,7 @@ def draw_simple_elevation(world, sea_level, target):
         on disk or a canvas part of a GUI)
     """
     e = world.layers['elevation'].data
-    c = numpy.empty(e.shape, dtype=numpy.float)
+    c = numpy.empty(e.shape, dtype=numpy.float64)
 
     has_ocean = not (sea_level is None or world.layers['ocean'].data is None or not world.layers['ocean'].data.any())  # or 'not any ocean'
     mask_land = numpy.ma.array(e, mask=world.layers['ocean'].data if has_ocean else False)  # only land
@@ -432,9 +433,10 @@ def draw_satellite(world, target):
 
                 # Making sure there is at least one valid tile to be smoothed before we attempt to average the values
                 if all_r:
-                    avg_r = int(sum(all_r) / len(all_r))
-                    avg_g = int(sum(all_g) / len(all_g))
-                    avg_b = int(sum(all_b) / len(all_b))
+                    # Convert to int to avoid overflow with uint8 in NumPy 2.x
+                    avg_r = int(sum(int(v) for v in all_r) / len(all_r))
+                    avg_g = int(sum(int(v) for v in all_g) / len(all_g))
+                    avg_b = int(sum(int(v) for v in all_b) / len(all_b))
 
                     ## Setting color of the pixel again - this will be once more modified by the shading algorithm
                     target.set_pixel(x, y, (avg_r, avg_g, avg_b, 255))
@@ -478,9 +480,10 @@ def draw_satellite(world, target):
                 # The amplified difference is now translated into the rgb of the tile.
                 # This adds light to tiles higher that the previous average, and shadow
                 # to tiles lower than the previous average
-                r = numpy.clip(adjusted_difference + r, 0, 255)  # prevent under-/overflows
-                g = numpy.clip(adjusted_difference + g, 0, 255)
-                b = numpy.clip(adjusted_difference + b, 0, 255)
+                # Convert uint8 to int to avoid overflow in NumPy 2.x
+                r = numpy.clip(adjusted_difference + int(r), 0, 255)  # prevent under-/overflows
+                g = numpy.clip(adjusted_difference + int(g), 0, 255)
+                b = numpy.clip(adjusted_difference + int(b), 0, 255)
 
                 # Set the final color for this pixel
                 target.set_pixel(x, y, (r, g, b, 255))
