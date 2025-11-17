@@ -1,3 +1,0 @@
-# For export support, you'll need GDAL.
--r requirements.txt
-pygdal==1.11.3.3

@@ -19,7 +19,8 @@ author:  Bret Curtis
 
 
 class Path:
-    """ A path object, containing the nodes and total cost."""
+    """A path object, containing the nodes and total cost."""
+
     def __init__(self, nodes, total_cost):
         self.nodes = nodes
         self.totalCost = total_cost
@@ -32,7 +33,8 @@ class Path:
 
 
 class Node:
-    """ The basic unit/pixel/location is a Node."""
+    """The basic unit/pixel/location is a Node."""
+
     def __init__(self, location, movement_cost, lid, parent=None):
         self.location = location  # where is this node located
         self.mCost = movement_cost  # total move cost to reach this node
@@ -48,11 +50,12 @@ class Node:
 
 
 class AStar:
-    """ The "A* Star Search Algorithm" itself.
+    """The "A* Star Search Algorithm" itself.
 
     Have a read:
     https://en.wikipedia.org/wiki/A*_search_algorithm
     """
+
     def __init__(self, map_handler):
         self.mh = map_handler
         self.o = []
@@ -140,8 +143,8 @@ class SQLocation:
         self.x = x
         self.y = y
 
-    def __eq__(self, l):
-        if l.x == self.x and l.y == self.y:
+    def __eq__(self, other):
+        if other.x == self.x and other.y == self.y:
             return 1
         else:
             return 0
@@ -199,7 +202,7 @@ class SQMapHandler:
 
 class PathFinder:
     """Using the a* algorithm we will try to find the best path between two
-       points.
+    points.
     """
 
     def __init__(self):
@@ -212,7 +215,7 @@ class PathFinder:
         path = []
         height, width = height_map.shape
 
-        graph = height_map.flatten('C') #flatten array (row-major)
+        graph = height_map.flatten("C")  # flatten array (row-major)
 
         pathfinder = AStar(SQMapHandler(graph, width, height))
         start = SQLocation(sx, sy)

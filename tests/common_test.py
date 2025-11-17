@@ -1,10 +1,11 @@
 import unittest
+
 import numpy
-from worldengine.common import Counter, anti_alias, get_verbose, set_verbose, _equal
+
+from worldengine.common import Counter, _equal, anti_alias, get_verbose, set_verbose
 
 
 class TestCommon(unittest.TestCase):
-
     def setUp(self):
         pass
 
@@ -27,9 +28,7 @@ class TestCommon(unittest.TestCase):
         self.assertEqual("a : 1\nb : 3\n", c.to_str())
 
     def test_antialias(self):
-        original = numpy.array([[0.5, 0.12, 0.7, 0.15, 0.0],
-                                [0.0, 0.12, 0.7, 0.7, 8.0],
-                                [0.2, 0.12, 0.7, 0.7, 4.0]])
+        original = numpy.array([[0.5, 0.12, 0.7, 0.15, 0.0], [0.0, 0.12, 0.7, 0.7, 8.0], [0.2, 0.12, 0.7, 0.7, 4.0]])
         antialiased = anti_alias(original, 1)
         self.assertAlmostEqual(1.2781818181818183, antialiased[0][0])
         self.assertAlmostEqual(0.4918181818181818, antialiased[1][2])
@@ -42,13 +41,14 @@ class TestCommon(unittest.TestCase):
         a = {}
         b = {}
 
-        a['foo'] = 'bar'
+        a["foo"] = "bar"
 
         self.assertFalse(_equal(a, b))
 
-        b['foo'] = 'bar'
+        b["foo"] = "bar"
 
         self.assertTrue(_equal(a, b))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

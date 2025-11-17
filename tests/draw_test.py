@@ -1,26 +1,35 @@
-import unittest
 import os
+import unittest
+
 import numpy
 
-from worldengine.draw import _biome_colors, draw_simple_elevation, elevation_color, \
-    draw_elevation, draw_riversmap, draw_ocean, draw_precipitation, \
-    draw_world, draw_temperature_levels, draw_biome, draw_scatter_plot, draw_satellite
 from worldengine.biome import Biome
+from worldengine.draw import (
+    _biome_colors,
+    draw_biome,
+    draw_elevation,
+    draw_ocean,
+    draw_precipitation,
+    draw_riversmap,
+    draw_satellite,
+    draw_scatter_plot,
+    draw_simple_elevation,
+    draw_temperature_levels,
+    draw_world,
+    elevation_color,
+)
+from worldengine.image_io import PNGReader, PNGWriter
 from worldengine.model.world import World
-from worldengine.image_io import PNGWriter, PNGReader
 
 
 class TestBase(unittest.TestCase):
-
     def setUp(self):
         tests_dir = os.path.dirname(os.path.realpath(__file__))
-        self.tests_data_dir = os.path.abspath(os.path.join(
-            tests_dir, "../../worldengine-data/tests/data"))
-        self.tests_blessed_images_dir = os.path.abspath(
-            os.path.join(tests_dir, "../../worldengine-data/tests/images"))
+        self.tests_data_dir = os.path.abspath(os.path.join(tests_dir, "../../worldengine-data/tests/data"))
+        self.tests_blessed_images_dir = os.path.abspath(os.path.join(tests_dir, "../../worldengine-data/tests/images"))
         self.assertTrue(
-            os.path.isdir(self.tests_data_dir),
-            "worldengine-data doesn't exist, please clone it before continuing.")
+            os.path.isdir(self.tests_data_dir), "worldengine-data doesn't exist, please clone it before continuing."
+        )
 
     def _assert_is_valid_color(self, color, color_name):
         r, g, b = color
@@ -39,10 +48,12 @@ class TestBase(unittest.TestCase):
         blessed_img = PNGReader("%s/%s.png" % (self.tests_blessed_images_dir, blessed_image_name))
 
         # check shapes (i.e. (height, width, channels)-tuple)
-        self.assertTrue(blessed_img.array.shape == drawn_image.array.shape,
-                        "Blessed and drawn images differ in height, width " +
-                        "and/or amount of channels. Blessed %s, drawn %s"
-                        % (str(blessed_img.array.shape), str(drawn_image.array.shape)))
+        self.assertTrue(
+            blessed_img.array.shape == drawn_image.array.shape,
+            "Blessed and drawn images differ in height, width "
+            + "and/or amount of channels. Blessed %s, drawn %s"
+            % (str(blessed_img.array.shape), str(drawn_image.array.shape)),
+        )
 
         # compare images;
         # cmp_array will be an array of booleans in case of equal shapes
@@ -54,14 +65,17 @@ class TestBase(unittest.TestCase):
             diff = numpy.transpose(numpy.nonzero(cmp_array))  # list of tuples of differing indices
             self.assertTrue(
                 False,
-                "Pixels at %i, %i are different. Blessed %s, drawn %s" % (
-                    diff[0][0], diff[0][1],
+                "Pixels at %i, %i are different. Blessed %s, drawn %s"
+                % (
+                    diff[0][0],
+                    diff[0][1],
                     blessed_img.array[diff[0][0], diff[0][1]],
-                    drawn_image.array[diff[0][0], diff[0][1]]))
+                    drawn_image.array[diff[0][0], diff[0][1]],
+                ),
+            )
 
 
 class TestDraw(TestBase):
-
     def test_biome_colors(self):
         self.assertEqual(Biome.all_names(), sorted(_biome_colors.keys()))
 
@@ -83,12 +97,12 @@ class TestDraw(TestBase):
             # ra, ga, ba = c
             # rb, gb, bb = c_low
             # rc, gc, bc = c_high
-            #self.assertAlmostEqual(ra, rb, 5, "value %f, red, low, from %f to %f" % (v, ra, rb))
-            #self.assertAlmostEqual(ra, rc, 5, "value %f, red, high, from %f to %f" % (v, ra, rc))
-            #self.assertAlmostEqual(ga, gb, 5, "value %f, green, low, from %f to %f" % (v, ga, gb))
-            #self.assertAlmostEqual(ga, gc, 5, "value %f, green, high, from %f to %f" % (v, ga, gc))
-            #self.assertAlmostEqual(ba, bb, 5, "value %f, blue, low, from %f to %f" % (v, ba, bb))
-            #self.assertAlmostEqual(ba, bc, 5, "value %f, blue, high, from %f to %f" % (v, ba, bc))
+            # self.assertAlmostEqual(ra, rb, 5, "value %f, red, low, from %f to %f" % (v, ra, rb))
+            # self.assertAlmostEqual(ra, rc, 5, "value %f, red, high, from %f to %f" % (v, ra, rc))
+            # self.assertAlmostEqual(ga, gb, 5, "value %f, green, low, from %f to %f" % (v, ga, gb))
+            # self.assertAlmostEqual(ga, gc, 5, "value %f, green, high, from %f to %f" % (v, ga, gc))
+            # self.assertAlmostEqual(ba, bb, 5, "value %f, blue, low, from %f to %f" % (v, ba, bb))
+            # self.assertAlmostEqual(ba, bc, 5, "value %f, blue, high, from %f to %f" % (v, ba, bc))
 
     def test_draw_simple_elevation(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
@@ -116,13 +130,13 @@ class TestDraw(TestBase):
 
     def test_draw_grayscale_heightmap(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
-        target = PNGWriter.grayscale_from_array(w.layers['elevation'].data, scale_to_range=True)
+        target = PNGWriter.grayscale_from_array(w.layers["elevation"].data, scale_to_range=True)
         self._assert_img_equal("grayscale_heightmap_28070", target)
 
     def test_draw_ocean(self):
         w = World.open_protobuf("%s/seed_28070.world" % self.tests_data_dir)
         target = PNGWriter.rgba_from_dimensions(w.width, w.height)
-        draw_ocean(w.layers['ocean'].data, target)
+        draw_ocean(w.layers["ocean"].data, target)
         self._assert_img_equal("ocean_28070", target)
 
     def test_draw_precipitation(self):
@@ -161,5 +175,6 @@ class TestDraw(TestBase):
         draw_satellite(w, target)
         self._assert_img_equal("satellite_28070", target)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

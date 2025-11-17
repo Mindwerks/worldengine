@@ -1,0 +1,136 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "worldengine"
+dynamic = ["version"]
+description = "World generator simulating plate tectonics, erosion, etc."
+readme = "README.md"
+authors = [
+    {name = "Federico Tomassetti", email = "f.tomassetti@gmail.com"},
+    {name = "Bret Curtis", email = "psi29a@gmail.com"}
+]
+license = {text = "MIT License"}
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Games/Entertainment :: Simulation",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "PyPlatec==1.4.2",
+    "pypng>=0.20220715.0",
+    "numpy>=1.24.0",
+    "noise==1.2.2",
+    "protobuf>=4.21.0",
+]
+
+[project.optional-dependencies]
+hdf5 = [
+    "Cython>=3.0.0",
+    "h5py>=3.10.0",
+]
+gdal = [
+    # GDAL is optional for heightmap export in various formats
+    # Note: Requires system GDAL libraries (libgdal-dev on Ubuntu, gdal on macOS via brew)
+    # Installation: apt-get install libgdal-dev (Ubuntu) or brew install gdal (macOS)
+    "GDAL>=3.0.0",
+]
+dev = [
+    # Include hdf5 for testing
+    "Cython>=3.0.0",
+    "h5py>=3.10.0",
+    # Testing
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    # Code quality
+    "ruff>=0.1.0",
+    "mypy>=1.7.0",
+    "pre-commit>=3.5.0",
+    # Documentation
+    "sphinx>=7.2.0",
+    "sphinx-rtd-theme>=2.0.0",
+    # Multi-version testing
+    "tox>=4.0.0",
+    "tox-uv>=1.0.0",
+]
+
+[project.urls]
+Homepage = "http://github.com/Mindwerks/worldengine"
+Download = "https://github.com/Mindwerks/worldengine/releases"
+Documentation = "https://worldengine.readthedocs.io"
+Repository = "https://github.com/Mindwerks/worldengine"
+Issues = "https://github.com/Mindwerks/worldengine/issues"
+
+[project.scripts]
+worldengine = "worldengine.cli.main:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "worldengine.version.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["worldengine*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP"]
+ignore = [
+    "E501",  # Line too long (handled by formatter)
+    "N802",  # Function name should be lowercase (some scientific methods use camelCase)
+    "N804",  # First argument of class method should be named 'cls' (mcs is conventional for metaclass)
+    "N806",  # Variable in function should be lowercase (scientific notation)
+    "N807",  # Function name should not start/end with __
+    "N999",  # Invalid module name
+    "UP031", # Use format specifiers (too many legacy % formats to change at once)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/blessed_images/generated_blessed_images.py" = ["F403", "F405"]  # Star imports used for image generation
+"setup.py" = ["F821"]  # __version__ defined via exec()
+
+[dependency-groups]
+dev = [
+    # Include hdf5 for testing
+    "Cython>=3.0.0",
+    "h5py>=3.10.0",
+    # Testing
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    # Code quality
+    "ruff>=0.1.0",
+    "mypy>=1.7.0",
+    "pre-commit>=3.5.0",
+    # Documentation
+    "sphinx>=7.2.0",
+    "sphinx-rtd-theme>=2.0.0",
+    # Multi-version testing
+    "tox>=4.0.0",
+    "tox-uv>=1.0.0",
+]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false

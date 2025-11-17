@@ -2,7 +2,7 @@
                                          base)
 	(gimp-context-set-sample-threshold-int 0)
 	(gimp-palette-set-foreground "#000000")
-	(let* ( 
+	(let* (
 		(polar-ice-layer base)
 		(subpolar-dry-tundra-layer base)
 		(subpolar-moist-tundra-layer base)
@@ -307,7 +307,7 @@
 	(gimp-item-set-name tundra-group "Ice Group")
 	(gimp-image-reorder-item img polar-desert-layer tundra-group 0)
 	(gimp-image-reorder-item img polar-ice-layer tundra-group 0)
-	
+
 	(set! tropical-rain-forest-layer2 (car (gimp-layer-new img 4096 2048 1 "Tropical Rain Forest" 100 0)))
 	(gimp-image-add-layer img tropical-rain-forest-layer2 0)
 	(gimp-image-select-color img 2 base "#40F090")
@@ -317,20 +317,20 @@
 	(gimp-image-select-color img 0 base "#20FFA0")
 	(gimp-palette-set-foreground "#1cb242")
 	(gimp-edit-fill tropical-rain-forest-layer2 0)
-	
+
 	(set! tropical-seasonal-forest-layer2 (car (gimp-layer-new img 4096 2048 1 "Tropical Seasonal Forest" 100 0)))
 	(gimp-image-add-layer img tropical-seasonal-forest-layer2 0)
 	(gimp-image-select-color img 2 base "#60F080")
 	(gimp-palette-set-foreground "#25e750")
 	(gimp-edit-fill tropical-seasonal-forest-layer2 0)
-	
+
 	(set! tropical-dry-forest-layer2 (car (gimp-layer-new img 4096 2048 1 "Tropical Dry Forest" 100 0)))
 	(gimp-image-add-layer img tropical-dry-forest-layer2 0)
 	(gimp-image-select-color img 2 base "#80F080")
 	(gimp-image-select-color img 0 base "#80FF80")
 	(gimp-palette-set-foreground "#4dff4d")
 	(gimp-edit-fill tropical-dry-forest-layer2 0)
-	
+
 	(set! savanna-layer (car (gimp-layer-new img 4096 2048 1 "Savanna" 100 0)))
 	(gimp-image-add-layer img savanna-layer 0)
 	(gimp-image-select-color img 2 base "#B0F080")
@@ -338,7 +338,7 @@
 	(gimp-image-select-color img 0 base "#A0FF80")
 	(gimp-palette-set-foreground "#90ff4d")
 	(gimp-edit-fill savanna-layer 0)
-	
+
 	(set! hot-desert-layer (car (gimp-layer-new img 4096 2048 1 "Hot Desert" 100 0)))
 	(gimp-image-add-layer img hot-desert-layer 0)
 	(gimp-image-select-color img 2 base "#E0E080")
@@ -349,14 +349,14 @@
 	(gimp-image-select-color img 0 base "#E0FF80")
 	(gimp-palette-set-foreground "#d4ff4d")
 	(gimp-edit-fill hot-desert-layer 0)
-	
+
 	(set! chapparal-layer (car (gimp-layer-new img 4096 2048 1 "Chapparal" 100 0)))
 	(gimp-image-add-layer img chapparal-layer 0)
 	(gimp-image-select-color img 2 base "#A0E080")
 	(gimp-image-select-color img 0 base "#80E080")
 	(gimp-palette-set-foreground "#52cd52")
 	(gimp-edit-fill chapparal-layer 0)
-	
+
 	(set! deciduous-forest-layer (car (gimp-layer-new img 4096 2048 1 "Deciduous Forest" 100 0)))
 	(gimp-image-add-layer img deciduous-forest-layer 0)
 	(gimp-image-select-color img 2 base "#60E080")
@@ -364,20 +364,20 @@
 	(gimp-image-select-color img 0 base "#20E0C0")
 	(gimp-palette-set-foreground "#00cd7b")
 	(gimp-edit-fill deciduous-forest-layer 0)
-	
+
 	(set! cool-desert-layer (car (gimp-layer-new img 4096 2048 1 "Cool Desert" 100 0)))
 	(gimp-image-add-layer img cool-desert-layer 0)
 	(gimp-image-select-color img 2 base "#C0C080")
 	(gimp-image-select-color img 0 base "#A0C080")
 	(gimp-palette-set-foreground "#aac066")
 	(gimp-edit-fill cool-desert-layer 0)
-	
+
 	(set! steppe-layer (car (gimp-layer-new img 4096 2048 1 "Steppes" 100 0)))
 	(gimp-image-add-layer img steppe-layer 0)
 	(gimp-image-select-color img 2 base "#80C080")
 	(gimp-palette-set-foreground "#529a52")
 	(gimp-edit-fill steppe-layer 0)
-	
+
 	(set! mixed-forest-layer (car (gimp-layer-new img 4096 2048 1 "Mixed Forest" 100 0)))
 	(gimp-image-add-layer img mixed-forest-layer 0)
 	(gimp-image-select-color img 2 base "#60C080")
@@ -385,7 +385,7 @@
 	(gimp-image-select-color img 0 base "#20C0C0")
 	(gimp-palette-set-foreground "#0a9a76")
 	(gimp-edit-fill mixed-forest-layer 0)
-	
+
 	(set! coniferous-forest-layer (car (gimp-layer-new img 4096 2048 1 "Coniferous Forest" 100 0)))
 	(gimp-image-add-layer img coniferous-forest-layer 0)
 	(gimp-image-select-color img 2 base "#60A080")
@@ -393,7 +393,7 @@
 	(gimp-image-select-color img 0 base "#20A0C0")
 	(gimp-palette-set-foreground "#1d6060")
 	(gimp-edit-fill coniferous-forest-layer 0)
-	
+
 	(set! cold-parklands-layer (car (gimp-layer-new img 4096 2048 1 "Cold Parklands" 100 0)))
 	(gimp-image-add-layer img cold-parklands-layer 0)
 	(gimp-image-select-color img 2 base "#808080")
@@ -401,7 +401,7 @@
 	(gimp-image-select-color img 0 base "#80A080")
 	(gimp-palette-set-foreground "#90907a")
 	(gimp-edit-fill cold-parklands-layer 0)
-	
+
 	(set! tundra-layer (car (gimp-layer-new img 4096 2048 1 "Tundra" 100 0)))
 	(gimp-image-add-layer img tundra-layer 0)
 	(gimp-image-select-color img 2 base "#608080")
@@ -409,7 +409,7 @@
 	(gimp-image-select-color img 0 base "#2080C0")
 	(gimp-palette-set-foreground "#0f3b3b")
 	(gimp-edit-fill tundra-layer 0)
-	
+
 	(set! ice-layer (car (gimp-layer-new img 4096 2048 1 "Ice" 100 0)))
 	(gimp-image-add-layer img ice-layer 0)
 	(gimp-image-select-color img 2 base "#FFFFFF")
@@ -429,7 +429,7 @@
     "copyright 2014, Evan Sampson"              ;copyright notice
     "October 24, 2014"                          ;date created
     ""                                          ;image type that the script works on
-    SF-IMAGE      "Image"        0         
-    SF-DRAWABLE   "Base layer"   0	
+    SF-IMAGE      "Image"        0
+    SF-DRAWABLE   "Base layer"   0
 )
 (script-fu-menu-register "script-fu-biomes-and-vegetation" "<Image>/Filters/Biomes")

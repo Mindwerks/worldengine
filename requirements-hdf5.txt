@@ -1,4 +1,0 @@
-# For export support, you'll need HDF5
--r requirements.txt
-Cython>=3.0.0
-h5py>=3.10.0

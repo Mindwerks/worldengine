@@ -6,30 +6,27 @@ import re
 
 
 def _un_camelize(name):
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1 \2', name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1 \2', s1).lower()
+    s1 = re.sub("(.)([A-Z][a-z]+)", r"\1 \2", name)
+    return re.sub("([a-z0-9])([A-Z])", r"\1 \2", s1).lower()
 
 
 class _BiomeMetaclass(type):
-
     def __new__(mcs, name, parents, dct):
         if not hasattr(_BiomeMetaclass, "biomes"):
             _BiomeMetaclass.biomes = {}
         un_camelized_name = _un_camelize(name)
-        created_class = super(_BiomeMetaclass, mcs).__new__(mcs, name,
-                                                            parents, dct)
+        created_class = super().__new__(mcs, name, parents, dct)
         # Don't register the base Biome class itself, only subclasses
-        if name != 'Biome' and parents:
+        if name != "Biome" and parents:
             _BiomeMetaclass.biomes[un_camelized_name] = created_class
         return created_class
 
 
 class Biome(metaclass=_BiomeMetaclass):
-
     @classmethod
     def by_name(cls, name):
         if name not in _BiomeMetaclass.biomes:
-            raise Exception("No biome named '%s'" % name)
+            raise Exception(f"No biome named '{name}'")
         return _BiomeMetaclass.biomes[name]()
 
     @classmethod
@@ -40,7 +37,8 @@ class Biome(metaclass=_BiomeMetaclass):
     def name(cls):
         return _un_camelize(cls.__name__)
 
-class BiomeGroup(object):
+
+class BiomeGroup:
     pass
 
 
@@ -93,10 +91,11 @@ class CoolDesert(BiomeGroup):
 
 
 class Chaparral(BiomeGroup):
-    """ Chaparral is a shrubland or heathland plant community.
+    """Chaparral is a shrubland or heathland plant community.
 
     For details see http://en.wikipedia.org/wiki/Chaparral.
     """
+
     pass
 
 
@@ -267,6 +266,7 @@ class TropicalRainForest(Biome, Jungle):
 # -------------
 # Serialization
 # -------------
+
 
 def biome_name_to_index(biome_name):
     names = sorted(_BiomeMetaclass.biomes.keys())

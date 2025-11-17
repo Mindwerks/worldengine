@@ -69,7 +69,7 @@ if [ -z "$AVAILABLE_VERSIONS" ]; then
     echo -e "${YELLOW}Warning: Python ${PYTHON_VERSION} not yet available in pyenv.${NC}"
     echo "Attempting to find the latest Python 3.14 release..."
     AVAILABLE_VERSIONS=$(pyenv install --list | grep -E "^\s*3\.14\.[0-9]+" | tail -1 | xargs)
-    
+
     if [ -z "$AVAILABLE_VERSIONS" ]; then
         echo -e "${RED}Error: Python 3.14.x not available in pyenv.${NC}"
         echo "Please update pyenv: cd \$(pyenv root) && git pull"
@@ -84,7 +84,7 @@ echo -e "${GREEN}Found Python version: ${PYTHON_VERSION}${NC}"
 if ! pyenv versions --bare | grep -q "^${PYTHON_VERSION}$"; then
     echo -e "${YELLOW}Installing Python ${PYTHON_VERSION}...${NC}"
     echo "This may take a few minutes..."
-    
+
     # Install dependencies based on OS
     if [[ "$OSTYPE" == "darwin"* ]]; then
         echo "Detected macOS"
@@ -101,7 +101,7 @@ if ! pyenv versions --bare | grep -q "^${PYTHON_VERSION}$"; then
         echo ""
         read -p "Press Enter to continue or Ctrl+C to cancel..."
     fi
-    
+
     pyenv install ${PYTHON_VERSION}
     echo -e "${GREEN}✓ Python ${PYTHON_VERSION} installed${NC}"
 else
@@ -137,20 +137,10 @@ pip install --upgrade pip setuptools wheel
 # Install requirements
 echo -e "${YELLOW}Installing dependencies...${NC}"
 
-if [ -f "requirements.txt" ]; then
-    echo "Installing requirements.txt..."
-    pip install -r requirements.txt
-fi
-
-if [ -f "requirements-dev.txt" ]; then
-    echo "Installing requirements-dev.txt..."
-    pip install -r requirements-dev.txt
-fi
-
-# Install package in development mode
-if [ -f "setup.py" ]; then
-    echo -e "${YELLOW}Installing worldengine in development mode...${NC}"
-    pip install -e .
+# Install package in development mode with all dependencies
+if [ -f "pyproject.toml" ]; then
+    echo "Installing worldengine with dependencies from pyproject.toml..."
+    pip install -e ".[hdf5,dev]"
 fi
 
 # Regenerate protobuf files if protoc is available

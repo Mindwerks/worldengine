@@ -1,50 +1,45 @@
 import numpy
-
 from noise import snoise2
 
+from worldengine.common import anti_alias, get_verbose
 from worldengine.model.world import Step
 from worldengine.simulations.basic import find_threshold_f
-from worldengine.simulations.hydrology import WatermapSimulation
-from worldengine.simulations.irrigation import IrrigationSimulation
-from worldengine.simulations.humidity import HumiditySimulation
-from worldengine.simulations.temperature import TemperatureSimulation
-from worldengine.simulations.permeability import PermeabilitySimulation
-from worldengine.simulations.erosion import ErosionSimulation
-from worldengine.simulations.precipitation import PrecipitationSimulation
 from worldengine.simulations.biome import BiomeSimulation
+from worldengine.simulations.erosion import ErosionSimulation
+from worldengine.simulations.humidity import HumiditySimulation
+from worldengine.simulations.hydrology import WatermapSimulation
 from worldengine.simulations.icecap import IcecapSimulation
-from worldengine.common import anti_alias, get_verbose
-
+from worldengine.simulations.irrigation import IrrigationSimulation
+from worldengine.simulations.permeability import PermeabilitySimulation
+from worldengine.simulations.precipitation import PrecipitationSimulation
+from worldengine.simulations.temperature import TemperatureSimulation
 
 # ------------------
 # Initial generation
 # ------------------
 
+
 def center_land(world):
     """Translate the map horizontally and vertically to put as much ocean as
-       possible at the borders. It operates on elevation and plates map"""
+    possible at the borders. It operates on elevation and plates map"""
 
-    y_sums = world.layers['elevation'].data.sum(1)  # 1 == sum along x-axis
+    y_sums = world.layers["elevation"].data.sum(1)  # 1 == sum along x-axis
     y_with_min_sum = y_sums.argmin()
     if get_verbose():
         print("geo.center_land: height complete")
 
-    x_sums = world.layers['elevation'].data.sum(0)  # 0 == sum along y-axis
+    x_sums = world.layers["elevation"].data.sum(0)  # 0 == sum along y-axis
     x_with_min_sum = x_sums.argmin()
     if get_verbose():
         print("geo.center_land: width complete")
 
     latshift = 0
-    world.layers['elevation'].data = numpy.roll(
-        numpy.roll(
-            world.layers['elevation'].data,
-            -y_with_min_sum + latshift, axis=0),
-        - x_with_min_sum, axis=1)
-    world.layers['plates'].data = numpy.roll(
-        numpy.roll(
-            world.layers['plates'].data,
-            -y_with_min_sum + latshift, axis=0),
-        - x_with_min_sum, axis=1)
+    world.layers["elevation"].data = numpy.roll(
+        numpy.roll(world.layers["elevation"].data, -y_with_min_sum + latshift, axis=0), -x_with_min_sum, axis=1
+    )
+    world.layers["plates"].data = numpy.roll(
+        numpy.roll(world.layers["plates"].data, -y_with_min_sum + latshift, axis=0), -x_with_min_sum, axis=1
+    )
     if get_verbose():
         print("geo.center_land: width complete")
 
@@ -57,8 +52,7 @@ def place_oceans_at_map_borders(world):
     ocean_border = int(min(30, max(world.width / 5, world.height / 5)))
 
     def place_ocean(x, y, i):
-        world.layers['elevation'].data[y, x] = \
-            (world.layers['elevation'].data[y, x] * i) / ocean_border
+        world.layers["elevation"].data[y, x] = (world.layers["elevation"].data[y, x] * i) / ocean_border
 
     for x in range(world.width):
         for i in range(ocean_border):
@@ -77,20 +71,20 @@ def add_noise_to_elevation(world, seed):
     for y in range(world.height):
         for x in range(world.width):
             n = snoise2(x / freq * 2, y / freq * 2, octaves, base=seed)
-            world.layers['elevation'].data[y, x] += n
+            world.layers["elevation"].data[y, x] += n
 
 
-def fill_ocean(elevation, sea_level):#TODO: Make more use of numpy?
+def fill_ocean(elevation, sea_level):  # TODO: Make more use of numpy?
     height, width = elevation.shape
 
     ocean = numpy.zeros(elevation.shape, dtype=bool)
     to_expand = []
-    for x in range(width):#handle top and bottom border of the map
+    for x in range(width):  # handle top and bottom border of the map
         if elevation[0, x] <= sea_level:
             to_expand.append((x, 0))
         if elevation[height - 1, x] <= sea_level:
             to_expand.append((x, height - 1))
-    for y in range(height):#handle left- and rightmost border of the map
+    for y in range(height):  # handle left- and rightmost border of the map
         if elevation[y, 0] <= sea_level:
             to_expand.append((0, y))
         if elevation[y, width - 1] <= sea_level:
@@ -113,14 +107,11 @@ def initialize_ocean_and_thresholds(world, ocean_level=1.0):
     :param ocean_level: the elevation representing the ocean level
     :return: nothing, the world will be changed
     """
-    e = world.layers['elevation'].data
+    e = world.layers["elevation"].data
     ocean = fill_ocean(e, ocean_level)
     hl = find_threshold_f(e, 0.10)  # the highest 10% of all (!) land are declared hills
     ml = find_threshold_f(e, 0.03)  # the highest 3% are declared mountains
-    e_th = [('sea', ocean_level),
-            ('plain', hl),
-            ('hill', ml),
-            ('mountain', None)]
+    e_th = [("sea", ocean_level), ("plain", hl), ("hill", ml), ("mountain", None)]
     harmonize_ocean(ocean, e, ocean_level)
     world.ocean = ocean
     world.elevation = (e, e_th)
@@ -144,12 +135,13 @@ def harmonize_ocean(ocean, elevation, ocean_level):
     deep_ocean = numpy.logical_and(elevation > midpoint, ocean_points)
     elevation[deep_ocean] = midpoint + ((elevation[deep_ocean] - midpoint) / 5.0)
 
+
 # ----
 # Misc
 # ----
 
-def sea_depth(world, sea_level):
 
+def sea_depth(world, sea_level):
     # a dynamic programming approach to gather how far the next land is
     # from a given coordinate up to a maximum distance of max_radius
     # result is 0 for land coordinates and -1 for coordinates further than
@@ -182,15 +174,15 @@ def sea_depth(world, sea_level):
     # possible TODO: make this a parameter
     factors = [0.0, 0.3, 0.5, 0.7, 0.9]
 
-    next_land = next_land_dynamic(world.layers['ocean'].data)
+    next_land = next_land_dynamic(world.layers["ocean"].data)
 
-    result = sea_level - world.layers['elevation'].data
+    result = sea_level - world.layers["elevation"].data
 
     for y in range(world.height):
         for x in range(world.width):
             dist_to_next_land = next_land[y, x]
             if dist_to_next_land > 0:
-                result[y, x] *= factors[dist_to_next_land-1]
+                result[y, x] *= factors[dist_to_next_land - 1]
 
     result = anti_alias(result, 10)
 
@@ -226,53 +218,53 @@ def generate_world(w, step):
     rng = numpy.random.RandomState(w.seed)
     # choose lowest common denominator (32 bit Windows numpy cannot handle a larger value)
     sub_seeds = rng.randint(0, numpy.iinfo(numpy.int32).max, size=100)
-     # after 0.19.0 do not ever switch out the seeds here to maximize seed-compatibility
+    # after 0.19.0 do not ever switch out the seeds here to maximize seed-compatibility
     seed_dict = {
-                 'PrecipitationSimulation': sub_seeds[ 0],
-                 'ErosionSimulation':       sub_seeds[ 1],
-                 'WatermapSimulation':      sub_seeds[ 2],
-                 'IrrigationSimulation':    sub_seeds[ 3],
-                 'TemperatureSimulation':   sub_seeds[ 4],
-                 'HumiditySimulation':      sub_seeds[ 5],
-                 'PermeabilitySimulation':  sub_seeds[ 6],
-                 'BiomeSimulation':         sub_seeds[ 7],
-                 'IcecapSimulation':        sub_seeds[ 8],
-                 '':                        sub_seeds[99]
+        "PrecipitationSimulation": sub_seeds[0],
+        "ErosionSimulation": sub_seeds[1],
+        "WatermapSimulation": sub_seeds[2],
+        "IrrigationSimulation": sub_seeds[3],
+        "TemperatureSimulation": sub_seeds[4],
+        "HumiditySimulation": sub_seeds[5],
+        "PermeabilitySimulation": sub_seeds[6],
+        "BiomeSimulation": sub_seeds[7],
+        "IcecapSimulation": sub_seeds[8],
+        "": sub_seeds[99],
     }
 
-    TemperatureSimulation().execute(w, seed_dict['TemperatureSimulation'])
+    TemperatureSimulation().execute(w, seed_dict["TemperatureSimulation"])
     # Precipitation with thresholds
-    PrecipitationSimulation().execute(w, seed_dict['PrecipitationSimulation'])
+    PrecipitationSimulation().execute(w, seed_dict["PrecipitationSimulation"])
 
     if not step.include_erosion:
         return w
-    ErosionSimulation().execute(w, seed_dict['ErosionSimulation'])  # seed not currently used
+    ErosionSimulation().execute(w, seed_dict["ErosionSimulation"])  # seed not currently used
     if get_verbose():
         print("...erosion calculated")
 
-    WatermapSimulation().execute(w, seed_dict['WatermapSimulation'])  # seed not currently used
+    WatermapSimulation().execute(w, seed_dict["WatermapSimulation"])  # seed not currently used
 
     # FIXME: create setters
-    IrrigationSimulation().execute(w, seed_dict['IrrigationSimulation'])  # seed not currently used
-    HumiditySimulation().execute(w, seed_dict['HumiditySimulation'])  # seed not currently used
+    IrrigationSimulation().execute(w, seed_dict["IrrigationSimulation"])  # seed not currently used
+    HumiditySimulation().execute(w, seed_dict["HumiditySimulation"])  # seed not currently used
 
-    PermeabilitySimulation().execute(w, seed_dict['PermeabilitySimulation'])
+    PermeabilitySimulation().execute(w, seed_dict["PermeabilitySimulation"])
 
-    cm, biome_cm = BiomeSimulation().execute(w, seed_dict['BiomeSimulation'])  # seed not currently used
+    cm, biome_cm = BiomeSimulation().execute(w, seed_dict["BiomeSimulation"])  # seed not currently used
     for cl in cm:
         count = cm[cl]
         if get_verbose():
             print("%s = %i" % (str(cl), count))
 
     if get_verbose():
-        print('')  # empty line
-        print('Biome obtained:')
+        print("")  # empty line
+        print("Biome obtained:")
 
     for cl in biome_cm:
         count = biome_cm[cl]
         if get_verbose():
             print(" %30s = %7i" % (str(cl), count))
 
-    IcecapSimulation().execute(w, seed_dict['IcecapSimulation'])  # makes use of temperature-map
+    IcecapSimulation().execute(w, seed_dict["IcecapSimulation"])  # makes use of temperature-map
 
     return w

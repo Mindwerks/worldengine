@@ -1,7 +1,7 @@
-class Step(object):
-    """ A Step in the world generation process.
-        The process starts with plates simulation and go on through different
-        intermediate steps to reach the 'full' step.
+class Step:
+    """A Step in the world generation process.
+    The process starts with plates simulation and go on through different
+    intermediate steps to reach the 'full' step.
     """
 
     def __init__(self, name):
@@ -19,7 +19,7 @@ class Step(object):
             return Step.precipitations()
         elif name == "full":
             return Step.full()
-        raise Exception("Unknown step '%s'" % name)
+        raise Exception(f"Unknown step '{name}'")
 
     @classmethod
     def full(cls):
@@ -50,5 +50,4 @@ class Step(object):
         return cls._plates
 
     def __eq__(self, other):
-        return isinstance(other, self.__class__) and \
-            self.__dict__ == other.__dict__
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__

@@ -9,19 +9,20 @@ except ImportError:
 import os
 import sys
 import tempfile
+
 import numpy
 
-'''
+"""
 Useful CLI tools:
 python worldengine export seed_24106.world --export-format envi --export-datatype float32
 gdal_translate -srcwin 375 384 128 128 seed_24106_elevation-32.envi test.envi
 gdal_translate test.envi -r cubicspline -outsize 1000% 1000% test2.envi
 gdal_translate test2.envi -scale -of PNG -ot Byte test.png
 gdal_translate test2.envi -scale -ot int32 test3.envi
-'''
+"""
 
 
-'''
+"""
 Whenever a GDAL short-format (http://www.gdal.org/formats_list.html) is given
 and a unique mapping to a file suffix exists, it is looked up in gdal_mapper.
 
@@ -30,26 +31,33 @@ Trivial ones (i.e. a call to lower() does the job) are not handled:
 
 All other formats (>100) currently end up with their respective GDAL short-format
 converted to lower-case and might need to be renamed by the user.
-'''
+"""
 gdal_mapper = {  # TODO: Find a way to make GDAL provide this mapping.
-    "aig"     : "adf",
-    "bsb"     : "kap",
-    "doq1"    : "doq",
-    "doq2"    : "doq",
-    "esat"    : "n1",
-    "grib"    : "grb",
-    "gtiff"   : "tif",
-    "hfa"     : "img",
-    "jdem"    : "mem",
-    "jpeg"    : "jpg",
-    "msgn"    : "nat",
+    "aig": "adf",
+    "bsb": "kap",
+    "doq1": "doq",
+    "doq2": "doq",
+    "esat": "n1",
+    "grib": "grb",
+    "gtiff": "tif",
+    "hfa": "img",
+    "jdem": "mem",
+    "jpeg": "jpg",
+    "msgn": "nat",
     "terragen": "ter",
-    "usgsdem" : "dem",
+    "usgsdem": "dem",
 }
 
 
-def export(world, export_filetype='GTiff', export_datatype='float32', export_dimensions=None,
-           export_normalize=None, export_subset=None, path='seed_output'):
+def export(
+    world,
+    export_filetype="GTiff",
+    export_datatype="float32",
+    export_dimensions=None,
+    export_normalize=None,
+    export_subset=None,
+    path="seed_output",
+):
     try:
         gdal
     except NameError:
@@ -58,7 +66,7 @@ def export(world, export_filetype='GTiff', export_datatype='float32', export_dim
 
     final_driver = gdal.GetDriverByName(export_filetype)
     if final_driver is None:
-        print("%s driver not registered." % export_filetype)
+        print(f"{export_filetype} driver not registered.")
         sys.exit(1)
 
     # try to find the proper file-suffix
@@ -72,40 +80,39 @@ def export(world, export_filetype='GTiff', export_datatype='float32', export_dim
     # translate export_datatype; http://www.gdal.org/gdal_8h.html#a22e22ce0a55036a96f652765793fb7a4
     export_datatype = export_datatype.lower()
 
-    if export_datatype in ['gdt_byte', 'uint8', 'int8', 'byte', 'char']:
+    if export_datatype in ["gdt_byte", "uint8", "int8", "byte", "char"]:
         bpp = 8  # GDAL does not support int8
         numpy_type = numpy.uint8
         gdal_type = gdal.GDT_Byte
-    elif export_datatype in ['gdt_uint16', 'uint16']:
+    elif export_datatype in ["gdt_uint16", "uint16"]:
         bpp = 16
         numpy_type = numpy.uint16
         gdal_type = gdal.GDT_UInt16
-    elif export_datatype in ['gdt_uint32', 'uint32']:
+    elif export_datatype in ["gdt_uint32", "uint32"]:
         bpp = 32
         numpy_type = numpy.uint32
         gdal_type = gdal.GDT_UInt32
-    elif export_datatype in ['gdt_int16', 'int16']:
+    elif export_datatype in ["gdt_int16", "int16"]:
         bpp = 16
         numpy_type = numpy.int16
         gdal_type = gdal.GDT_Int16
-    elif export_datatype in ['gdt_int32', 'int32', 'int']:  # fallback for 'int'
+    elif export_datatype in ["gdt_int32", "int32", "int"]:  # fallback for 'int'
         bpp = 32
         numpy_type = numpy.int32
         gdal_type = gdal.GDT_Int32
-    elif export_datatype in ['gdt_float32', 'float32', 'float']:  # fallback for 'float'
+    elif export_datatype in ["gdt_float32", "float32", "float"]:  # fallback for 'float'
         bpp = 32
         numpy_type = numpy.float32
         gdal_type = gdal.GDT_Float32
-    elif export_datatype in ['gdt_float64', 'float64']:
+    elif export_datatype in ["gdt_float64", "float64"]:
         bpp = 64
         numpy_type = numpy.float64
         gdal_type = gdal.GDT_Float64
     else:
-        raise TypeError(
-            "Type of data not recognized or not supported by GDAL: %s" % export_datatype)
+        raise TypeError(f"Type of data not recognized or not supported by GDAL: {export_datatype}")
 
     # massage data to scale between the absolute min and max
-    elevation = numpy.copy(world.layers['elevation'].data)
+    elevation = numpy.copy(world.layers["elevation"].data)
 
     # switch to final data type; no rounding performed
     elevation = elevation.astype(numpy_type)
@@ -141,16 +148,21 @@ def export(world, export_filetype='GTiff', export_datatype='float32', export_dim
     # apply changes to the dataset
     if export_dimensions or export_normalize:
         intermediate_ds = gdal.Translate(
-            '', intermediate_ds, format='MEM', width=width, height=height,
-            scaleParams=scale_param, resampleAlg=gdal.GRA_CubicSpline
-            #exponents=str(2)
-            )
+            "",
+            intermediate_ds,
+            format="MEM",
+            width=width,
+            height=height,
+            scaleParams=scale_param,
+            resampleAlg=gdal.GRA_CubicSpline,
+            # exponents=str(2)
+        )
 
     # only use a specific subset of dataset
     if export_subset is not None:
-        intermediate_ds = gdal.Translate('', intermediate_ds, format='MEM', srcWin=export_subset)
+        intermediate_ds = gdal.Translate("", intermediate_ds, format="MEM", srcWin=export_subset)
 
-    final_driver.CreateCopy('%s-%d.%s' % (path, bpp, export_filetype), intermediate_ds)
+    final_driver.CreateCopy("%s-%d.%s" % (path, bpp, export_filetype), intermediate_ds)
 
     intermediate_ds = None  # dereference
     os.close(fh_inter_file)

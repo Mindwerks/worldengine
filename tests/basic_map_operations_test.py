@@ -1,9 +1,9 @@
 import unittest
+
 from worldengine.basic_map_operations import distance, index_of_nearest
 
 
 class TestBasicMapOperations(unittest.TestCase):
-
     def setUp(self):
         pass
 
@@ -15,14 +15,11 @@ class TestBasicMapOperations(unittest.TestCase):
 
     def test_index_of_nearest(self):
         self.assertTrue(index_of_nearest((0, 0), []) is None)
-        self.assertEqual(0, index_of_nearest(
-            (0, 0), [(0, 0), (10, 10), (7, 7), (-5, -5), (-2, 7)]))
-        self.assertEqual(3, index_of_nearest(
-            (-4, -4), [(0, 0), (10, 10), (7, 7), (-5, -5), (-2, 7)]))
-        self.assertEqual(3, index_of_nearest(
-            (-100, -100), [(0, 0), (10, 10), (7, 7), (-5, -5), (-2, 7)]))
-        self.assertEqual(3, index_of_nearest(
-            (-100.0, -100.0), [(0, 0), (10, 10), (7, 7), (-5, -5), (-2, 7)]))
+        self.assertEqual(0, index_of_nearest((0, 0), [(0, 0), (10, 10), (7, 7), (-5, -5), (-2, 7)]))
+        self.assertEqual(3, index_of_nearest((-4, -4), [(0, 0), (10, 10), (7, 7), (-5, -5), (-2, 7)]))
+        self.assertEqual(3, index_of_nearest((-100, -100), [(0, 0), (10, 10), (7, 7), (-5, -5), (-2, 7)]))
+        self.assertEqual(3, index_of_nearest((-100.0, -100.0), [(0, 0), (10, 10), (7, 7), (-5, -5), (-2, 7)]))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
