@@ -4,7 +4,7 @@ except ImportError:
     try:
         import gdal
     except ImportError:
-        print("Unable to load GDAL support, no heightmap export possible.")
+        gdal = None  # GDAL not available - export functions will handle this
 
 import os
 import sys

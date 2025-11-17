@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ master, python314 ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
   workflow_dispatch:
