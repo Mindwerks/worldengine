@@ -106,7 +106,6 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/blessed_images/generated_blessed_images.py" = ["F403", "F405"]  # Star imports used for image generation
 "setup.py" = ["F821"]  # __version__ defined via exec()
 
 [dependency-groups]

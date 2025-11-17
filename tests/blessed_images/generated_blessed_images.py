@@ -9,9 +9,23 @@ A script, generate_blessed_images, can be used to regenerate blessed images
 
 import os
 
-from worldengine.draw import *
+from worldengine.draw import (
+    draw_ancientmap_on_file,
+    draw_biome_on_file,
+    draw_elevation_on_file,
+    draw_grayscale_heightmap_on_file,
+    draw_ocean_on_file,
+    draw_precipitation_on_file,
+    draw_rivers_on_image,
+    draw_riversmap_on_file,
+    draw_satellite_on_file,
+    draw_scatter_plot_on_file,
+    draw_simple_elevation_on_file,
+    draw_temperature_levels_on_file,
+    draw_world_on_file,
+)
 from worldengine.image_io import PNGWriter
-from worldengine.model.world import *
+from worldengine.model.world import World
 
 
 def main(blessed_images_dir, tests_data_dir):
