@@ -121,7 +121,9 @@ class World:
 
     @classmethod
     def from_dict(cls, in_dict):
-        instance = World(in_dict["name"], Size(in_dict["width"], in_dict["height"]))
+        instance = World(
+            in_dict["name"], Size(in_dict["width"], in_dict["height"]), in_dict["seed"], in_dict["generation_params"]
+        )
         for k in in_dict:
             instance.__dict__[k] = in_dict[k]
         return instance
