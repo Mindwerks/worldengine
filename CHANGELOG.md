@@ -1,9 +1,13 @@
-Version 0.20 (UNRELEASED)
+Version 0.20
 
 * Calculation of sea depth is now faster.
 * Hydrology simulation is now faster.
 * BiomeGroups are now configurable via the class hierarchy.
 * Ancient map is now faster.
+* Dropped support for Python 2
+* Dropped support for Python 3 <= 3.8
+* Support Python up to 3.14
+* Bumped to PyPlatec 1.4.3
 
 Version 0.19
 
