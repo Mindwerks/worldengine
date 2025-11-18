@@ -4,7 +4,7 @@ WorldEngine - a world generator
 [![CI](https://github.com/Mindwerks/worldengine/actions/workflows/ci.yml/badge.svg)](https://github.com/Mindwerks/worldengine/actions/workflows/ci.yml)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 
-_The current stable version is 0.19.0_
+_The current stable version is 0.20.0_
 
 You can generate the data for your own world, including a number of images (heightmap, biomes, etc.).
 
