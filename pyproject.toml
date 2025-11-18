@@ -29,7 +29,7 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
-    "PyPlatec==1.4.2",
+    "PyPlatec==1.4.3",
     "pypng>=0.20220715.0",
     "numpy>=1.24.0",
     "noise==1.2.2",
