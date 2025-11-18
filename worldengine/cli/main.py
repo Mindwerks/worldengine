@@ -392,7 +392,7 @@ def main():
         "--ocean_level",
         dest="ocean_level",
         type=float,
-        help='elevation cut off for sea level " +' "[default = %(default)s]",
+        help='elevation cut off for sea level " +[default = %(default)s]',
         metavar="N",
         default=1.0,
     )
