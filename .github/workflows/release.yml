@@ -32,12 +32,9 @@ jobs:
         name: sdist
         path: dist/*.tar.gz
 
-  build-wheels:
-    name: Build wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+  build-wheel:
+    name: Build universal wheel
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -55,15 +52,15 @@ jobs:
       run: |
         python -m build --wheel
 
-    - name: Upload wheels
+    - name: Upload wheel
       uses: actions/upload-artifact@v4
       with:
-        name: wheels-${{ matrix.os }}
+        name: wheel
         path: dist/*.whl
 
   publish:
     name: Publish to PyPI
-    needs: [build-sdist, build-wheels]
+    needs: [build-sdist, build-wheel]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     environment:
@@ -89,7 +86,7 @@ jobs:
 
   create-github-release-assets:
     name: Upload release assets
-    needs: [build-sdist, build-wheels]
+    needs: [build-sdist, build-wheel]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     permissions:
