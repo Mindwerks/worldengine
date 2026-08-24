@@ -1,8 +1,8 @@
 import numpy
-from noise import snoise2
 
 from worldengine.common import anti_alias, get_verbose
 from worldengine.model.world import Step
+from worldengine.simplex import snoise2
 from worldengine.simulations.basic import find_threshold_f
 from worldengine.simulations.biome import BiomeSimulation
 from worldengine.simulations.erosion import ErosionSimulation
@@ -68,10 +68,10 @@ def place_oceans_at_map_borders(world):
 def add_noise_to_elevation(world, seed):
     octaves = 8
     freq = 16.0 * octaves
-    for y in range(world.height):
-        for x in range(world.width):
-            n = snoise2(x / freq * 2, y / freq * 2, octaves, base=seed)
-            world.layers["elevation"].data[y, x] += n
+    x = numpy.arange(world.width)
+    y = numpy.arange(world.height).reshape(-1, 1)
+    n = snoise2(x / freq * 2, y / freq * 2, octaves, base=seed)
+    world.layers["elevation"].data += n
 
 
 def fill_ocean(elevation, sea_level):  # TODO: Make more use of numpy?

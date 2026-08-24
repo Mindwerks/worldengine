@@ -1,9 +1,9 @@
 import time
 
 import numpy
-from noise import snoise2
 
 from worldengine.common import get_verbose
+from worldengine.simplex import snoise2
 from worldengine.simulations.basic import find_threshold_f
 
 
@@ -38,7 +38,6 @@ class PrecipitationSimulation:
         height = world.height
         width = world.width
         border = width / 4
-        precipitations = numpy.zeros((height, width), dtype=float)
 
         octaves = 6
         freq = 64.0 * octaves
@@ -47,19 +46,19 @@ class PrecipitationSimulation:
         # so that worlds sharing a common seed but
         # different sizes will have similar patterns
 
-        for y in range(height):  # TODO: numpy
-            for x in range(width):
-                n = snoise2((x * n_scale) / freq, (y * n_scale) / freq, octaves, base=base)
+        x = numpy.arange(width)
+        y = numpy.arange(height).reshape(-1, 1)
+        y_sampled = (y * n_scale) / freq
 
-                # Added to allow noise pattern to wrap around right and left.
-                if x < border:
-                    n = (snoise2((x * n_scale) / freq, (y * n_scale) / freq, octaves, base=base) * x / border) + (
-                        snoise2(((x * n_scale) + width) / freq, (y * n_scale) / freq, octaves, base=base)
-                        * (border - x)
-                        / border
-                    )
+        precipitations = snoise2((x * n_scale) / freq, y_sampled, octaves, base=base).astype(float)
 
-                precipitations[y, x] = n
+        # Added to allow noise pattern to wrap around right and left.
+        wrapped = snoise2(((x * n_scale) + width) / freq, y_sampled, octaves, base=base).astype(float)
+        precipitations = numpy.where(
+            x < border,
+            precipitations * x / border + wrapped * (border - x) / border,
+            precipitations,
+        )
 
         # find ranges
         min_precip = precipitations.min()

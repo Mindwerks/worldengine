@@ -1,6 +1,6 @@
 import numpy
-from noise import snoise2  # http://nullege.com/codes/search/noise.snoise2
 
+from worldengine.simplex import snoise2
 from worldengine.simulations.basic import find_threshold_f
 
 
@@ -33,7 +33,6 @@ class TemperatureSimulation:
 
         rng = numpy.random.RandomState(seed)  # create our own random generator
         base = rng.randint(0, 4096)
-        temp = numpy.zeros((height, width), dtype=float)
 
         """
         Set up variables to take care of some orbital parameters:
@@ -71,32 +70,26 @@ class TemperatureSimulation:
         freq = 16.0 * octaves
         n_scale = 1024 / float(height)
 
-        for y in range(0, height):  # TODO: Check for possible numpy optimizations.
-            y_scaled = float(y) / height - 0.5  # -0.5...0.5
+        x = numpy.arange(width)
+        y = numpy.arange(height).reshape(-1, 1)
+        y_scaled = y / height - 0.5  # -0.5...0.5
 
-            # map/linearly interpolate y_scaled to latitude measured from where the most sunlight hits the world:
-            # 1.0 = hottest zone, 0.0 = coldest zone
-            latitude_factor = numpy.interp(
-                y_scaled, [axial_tilt - 0.5, axial_tilt, axial_tilt + 0.5], [0.0, 1.0, 0.0], left=0.0, right=0.0
-            )
-            for x in range(0, width):
-                n = snoise2((x * n_scale) / freq, (y * n_scale) / freq, octaves, base=base)
+        # map/linearly interpolate y_scaled to latitude measured from where the most sunlight hits the world:
+        # 1.0 = hottest zone, 0.0 = coldest zone
+        latitude_factor = numpy.interp(
+            y_scaled, [axial_tilt - 0.5, axial_tilt, axial_tilt + 0.5], [0.0, 1.0, 0.0], left=0.0, right=0.0
+        )
 
-                # Added to allow noise pattern to wrap around right and left.
-                if x <= border:
-                    n = (snoise2((x * n_scale) / freq, (y * n_scale) / freq, octaves, base=base) * x / border) + (
-                        snoise2(((x * n_scale) + width) / freq, (y * n_scale) / freq, octaves, base=base)
-                        * (border - x)
-                        / border
-                    )
+        y_sampled = (y * n_scale) / freq
+        n = snoise2((x * n_scale) / freq, y_sampled, octaves, base=base).astype(float)
 
-                t = (latitude_factor * 12 + n * 1) / 13.0 / distance_to_sun
-                if elevation[y, x] > mountain_level:  # vary temperature based on height
-                    if elevation[y, x] > (mountain_level + 29):
-                        altitude_factor = 0.033
-                    else:
-                        altitude_factor = 1.00 - (float(elevation[y, x] - mountain_level) / 30)
-                    t *= altitude_factor
-                temp[y, x] = t
+        # Added to allow noise pattern to wrap around right and left.
+        wrapped = snoise2(((x * n_scale) + width) / freq, y_sampled, octaves, base=base).astype(float)
+        n = numpy.where(x <= border, n * x / border + wrapped * (border - x) / border, n)
 
-        return temp
+        temp = (latitude_factor * 12 + n * 1) / 13.0 / distance_to_sun
+
+        # vary temperature based on height
+        drop = (elevation.astype(float) - mountain_level) / 30
+        altitude_factor = numpy.where(elevation > (mountain_level + 29), 0.033, 1.00 - drop)
+        return numpy.where(elevation > mountain_level, temp * altitude_factor, temp)
