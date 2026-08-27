@@ -1,6 +1,6 @@
 import numpy
-from noise import snoise2
 
+from worldengine.simplex import snoise2
 from worldengine.simulations.basic import find_threshold_f
 
 
@@ -24,15 +24,9 @@ class PermeabilitySimulation:
         rng = numpy.random.RandomState(seed)  # create our own random generator
         base = rng.randint(0, 4096)
 
-        perm = numpy.zeros((height, width), dtype=float)
-
         octaves = 6
         freq = 64.0 * octaves
 
-        for y in range(0, height):  # TODO: numpy optimization?
-            # yscaled = float(y) / height  # TODO: what is this?
-            for x in range(0, width):
-                n = snoise2(x / freq, y / freq, octaves, base=base)
-                perm[y, x] = n
-
-        return perm
+        x = numpy.arange(width)
+        y = numpy.arange(height).reshape(-1, 1)
+        return snoise2(x / freq, y / freq, octaves, base=base).astype(float)
