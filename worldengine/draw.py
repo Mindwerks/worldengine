@@ -221,7 +221,7 @@ def add_colors(*args):
     """Do some *args magic to return a tuple, which has the sums of all tuples in *args"""
     # Adapted from an answer here: http://stackoverflow.com/questions/14180866/sum-each-value-in-a-list-of-tuples
     # Convert to int to avoid overflow issues with uint8 arrays in NumPy 2.x
-    added = [sum(int(x) if isinstance(x, (numpy.integer, numpy.uint8)) else x for x in vals) for vals in zip(*args)]
+    added = [sum(int(x) if isinstance(x, numpy.integer | numpy.uint8) else x for x in vals) for vals in zip(*args)]
     return numpy.clip(added, 0, 255)  # restrict to uint8
 
 
