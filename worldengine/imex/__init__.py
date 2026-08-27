@@ -58,9 +58,7 @@ def export(
     export_subset=None,
     path="seed_output",
 ):
-    try:
-        gdal
-    except NameError:
+    if gdal is None:
         print("Cannot export: please install pygdal.")
         sys.exit(1)
 
