@@ -341,9 +341,9 @@ wheels = [
 
 [[package]]
 name = "gdal"
-version = "3.12.0.post1"
+version = "3.13.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/95/fc/9d187c4d280122b497c2d4c25a1c3b1ba50e5e1836924e49323685999c43/gdal-3.12.0.post1.tar.gz", hash = "sha256:d2b68361c7cf2ef7caa8cbb8549a315080301564e3f025d1842df71a4e406236", size = 902365, upload-time = "2025-11-07T23:40:07.734Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/92/55/0ae08a59293443bbbb8b692d1f4b6d9ca54562c359a48d0426684ac9ea06/gdal-3.13.1.tar.gz", hash = "sha256:94bb64d729ce73ceb75a314a15cba92696cdd854d99b6bf6b88a7b551227db74", size = 940649, upload-time = "2026-06-05T10:50:14.929Z" }
 
 [[package]]
 name = "h5py"
